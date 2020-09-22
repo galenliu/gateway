@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:device:fruit-vegetable-purifier:0000A09C",
+  "description": "Fruit Vegetable Purifier",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:fruit-vegetable-purifier:00007872"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:physical-controls-locked:00007807",
+    "urn:miot-spec-v2:service:alarm:00007804"
+  ]
+}

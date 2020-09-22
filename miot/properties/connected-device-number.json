@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:connected-device-number:000000A0",
+  "description": "Connected Device Number",
+  "format": "uint16",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    100,
+    1
+  ]
+}

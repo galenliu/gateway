@@ -1,0 +1,13 @@
+{
+  "type": "urn:miot-spec-v2:device:router:0000A036",
+  "description": "Router",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:router:00007864"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:wifi:0000788F",
+    "urn:miot-spec-v2:service:guest-wifi:00007890",
+    "urn:miot-spec-v2:service:indicator-light:00007803"
+  ]
+}

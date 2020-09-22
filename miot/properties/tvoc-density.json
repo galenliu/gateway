@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:tvoc-density:00000065",
+  "description": "TVOC Density",
+  "format": "float",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    1,
+    0.1
+  ],
+  "unit": "mg/m3"
+}

@@ -1,0 +1,9 @@
+{
+  "type": "urn:miot-spec-v2:service:smoke-sensor:00007838",
+  "description": "Smoke Sensor",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:smoke-concentration:00000068"
+  ]
+}

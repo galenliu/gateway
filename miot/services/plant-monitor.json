@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:service:plant-monitor:0000784B",
+  "description": "Plant Monitor",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:temperature:00000020",
+    "urn:miot-spec-v2:property:relative-humidity:0000000C",
+    "urn:miot-spec-v2:property:soil-ec:00000084",
+    "urn:miot-spec-v2:property:illumination:0000004E"
+  ]
+}

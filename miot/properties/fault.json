@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:fault:00000009",
+  "description": "Device Fault",
+  "format": "uint8",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-list": [
+    {
+      "value": 0,
+      "description": "No Faults"
+    }
+  ]
+}

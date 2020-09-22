@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:left-step-count:000000F8",
+  "description": "Left Step Count",
+  "format": "uint16",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    1000,
+    1
+  ]
+}

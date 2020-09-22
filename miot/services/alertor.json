@@ -1,0 +1,13 @@
+{
+  "type": "urn:miot-spec-v2:service:alertor:0000788A",
+  "description": "Alertor",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:fault:00000009"
+  ],
+  "required-events": [
+    "urn:miot-spec-v2:event:alert:00005018"
+  ]
+}

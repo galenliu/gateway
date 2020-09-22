@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:service:video-doorbell:00007863",
+  "description": "Video Doorbell",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:night-shot:00000057",
+    "urn:miot-spec-v2:property:time-watermark:00000087",
+    "urn:miot-spec-v2:property:wdr-mode:00000088",
+    "urn:miot-spec-v2:property:eco:00000024",
+    "urn:miot-spec-v2:property:ringtone:0000009D"
+  ],
+  "optional-events": [
+    "urn:miot-spec-v2:event:doorbell-ring:00005013"
+  ]
+}

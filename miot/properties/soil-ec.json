@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:soil-ec:00000084",
+  "description": "Soil EC",
+  "format": "uint8",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    20,
+    1
+  ]
+}

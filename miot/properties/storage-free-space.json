@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:storage-free-space:0000008E",
+  "description": "Storage Free Space",
+  "format": "uint8",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    10,
+    1
+  ]
+}

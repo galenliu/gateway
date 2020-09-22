@@ -1,0 +1,8 @@
+{
+  "type": "urn:miot-spec-v2:action:start-room-sweep:00002826",
+  "description": "Start Room Sweep",
+  "in": [
+    "urn:miot-spec-v2:property:room-ids:00000073"
+  ],
+  "out": []
+}

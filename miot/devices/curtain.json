@@ -1,0 +1,8 @@
+{
+  "type": "urn:miot-spec-v2:device:curtain:0000A00C",
+  "description": "Curtain",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:curtain:00007816"
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:channel-up:00002815",
+  "description": "Channel Up",
+  "in": [],
+  "out": []
+}

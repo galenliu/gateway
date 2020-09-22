@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:property:recipe-command:000000FD",
+  "description": "Recipe Command",
+  "format": "string",
+  "access": []
+}

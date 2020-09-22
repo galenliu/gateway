@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:working-time:00000079",
+  "description": "Working Time",
+  "format": "uint32",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    300,
+    1
+  ],
+  "unit": "minutes"
+}

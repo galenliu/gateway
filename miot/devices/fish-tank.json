@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:device:fish-tank:0000A0A2",
+  "description": "Fish Tank",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:fish-tank:00007894"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:light:00007802",
+    "urn:miot-spec-v2:service:tds-sensor:0000780D"
+  ]
+}

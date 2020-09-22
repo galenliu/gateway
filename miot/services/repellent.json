@@ -1,0 +1,7 @@
+{
+  "type": "urn:miot-spec-v2:service:repellent:0000785A",
+  "description": "Repellent",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:repellent-left-level:0000009B"
+  ]
+}

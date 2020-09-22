@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:service:detergent-management:0000788B",
+  "description": "Detergent Management",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:detergent-left-level:000000D1",
+    "urn:miot-spec-v2:property:detergent-self-delivery:000000D0"
+  ],
+  "optional-events": [
+    "urn:miot-spec-v2:event:low-detergent-level:00005019"
+  ]
+}

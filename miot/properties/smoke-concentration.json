@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:smoke-concentration:00000068",
+  "description": "Smoke Concentration",
+  "format": "float",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    100,
+    1
+  ],
+  "unit": "percentage"
+}

@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:device:alertor:0000A040",
+  "description": "Alertor",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:alertor:0000788A"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:battery:00007805"
+  ]
+}

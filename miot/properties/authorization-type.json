@@ -1,0 +1,20 @@
+{
+  "type": "urn:miot-spec-v2:property:authorization-type:00000062",
+  "description": "Authorization Type",
+  "format": "uint8",
+  "access": [],
+  "value-list": [
+    {
+      "value": 0,
+      "description": "None"
+    },
+    {
+      "value": 1,
+      "description": "Basic"
+    },
+    {
+      "value": 2,
+      "description": "Digest"
+    }
+  ]
+}

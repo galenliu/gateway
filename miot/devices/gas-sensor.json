@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:device:gas-sensor:0000A022",
+  "description": "Gas Sensor",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:gas-sensor:00007837"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:battery:00007805"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "type": "urn:miot-spec-v2:action:set-channel-number:00002817",
+  "description": "Set Channel Number",
+  "in": [
+    "urn:miot-spec-v2:property:channel-number:00000045"
+  ],
+  "out": []
+}

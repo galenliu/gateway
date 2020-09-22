@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:input-source-switch:0000282A",
+  "description": "Input Source Switch",
+  "in": [],
+  "out": []
+}

@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:service:motor-controller:00007832",
+  "description": "Motor Controller",
+  "required-properties": [
+    "urn:miot-spec-v2:property:motor-control:00000038",
+    "urn:miot-spec-v2:property:fault:00000009"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:target-position:0000003A",
+    "urn:miot-spec-v2:property:current-position:00000039"
+  ]
+}

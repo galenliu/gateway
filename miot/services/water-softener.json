@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:service:water-softener:00007876",
+  "description": "Water Softener",
+  "required-properties": [
+    "urn:miot-spec-v2:property:fault:00000009"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:water-hardness:000000B7"
+  ],
+  "required-actions": [
+    "urn:miot-spec-v2:action:resin-regeneration:00002833"
+  ]
+}

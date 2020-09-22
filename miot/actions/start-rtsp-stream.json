@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:action:start-rtsp-stream:00002820",
+  "description": "Start Camera Stream for Alexa",
+  "in": [
+    "urn:miot-spec-v2:property:authorization-type:00000062",
+    "urn:miot-spec-v2:property:video-codec-type:0000005A",
+    "urn:miot-spec-v2:property:video-attribute:0000005B",
+    "urn:miot-spec-v2:property:audio-codec-type:0000005C",
+    "urn:miot-spec-v2:property:audio-attribute:0000005D"
+  ],
+  "out": [
+    "urn:miot-spec-v2:property:stream-address:0000005E",
+    "urn:miot-spec-v2:property:image-snapshot:00000064",
+    "urn:miot-spec-v2:property:expiration-time:00000063"
+  ]
+}

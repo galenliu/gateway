@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:device:sleep-monitor:0000A080",
+  "description": "Sleep Monitor",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:sleep-monitor:00007885"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:vital-signs:00007866"
+  ]
+}

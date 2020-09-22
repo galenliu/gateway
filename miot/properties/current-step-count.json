@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:current-step-count:0000007B",
+  "description": "Current Step Count",
+  "format": "uint32",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    10000,
+    1
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:wifi-band-combine:000000E0",
+  "description": "WiFi Band Combine",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:left-time:0000003C",
+  "description": "Left Time",
+  "format": "uint16",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "unit": "minutes",
+  "value-range": [
+    0,
+    1440,
+    1
+  ]
+}

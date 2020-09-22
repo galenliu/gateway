@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:device:air-monitor:0000A008",
+  "description": "Air Monitor",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:air-monitor:00007812",
+    "urn:miot-spec-v2:service:environment:0000780A"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:battery:00007805",
+    "urn:miot-spec-v2:service:screen:00007806",
+    "urn:miot-spec-v2:service:alarm:00007804",
+    "urn:miot-spec-v2:service:indicator-light:00007803"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "type": "urn:miot-spec-v2:action:play-text:00002841",
+  "description": "Play Text",
+  "in": [
+    "urn:miot-spec-v2:property:text-content:000000FA"
+  ],
+  "out": []
+}

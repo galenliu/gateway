@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:target-distance:00000076",
+  "description": "Target Distance",
+  "format": "uint32",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    50000,
+    1
+  ]
+}

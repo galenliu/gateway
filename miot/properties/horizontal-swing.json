@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:horizontal-swing:00000017",
+  "description": "Horizontal Swing",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

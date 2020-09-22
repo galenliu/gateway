@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:brush-left-time:00000086",
+  "description": "Brush Left Time",
+  "format": "uint16",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    100,
+    1
+  ],
+  "unit": "days"
+}

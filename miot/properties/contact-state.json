@@ -1,0 +1,9 @@
+{
+  "type": "urn:miot-spec-v2:property:contact-state:0000007C",
+  "description": "Contact State",
+  "format": "bool",
+  "access": [
+    "read",
+    "notify"
+  ]
+}

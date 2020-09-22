@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:service:temperature-humidity-sensor:00007814",
+  "description": "Temperature Humidity Sensor",
+  "required-properties": [
+    "urn:miot-spec-v2:property:temperature:00000020",
+    "urn:miot-spec-v2:property:relative-humidity:0000000C"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:pm2.5-density:00000034",
+    "urn:miot-spec-v2:property:atmospheric-pressure:00000036"
+  ]
+}

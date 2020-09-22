@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:gateway-ip-address:000000D9",
+  "description": "Gateway IP Address",
+  "format": "string",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

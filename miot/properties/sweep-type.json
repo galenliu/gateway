@@ -1,0 +1,28 @@
+{
+  "type": "urn:miot-spec-v2:property:sweep-type:000000D3",
+  "description": "Sweep Type",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-list": [
+    {
+      "value": 1,
+      "description": "Global"
+    },
+    {
+      "value": 2,
+      "description": "Edge"
+    },
+    {
+      "value": 3,
+      "description": "Point"
+    },
+    {
+      "value": 4,
+      "description": "Area"
+    }
+  ]
+}

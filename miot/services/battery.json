@@ -1,0 +1,17 @@
+{
+  "type": "urn:miot-spec-v2:service:battery:00007805",
+  "description": "Battery",
+  "required-properties": [
+    "urn:miot-spec-v2:property:battery-level:00000014"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:charging-state:00000015",
+    "urn:miot-spec-v2:property:voltage:00000031"
+  ],
+  "optional-events": [
+    "urn:miot-spec-v2:event:low-battery:00005003"
+  ],
+  "optional-actions": [
+    "urn:miot-spec-v2:action:start-charge:00002802"
+  ]
+}

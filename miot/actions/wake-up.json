@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:wake-up:0000283F",
+  "description": "Wake Up",
+  "in": [],
+  "out": []
+}

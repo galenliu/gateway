@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:property:keep-warm-temperature:0000002E",
+  "description": "Keep Warm Temperature",
+  "format": "float",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "unit": "celsius",
+  "value-range": [
+    0,
+    100,
+    1
+  ]
+}

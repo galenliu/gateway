@@ -1,0 +1,13 @@
+{
+  "type": "urn:miot-spec-v2:property:volume-decrease:00000083",
+  "description": "Volume Decrease Value",
+  "format": "uint8",
+  "access": [
+    "write"
+  ],
+  "value-range": [
+    1,
+    20,
+    1
+  ]
+}

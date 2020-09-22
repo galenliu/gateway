@@ -1,0 +1,19 @@
+{
+  "type": "urn:miot-spec-v2:service:electronic-valve:0000789E",
+  "description": "Electronic Valve",
+  "required-properties": [
+    "urn:miot-spec-v2:property:valve-switch:000000FE",
+    "urn:miot-spec-v2:property:target-water-level:00000069"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:target-time:00000078",
+    "urn:miot-spec-v2:property:abnormal-condition:00000095"
+  ],
+  "optional-events": [
+    "urn:miot-spec-v2:event:exception-occurred:00005011"
+  ]
+}

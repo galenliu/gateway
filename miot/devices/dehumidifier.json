@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:device:dehumidifier:0000A02D",
+  "description": "Dehumidifier",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:dehumidifier:00007841"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:environment:0000780A",
+    "urn:miot-spec-v2:service:alarm:00007804",
+    "urn:miot-spec-v2:service:indicator-light:00007803",
+    "urn:miot-spec-v2:service:physical-controls-locked:00007807"
+  ]
+}

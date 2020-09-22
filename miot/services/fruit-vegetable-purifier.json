@@ -1,0 +1,21 @@
+{
+  "type": "urn:miot-spec-v2:service:fruit-vegetable-purifier:00007872",
+  "description": "Fruit Vegetable Purifier",
+  "required-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:wash-mode:000000B1"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:wash-time:0000006D",
+    "urn:miot-spec-v2:property:left-time:0000003C",
+    "urn:miot-spec-v2:property:target-water-level:00000069"
+  ],
+  "optional-events": [
+    "urn:miot-spec-v2:event:wash-end:0000500B"
+  ],
+  "required-actions": [
+    "urn:miot-spec-v2:action:start-wash:00002824",
+    "urn:miot-spec-v2:action:pause:0000280C"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:device:treadmill:0000A035",
+  "description": "Treadmill",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:treadmill:00007851"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:indicator-light:00007803"
+  ]
+}

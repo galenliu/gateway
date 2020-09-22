@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:deodorization:000000C6",
+  "description": "Deodorization",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "type": "urn:miot-spec-v2:property:fan-level:00000016",
+  "description": "Fan Level",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-list": [
+    {
+      "value": 0,
+      "description": "Auto"
+    },
+    {
+      "value": 1,
+      "description": "Level1"
+    }
+  ]
+}

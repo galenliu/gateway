@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:current-position:00000039",
+  "description": "Current Position",
+  "format": "uint8",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    100,
+    1
+  ],
+  "unit": "percentage"
+}

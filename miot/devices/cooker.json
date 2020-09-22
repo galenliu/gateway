@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:device:cooker:0000A00B",
+  "description": "Cooker",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:cooker:00007815"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:alarm:00007804"
+  ]
+}

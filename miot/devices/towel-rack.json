@@ -1,0 +1,8 @@
+{
+  "type": "urn:miot-spec-v2:device:towel-rack:0000A09A",
+  "description": "Towel Rack",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:towel-rack:0000785D"
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:stop-working:00002825",
+  "description": "Stop Working",
+  "in": [],
+  "out": []
+}

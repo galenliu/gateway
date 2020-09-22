@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:next:0000280F",
+  "description": "Next",
+  "in": [],
+  "out": []
+}

@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:device:sofa:0000A0A8",
+  "description": "Sofa",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:sofa:000078A1"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:backrest-control:0000782A"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:download-speed:0000009E",
+  "description": "Download Speed",
+  "format": "float",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    100,
+    0.1
+  ]
+}

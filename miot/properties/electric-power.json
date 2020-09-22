@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:electric-power:00000066",
+  "description": "Electric Power",
+  "format": "float",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    1000,
+    1
+  ],
+  "unit": "watt"
+}

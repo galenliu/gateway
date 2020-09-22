@@ -1,0 +1,19 @@
+{
+  "type": "urn:miot-spec-v2:service:motion-sensor:00007825",
+  "description": "Motion Sensor",
+  "required-properties": [
+    "urn:miot-spec-v2:property:motion-state:0000007D"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:illumination:0000004E",
+    "urn:miot-spec-v2:property:no-motion-duration:000000CB"
+  ],
+  "optional-events": [
+    "urn:miot-spec-v2:event:motion-detected:00005001",
+    "urn:miot-spec-v2:event:no-motion:00005002"
+  ]
+}

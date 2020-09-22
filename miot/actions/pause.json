@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:pause:0000280C",
+  "description": "Pause",
+  "in": [],
+  "out": []
+}

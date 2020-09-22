@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:subnet-mask:000000D8",
+  "description": "Subnet Mask",
+  "format": "string",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "type": "urn:miot-spec-v2:property:driving-status:000000B9",
+  "description": "Driving Status",
+  "format": "bool",
+  "access": [
+    "read",
+    "notify"
+  ]
+}

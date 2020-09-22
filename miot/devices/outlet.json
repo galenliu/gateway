@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:device:outlet:0000A002",
+  "description": "Outlet",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:switch:0000780C"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:indicator-light:00007803"
+  ]
+}

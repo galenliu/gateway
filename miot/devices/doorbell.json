@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:device:doorbell:0000A03B",
+  "description": "Doorbell",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:doorbell:00007857"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:indicator-light:00007803"
+  ]
+}

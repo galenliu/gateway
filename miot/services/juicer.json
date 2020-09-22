@@ -1,0 +1,19 @@
+{
+  "type": "urn:miot-spec-v2:service:juicer:0000785F",
+  "description": "Juicer",
+  "required-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:fault:00000009"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:left-time:0000003C",
+    "urn:miot-spec-v2:property:temperature:00000020",
+    "urn:miot-spec-v2:property:cook-mode:00000037",
+    "urn:miot-spec-v2:property:mode:00000008"
+  ],
+  "required-actions": [
+    "urn:miot-spec-v2:action:start-cook:00002806",
+    "urn:miot-spec-v2:action:cancel-cooking:00002807"
+  ]
+}

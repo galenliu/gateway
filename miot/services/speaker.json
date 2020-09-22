@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:service:speaker:0000781C",
+  "description": "Speaker",
+  "required-properties": [
+    "urn:miot-spec-v2:property:volume:00000013"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:mute:00000040"
+  ]
+}

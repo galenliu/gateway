@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:service:window-opener:00007889",
+  "description": "Window Opener",
+  "required-properties": [
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:motor-control:00000038"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:target-position:0000003A",
+    "urn:miot-spec-v2:property:current-position:00000039",
+    "urn:miot-spec-v2:property:speed-level:00000023"
+  ]
+}

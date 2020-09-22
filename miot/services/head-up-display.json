@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:service:head-up-display:00007887",
+  "description": "Head Up Display",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:driving-status:000000B9",
+    "urn:miot-spec-v2:property:longitude:000000BA",
+    "urn:miot-spec-v2:property:latitude:000000BB",
+    "urn:miot-spec-v2:property:current-address:000000BC"
+  ],
+  "optional-events": [
+    "urn:miot-spec-v2:event:location-update:0000501B"
+  ]
+}

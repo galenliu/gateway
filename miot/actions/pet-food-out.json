@@ -1,0 +1,8 @@
+{
+  "type": "urn:miot-spec-v2:action:pet-food-out:0000282B",
+  "description": "Pet Food Out",
+  "in": [
+    "urn:miot-spec-v2:property:feeding-measure:00000080"
+  ],
+  "out": []
+}

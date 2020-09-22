@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:mute-off:0000281A",
+  "description": "Mute Off",
+  "in": [],
+  "out": []
+}

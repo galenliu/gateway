@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:device:smoke-sensor:0000A023",
+  "description": "Smoke Sensor",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:smoke-sensor:00007838"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:battery:00007805"
+  ]
+}

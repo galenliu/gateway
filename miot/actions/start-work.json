@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:start-work:00002827",
+  "description": "Start Work",
+  "in": [],
+  "out": []
+}

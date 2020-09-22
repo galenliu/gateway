@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:property:default-open-position:000000C2",
+  "description": "Default Open Position",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    100,
+    1
+  ],
+  "unit": "percentage"
+}

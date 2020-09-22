@@ -1,0 +1,7 @@
+{
+  "type": "urn:miot-spec-v2:service:countdown:0000782D",
+  "description": "Countdown",
+  "required-properties": [
+    "urn:miot-spec-v2:property:countdown-time:00000055"
+  ]
+}

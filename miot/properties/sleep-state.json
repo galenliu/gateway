@@ -1,0 +1,31 @@
+{
+  "type": "urn:miot-spec-v2:property:sleep-state:000000C9",
+  "description": "Sleep State",
+  "format": "uint8",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-list": [
+    {
+      "value": 1,
+      "description": "Out of Bed"
+    },
+    {
+      "value": 2,
+      "description": "Awake"
+    },
+    {
+      "value": 3,
+      "description": "Light Sleep"
+    },
+    {
+      "value": 4,
+      "description": "Deep Sleep"
+    },
+    {
+      "value": 5,
+      "description": "Rapid Eye Movement"
+    }
+  ]
+}

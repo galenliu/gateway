@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:property:cook-time:000000C8",
+  "description": "Cook Time",
+  "format": "uint16",
+  "access": [],
+  "value-range": [
+    0,
+    600,
+    1
+  ],
+  "unit": "minutes"
+}

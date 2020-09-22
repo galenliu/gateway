@@ -1,0 +1,13 @@
+{
+  "type": "urn:miot-spec-v2:device:diffuser:0000A01E",
+  "description": "Diffuser",
+  "required-services": [
+    "urn:miot-spec-v2:service:diffuser:00007833",
+    "urn:miot-spec-v2:service:device-information:00007801"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:light:00007802",
+    "urn:miot-spec-v2:service:environment:0000780A",
+    "urn:miot-spec-v2:service:countdown:0000782D"
+  ]
+}

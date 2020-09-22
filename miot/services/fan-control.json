@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:service:fan-control:00007809",
+  "description": "Fan Control",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:fan-level:00000016",
+    "urn:miot-spec-v2:property:horizontal-swing:00000017",
+    "urn:miot-spec-v2:property:vertical-swing:00000018",
+    "urn:miot-spec-v2:property:horizontal-angle:00000019",
+    "urn:miot-spec-v2:property:vertical-angle:0000001A"
+  ]
+}

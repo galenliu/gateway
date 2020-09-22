@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:tds-in:0000002C",
+  "description": "Total Dissolved Solids for Input Water",
+  "format": "uint16",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    1000,
+    1
+  ]
+}

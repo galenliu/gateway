@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:no-motion-duration:000000CB",
+  "description": "No Motion Duration",
+  "format": "uint16",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    600,
+    60
+  ],
+  "unit": "seconds"
+}

@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:current-heat-level:0000009C",
+  "description": "Current Heat Level",
+  "format": "uint8",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    1,
+    5,
+    1
+  ]
+}

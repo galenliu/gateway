@@ -1,0 +1,9 @@
+{
+  "type": "urn:miot-spec-v2:property:current-address:000000BC",
+  "description": "Current Address",
+  "format": "string",
+  "access": [
+    "read",
+    "notify"
+  ]
+}

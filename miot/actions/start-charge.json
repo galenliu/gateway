@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:start-charge:00002802",
+  "description": "Start Charge",
+  "in": [],
+  "out": []
+}

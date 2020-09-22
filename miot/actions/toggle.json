@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:toggle:00002811",
+  "description": "Toggle",
+  "in": [],
+  "out": []
+}

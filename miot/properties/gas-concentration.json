@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:gas-concentration:00000067",
+  "description": "Gas Concentration",
+  "format": "float",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    100,
+    1
+  ],
+  "unit": "percentage"
+}

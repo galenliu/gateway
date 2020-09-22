@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:filter-used-flow:0000004A",
+  "description": "Filter Used Flow",
+  "format": "uint16",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    1000,
+    1
+  ]
+}

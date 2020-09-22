@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:vertical-angle:0000001A",
+  "description": "Vertical Angle",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    90,
+    1
+  ]
+}

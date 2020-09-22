@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:property:channel-name:00000046",
+  "description": "Channel Name",
+  "format": "string",
+  "access": []
+}

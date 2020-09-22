@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:device:gateway:0000A019",
+  "description": "Gateway",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:gateway:00007875"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:light:00007802",
+    "urn:miot-spec-v2:service:motion-sensor:00007825"
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:property:stream-auth-token:00000061",
+  "description": "Stream Auth Token",
+  "format": "string",
+  "access": []
+}

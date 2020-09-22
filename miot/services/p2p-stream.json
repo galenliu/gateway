@@ -1,0 +1,8 @@
+{
+  "type": "urn:miot-spec-v2:service:p2p-stream:00007881",
+  "description": "P2P Stream",
+  "optional-actions": [
+    "urn:miot-spec-v2:action:start-p2p-stream:00002839",
+    "urn:miot-spec-v2:action:stop-stream:00002822"
+  ]
+}

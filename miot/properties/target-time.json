@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:property:target-time:00000078",
+  "description": "Target Time",
+  "format": "uint32",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    300,
+    1
+  ],
+  "unit": "minutes"
+}

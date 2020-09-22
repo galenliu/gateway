@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:service:air-purifier:00007811",
+  "description": "Air Purifier",
+  "required-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:fault:00000009"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:fan-level:00000016",
+    "urn:miot-spec-v2:property:anion:00000025",
+    "urn:miot-spec-v2:property:uv:00000029",
+    "urn:miot-spec-v2:property:wet:0000002A"
+  ]
+}

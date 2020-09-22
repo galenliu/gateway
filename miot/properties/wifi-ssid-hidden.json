@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:wifi-ssid-hidden:000000E3",
+  "description": "WiFi SSID Hidden",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

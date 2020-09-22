@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:left-calorie-consumption:000000F6",
+  "description": "Left Calorie Consumption",
+  "format": "uint16",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    1000,
+    1
+  ]
+}

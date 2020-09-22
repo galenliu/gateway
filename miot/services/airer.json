@@ -1,0 +1,19 @@
+{
+  "type": "urn:miot-spec-v2:service:airer:00007817",
+  "description": "Airer",
+  "required-properties": [
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:motor-control:00000038"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:target-position:0000003A",
+    "urn:miot-spec-v2:property:current-position:00000039",
+    "urn:miot-spec-v2:property:dryer:00000027",
+    "urn:miot-spec-v2:property:drying-level:0000003B",
+    "urn:miot-spec-v2:property:left-time:0000003C",
+    "urn:miot-spec-v2:property:uv:00000029"
+  ]
+}

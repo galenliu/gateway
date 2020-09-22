@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:property:current-time:00000098",
+  "description": "Current Time",
+  "format": "string",
+  "access": []
+}

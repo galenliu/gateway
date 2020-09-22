@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:pop-up:00002832",
+  "description": "Pop Up",
+  "in": [],
+  "out": []
+}

@@ -1,0 +1,19 @@
+{
+  "type": "urn:miot-spec-v2:service:diffuser:00007833",
+  "description": "Diffuser",
+  "required-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:fault:00000009"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:fan-level:00000016",
+    "urn:miot-spec-v2:property:target-humidity:00000022",
+    "urn:miot-spec-v2:property:anion:00000025",
+    "urn:miot-spec-v2:property:water-level:0000003D"
+  ],
+  "optional-events": [
+    "urn:miot-spec-v2:event:low-water-level:0000500A"
+  ]
+}

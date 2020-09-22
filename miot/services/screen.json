@@ -1,0 +1,8 @@
+{
+  "type": "urn:miot-spec-v2:service:screen:00007806",
+  "description": "Screen",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:brightness:0000000D"
+  ]
+}

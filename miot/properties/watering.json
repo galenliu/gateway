@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:watering:000000CC",
+  "description": "Watering",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "type": "urn:miot-spec-v2:property:motion-state:0000007D",
+  "description": "Motion State",
+  "format": "bool",
+  "access": [
+    "read",
+    "notify"
+  ]
+}

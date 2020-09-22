@@ -1,0 +1,22 @@
+{
+  "type": "urn:miot-spec-v2:service:air-conditioner:0000780F",
+  "description": "Air Conditioner",
+  "required-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:target-temperature:00000021"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:target-humidity:00000022",
+    "urn:miot-spec-v2:property:eco:00000024",
+    "urn:miot-spec-v2:property:anion:00000025",
+    "urn:miot-spec-v2:property:heater:00000026",
+    "urn:miot-spec-v2:property:dryer:00000027",
+    "urn:miot-spec-v2:property:sleep-mode:00000028",
+    "urn:miot-spec-v2:property:soft-wind:000000CF",
+    "urn:miot-spec-v2:property:uv:00000029",
+    "urn:miot-spec-v2:property:un-straight-blowing:00000100"
+  ]
+}

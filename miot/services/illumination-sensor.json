@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:service:illumination-sensor:0000783D",
+  "description": "Illumination Sensor",
+  "required-properties": [
+    "urn:miot-spec-v2:property:illumination:0000004E"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:status:00000007"
+  ]
+}

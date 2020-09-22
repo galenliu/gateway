@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:property:stream-receiver-id:00000060",
+  "description": "Stream Receiver id",
+  "format": "string",
+  "access": []
+}

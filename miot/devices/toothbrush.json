@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:device:toothbrush:0000A07E",
+  "description": "Toothbrush",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:toothbrush:0000786D",
+    "urn:miot-spec-v2:service:brush-head:0000786C",
+    "urn:miot-spec-v2:service:battery:00007805"
+  ]
+}

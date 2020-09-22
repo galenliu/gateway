@@ -1,0 +1,13 @@
+{
+  "type": "urn:miot-spec-v2:device:bed:0000A06A",
+  "description": "Bed",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:bed:0000785C"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:backrest-control:0000782A",
+    "urn:miot-spec-v2:service:leg-rest-control:00007859",
+    "urn:miot-spec-v2:service:physical-controls-locked:00007807"
+  ]
+}

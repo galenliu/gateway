@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:property:volume:00000013",
+  "description": "Volume",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "unit": "percentage",
+  "value-range": [
+    0,
+    100,
+    1
+  ]
+}

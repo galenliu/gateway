@@ -1,0 +1,7 @@
+{
+  "type": "urn:miot-spec-v2:device:control-panel:0000A099",
+  "description": "Control Panel",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801"
+  ]
+}

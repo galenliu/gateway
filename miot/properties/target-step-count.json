@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:target-step-count:000000F7",
+  "description": "Target Step Count",
+  "format": "uint16",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    1000,
+    1
+  ]
+}

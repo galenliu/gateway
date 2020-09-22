@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:stop-stream:00002822",
+  "description": "Stop Camera Stream",
+  "in": [],
+  "out": []
+}

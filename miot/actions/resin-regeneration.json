@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:resin-regeneration:00002833",
+  "description": "Resin Regeneration",
+  "in": [],
+  "out": []
+}

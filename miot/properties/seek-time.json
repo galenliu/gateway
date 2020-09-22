@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:property:seek-time:00000042",
+  "description": "Seek Time",
+  "format": "int16",
+  "access": [],
+  "unit": "seconds",
+  "value-range": [
+    -30000,
+    30000,
+    10
+  ]
+}

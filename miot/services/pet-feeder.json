@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:service:pet-feeder:00007847",
+  "description": "Pet Feeder",
+  "required-properties": [
+    "urn:miot-spec-v2:property:fault:00000009"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:feeding-measure:00000080"
+  ],
+  "required-actions": [
+    "urn:miot-spec-v2:action:pet-food-out:0000282B"
+  ]
+}

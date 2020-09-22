@@ -1,0 +1,13 @@
+{
+  "type": "urn:miot-spec-v2:service:ambient-light:0000789D",
+  "description": "Ambient Light",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:brightness:0000000D",
+    "urn:miot-spec-v2:property:color-temperature:0000000F",
+    "urn:miot-spec-v2:property:color:0000000E",
+    "urn:miot-spec-v2:property:saturability:00000011",
+    "urn:miot-spec-v2:property:flow:00000010"
+  ]
+}

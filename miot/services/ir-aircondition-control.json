@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:service:ir-aircondition-control:00007824",
+  "description": "IR Aircondition Control",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:ir-mode:0000004C",
+    "urn:miot-spec-v2:property:ir-temperature:0000004D"
+  ],
+  "optional-actions": [
+    "urn:miot-spec-v2:action:turn-on:00002808",
+    "urn:miot-spec-v2:action:turn-off:00002809",
+    "urn:miot-spec-v2:action:fan-speed-up:0000281B",
+    "urn:miot-spec-v2:action:fan-speed-down:0000281C",
+    "urn:miot-spec-v2:action:temperature-up:0000281D",
+    "urn:miot-spec-v2:action:temperature-down:0000281E"
+  ]
+}

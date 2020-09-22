@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:speed-control:000000E8",
+  "description": "Speed Control",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

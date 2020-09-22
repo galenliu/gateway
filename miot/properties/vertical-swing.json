@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:vertical-swing:00000018",
+  "description": "Vertical Swing",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

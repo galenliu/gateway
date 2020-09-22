@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:device:vibration-sensor:0000A09B",
+  "description": "Vibration Sensor",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:vibration-sensor:0000786A"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:battery:00007805"
+  ]
+}

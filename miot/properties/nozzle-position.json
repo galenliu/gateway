@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:nozzle-position:000000C5",
+  "description": "Nozzle Position",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-range": [
+    1,
+    5,
+    1
+  ]
+}

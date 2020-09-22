@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:start-mop:00002834",
+  "description": "Start Mop",
+  "in": [],
+  "out": []
+}

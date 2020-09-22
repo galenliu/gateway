@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:property:response:00000044",
+  "description": "Response",
+  "format": "string",
+  "access": []
+}

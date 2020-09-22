@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:property:text-content:000000FA",
+  "description": "Text Content",
+  "format": "string",
+  "access": []
+}

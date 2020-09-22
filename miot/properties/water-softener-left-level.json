@@ -1,0 +1,19 @@
+{
+  "type": "urn:miot-spec-v2:property:water-softener-left-level:000000D2",
+  "description": "Water Softener Left Level",
+  "format": "uint8",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-list": [
+    {
+      "value": 1,
+      "description": "Normal"
+    },
+    {
+      "value": 2,
+      "description": "Low"
+    }
+  ]
+}

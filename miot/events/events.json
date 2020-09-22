@@ -1,0 +1,30 @@
+{
+  "types": [
+    "urn:miot-spec-v2:event:alert:00005018",
+    "urn:miot-spec-v2:event:back-locking:00005010",
+    "urn:miot-spec-v2:event:click:00005007",
+    "urn:miot-spec-v2:event:close:00005005",
+    "urn:miot-spec-v2:event:door-knocked:00005012",
+    "urn:miot-spec-v2:event:door-not-closed:00005006",
+    "urn:miot-spec-v2:event:doorbell-ring:00005013",
+    "urn:miot-spec-v2:event:double-click:00005008",
+    "urn:miot-spec-v2:event:exception-occurred:00005011",
+    "urn:miot-spec-v2:event:fall:00005015",
+    "urn:miot-spec-v2:event:location-update:0000501B",
+    "urn:miot-spec-v2:event:lock-locked:0000500F",
+    "urn:miot-spec-v2:event:lock-opened:0000500E",
+    "urn:miot-spec-v2:event:long-press:00005009",
+    "urn:miot-spec-v2:event:low-battery:00005003",
+    "urn:miot-spec-v2:event:low-detergent-level:00005019",
+    "urn:miot-spec-v2:event:low-water-level:0000500A",
+    "urn:miot-spec-v2:event:low-water-softener-level:0000501A",
+    "urn:miot-spec-v2:event:motion-detected:00005001",
+    "urn:miot-spec-v2:event:no-motion:00005002",
+    "urn:miot-spec-v2:event:no-submersion:0000500D",
+    "urn:miot-spec-v2:event:open:00005004",
+    "urn:miot-spec-v2:event:submersion-detected:0000500C",
+    "urn:miot-spec-v2:event:tilt:00005014",
+    "urn:miot-spec-v2:event:vibration:00005016",
+    "urn:miot-spec-v2:event:wash-end:0000500B"
+  ]
+}

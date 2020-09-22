@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:hcho-density:000000B0",
+  "description": "HCHO Density",
+  "format": "float",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    2,
+    0.01
+  ],
+  "unit": "mg/m3"
+}

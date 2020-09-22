@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:volume-down:00002813",
+  "description": "Volume Down",
+  "in": [],
+  "out": []
+}

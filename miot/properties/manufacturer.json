@@ -1,0 +1,8 @@
+{
+  "type": "urn:miot-spec-v2:property:manufacturer:00000001",
+  "description": "Device Manufacturer",
+  "format": "string",
+  "access": [
+    "read"
+  ]
+}

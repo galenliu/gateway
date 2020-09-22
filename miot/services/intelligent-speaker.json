@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:service:intelligent-speaker:0000789B",
+  "description": "Intelligent Speaker",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:text-content:000000FA",
+    "urn:miot-spec-v2:property:silent-execution:000000FB"
+  ],
+  "optional-actions": [
+    "urn:miot-spec-v2:action:wake-up:0000283F",
+    "urn:miot-spec-v2:action:play-radio:00002840",
+    "urn:miot-spec-v2:action:play-text:00002841",
+    "urn:miot-spec-v2:action:execute-text-directive:00002842"
+  ]
+}

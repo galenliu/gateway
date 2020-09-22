@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:service:wine-tank:0000789C",
+  "description": "Wine Tank",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:heating:000000C7",
+    "urn:miot-spec-v2:property:target-temperature:00000021",
+    "urn:miot-spec-v2:property:temperature:00000020",
+    "urn:miot-spec-v2:property:current-liquid-volume:000000F9"
+  ]
+}

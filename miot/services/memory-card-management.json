@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:service:memory-card-management:0000784E",
+  "description": "Memory Card Management",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:storage-total-space:0000008C",
+    "urn:miot-spec-v2:property:storage-free-space:0000008E",
+    "urn:miot-spec-v2:property:storage-used-space:0000008D"
+  ],
+  "optional-actions": [
+    "urn:miot-spec-v2:action:format:00002831",
+    "urn:miot-spec-v2:action:pop-up:00002832"
+  ]
+}

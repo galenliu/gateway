@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:service:water-softener-management:0000788C",
+  "description": "Water Softener Management",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:water-softener-left-level:000000D2"
+  ],
+  "optional-events": [
+    "urn:miot-spec-v2:event:low-water-softener-level:0000501A"
+  ]
+}

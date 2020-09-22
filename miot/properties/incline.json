@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:incline:00000074",
+  "description": "Incline",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    5,
+    1
+  ]
+}

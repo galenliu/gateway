@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:ringtone:0000009D",
+  "description": "Ringtone",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-range": [
+    1,
+    5,
+    1
+  ]
+}

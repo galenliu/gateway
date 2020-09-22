@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:start-wash:00002824",
+  "description": "Start Wash",
+  "in": [],
+  "out": []
+}

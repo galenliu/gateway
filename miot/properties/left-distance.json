@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:left-distance:00000077",
+  "description": "Left Distance",
+  "format": "uint32",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    50000,
+    1
+  ]
+}

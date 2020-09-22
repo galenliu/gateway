@@ -1,0 +1,13 @@
+{
+  "type": "urn:miot-spec-v2:service:pillow:0000788D",
+  "description": "Pillow",
+  "required-properties": [
+    "urn:miot-spec-v2:property:fault:00000009"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:working-time:00000079"
+  ]
+}

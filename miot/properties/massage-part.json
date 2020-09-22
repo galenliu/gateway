@@ -1,0 +1,20 @@
+{
+  "type": "urn:miot-spec-v2:property:massage-part:00000050",
+  "description": "Massage Part",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-list": [
+    {
+      "value": 1,
+      "description": "Neck"
+    },
+    {
+      "value": 2,
+      "description": "Shoulder"
+    }
+  ]
+}

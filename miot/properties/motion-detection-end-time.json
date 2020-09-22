@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:motion-detection-end-time:00000092",
+  "description": "Motion Detection End Time",
+  "format": "string",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

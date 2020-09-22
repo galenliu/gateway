@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:service:mosquito-dispeller:00007886",
+  "description": "Mosquito Dispeller",
+  "required-properties": [
+    "urn:miot-spec-v2:property:on:00000006"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:fault:00000009"
+  ]
+}

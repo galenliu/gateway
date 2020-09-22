@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:service:towel-rack:0000785D",
+  "description": "Towel Rack",
+  "required-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:mode:00000008"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:target-temperature:00000021",
+    "urn:miot-spec-v2:property:temperature:00000020",
+    "urn:miot-spec-v2:property:uv:00000029"
+  ]
+}

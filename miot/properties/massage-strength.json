@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:massage-strength:00000051",
+  "description": "Massage Strength",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-range": [
+    1,
+    5,
+    1
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:property:off-delay-time:00000054",
+  "description": "Power Off Delay Time",
+  "format": "uint32",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    120,
+    1
+  ],
+  "unit": "minutes"
+}

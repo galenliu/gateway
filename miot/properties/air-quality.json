@@ -1,0 +1,19 @@
+{
+  "type": "urn:miot-spec-v2:property:air-quality:0000001C",
+  "description": "Air Quality",
+  "format": "uint8",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-list": [
+    {
+      "value": 1,
+      "description": "Excellent"
+    },
+    {
+      "value": 2,
+      "description": "Fine"
+    }
+  ]
+}

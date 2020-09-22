@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:volume-up:00002812",
+  "description": "Volume Up",
+  "in": [],
+  "out": []
+}

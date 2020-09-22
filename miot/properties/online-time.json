@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:online-time:000000DF",
+  "description": "Online Time",
+  "format": "uint32",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    10000,
+    1
+  ],
+  "unit": "minutes"
+}

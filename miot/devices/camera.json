@@ -1,0 +1,13 @@
+{
+  "type": "urn:miot-spec-v2:device:camera:0000A01C",
+  "description": "Camera",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:camera-control:0000782F"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:indicator-light:00007803",
+    "urn:miot-spec-v2:service:memory-card-management:0000784E",
+    "urn:miot-spec-v2:service:motion-detection:0000784F"
+  ]
+}

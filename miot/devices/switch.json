@@ -1,0 +1,8 @@
+{
+  "type": "urn:miot-spec-v2:device:switch:0000A003",
+  "description": "Switch",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:switch:0000780C"
+  ]
+}

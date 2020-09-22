@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:service:light-bath-heater:0000783A",
+  "description": "Light Bath Heater",
+  "required-properties": [
+    "urn:miot-spec-v2:property:on:00000006"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:status:00000007"
+  ]
+}

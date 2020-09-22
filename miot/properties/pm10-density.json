@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:pm10-density:00000035",
+  "description": "PM10 Density",
+  "format": "float",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    1000,
+    1
+  ]
+}

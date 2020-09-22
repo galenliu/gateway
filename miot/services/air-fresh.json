@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:service:air-fresh:00007822",
+  "description": "Air Fresh",
+  "required-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:fault:00000009"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:fan-level:00000016",
+    "urn:miot-spec-v2:property:heater:00000026",
+    "urn:miot-spec-v2:property:heat-level:00000047"
+  ]
+}

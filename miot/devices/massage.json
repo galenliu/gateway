@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:device:massage:0000A018",
+  "description": "Massage",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:massage:00007829"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:backrest-control:0000782A",
+    "urn:miot-spec-v2:service:physical-controls-locked:00007807"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:electric-current:00000030",
+  "description": "Electric Current",
+  "format": "uint16",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    65535,
+    1
+  ]
+}

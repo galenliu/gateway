@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:water-level:0000003D",
+  "description": "Water Level",
+  "format": "uint8",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    100,
+    1
+  ],
+  "unit": "percentage"
+}

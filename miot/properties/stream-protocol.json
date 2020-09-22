@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:property:stream-protocol:0000005F",
+  "description": "Stream Protocol Type",
+  "format": "uint8",
+  "access": [],
+  "value-list": [
+    {
+      "value": 1,
+      "description": "RTSP"
+    },
+    {
+      "value": 2,
+      "description": "HLS"
+    }
+  ]
+}

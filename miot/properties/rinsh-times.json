@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:rinsh-times:0000006F",
+  "description": "Rinsh Times",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    3,
+    1
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "type": "urn:miot-spec-v2:service:magnet-sensor:00007827",
+  "description": "Magnet Sensor",
+  "required-properties": [
+    "urn:miot-spec-v2:property:contact-state:0000007C"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:status:00000007"
+  ],
+  "optional-events": [
+    "urn:miot-spec-v2:event:close:00005005",
+    "urn:miot-spec-v2:event:open:00005004",
+    "urn:miot-spec-v2:event:door-not-closed:00005006"
+  ]
+}

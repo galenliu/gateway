@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:water-hardness:000000B7",
+  "description": "Water Hardness",
+  "format": "uint16",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    1000,
+    1
+  ]
+}

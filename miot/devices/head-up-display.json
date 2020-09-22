@@ -1,0 +1,8 @@
+{
+  "type": "urn:miot-spec-v2:device:head-up-display:0000A09F",
+  "description": "Head Up Display",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:head-up-display:00007887"
+  ]
+}

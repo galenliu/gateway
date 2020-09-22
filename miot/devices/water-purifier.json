@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:device:water-purifier:0000A013",
+  "description": "Water Purifier",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:water-purifier:00007821",
+    "urn:miot-spec-v2:service:filter:0000780B",
+    "urn:miot-spec-v2:service:tds-sensor:0000780D"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:physical-controls-locked:00007807",
+    "urn:miot-spec-v2:service:alarm:00007804"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "type": "urn:miot-spec-v2:property:door-state:0000006B",
+  "description": "Door State",
+  "format": "uint8",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-list": [
+    {
+      "value": 1,
+      "description": "Open"
+    },
+    {
+      "value": 2,
+      "description": "Closed"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "type": "urn:miot-spec-v2:service:tv-box:00007835",
+  "description": "TV Box",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:channel-control:0000003F"
+  ],
+  "required-actions": [
+    "urn:miot-spec-v2:action:turn-off:00002809"
+  ],
+  "optional-actions": [
+    "urn:miot-spec-v2:action:turn-on:00002808",
+    "urn:miot-spec-v2:action:channel-up:00002815",
+    "urn:miot-spec-v2:action:channel-down:00002816"
+  ]
+}

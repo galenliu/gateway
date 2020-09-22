@@ -1,0 +1,20 @@
+{
+  "type": "urn:miot-spec-v2:property:input-control:0000003E",
+  "description": "TV Input Control",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-list": [
+    {
+      "value": 1,
+      "description": "HDMI 1"
+    },
+    {
+      "value": 2,
+      "description": "HDMI 2"
+    }
+  ]
+}

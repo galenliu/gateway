@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:service:weather-sensor:00007898",
+  "description": "Weather Sensor",
+  "required-properties": [
+    "urn:miot-spec-v2:property:temperature:00000020",
+    "urn:miot-spec-v2:property:relative-humidity:0000000C"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:atmospheric-pressure:00000036",
+    "urn:miot-spec-v2:property:uv-index:000000F4",
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:fault:00000009"
+  ]
+}

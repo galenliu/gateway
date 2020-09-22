@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:brightness-up:00002828",
+  "description": "Brightness Up",
+  "in": [],
+  "out": []
+}

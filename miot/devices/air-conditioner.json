@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:device:air-conditioner:0000A004",
+  "description": "Air Conditioner",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:air-conditioner:0000780F",
+    "urn:miot-spec-v2:service:fan-control:00007809",
+    "urn:miot-spec-v2:service:environment:0000780A",
+    "urn:miot-spec-v2:service:alarm:00007804",
+    "urn:miot-spec-v2:service:indicator-light:00007803",
+    "urn:miot-spec-v2:service:countdown:0000782D"
+  ]
+}

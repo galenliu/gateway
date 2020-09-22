@@ -1,0 +1,8 @@
+{
+  "type": "urn:miot-spec-v2:service:night-light:00007883",
+  "description": "Night Light",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007"
+  ]
+}

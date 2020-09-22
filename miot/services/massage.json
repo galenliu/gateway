@@ -1,0 +1,21 @@
+{
+  "type": "urn:miot-spec-v2:service:massage:00007829",
+  "description": "Massage",
+  "required-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:fault:00000009"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:massage-strength:00000051",
+    "urn:miot-spec-v2:property:massage-part:00000050",
+    "urn:miot-spec-v2:property:massage-manipulation:0000004F",
+    "urn:miot-spec-v2:property:left-time:0000003C",
+    "urn:miot-spec-v2:property:heating:000000C7",
+    "urn:miot-spec-v2:property:heat-level:00000047"
+  ],
+  "required-actions": [
+    "urn:miot-spec-v2:action:stop-massage:0000281F"
+  ]
+}

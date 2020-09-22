@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:air-cooler:000000EB",
+  "description": "Air Cooler",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

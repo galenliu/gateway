@@ -1,0 +1,9 @@
+{
+  "type": "urn:miot-spec-v2:property:seating-state:000000B8",
+  "description": "Seating State",
+  "format": "bool",
+  "access": [
+    "read",
+    "notify"
+  ]
+}

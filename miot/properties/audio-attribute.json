@@ -1,0 +1,20 @@
+{
+  "type": "urn:miot-spec-v2:property:audio-attribute:0000005D",
+  "description": "Audio Attribute",
+  "format": "uint8",
+  "access": [],
+  "value-list": [
+    {
+      "value": 0,
+      "description": "Default"
+    },
+    {
+      "value": 1,
+      "description": "44100_2_16_VARIABLE"
+    },
+    {
+      "value": 2,
+      "description": "8000_1_8_CONSTANT"
+    }
+  ]
+}

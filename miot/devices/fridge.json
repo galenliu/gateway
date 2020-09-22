@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:device:fridge:0000A00F",
+  "description": "Fridge",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:fridge:00007819",
+    "urn:miot-spec-v2:service:fridge-chamber:0000781A"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:physical-controls-locked:00007807"
+  ]
+}

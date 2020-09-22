@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:service:fridge-chamber:0000781A",
+  "description": "Fridge Chamber",
+  "required-properties": [
+    "urn:miot-spec-v2:property:temperature:00000020",
+    "urn:miot-spec-v2:property:target-temperature:00000021"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:mode:00000008"
+  ]
+}

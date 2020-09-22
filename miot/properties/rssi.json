@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:rssi:000000DE",
+  "description": "Received Signal Strength Indicator",
+  "format": "int8",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    -100,
+    0,
+    1
+  ]
+}

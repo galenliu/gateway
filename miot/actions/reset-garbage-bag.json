@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:reset-garbage-bag:0000283D",
+  "description": "Reset Garbage Bag",
+  "in": [],
+  "out": []
+}

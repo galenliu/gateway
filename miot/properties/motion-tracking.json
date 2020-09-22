@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:motion-tracking:0000008A",
+  "description": "Motion Tracking",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

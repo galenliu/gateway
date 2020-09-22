@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:property:feeding-measure:00000080",
+  "description": "Feeding Measure",
+  "format": "uint8",
+  "access": [],
+  "value-range": [
+    1,
+    10,
+    1
+  ]
+}

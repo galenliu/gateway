@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:water-pump:000000F2",
+  "description": "Water Pump",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

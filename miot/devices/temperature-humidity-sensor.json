@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:device:temperature-humidity-sensor:0000A00A",
+  "description": "Temperature Humidity Sensor",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:temperature-humidity-sensor:00007814"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:battery:00007805"
+  ]
+}

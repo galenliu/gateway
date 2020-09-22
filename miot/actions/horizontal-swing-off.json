@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:horizontal-swing-off:0000282D",
+  "description": "Horizontal Swing Off",
+  "in": [],
+  "out": []
+}

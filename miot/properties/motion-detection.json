@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:motion-detection:00000056",
+  "description": "Motion Detection",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

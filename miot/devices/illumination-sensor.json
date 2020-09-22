@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:device:illumination-sensor:0000A029",
+  "description": "Illumination Sensor",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:illumination-sensor:0000783D"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:battery:00007805"
+  ]
+}

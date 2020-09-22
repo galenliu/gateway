@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:service:message-router:0000781E",
+  "description": "Message Router",
+  "required-properties": [
+    "urn:miot-spec-v2:property:request:00000043",
+    "urn:miot-spec-v2:property:response:00000044"
+  ],
+  "required-actions": [
+    "urn:miot-spec-v2:action:post:00002810"
+  ]
+}

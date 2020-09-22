@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:play:0000280B",
+  "description": "Play",
+  "in": [],
+  "out": []
+}

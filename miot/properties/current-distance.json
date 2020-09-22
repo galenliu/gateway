@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:current-distance:00000075",
+  "description": "Current Distance",
+  "format": "uint32",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    5000,
+    1
+  ]
+}

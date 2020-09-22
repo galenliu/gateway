@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:service:submersion-sensor:00007839",
+  "description": "Submersion Sensor",
+  "required-properties": [
+    "urn:miot-spec-v2:property:submersion-state:0000007E"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:fault:00000009"
+  ],
+  "optional-events": [
+    "urn:miot-spec-v2:event:submersion-detected:0000500C",
+    "urn:miot-spec-v2:event:no-submersion:0000500D"
+  ]
+}

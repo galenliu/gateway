@@ -1,0 +1,7 @@
+{
+  "type": "urn:miot-spec-v2:device:watch:0000A07C",
+  "description": "Watch",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:max-download-speed:000000EA",
+  "description": "Max Download Speed",
+  "format": "uint32",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-range": [
+    1,
+    10000,
+    1
+  ]
+}

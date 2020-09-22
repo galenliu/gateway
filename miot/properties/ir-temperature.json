@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:ir-temperature:0000004D",
+  "description": "Temperature for IR",
+  "format": "float",
+  "access": [
+    "write"
+  ],
+  "value-range": [
+    16,
+    30,
+    1
+  ],
+  "unit": "celsius"
+}

@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:filter-used-time:00000048",
+  "description": "Filter Used Time",
+  "format": "uint16",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "unit": "hours",
+  "value-range": [
+    0,
+    10000,
+    1
+  ]
+}

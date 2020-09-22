@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:dns-ip-address:000000DB",
+  "description": "DNS IP Address",
+  "format": "string",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

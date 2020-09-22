@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:reset-brush-life:00002830",
+  "description": "Reset Brush Life",
+  "in": [],
+  "out": []
+}

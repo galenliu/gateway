@@ -1,0 +1,20 @@
+{
+  "type": "urn:miot-spec-v2:property:detection-sensitivity:00000090",
+  "description": "Detection Sensitivity",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-list": [
+    {
+      "value": 1,
+      "description": "Low"
+    },
+    {
+      "value": 2,
+      "description": "High"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:leg-rest-angle:0000009A",
+  "description": "Leg Rest Angle",
+  "format": "uint16",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    90,
+    1
+  ]
+}

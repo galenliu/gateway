@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:service:switch-sensor:00007828",
+  "description": "Switch Sensor",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:on:00000006"
+  ],
+  "optional-events": [
+    "urn:miot-spec-v2:event:click:00005007",
+    "urn:miot-spec-v2:event:double-click:00005008",
+    "urn:miot-spec-v2:event:long-press:00005009"
+  ]
+}

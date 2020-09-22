@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:start-p2p-stream:00002839",
+  "description": "Start P2P Stream",
+  "in": [],
+  "out": []
+}

@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:power-consumption:0000002F",
+  "description": "Power Consumption",
+  "format": "uint16",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    65535,
+    1
+  ]
+}

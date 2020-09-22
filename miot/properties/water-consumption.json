@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:water-consumption:000000C1",
+  "description": "Water Consumption",
+  "format": "uint8",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    255,
+    1
+  ]
+}

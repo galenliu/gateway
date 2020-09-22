@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:service:vibration-sensor:0000786A",
+  "description": "Vibration Sensor",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:detection-sensitivity:00000090"
+  ],
+  "optional-events": [
+    "urn:miot-spec-v2:event:tilt:00005014",
+    "urn:miot-spec-v2:event:fall:00005015",
+    "urn:miot-spec-v2:event:vibration:00005016"
+  ]
+}

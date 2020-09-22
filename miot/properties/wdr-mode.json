@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:wdr-mode:00000088",
+  "description": "Wide Dynamic Range Mode",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

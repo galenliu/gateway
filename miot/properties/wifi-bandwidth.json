@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:wifi-bandwidth:000000E7",
+  "description": "WiFi Bandwidth",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-range": [
+    20,
+    40,
+    10
+  ]
+}

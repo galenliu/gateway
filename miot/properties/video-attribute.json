@@ -1,0 +1,20 @@
+{
+  "type": "urn:miot-spec-v2:property:video-attribute:0000005B",
+  "description": "Video Attribute",
+  "format": "uint8",
+  "access": [],
+  "value-list": [
+    {
+      "value": 1,
+      "description": "1920_1080_30"
+    },
+    {
+      "value": 2,
+      "description": "1280_720_30"
+    },
+    {
+      "value": 3,
+      "description": "1024_768_30"
+    }
+  ]
+}

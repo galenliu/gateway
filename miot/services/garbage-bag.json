@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:service:garbage-bag:00007893",
+  "description": "Garbage Bag",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:garbage-bag-left-level:000000EF"
+  ],
+  "optional-actions": [
+    "urn:miot-spec-v2:action:reset-garbage-bag:0000283D"
+  ]
+}

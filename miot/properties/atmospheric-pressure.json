@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:atmospheric-pressure:00000036",
+  "description": "Atmospheric Pressure",
+  "format": "float",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    100000,
+    1
+  ],
+  "unit": "pascal"
+}

@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:brush-head-left-level:000000AE",
+  "description": "Brush Head Left Level",
+  "format": "uint8",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    100,
+    1
+  ],
+  "unit": "percentage"
+}

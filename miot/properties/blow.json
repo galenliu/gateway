@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:blow:000000CD",
+  "description": "Blow",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

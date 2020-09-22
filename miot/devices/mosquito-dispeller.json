@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:device:mosquito-dispeller:0000A065",
+  "description": "Mosquito Dispeller",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:mosquito-dispeller:00007886"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:repellent:0000785A",
+    "urn:miot-spec-v2:service:battery:00007805"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:uv:00000029",
+  "description": "UV",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

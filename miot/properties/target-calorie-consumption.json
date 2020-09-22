@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:target-calorie-consumption:000000F5",
+  "description": "Target Calorie Consumption",
+  "format": "uint16",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    1000,
+    1
+  ]
+}

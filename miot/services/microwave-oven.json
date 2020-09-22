@@ -1,0 +1,21 @@
+{
+  "type": "urn:miot-spec-v2:service:microwave-oven:00007843",
+  "description": "Microwave Oven",
+  "required-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:fault:00000009"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:cook-mode:00000037",
+    "urn:miot-spec-v2:property:left-time:0000003C",
+    "urn:miot-spec-v2:property:heat-level:00000047"
+  ],
+  "required-actions": [
+    "urn:miot-spec-v2:action:start-cook:00002806",
+    "urn:miot-spec-v2:action:cancel-cooking:00002807"
+  ],
+  "optional-actions": [
+    "urn:miot-spec-v2:action:pause:0000280C"
+  ]
+}

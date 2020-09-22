@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:service:clothes-dryer:00007848",
+  "description": "Clothes Dryer",
+  "required-properties": [
+    "urn:miot-spec-v2:property:fault:00000009"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:left-time:0000003C",
+    "urn:miot-spec-v2:property:dryer:00000027",
+    "urn:miot-spec-v2:property:drying-time:0000006A",
+    "urn:miot-spec-v2:property:drying-level:0000003B"
+  ]
+}

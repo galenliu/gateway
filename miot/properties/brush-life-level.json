@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:brush-life-level:00000085",
+  "description": "Brush Life Level",
+  "format": "uint8",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    100,
+    1
+  ],
+  "unit": "percentage"
+}

@@ -1,0 +1,8 @@
+{
+  "type": "urn:miot-spec-v2:service:tds-sensor:0000780D",
+  "description": "Total Dissolved Solids Sensor",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:tds-in:0000002C",
+    "urn:miot-spec-v2:property:tds-out:0000002D"
+  ]
+}

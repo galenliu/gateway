@@ -1,0 +1,9 @@
+{
+  "type": "urn:miot-spec-v2:property:current-physical-control-lock:00000099",
+  "description": "Current Physical Control Lock",
+  "format": "bool",
+  "access": [
+    "read",
+    "notify"
+  ]
+}

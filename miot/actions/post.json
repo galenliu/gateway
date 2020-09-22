@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:action:post:00002810",
+  "description": "Post",
+  "in": [
+    "urn:miot-spec-v2:property:request:00000043"
+  ],
+  "out": [
+    "urn:miot-spec-v2:property:response:00000044"
+  ]
+}

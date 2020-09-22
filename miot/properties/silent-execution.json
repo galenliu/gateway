@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:property:silent-execution:000000FB",
+  "description": "Silent Execution",
+  "format": "bool",
+  "access": []
+}

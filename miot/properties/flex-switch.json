@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:flex-switch:000000EC",
+  "description": "Flex Switch",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

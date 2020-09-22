@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:co2-density:0000004B",
+  "description": "CO2 Density",
+  "format": "float",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    1000,
+    1
+  ],
+  "unit": "ppm"
+}

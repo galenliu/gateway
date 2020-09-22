@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:device:video-doorbell:0000A03A",
+  "description": "Video Doorbell",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:video-doorbell:00007863"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:indicator-light:00007803",
+    "urn:miot-spec-v2:service:motion-detection:0000784F"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:property:play-loop-mode:00000094",
+  "description": "Play Loop Mode",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-list": [
+    {
+      "value": 1,
+      "description": "Single Cycle"
+    }
+  ]
+}

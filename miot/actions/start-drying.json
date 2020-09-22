@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:start-drying:0000283E",
+  "description": "Start Drying",
+  "in": [],
+  "out": []
+}

@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:play-radio:00002840",
+  "description": "Play Radio",
+  "in": [],
+  "out": []
+}

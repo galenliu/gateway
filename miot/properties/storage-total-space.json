@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:storage-total-space:0000008C",
+  "description": "Storage Total Space",
+  "format": "uint8",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    10,
+    1
+  ]
+}

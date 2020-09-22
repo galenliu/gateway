@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:service:alarm:00007804",
+  "description": "Alarm",
+  "required-properties": [
+    "urn:miot-spec-v2:property:alarm:00000012"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:volume:00000013"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:service:light:00007802",
+  "description": "Light",
+  "required-properties": [
+    "urn:miot-spec-v2:property:on:00000006"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:brightness:0000000D",
+    "urn:miot-spec-v2:property:color:0000000E",
+    "urn:miot-spec-v2:property:color-temperature:0000000F",
+    "urn:miot-spec-v2:property:flow:00000010",
+    "urn:miot-spec-v2:property:saturability:00000011",
+    "urn:miot-spec-v2:property:flex-switch:000000EC"
+  ]
+}

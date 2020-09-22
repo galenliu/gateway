@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:device:lock:0000A038",
+  "description": "Lock",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:lock:00007855"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:door:00007856",
+    "urn:miot-spec-v2:service:doorbell:00007857",
+    "urn:miot-spec-v2:service:battery:00007805",
+    "urn:miot-spec-v2:service:physical-controls-locked:00007807"
+  ]
+}

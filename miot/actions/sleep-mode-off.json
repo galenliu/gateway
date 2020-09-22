@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:sleep-mode-off:0000282F",
+  "description": "Turn Off Sleep Mode",
+  "in": [],
+  "out": []
+}

@@ -1,0 +1,19 @@
+{
+  "type": "urn:miot-spec-v2:service:pressure-cooker:00007861",
+  "description": "Pressure Cooker",
+  "required-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:cook-mode:00000037"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:left-time:0000003C",
+    "urn:miot-spec-v2:property:auto-keep-warm:0000002B",
+    "urn:miot-spec-v2:property:temperature:00000020"
+  ],
+  "required-actions": [
+    "urn:miot-spec-v2:action:start-cook:00002806",
+    "urn:miot-spec-v2:action:cancel-cooking:00002807"
+  ]
+}

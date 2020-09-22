@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:turn-off:00002809",
+  "description": "Turn Off",
+  "in": [],
+  "out": []
+}

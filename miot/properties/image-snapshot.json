@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:property:image-snapshot:00000064",
+  "description": "Image Snapshot URL",
+  "format": "string",
+  "access": []
+}

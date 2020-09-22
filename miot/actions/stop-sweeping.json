@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:stop-sweeping:00002805",
+  "description": "Stop Sweeping",
+  "in": [],
+  "out": []
+}

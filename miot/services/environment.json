@@ -1,0 +1,17 @@
+{
+  "type": "urn:miot-spec-v2:service:environment:0000780A",
+  "description": "Environment",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:relative-humidity:0000000C",
+    "urn:miot-spec-v2:property:air-quality-index:0000001B",
+    "urn:miot-spec-v2:property:air-quality:0000001C",
+    "urn:miot-spec-v2:property:pm2.5-density:00000034",
+    "urn:miot-spec-v2:property:pm10-density:00000035",
+    "urn:miot-spec-v2:property:atmospheric-pressure:00000036",
+    "urn:miot-spec-v2:property:temperature:00000020",
+    "urn:miot-spec-v2:property:co2-density:0000004B",
+    "urn:miot-spec-v2:property:tvoc-density:00000065",
+    "urn:miot-spec-v2:property:voc-density:00000081",
+    "urn:miot-spec-v2:property:hcho-density:000000B0"
+  ]
+}

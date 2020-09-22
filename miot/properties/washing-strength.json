@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:property:washing-strength:000000C4",
+  "description": "Washing Strength",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-list": [
+    {
+      "value": 1,
+      "description": "Weak"
+    }
+  ]
+}

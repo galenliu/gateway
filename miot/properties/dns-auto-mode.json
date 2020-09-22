@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:dns-auto-mode:000000DC",
+  "description": "DNS Auto Mode",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "type": "urn:miot-spec-v2:service:ble-control:0000783C",
+  "description": "BLE Local Control",
+  "optional-actions": [
+    "urn:miot-spec-v2:action:turn-on:00002808"
+  ]
+}

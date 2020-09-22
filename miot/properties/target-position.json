@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:property:target-position:0000003A",
+  "description": "Target Position",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    100,
+    1
+  ],
+  "unit": "percentage"
+}

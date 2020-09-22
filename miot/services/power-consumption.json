@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:service:power-consumption:0000780E",
+  "description": "Power Consumption",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:power-consumption:0000002F",
+    "urn:miot-spec-v2:property:electric-current:00000030",
+    "urn:miot-spec-v2:property:voltage:00000031",
+    "urn:miot-spec-v2:property:leakage-current:00000032",
+    "urn:miot-spec-v2:property:surge-power:00000033",
+    "urn:miot-spec-v2:property:electric-power:00000066"
+  ]
+}

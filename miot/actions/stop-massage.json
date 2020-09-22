@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:stop-massage:0000281F",
+  "description": "Stop Massage",
+  "in": [],
+  "out": []
+}

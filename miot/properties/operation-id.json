@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:property:operation-id:00000097",
+  "description": "Operation ID",
+  "format": "uint32",
+  "access": [],
+  "value-range": [
+    0,
+    4294967295,
+    1
+  ]
+}

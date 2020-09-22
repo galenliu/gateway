@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:service:switch:0000780C",
+  "description": "Switch",
+  "required-properties": [
+    "urn:miot-spec-v2:property:on:00000006"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:name:00000004",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:temperature:00000020",
+    "urn:miot-spec-v2:property:working-time:00000079"
+  ]
+}

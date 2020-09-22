@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:heater:00000026",
+  "description": "Heater",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

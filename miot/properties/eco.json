@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:eco:00000024",
+  "description": "ECO",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

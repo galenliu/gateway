@@ -1,0 +1,20 @@
+{
+  "type": "urn:miot-spec-v2:property:target-lid-state:000000ED",
+  "description": "Target Lid State",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-list": [
+    {
+      "value": 1,
+      "description": "Open"
+    },
+    {
+      "value": 2,
+      "description": "Closed"
+    }
+  ]
+}

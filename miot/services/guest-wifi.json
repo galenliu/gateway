@@ -1,0 +1,18 @@
+{
+  "type": "urn:miot-spec-v2:service:guest-wifi:00007890",
+  "description": "Guest WiFi",
+  "required-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:wifi-ssid:000000E1",
+    "urn:miot-spec-v2:property:wifi-encrypted-password:000000E2"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:encrypted-strength:000000E4",
+    "urn:miot-spec-v2:property:signal-strength:000000E5",
+    "urn:miot-spec-v2:property:wifi-channel:000000E6",
+    "urn:miot-spec-v2:property:wifi-bandwidth:000000E7",
+    "urn:miot-spec-v2:property:speed-control:000000E8",
+    "urn:miot-spec-v2:property:max-upload-speed:000000E9",
+    "urn:miot-spec-v2:property:max-download-speed:000000EA"
+  ]
+}

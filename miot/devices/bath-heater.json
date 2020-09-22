@@ -1,0 +1,13 @@
+{
+  "type": "urn:miot-spec-v2:device:bath-heater:0000A028",
+  "description": "Bath Heater",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:light:00007802",
+    "urn:miot-spec-v2:service:light-bath-heater:0000783A",
+    "urn:miot-spec-v2:service:ptc-bath-heater:0000783B",
+    "urn:miot-spec-v2:service:fan-control:00007809"
+  ]
+}

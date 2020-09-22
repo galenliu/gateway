@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:device:humidifier:0000A00E",
+  "description": "Humidifier",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:humidifier:00007818"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:environment:0000780A",
+    "urn:miot-spec-v2:service:filter:0000780B"
+  ]
+}

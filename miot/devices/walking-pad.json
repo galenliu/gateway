@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:device:walking-pad:0000A02F",
+  "description": "Walking Pad",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:walking-pad:00007842"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:indicator-light:00007803"
+  ]
+}

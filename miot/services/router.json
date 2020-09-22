@@ -1,0 +1,26 @@
+{
+  "type": "urn:miot-spec-v2:service:router:00007864",
+  "description": "Router",
+  "required-properties": [
+    "urn:miot-spec-v2:property:download-speed:0000009E",
+    "urn:miot-spec-v2:property:upload-speed:0000009F",
+    "urn:miot-spec-v2:property:connected-device-number:000000A0",
+    "urn:miot-spec-v2:property:network-connection-type:000000D4",
+    "urn:miot-spec-v2:property:ip-address:000000DA"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:ppp-username:000000D5",
+    "urn:miot-spec-v2:property:ppp-encrypted-password:000000D6",
+    "urn:miot-spec-v2:property:static-ip-address:000000D7",
+    "urn:miot-spec-v2:property:subnet-mask:000000D8",
+    "urn:miot-spec-v2:property:gateway-ip-address:000000D9",
+    "urn:miot-spec-v2:property:dns-ip-address:000000DB",
+    "urn:miot-spec-v2:property:dns-auto-mode:000000DC",
+    "urn:miot-spec-v2:property:access-mode:000000DD",
+    "urn:miot-spec-v2:property:rssi:000000DE",
+    "urn:miot-spec-v2:property:wifi-band-combine:000000E0",
+    "urn:miot-spec-v2:property:online-time:000000DF"
+  ]
+}

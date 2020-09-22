@@ -1,0 +1,13 @@
+{
+  "type": "urn:miot-spec-v2:device:kettle:0000A009",
+  "description": "Kettle",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:kettle:00007813"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:tds-sensor:0000780D",
+    "urn:miot-spec-v2:service:physical-controls-locked:00007807",
+    "urn:miot-spec-v2:service:alarm:00007804"
+  ]
+}

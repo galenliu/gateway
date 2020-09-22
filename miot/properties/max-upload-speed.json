@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:max-upload-speed:000000E9",
+  "description": "Max Upload Speed",
+  "format": "uint32",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    1000,
+    1
+  ]
+}

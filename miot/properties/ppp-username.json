@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:ppp-username:000000D5",
+  "description": "PPPOE Username",
+  "format": "string",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

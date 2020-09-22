@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:property:abnormal-condition:00000095",
+  "description": "Abnormal Condition",
+  "format": "uint8",
+  "access": [],
+  "value-list": [
+    {
+      "value": 0,
+      "description": ""
+    }
+  ]
+}

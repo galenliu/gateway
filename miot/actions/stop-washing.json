@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:stop-washing:0000283B",
+  "description": "Stop Washing",
+  "in": [],
+  "out": []
+}

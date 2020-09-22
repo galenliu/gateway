@@ -1,0 +1,29 @@
+{
+  "type": "urn:miot-spec-v2:service:oven:00007862",
+  "description": "Oven",
+  "required-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:fault:00000009"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:cook-mode:00000037",
+    "urn:miot-spec-v2:property:left-time:0000003C",
+    "urn:miot-spec-v2:property:working-time:00000079",
+    "urn:miot-spec-v2:property:target-temperature:00000021",
+    "urn:miot-spec-v2:property:temperature:00000020",
+    "urn:miot-spec-v2:property:heat-level:00000047",
+    "urn:miot-spec-v2:property:water-level:0000003D",
+    "urn:miot-spec-v2:property:cook-time:000000C8"
+  ],
+  "required-events": [
+    "urn:miot-spec-v2:event:low-water-level:0000500A"
+  ],
+  "required-actions": [
+    "urn:miot-spec-v2:action:start-cook:00002806",
+    "urn:miot-spec-v2:action:cancel-cooking:00002807"
+  ],
+  "optional-actions": [
+    "urn:miot-spec-v2:action:pause:0000280C"
+  ]
+}

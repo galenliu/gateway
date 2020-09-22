@@ -1,0 +1,7 @@
+{
+  "type": "urn:miot-spec-v2:device:ir-remote-control:0000A025",
+  "description": "IR Remote Control",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801"
+  ]
+}

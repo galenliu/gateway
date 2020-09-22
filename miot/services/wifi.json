@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:service:wifi:0000788F",
+  "description": "WiFi Managerment",
+  "required-properties": [
+    "urn:miot-spec-v2:property:wifi-ssid:000000E1",
+    "urn:miot-spec-v2:property:wifi-encrypted-password:000000E2"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:wifi-ssid-hidden:000000E3",
+    "urn:miot-spec-v2:property:encrypted-strength:000000E4",
+    "urn:miot-spec-v2:property:signal-strength:000000E5",
+    "urn:miot-spec-v2:property:wifi-channel:000000E6",
+    "urn:miot-spec-v2:property:wifi-bandwidth:000000E7"
+  ]
+}

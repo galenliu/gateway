@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:current-liquid-volume:000000F9",
+  "description": "Current Liquid Volume",
+  "format": "uint16",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    1,
+    10,
+    1
+  ],
+  "unit": "L"
+}

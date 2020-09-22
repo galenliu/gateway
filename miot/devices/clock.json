@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:device:clock:0000A026",
+  "description": "Clock",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:clock:0000789A"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:countdown:0000782D",
+    "urn:miot-spec-v2:service:speaker:0000781C",
+    "urn:miot-spec-v2:service:microphone:00007826",
+    "urn:miot-spec-v2:service:screen:00007806",
+    "urn:miot-spec-v2:service:indicator-light:00007803"
+  ]
+}

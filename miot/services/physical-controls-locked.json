@@ -1,0 +1,8 @@
+{
+  "type": "urn:miot-spec-v2:service:physical-controls-locked:00007807",
+  "description": "Physical Control Locked",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:physical-controls-locked:0000001D",
+    "urn:miot-spec-v2:property:current-physical-control-lock:00000099"
+  ]
+}

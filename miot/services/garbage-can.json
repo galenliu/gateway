@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:service:garbage-can:00007892",
+  "description": "Garbage Can",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:target-lid-state:000000ED",
+    "urn:miot-spec-v2:property:current-lid-state:000000EE"
+  ],
+  "required-actions": [
+    "urn:miot-spec-v2:action:package:0000283C"
+  ]
+}

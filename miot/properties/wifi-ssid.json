@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:wifi-ssid:000000E1",
+  "description": "WiFi Service Set Identifier",
+  "format": "string",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

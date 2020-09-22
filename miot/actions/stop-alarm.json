@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:stop-alarm:00002843",
+  "description": "Stop Alarm",
+  "in": [],
+  "out": []
+}

@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:start-only-sweep:0000283A",
+  "description": "Start Only Sweep",
+  "in": [],
+  "out": []
+}

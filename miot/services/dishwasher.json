@@ -1,0 +1,27 @@
+{
+  "type": "urn:miot-spec-v2:service:dishwasher:0000784D",
+  "description": "Dishwasher",
+  "required-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:mode:00000008"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:left-time:0000003C",
+    "urn:miot-spec-v2:property:dryer:00000027",
+    "urn:miot-spec-v2:property:door-state:0000006B",
+    "urn:miot-spec-v2:property:target-temperature:00000021",
+    "urn:miot-spec-v2:property:power-consumption:0000002F"
+  ],
+  "optional-events": [
+    "urn:miot-spec-v2:event:wash-end:0000500B"
+  ],
+  "required-actions": [
+    "urn:miot-spec-v2:action:start-wash:00002824",
+    "urn:miot-spec-v2:action:pause:0000280C"
+  ],
+  "optional-actions": [
+    "urn:miot-spec-v2:action:stop-washing:0000283B"
+  ]
+}

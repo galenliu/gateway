@@ -1,0 +1,9 @@
+{
+  "type": "urn:miot-spec-v2:action:execute-text-directive:00002842",
+  "description": "Execute Text Directive",
+  "in": [
+    "urn:miot-spec-v2:property:text-content:000000FA",
+    "urn:miot-spec-v2:property:silent-execution:000000FB"
+  ],
+  "out": []
+}

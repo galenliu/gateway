@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:device:dryer:0000A0A3",
+  "description": "Dryer",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:dryer:00007895"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:physical-controls-locked:00007807",
+    "urn:miot-spec-v2:service:alarm:00007804"
+  ]
+}

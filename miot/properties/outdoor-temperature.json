@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:outdoor-temperature:0000000B",
+  "description": "Outdoor Temperature",
+  "format": "float",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "unit": "celsius",
+  "value-range": [
+    -50,
+    50,
+    1
+  ]
+}

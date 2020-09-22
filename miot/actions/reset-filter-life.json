@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:reset-filter-life:00002803",
+  "description": "Reset Filter Life",
+  "in": [],
+  "out": []
+}

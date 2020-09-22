@@ -1,0 +1,9 @@
+{
+  "type": "urn:miot-spec-v2:property:submersion-state:0000007E",
+  "description": "Submersion State",
+  "format": "bool",
+  "access": [
+    "read",
+    "notify"
+  ]
+}

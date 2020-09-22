@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:longitude:000000BA",
+  "description": "Longitude",
+  "format": "float",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    -180,
+    180,
+    0.000001
+  ]
+}

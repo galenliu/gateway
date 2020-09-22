@@ -1,0 +1,8 @@
+{
+  "type": "urn:miot-spec-v2:service:vital-signs:00007866",
+  "description": "Vital Signs",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:heart-rate:000000A1",
+    "urn:miot-spec-v2:property:respiratory-rate:000000CA"
+  ]
+}

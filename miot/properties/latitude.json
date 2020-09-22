@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:latitude:000000BB",
+  "description": "Latitude",
+  "format": "float",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    -180,
+    180,
+    0.000001
+  ]
+}

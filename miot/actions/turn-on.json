@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:turn-on:00002808",
+  "description": "Turn On",
+  "in": [],
+  "out": []
+}

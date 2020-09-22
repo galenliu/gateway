@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:property:access-mode:000000DD",
+  "description": "Access Mode",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-list": [
+    {
+      "value": 0,
+      "description": ""
+    }
+  ]
+}

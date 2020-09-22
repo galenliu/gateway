@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:device:air-purifier:0000A007",
+  "description": "Air Purifier",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:air-purifier:00007811",
+    "urn:miot-spec-v2:service:environment:0000780A",
+    "urn:miot-spec-v2:service:filter:0000780B"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:indicator-light:00007803",
+    "urn:miot-spec-v2:service:alarm:00007804",
+    "urn:miot-spec-v2:service:screen:00007806",
+    "urn:miot-spec-v2:service:physical-controls-locked:00007807"
+  ]
+}

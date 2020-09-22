@@ -1,0 +1,9 @@
+{
+  "type": "urn:miot-spec-v2:property:ip-address:000000DA",
+  "description": "IP Address",
+  "format": "string",
+  "access": [
+    "read",
+    "notify"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "type": "urn:miot-spec-v2:property:night-shot:00000057",
+  "description": "Night Shot",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-list": [
+    {
+      "value": 0,
+      "description": "Off"
+    },
+    {
+      "value": 1,
+      "description": "On"
+    },
+    {
+      "value": 2,
+      "description": "Auto"
+    }
+  ]
+}

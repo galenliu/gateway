@@ -1,0 +1,90 @@
+{
+  "author": "Galveston01",
+  "description": "Tuya Smart Life IoT devices support",
+  "gateway_specific_settings": {
+    "webthings": {
+      "exec": "{nodeLoader} {path}",
+      "primary_type": "adapter",
+      "strict_max_version": "*",
+      "strict_min_version": "0.10.0"
+    }
+  },
+  "homepage_url": "https://github.com/Galveston01/tuya-adapter",
+  "id": "tuya-adapter",
+  "license": "GPL-3.0",
+  "manifest_version": 1,
+  "name": "Tuya Smart Life",
+  "short_name": "Tuya",
+  "version": "0.1.3",
+  "options": {
+    "default": {
+      "devices": [],
+      "timeout": 10,
+      "log": "warn"
+    },
+    "schema": {
+      "type": "object",
+      "required": [
+        "devices",
+        "timeout",
+        "log"
+      ],
+      "properties": {
+        "devices": {
+          "title": "Define id and key values of your devices here",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "title": "id",
+                "type": "string"
+              },
+              "key": {
+                "title": "key (aka localKey)",
+                "type": "string"
+              },
+              "type": {
+                "title": "Type",
+                "type": "string",
+                "enum": [
+                  "Colour Light",
+                  "Dimmer",
+                  "Light",
+                  "Plug",
+                  "Plug with night light",
+                  "Switch"
+                ]
+              },
+              "config": {
+                "title": "Configuration (usually needn't be changed manually)",
+                "type": "string",
+                "default": ""
+              },
+              "name": {
+                "title": "Name",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "timeout": {
+          "type": "number",
+          "title": "Connection timeout in seconds"
+        },
+        "log": {
+          "type": "string",
+          "title": "Log level",
+          "enum": [
+            "none",
+            "error",
+            "warn",
+            "info",
+            "debug"
+          ]
+        }
+      }
+    }
+  }
+}
+

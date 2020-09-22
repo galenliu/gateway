@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:service:motion-detection:0000784F",
+  "description": "Motion Detection",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:motion-detection:00000056",
+    "urn:miot-spec-v2:property:alarm-interval:0000008F",
+    "urn:miot-spec-v2:property:detection-sensitivity:00000090",
+    "urn:miot-spec-v2:property:motion-detection-start-time:00000091",
+    "urn:miot-spec-v2:property:motion-detection-end-time:00000092"
+  ]
+}

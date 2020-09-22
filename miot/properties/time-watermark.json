@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:time-watermark:00000087",
+  "description": "Time Watermark",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

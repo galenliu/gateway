@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:ventilation:000000CE",
+  "description": "Ventilation",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

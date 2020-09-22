@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:previous:0000280E",
+  "description": "Previous",
+  "in": [],
+  "out": []
+}

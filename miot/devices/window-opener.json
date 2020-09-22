@@ -1,0 +1,13 @@
+{
+  "type": "urn:miot-spec-v2:device:window-opener:0000A043",
+  "description": "Window Opener",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:window-opener:00007889"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:alarm:00007804",
+    "urn:miot-spec-v2:service:physical-controls-locked:00007807",
+    "urn:miot-spec-v2:service:indicator-light:00007803"
+  ]
+}

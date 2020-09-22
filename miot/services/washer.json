@@ -1,0 +1,35 @@
+{
+  "type": "urn:miot-spec-v2:service:washer:00007834",
+  "description": "Washer",
+  "required-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:fault:00000009"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:left-time:0000003C",
+    "urn:miot-spec-v2:property:target-temperature:00000021",
+    "urn:miot-spec-v2:property:temperature:00000020",
+    "urn:miot-spec-v2:property:target-water-level:00000069",
+    "urn:miot-spec-v2:property:dryer:00000027",
+    "urn:miot-spec-v2:property:drying-level:0000003B",
+    "urn:miot-spec-v2:property:drying-time:0000006A",
+    "urn:miot-spec-v2:property:door-state:0000006B",
+    "urn:miot-spec-v2:property:soak-time:0000006C",
+    "urn:miot-spec-v2:property:wash-time:0000006D",
+    "urn:miot-spec-v2:property:rinsh-time:0000006E",
+    "urn:miot-spec-v2:property:rinsh-times:0000006F",
+    "urn:miot-spec-v2:property:spin-time:00000070",
+    "urn:miot-spec-v2:property:spin-speed:00000071",
+    "urn:miot-spec-v2:property:water-consumption:000000C1",
+    "urn:miot-spec-v2:property:power-consumption:0000002F"
+  ],
+  "optional-events": [
+    "urn:miot-spec-v2:event:wash-end:0000500B"
+  ],
+  "required-actions": [
+    "urn:miot-spec-v2:action:start-wash:00002824",
+    "urn:miot-spec-v2:action:pause:0000280C"
+  ]
+}

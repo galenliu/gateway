@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:property:image-rollover:00000058",
+  "description": "Image Rollover",
+  "format": "uint16",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    360,
+    180
+  ],
+  "unit": "arcdegrees"
+}

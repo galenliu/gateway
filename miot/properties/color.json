@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:property:color:0000000E",
+  "description": "Color",
+  "format": "uint32",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "unit": "rgb",
+  "value-range": [
+    0,
+    16777215,
+    1
+  ]
+}

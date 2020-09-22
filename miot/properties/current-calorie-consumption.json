@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:current-calorie-consumption:0000007A",
+  "description": "Current Calorie Consumption",
+  "format": "uint32",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    1000000,
+    1
+  ]
+}

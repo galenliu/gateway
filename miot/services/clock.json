@@ -1,0 +1,13 @@
+{
+  "type": "urn:miot-spec-v2:service:clock:0000789A",
+  "description": "Clock",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:ringtone:0000009D"
+  ],
+  "optional-actions": [
+    "urn:miot-spec-v2:action:stop-alarm:00002843"
+  ]
+}

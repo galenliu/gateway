@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:service:story-machine:00007853",
+  "description": "Story Machine",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:fault:00000009"
+  ]
+}

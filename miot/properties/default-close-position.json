@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:property:default-close-position:000000C3",
+  "description": "Default Close Position",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    100,
+    1
+  ],
+  "unit": "percentage"
+}

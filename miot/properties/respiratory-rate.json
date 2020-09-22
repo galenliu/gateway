@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:respiratory-rate:000000CA",
+  "description": "Respiratory Rate",
+  "format": "uint8",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    100,
+    1
+  ]
+}

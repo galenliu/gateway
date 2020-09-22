@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:device:heater:0000A01A",
+  "description": "Heater",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:heater:0000782E"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:countdown:0000782D",
+    "urn:miot-spec-v2:service:environment:0000780A",
+    "urn:miot-spec-v2:service:physical-controls-locked:00007807",
+    "urn:miot-spec-v2:service:alarm:00007804",
+    "urn:miot-spec-v2:service:indicator-light:00007803"
+  ]
+}

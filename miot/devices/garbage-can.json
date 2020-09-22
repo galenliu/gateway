@@ -1,0 +1,13 @@
+{
+  "type": "urn:miot-spec-v2:device:garbage-can:0000A03E",
+  "description": "Garbage Can",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:garbage-can:00007892"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:battery:00007805",
+    "urn:miot-spec-v2:service:garbage-bag:00007893",
+    "urn:miot-spec-v2:service:indicator-light:00007803"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:service:doorbell:00007857",
+  "description": "Doorbell",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:ringtone:0000009D",
+    "urn:miot-spec-v2:property:volume:00000013",
+    "urn:miot-spec-v2:property:current-time:00000098"
+  ],
+  "required-events": [
+    "urn:miot-spec-v2:event:doorbell-ring:00005013"
+  ]
+}

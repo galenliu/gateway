@@ -1,0 +1,17 @@
+{
+  "type": "urn:miot-spec-v2:device:story-machine:0000A05B",
+  "description": "Story Machine",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:story-machine:00007853",
+    "urn:miot-spec-v2:service:speaker:0000781C",
+    "urn:miot-spec-v2:service:play-control:0000781D"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:light:00007802",
+    "urn:miot-spec-v2:service:physical-controls-locked:00007807",
+    "urn:miot-spec-v2:service:battery:00007805",
+    "urn:miot-spec-v2:service:memory-card-management:0000784E",
+    "urn:miot-spec-v2:service:screen:00007806"
+  ]
+}

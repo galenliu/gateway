@@ -1,0 +1,33 @@
+{
+  "type": "urn:miot-spec-v2:service:treadmill:00007851",
+  "description": "Treadmill",
+  "required-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:speed-level:00000023"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:incline:00000074",
+    "urn:miot-spec-v2:property:target-distance:00000076",
+    "urn:miot-spec-v2:property:current-distance:00000075",
+    "urn:miot-spec-v2:property:left-distance:00000077",
+    "urn:miot-spec-v2:property:target-time:00000078",
+    "urn:miot-spec-v2:property:working-time:00000079",
+    "urn:miot-spec-v2:property:left-time:0000003C",
+    "urn:miot-spec-v2:property:target-calorie-consumption:000000F5",
+    "urn:miot-spec-v2:property:current-calorie-consumption:0000007A",
+    "urn:miot-spec-v2:property:left-calorie-consumption:000000F6",
+    "urn:miot-spec-v2:property:target-step-count:000000F7",
+    "urn:miot-spec-v2:property:current-step-count:0000007B",
+    "urn:miot-spec-v2:property:left-step-count:000000F8"
+  ],
+  "required-actions": [
+    "urn:miot-spec-v2:action:start-work:00002827",
+    "urn:miot-spec-v2:action:pause:0000280C"
+  ],
+  "optional-actions": [
+    "urn:miot-spec-v2:action:stop-working:00002825"
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:property:room-ids:00000073",
+  "description": "Room IDs",
+  "format": "string",
+  "access": []
+}

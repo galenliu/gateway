@@ -1,0 +1,13 @@
+{
+  "type": "urn:miot-spec-v2:service:sleep-monitor:00007885",
+  "description": "Sleep Monitor",
+  "required-properties": [
+    "urn:miot-spec-v2:property:sleep-state:000000C9"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:fault:00000009"
+  ]
+}

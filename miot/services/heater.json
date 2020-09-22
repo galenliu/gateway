@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:service:heater:0000782E",
+  "description": "Heater",
+  "required-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:fault:00000009"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:target-temperature:00000021",
+    "urn:miot-spec-v2:property:temperature:00000020",
+    "urn:miot-spec-v2:property:heat-level:00000047",
+    "urn:miot-spec-v2:property:working-time:00000079"
+  ]
+}

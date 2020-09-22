@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:name:00000004",
+  "description": "Service Name",
+  "format": "string",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

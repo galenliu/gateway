@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:service:massager:0000788E",
+  "description": "Massager",
+  "required-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:massage-strength:00000051"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:massage-manipulation:0000004F",
+    "urn:miot-spec-v2:property:heating:000000C7",
+    "urn:miot-spec-v2:property:heat-level:00000047",
+    "urn:miot-spec-v2:property:temperature:00000020"
+  ]
+}

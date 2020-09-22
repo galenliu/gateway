@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:device:thermostat:0000A031",
+  "description": "Thermostat",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:thermostat:0000784A"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:environment:0000780A"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:service:printer:0000786F",
+  "description": "Printer",
+  "required-properties": [
+    "urn:miot-spec-v2:property:status:00000007"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:fault:00000009"
+  ]
+}

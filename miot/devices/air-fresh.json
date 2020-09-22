@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:device:air-fresh:0000A012",
+  "description": "Fresh Air System",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:air-fresh:00007822",
+    "urn:miot-spec-v2:service:environment:0000780A",
+    "urn:miot-spec-v2:service:filter:0000780B"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:physical-controls-locked:00007807",
+    "urn:miot-spec-v2:service:alarm:00007804",
+    "urn:miot-spec-v2:service:indicator-light:00007803"
+  ]
+}

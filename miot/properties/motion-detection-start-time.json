@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:motion-detection-start-time:00000091",
+  "description": "Motion Detection Start Time",
+  "format": "string",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

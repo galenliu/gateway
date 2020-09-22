@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:glimmer-full-color:00000089",
+  "description": "Glimmer Full Color",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

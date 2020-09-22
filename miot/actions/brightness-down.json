@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:brightness-down:00002829",
+  "description": "Brightness Down",
+  "in": [],
+  "out": []
+}

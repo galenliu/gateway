@@ -1,0 +1,13 @@
+{
+  "type": "urn:miot-spec-v2:service:door:00007856",
+  "description": "Door",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:abnormal-condition:00000095",
+    "urn:miot-spec-v2:property:current-time:00000098"
+  ],
+  "optional-events": [
+    "urn:miot-spec-v2:event:exception-occurred:00005011",
+    "urn:miot-spec-v2:event:door-knocked:00005012"
+  ]
+}

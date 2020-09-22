@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:service:ir-fan-control:00007823",
+  "description": "IR Fan Control",
+  "optional-actions": [
+    "urn:miot-spec-v2:action:turn-on:00002808",
+    "urn:miot-spec-v2:action:turn-off:00002809",
+    "urn:miot-spec-v2:action:fan-speed-up:0000281B",
+    "urn:miot-spec-v2:action:fan-speed-down:0000281C"
+  ]
+}

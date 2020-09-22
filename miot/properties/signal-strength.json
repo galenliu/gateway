@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:property:signal-strength:000000E5",
+  "description": "Signal Strength",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-list": [
+    {
+      "value": 0,
+      "description": ""
+    }
+  ]
+}

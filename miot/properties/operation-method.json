@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:property:operation-method:00000096",
+  "description": "Operation Method",
+  "format": "uint32",
+  "access": [],
+  "value-list": [
+    {
+      "value": 1,
+      "description": "BLE Outdoor"
+    }
+  ]
+}

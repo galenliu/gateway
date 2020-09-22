@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:device:pillow:0000A0A0",
+  "description": "Pillow",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:pillow:0000788D"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:massager:0000788E",
+    "urn:miot-spec-v2:service:sleep-monitor:00007885",
+    "urn:miot-spec-v2:service:speaker:0000781C",
+    "urn:miot-spec-v2:service:play-control:0000781D"
+  ]
+}

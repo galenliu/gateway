@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:fan-speed-down:0000281C",
+  "description": "Fan Speed Down",
+  "in": [],
+  "out": []
+}

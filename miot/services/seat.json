@@ -1,0 +1,8 @@
+{
+  "type": "urn:miot-spec-v2:service:seat:00007884",
+  "description": "Seat",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:heating:000000C7",
+    "urn:miot-spec-v2:property:heat-level:00000047"
+  ]
+}

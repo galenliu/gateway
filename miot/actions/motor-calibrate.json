@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:motor-calibrate:00002836",
+  "description": "Motor Calibrate",
+  "in": [],
+  "out": []
+}

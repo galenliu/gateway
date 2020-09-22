@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:service:water-heater:0000783E",
+  "description": "Water Heater",
+  "required-properties": [
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:target-temperature:00000021",
+    "urn:miot-spec-v2:property:temperature:00000020"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:water-level:0000003D",
+    "urn:miot-spec-v2:property:left-time:0000003C"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "type": "urn:miot-spec-v2:service:lock:00007855",
+  "description": "Lock",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:abnormal-condition:00000095",
+    "urn:miot-spec-v2:property:operation-method:00000096",
+    "urn:miot-spec-v2:property:operation-id:00000097",
+    "urn:miot-spec-v2:property:current-time:00000098"
+  ],
+  "optional-events": [
+    "urn:miot-spec-v2:event:lock-opened:0000500E",
+    "urn:miot-spec-v2:event:lock-locked:0000500F",
+    "urn:miot-spec-v2:event:back-locking:00005010",
+    "urn:miot-spec-v2:event:exception-occurred:00005011"
+  ]
+}

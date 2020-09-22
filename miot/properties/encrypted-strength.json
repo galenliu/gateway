@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:property:encrypted-strength:000000E4",
+  "description": "Encrypted Strength",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-list": [
+    {
+      "value": 0,
+      "description": ""
+    }
+  ]
+}

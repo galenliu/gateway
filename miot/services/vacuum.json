@@ -1,0 +1,27 @@
+{
+  "type": "urn:miot-spec-v2:service:vacuum:00007810",
+  "description": "Robot Cleaner",
+  "required-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:fault:00000009"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:speed-level:00000023",
+    "urn:miot-spec-v2:property:uv:00000029",
+    "urn:miot-spec-v2:property:fan-level:00000016",
+    "urn:miot-spec-v2:property:sweep-type:000000D3",
+    "urn:miot-spec-v2:property:room-ids:00000073"
+  ],
+  "required-actions": [
+    "urn:miot-spec-v2:action:start-sweep:00002804",
+    "urn:miot-spec-v2:action:stop-sweeping:00002805"
+  ],
+  "optional-actions": [
+    "urn:miot-spec-v2:action:start-only-sweep:0000283A",
+    "urn:miot-spec-v2:action:start-mop:00002834",
+    "urn:miot-spec-v2:action:start-sweep-mop:00002835",
+    "urn:miot-spec-v2:action:start-room-sweep:00002826"
+  ]
+}

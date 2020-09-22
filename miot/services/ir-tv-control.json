@@ -1,0 +1,20 @@
+{
+  "type": "urn:miot-spec-v2:service:ir-tv-control:0000781F",
+  "description": "IR TV Control",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:channel-number:00000045",
+    "urn:miot-spec-v2:property:channel-name:00000046"
+  ],
+  "optional-actions": [
+    "urn:miot-spec-v2:action:volume-up:00002812",
+    "urn:miot-spec-v2:action:volume-down:00002813",
+    "urn:miot-spec-v2:action:channel-up:00002815",
+    "urn:miot-spec-v2:action:channel-down:00002816",
+    "urn:miot-spec-v2:action:turn-on:00002808",
+    "urn:miot-spec-v2:action:turn-off:00002809",
+    "urn:miot-spec-v2:action:mute-on:00002819",
+    "urn:miot-spec-v2:action:mute-off:0000281A",
+    "urn:miot-spec-v2:action:set-channel-number:00002817",
+    "urn:miot-spec-v2:action:set-channel-name:00002818"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:device:massager:0000A083",
+  "description": "Massager",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:massager:0000788E"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:battery:00007805"
+  ]
+}

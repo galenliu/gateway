@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:device:electronic-valve:0000A0A7",
+  "description": "Electronic Valve",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:electronic-valve:0000789E"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:battery:00007805"
+  ]
+}

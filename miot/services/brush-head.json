@@ -1,0 +1,7 @@
+{
+  "type": "urn:miot-spec-v2:service:brush-head:0000786C",
+  "description": "Brush Head",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:brush-head-left-level:000000AE"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "type": "urn:miot-spec-v2:property:ir-mode:0000004C",
+  "description": "Mode for IR",
+  "format": "uint8",
+  "access": [
+    "write"
+  ],
+  "value-list": [
+    {
+      "value": 1,
+      "description": "Auto"
+    },
+    {
+      "value": 2,
+      "description": "Heat"
+    },
+    {
+      "value": 3,
+      "description": "Cool"
+    },
+    {
+      "value": 4,
+      "description": "Dry"
+    },
+    {
+      "value": 5,
+      "description": "Fan"
+    }
+  ]
+}

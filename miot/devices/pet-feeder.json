@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:device:pet-feeder:0000A06C",
+  "description": "Pet Feeder",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:pet-feeder:00007847"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:indicator-light:00007803"
+  ]
+}

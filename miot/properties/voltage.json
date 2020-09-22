@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:voltage:00000031",
+  "description": "Voltage",
+  "format": "uint16",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    65535,
+    1
+  ]
+}

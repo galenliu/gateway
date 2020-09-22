@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:property:request:00000043",
+  "description": "Request",
+  "format": "string",
+  "access": []
+}

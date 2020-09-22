@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:battery-level:00000014",
+  "description": "Battery Level",
+  "format": "uint8",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "unit": "percentage",
+  "value-range": [
+    0,
+    100,
+    1
+  ]
+}

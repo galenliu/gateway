@@ -1,0 +1,8 @@
+{
+  "type": "urn:miot-spec-v2:action:seek:0000280A",
+  "description": "Seek",
+  "in": [
+    "urn:miot-spec-v2:property:seek-time:00000042"
+  ],
+  "out": []
+}

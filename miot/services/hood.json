@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:service:hood:0000782B",
+  "description": "Hood",
+  "required-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:fault:00000009"
+  ],
+  "optional-properties": [
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:off-delay:00000053",
+    "urn:miot-spec-v2:property:off-delay-time:00000054"
+  ]
+}

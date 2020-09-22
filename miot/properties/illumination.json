@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:illumination:0000004E",
+  "description": "Illumination",
+  "format": "float",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    10000,
+    1
+  ],
+  "unit": "lux"
+}

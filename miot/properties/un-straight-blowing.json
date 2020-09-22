@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:un-straight-blowing:00000100",
+  "description": "Unstraight Blowing",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

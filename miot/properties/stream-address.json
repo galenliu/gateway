@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:property:stream-address:0000005E",
+  "description": "Stream URL",
+  "format": "string",
+  "access": []
+}

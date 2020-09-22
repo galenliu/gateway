@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:device:magnet-sensor:0000A016",
+  "description": "Magnet Sensor",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:magnet-sensor:00007827"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:battery:00007805"
+  ]
+}

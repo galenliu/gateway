@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:wet:0000002A",
+  "description": "Wet",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

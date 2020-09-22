@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:static-ip-address:000000D7",
+  "description": "Static IP Address",
+  "format": "string",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

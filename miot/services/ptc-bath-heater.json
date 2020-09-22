@@ -1,0 +1,21 @@
+{
+  "type": "urn:miot-spec-v2:service:ptc-bath-heater:0000783B",
+  "description": "PTC Bath Heater",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:target-temperature:00000021",
+    "urn:miot-spec-v2:property:temperature:00000020",
+    "urn:miot-spec-v2:property:heating:000000C7",
+    "urn:miot-spec-v2:property:blow:000000CD",
+    "urn:miot-spec-v2:property:ventilation:000000CE",
+    "urn:miot-spec-v2:property:dryer:00000027",
+    "urn:miot-spec-v2:property:heat-level:00000047",
+    "urn:miot-spec-v2:property:off-delay:00000053",
+    "urn:miot-spec-v2:property:off-delay-time:00000054"
+  ],
+  "optional-actions": [
+    "urn:miot-spec-v2:action:stop-working:00002825"
+  ]
+}

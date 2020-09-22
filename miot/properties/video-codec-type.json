@@ -1,0 +1,24 @@
+{
+  "type": "urn:miot-spec-v2:property:video-codec-type:0000005A",
+  "description": "Video Codec Type",
+  "format": "uint8",
+  "access": [],
+  "value-list": [
+    {
+      "value": 1,
+      "description": "H264"
+    },
+    {
+      "value": 2,
+      "description": "MPEG"
+    },
+    {
+      "value": 3,
+      "description": "MPEG2"
+    },
+    {
+      "value": 4,
+      "description": "MP4"
+    }
+  ]
+}

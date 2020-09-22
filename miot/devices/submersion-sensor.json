@@ -1,0 +1,11 @@
+{
+  "type": "urn:miot-spec-v2:device:submersion-sensor:0000A024",
+  "description": "Submersion Sensor",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:submersion-sensor:00007839"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:battery:00007805"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "type": "urn:miot-spec-v2:device:toilet:0000A02E",
+  "description": "Toilet",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:toilet:00007877"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:seat:00007884",
+    "urn:miot-spec-v2:service:night-light:00007883",
+    "urn:miot-spec-v2:service:filter:0000780B",
+    "urn:miot-spec-v2:service:alarm:00007804",
+    "urn:miot-spec-v2:service:physical-controls-locked:00007807",
+    "urn:miot-spec-v2:service:indicator-light:00007803"
+  ]
+}

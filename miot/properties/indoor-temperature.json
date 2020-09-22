@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:indoor-temperature:0000000A",
+  "description": "Indoor Temperature",
+  "format": "float",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "unit": "celsius",
+  "value-range": [
+    -50,
+    50,
+    1
+  ]
+}

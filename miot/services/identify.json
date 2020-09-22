@@ -1,0 +1,7 @@
+{
+  "type": "urn:miot-spec-v2:service:identify:0000782C",
+  "description": "Identify",
+  "required-actions": [
+    "urn:miot-spec-v2:action:identify:00002801"
+  ]
+}

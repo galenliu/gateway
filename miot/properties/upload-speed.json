@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:upload-speed:0000009F",
+  "description": "Upload Speed",
+  "format": "float",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    100,
+    0.1
+  ]
+}

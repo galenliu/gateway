@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:motor-reverse:00000072",
+  "description": "Motor Reverse",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

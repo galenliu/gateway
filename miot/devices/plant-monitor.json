@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:device:plant-monitor:0000A030",
+  "description": "Plant Monitor",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:plant-monitor:0000784B"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:environment:0000780A",
+    "urn:miot-spec-v2:service:battery:00007805"
+  ]
+}

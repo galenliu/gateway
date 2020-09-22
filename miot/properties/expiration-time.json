@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:property:expiration-time:00000063",
+  "description": "Expiration Time",
+  "format": "uint32",
+  "access": [],
+  "value-range": [
+    0,
+    3600,
+    3600
+  ],
+  "unit": "seconds"
+}

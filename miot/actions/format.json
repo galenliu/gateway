@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:format:00002831",
+  "description": "Format",
+  "in": [],
+  "out": []
+}

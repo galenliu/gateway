@@ -1,0 +1,15 @@
+{
+  "type": "urn:miot-spec-v2:property:wifi-channel:000000E6",
+  "description": "WiFi Channel",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "value-range": [
+    1,
+    14,
+    1
+  ]
+}

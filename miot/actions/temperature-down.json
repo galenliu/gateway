@@ -1,0 +1,6 @@
+{
+  "type": "urn:miot-spec-v2:action:temperature-down:0000281E",
+  "description": "Temperature Down",
+  "in": [],
+  "out": []
+}

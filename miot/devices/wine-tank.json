@@ -1,0 +1,12 @@
+{
+  "type": "urn:miot-spec-v2:device:wine-tank:0000A0A6",
+  "description": "Wine Tank",
+  "required-services": [
+    "urn:miot-spec-v2:service:device-information:00007801",
+    "urn:miot-spec-v2:service:wine-tank:0000789C"
+  ],
+  "optional-services": [
+    "urn:miot-spec-v2:service:indicator-light:00007803",
+    "urn:miot-spec-v2:service:screen:00007806"
+  ]
+}

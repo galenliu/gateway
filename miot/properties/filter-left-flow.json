@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:property:filter-left-flow:00000049",
+  "description": "Filter Left FLow",
+  "format": "uint16",
+  "access": [
+    "read",
+    "notify"
+  ],
+  "value-range": [
+    0,
+    1000,
+    1
+  ]
+}

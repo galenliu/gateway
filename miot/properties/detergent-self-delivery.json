@@ -1,0 +1,10 @@
+{
+  "type": "urn:miot-spec-v2:property:detergent-self-delivery:000000D0",
+  "description": "Detergent Self Delivery",
+  "format": "bool",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ]
+}

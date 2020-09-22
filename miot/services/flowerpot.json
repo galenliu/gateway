@@ -1,0 +1,14 @@
+{
+  "type": "urn:miot-spec-v2:service:flowerpot:00007888",
+  "description": "Flowerpot",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:on:00000006",
+    "urn:miot-spec-v2:property:status:00000007",
+    "urn:miot-spec-v2:property:mode:00000008",
+    "urn:miot-spec-v2:property:fault:00000009",
+    "urn:miot-spec-v2:property:watering:000000CC"
+  ],
+  "optional-events": [
+    "urn:miot-spec-v2:event:low-water-level:0000500A"
+  ]
+}

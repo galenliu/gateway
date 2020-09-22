@@ -1,0 +1,8 @@
+{
+  "type": "urn:miot-spec-v2:property:firmware-revision:00000005",
+  "description": "Current Firmware Version",
+  "format": "string",
+  "access": [
+    "read"
+  ]
+}

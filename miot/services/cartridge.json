@@ -1,0 +1,7 @@
+{
+  "type": "urn:miot-spec-v2:service:cartridge:0000786E",
+  "description": "Cartridge",
+  "optional-properties": [
+    "urn:miot-spec-v2:property:cartridge-left-level:000000AF"
+  ]
+}
