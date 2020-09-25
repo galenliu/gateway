@@ -2,7 +2,7 @@ package plugin
 
 import (
 	"context"
-	messages "github.com/galenliu/smartassistant-ipc"
+	messages "github.com/galeuliu/gateway-schema"
 	"go.uber.org/zap"
 	"io/ioutil"
 	"path"
