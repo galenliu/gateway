@@ -3,7 +3,7 @@ package plugin
 //	plugin server
 import (
 	"context"
-	messages "github.com/galenliu/smartassistant-ipc"
+	messages "github.com/galeuliu/gateway-schema"
 	json "github.com/json-iterator/go"
 	"go.uber.org/zap"
 	"sync"
@@ -115,6 +115,10 @@ func (s *PluginsServer) newConn(c *Connection) {
 		}
 		s.messageHandler(m, c)
 	}
+}
+
+func (s *PluginsServer) sendMsg() {
+
 }
 
 //开启goroutines处理ipc_server中ws

@@ -15,6 +15,7 @@ type AddonsManager struct {
 	preferences  messages.Preferences
 	configPath   string
 	pluginServer *PluginsServer
+	devices      map[string]*DeviceProxy
 
 	isLoaded     bool
 	addonPath    string
@@ -26,6 +27,7 @@ func NewAddonsManager(u messages.UserProfile, p messages.Preferences, _log *zap.
 	ctx := context.Background()
 	am := &AddonsManager{}
 	am.isLoaded = false
+	am.devices = make(map[string]*DeviceProxy)
 	am.userProfile = u
 	am.preferences = p
 	am.addonPath = am.userProfile.AddonsDir
@@ -35,36 +37,58 @@ func NewAddonsManager(u messages.UserProfile, p messages.Preferences, _log *zap.
 
 }
 
-func (am *AddonsManager) LoadAddons() {
-	if am.isLoaded {
+func (manager *AddonsManager) LoadAddons() {
+	if manager.isLoaded {
 		return
 	}
-	fs, err := ioutil.ReadDir(am.addonPath)
+	fs, err := ioutil.ReadDir(manager.addonPath)
 	if err != nil {
 		return
 	}
 	for _, fi := range fs {
 		if fi.IsDir() {
-			am.loadAddon(fi.Name())
+			manager.loadAddon(fi.Name())
 		}
 
 	}
 
 }
 
-func (am *AddonsManager) loadAddon(PluginDirName string) {
-	manifest, err := LoadManifest(am.addonPath, PluginDirName)
+func (manager *AddonsManager) loadAddon(PluginDirName string) {
+	manifest, err := LoadManifest(manager.addonPath, PluginDirName)
 	if err != nil {
 		log.Error("load manifest fail", zap.String("plugin name", PluginDirName), zap.Error(err))
 		return
 	}
-	plugin := am.pluginServer.getPlugin(manifest.ID)
+	plugin := manager.pluginServer.getPlugin(manifest.ID)
 	plugin.exec = manifest.Settings.Exec
-	plugin.execPath = path.Join(am.addonPath, PluginDirName)
+	plugin.execPath = path.Join(manager.addonPath, PluginDirName)
 	plugin.run()
 }
 
-func (am *AddonsManager) Run() {
+func (manager *AddonsManager) Run() {
 	//启动plugin server,接受来自plugin的请求
-	am.pluginServer.Run()
+	manager.pluginServer.Run()
+}
+
+func (manager *AddonsManager) GetProperty(thingId, propName string) interface{} {
+	dev := manager.getDevice(thingId)
+	return dev.GetProperty(propName)
+}
+
+func (manager *AddonsManager) SetProperty(thingId, propName string, value interface{}) {
+	dev := manager.getDevice(thingId)
+	prop := dev.FindProperty(propName)
+	prop.setValue(value)
+
+}
+
+func (manager *AddonsManager) getDevice(thingId string) *DeviceProxy {
+	if len(manager.devices) > 0 {
+		dev := manager.devices[thingId]
+		if dev != nil {
+			return dev
+		}
+	}
+	return nil
 }

@@ -1,3 +1,0 @@
-{"level":"info","time":"2020-09-22T14:12:16.869+0800","file":"smartassistant/logger.go:60","msg":"logger 初始化成功","appName":"smartassistant"}
-{"level":"error","time":"2020-09-22T14:12:16.872+0800","file":"smartassistant/bootstrap.go:36","msg":"update preferences err","appName":"smartassistant","error":"sql: converting argument $1 type: unsupported type []string, a slice of string"}
-{"level":"info","time":"2020-09-22T14:12:16.872+0800","file":"plugin/ipc_server.go:83","msg":"listening","appName":"smartassistant","addr":":9500"}

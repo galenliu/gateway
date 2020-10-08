@@ -3,11 +3,10 @@ package gateway
 import (
 	"gateway/db"
 	"gateway/plugin"
-	messages "github.com/galenliu/gateway-schema"
+	messages "github.com/galeuliu/gateway-schema"
 	"path"
 )
 
-//homeGateway
 type HomeGateway struct {
 	UserProfile   messages.UserProfile
 	Preferences   messages.Preferences
@@ -61,10 +60,11 @@ func (gateway *HomeGateway) setUserProfile(baseDir string) {
 		AddonsDir:      path.Join(baseDir, AddonsDir),
 		ConfigDir:      path.Join(baseDir, ConfigDir),
 		MediaDir:       path.Join(baseDir, MediaDir),
+		UploadDir:      path.Join(baseDir, UploadDir),
 		LogDir:         path.Join(baseDir, LogDir),
 		GatewayVersion: Version,
 	}
-	EnsureConfigPath(profile.BaseDir, profile.DataDir, profile.AddonsDir, profile.ConfigDir, profile.MediaDir)
+	EnsureConfigPath(profile.BaseDir, profile.DataDir, profile.AddonsDir, profile.ConfigDir, profile.MediaDir, profile.UploadDir, profile.LogDir)
 	gateway.UserProfile = profile
 }
 
@@ -73,4 +73,8 @@ func (gateway *HomeGateway) addonManagerLoadAndRun() error {
 	gateway.AddonsManager = addonManager
 	addonManager.LoadAddons()
 	return nil
+}
+
+func (gateway *HomeGateway) Close() {
+
 }

@@ -70,14 +70,14 @@ func (db *DataBase) get(_sql string) (string, error) {
 }
 
 //插入
-func (db *DataBase) insert(prepare string, arg ...string) error {
+func (db *DataBase) insert(prepare string, k, value string) error {
 	db.open()
 	defer db.close()
 	stmt, err := db.Prepare(prepare)
 	if err != nil {
 		return err
 	}
-	_, e := stmt.Exec(arg)
+	_, e := stmt.Exec(k, value)
 	return e
 }
 

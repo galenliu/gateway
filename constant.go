@@ -11,7 +11,12 @@ const (
 	DataDir   = "data"
 	ConfigDir = "config"
 	MediaDir  = "media"
+	UploadDir = "upload"
 	LogDir    = "log"
+
+	ApiPrefix  = "/api"
+	ThingsPath = "/things"
+	AddonsPath = "/addons"
 )
 
 var (

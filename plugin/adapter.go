@@ -1,7 +1,7 @@
 package plugin
 
 import (
-	messages "github.com/galenliu/smartassistant-ipc"
+	messages "github.com/galeuliu/gateway-schema"
 )
 
 type Adapter struct {

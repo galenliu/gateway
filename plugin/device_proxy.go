@@ -1,13 +1,13 @@
 package plugin
 
 import (
-	addon "github.com/galenliu/smartassistant-ipc"
+	addon "github.com/galeuliu/gateway-schema"
 	json "github.com/json-iterator/go"
 )
 
 type DeviceProxy struct {
 	*addon.Device
-	adapter    *Adapter
+	adapter    *AdapterProxy
 	Properties map[string]*PropertyProxy
 }
 
@@ -16,7 +16,7 @@ func NewDeviceProxy(proxy *AdapterProxy, device interface{}) *DeviceProxy {
 	return devProxy
 }
 
-func NewDevice(adapter *Adapter, _id string) (dev *DeviceProxy) {
+func NewDevice(adapter *AdapterProxy, _id string) (dev *DeviceProxy) {
 	dev = &DeviceProxy{}
 	dev.adapter = adapter
 	dev.ID = _id
@@ -29,7 +29,7 @@ func (proxy *DeviceProxy) GetId() string {
 	return proxy.ID
 }
 
-func (proxy *DeviceProxy) GetAdapter() *Adapter {
+func (proxy *DeviceProxy) GetAdapter() *AdapterProxy {
 	return proxy.adapter
 }
 
@@ -40,7 +40,8 @@ func (proxy *DeviceProxy) FindProperty(propName string) *PropertyProxy {
 
 func (proxy *DeviceProxy) AddProperty(props ...*PropertyProxy) {
 	for _, prop := range props {
-		proxy.Properties[prop.gitName()] = prop
+		prop.EventEmitter = proxy
+		proxy.Properties[prop.getName()] = prop
 	}
 }
 
@@ -58,7 +59,7 @@ func (proxy *DeviceProxy) AppendType(ts ...string) {
 	}
 }
 
-func (proxy *DeviceProxy) notifyPropertyChanged(prop interface{}) {
+func (proxy *DeviceProxy) OnPropertyChanged(prop interface{}) {
 
 }
 
@@ -66,6 +67,6 @@ func (proxy *DeviceProxy) doPropertyChanged(message string) {
 	var m addon.Property
 	_ = json.UnmarshalFromString(message, m)
 	p := proxy.FindProperty(m.Name)
-	p.Value = message
+	p.Value = m.Value
 
 }

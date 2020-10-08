@@ -1,7 +1,7 @@
 package plugin
 
 import (
-	messages "github.com/galenliu/smartassistant-ipc"
+	messages "github.com/galeuliu/gateway-schema"
 	json "github.com/json-iterator/go"
 	"go.uber.org/zap"
 	"os/exec"
@@ -65,6 +65,10 @@ func (plugin *Plugin) OnMessage(message messages.BaseMessage, data []byte) {
 		adapter.getDevice(m.DeviceId).doPropertyChanged(m.Property)
 		break
 	}
+}
+
+func (plugin *Plugin) sendMessage(message messages.BaseMessage) {
+	plugin.ws.SendMessage(message)
 }
 
 func (plugin *Plugin) addAdapter(a *AdapterProxy) {
