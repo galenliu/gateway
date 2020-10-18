@@ -1,7 +1,7 @@
 package plugin
 
 import (
-	addon "github.com/galeuliu/gateway-schema"
+	addon "gitee.com/liu_guilin/WebThings-schema"
 	json "github.com/json-iterator/go"
 )
 

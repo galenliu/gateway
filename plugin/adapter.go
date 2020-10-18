@@ -1,7 +1,7 @@
 package plugin
 
 import (
-	messages "github.com/galeuliu/gateway-schema"
+	messages "gitee.com/liu_guilin/WebThings-schema"
 )
 
 type Adapter struct {

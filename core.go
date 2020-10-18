@@ -3,7 +3,7 @@ package gateway
 import (
 	"gateway/db"
 	"gateway/plugin"
-	messages "github.com/galeuliu/gateway-schema"
+	messages "gitee.com/liu_guilin/WebThings-schema"
 	"path"
 )
 

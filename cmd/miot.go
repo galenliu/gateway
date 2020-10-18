@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"gateway"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
-	"smartassistant"
 	"strings"
 )
 
@@ -43,7 +43,7 @@ type types struct {
 }
 
 func init() {
-	flag.StringVar(&savaDir, "dir", smartassistant.GetDefaultConfigDir(), "download directory")
+	flag.StringVar(&savaDir, "dir", gateway.GetDefaultConfigDir(), "download directory")
 	flag.StringVar(&PJson, "json", "", "dir")
 }
 
@@ -58,7 +58,7 @@ func DownloadMiot() {
 		nSlice := strings.Split(v, "/")
 		name := nSlice[len(nSlice)-1]
 		p := path.Join(savaDir, name)
-		smartassistant.EnsureConfigPath(p)
+		gateway.EnsureConfigPath(p)
 		fileName := name + ".json"
 		f := path.Join(p, fileName)
 		downloadJson(f, v)

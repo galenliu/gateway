@@ -23,203 +23,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a08ae3e9-f015-4381-ba90-10535610bd97" name="Default Changelist" comment="1008">
-      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/liuguilin.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controllers/addon_controller.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controllers/debug_controller.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controllers/root_controller.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_config/addons/yeelight-adapter/main" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_config/addons/yeelight-adapter/manifest.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_config/log/gin.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_config/log/log.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/app.webmanifest" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/css/app.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/css/lib/highlight-9.12.0.min.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/css/menu.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/css/router-setup.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/css/rule.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/css/rules-common.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/css/rules.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/css/settings.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/css/subdomain-form.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/css/thing.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/css/things.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/css/user-form.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/css/wifi-setup.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/fonts/ZillaSlab-Bold.woff" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/fonts/ZillaSlab-Bold.woff2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/fonts/ZillaSlab-BoldItalic.woff" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/fonts/ZillaSlab-BoldItalic.woff2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/fonts/ZillaSlab-Regular.woff" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/fonts/ZillaSlab-Regular.woff2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/fonts/ZillaSlab-RegularItalic.woff" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/fonts/ZillaSlab-RegularItalic.woff2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/fonts/opensans-bold.woff" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/fonts/opensans-bold.woff2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/fonts/opensans-regular.woff" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/fonts/opensans-regular.woff2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/adapters-icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/add-on.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/add.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/add_arrayfield.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/arrowhead-left-16.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/arrowhead-right-16.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/authorization.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/back.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/background-small.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/background.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/check-16.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/checkbox-sprite.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/clear_arrayfield.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/close-16.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/close.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/alarm-alarm.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/alarm-ok.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/camera.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/door-sensor-closed.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/door-sensor-open.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/image.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/leak-sensor-dry.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/leak-sensor-leak.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/lock-jammed.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/lock-lock.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/lock-locked.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/lock-unknown.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/lock-unlock.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/lock-unlocked.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/motion-sensor-motion.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/motion-sensor-no-motion.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/on-off-switch-off.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/on-off-switch-on.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/push-button-not-pushed.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/push-button-pushed.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/smart-plug-off.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/smart-plug-on.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/temperature-sensor.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/thermostat-cooling.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/thermostat-heating.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/video-camera.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/component-icons/video.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/customize-16.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/delete-16.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/delete-button.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/developer-icon.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/disable.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/domain-icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/done.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/edit-plain.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/edit.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/enable.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/ethernet.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/experiments-icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/floorplan-icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/floorplan.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/icon-2x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/icon-maskable-2x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/icon-maskable.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/icon-maskable.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/icon.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/input-arrow.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/internet.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/link-icon.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/loading.gif" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/localization-icon.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/lock.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/log-out-icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/logs-icon.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/menu.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/network.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/new.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/on-off-switch.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/overflow.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/play.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/refresh.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/remove.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/right-arrow.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/rules-icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/select-arrow-dark.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/select-arrow.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/settings-icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/ssh-icon.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/stop-16.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/stop.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-details-link.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/alarm.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/binary_sensor.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/camera.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/clock.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/color_control.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/door_sensor.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/energy_monitor.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/leak_sensor.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/light.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/lock.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/motion_sensor.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/multi_level_sensor.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/multi_level_switch.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/notification.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/on_off_switch.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/pin_required_icon.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/push_button.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/smart_plug.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/temperature_sensor.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/thermostat.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/thing.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/video_camera.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/thing-icons/web_thing_icon.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/things-icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/update-icon.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/upload.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/user.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/users-icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/wifi-secure.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/wifi.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/images/wordmark.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/js/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/gateway-wot.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gateway-wot.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/addon/hap/controller/characteristic_controller.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/addon/hap/controller/container_controller.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/addon/hap/data/characteristics.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/addon/hap/handlers/accessories.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/addon/hap/handlers/characteristics.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/addon/hap/handlers/handler.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/addon/hap/handlers/pair-setup.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/addon/hap/http/server.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap.go" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/constant.go" beforeDir="false" afterPath="$PROJECT_DIR$/constant.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/things_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/things_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/gen/golang.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/gen/markdown.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/gen/yaml_json.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/miot.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/miot.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core.go" beforeDir="false" afterPath="$PROJECT_DIR$/core.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/logger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/things.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/things.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/adapter.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/adapter.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/plugin/adapter_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/adapter_proxy.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/plugin/addon_manager.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/addon_manager.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/addon_util.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/addon_util.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/plugin/device_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/device_proxy.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/ipc_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/ipc_server.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/plugin/plugin.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/plugin.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/plugin/plugin_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/plugin_server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/addon/addon.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/addon/addon_manager.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/hap/chunked_writer.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/hap/config.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/hap/connection.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/hap/constants.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/hap/context.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/hap/ip_transport.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/hap/listener.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/hap/session.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/service.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/zeroconf/config.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/zeroconf/dnssd.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/zeroconf/service.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/util.go" beforeDir="false" afterPath="$PROJECT_DIR$/util.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/middleware/jwt.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/message.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/templates/index.tmpl" beforeDir="false" afterPath="$PROJECT_DIR$/web/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/property_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/property_proxy.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/css/menu.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/css/menu.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -236,16 +58,13 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" path="/usr/local/go" />
+  <component name="GOROOT" path="C:\Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GoLibraries">
-    <option name="indexEntireGoPath" value="false" />
-  </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/../gateway-addon-golang/property_proxy.go" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/../gateway-addon-golang/go.mod" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../gateway-addon-golang/property_proxy.go" root0="SKIP_INSPECTION" />
   </component>
   <component name="ProjectId" id="1hsmJoKxjrJtPVL4SIt5ywZ6PnI" />
   <component name="ProjectLevelVcsManager">
@@ -265,10 +84,13 @@
     <property name="configurable.Global.GOPATH.is.expanded" value="true" />
     <property name="configurable.Module.GOPATH.is.expanded" value="true" />
     <property name="configurable.Project.GOPATH.is.expanded" value="true" />
+    <property name="configurable.全局.GOPATH.is.expanded" value="true" />
+    <property name="configurable.模块.GOPATH.is.expanded" value="true" />
+    <property name="configurable.项目.GOPATH.is.expanded" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/web/css" />
-    <property name="settings.editor.selected.configurable" value="configurable.group.tools" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="goland.project.structure" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -389,10 +211,15 @@
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="WindowStateProjectService">
-    <state x="760" y="205" key="#GOPATH" timestamp="1600926149985">
-      <screen x="0" y="0" width="1920" height="1080" />
+    <state x="760" y="197" key="#GOPATH" timestamp="1603029620040">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
+    <state x="760" y="197" key="#GOPATH/0.0.1920.1040@0.0.1920.1040" timestamp="1603029620040" />
     <state x="760" y="205" key="#GOPATH/0.0.1920.1080@0.0.1920.1080" timestamp="1600926149985" />
+    <state x="752" y="450" key="#GOROOT" timestamp="1603029116080">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="752" y="450" key="#GOROOT/0.0.1920.1040@0.0.1920.1040" timestamp="1603029116080" />
     <state x="184" y="112" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1601398523218">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
@@ -411,10 +238,15 @@
     <state width="939" height="466" key="DebuggerActiveHint/0.0.1440.900@0.0.1440.900" timestamp="1602525074684" />
     <state width="1204" height="560" key="DebuggerActiveHint/0.0.1920.1080@0.0.1920.1080" timestamp="1600959518413" />
     <state width="939" height="466" key="DebuggerActiveHint/0.23.1440.828@0.23.1440.828" timestamp="1602261262806" />
-    <state x="612" y="376" key="EnvironmentVariablesDialog" timestamp="1600808741939">
-      <screen x="0" y="23" width="1920" height="1008" />
+    <state x="612" y="364" key="EnvironmentVariablesDialog" timestamp="1603036293729">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
+    <state x="612" y="364" key="EnvironmentVariablesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1603036293729" />
     <state x="612" y="376" key="EnvironmentVariablesDialog/0.23.1920.1008@0.23.1920.1008" timestamp="1600808741939" />
+    <state x="510" y="237" key="FileChooserDialogImpl" timestamp="1603029637665">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="510" y="237" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1603029637665" />
     <state width="1398" height="220" key="GridCell.Tab.0.bottom" timestamp="1602956799639">
       <screen x="0" y="23" width="1440" height="828" />
     </state>
@@ -471,10 +303,11 @@
     <state width="1878" height="159" key="GridCell.Tab.1.right/0.0.1920.1080@0.0.1920.1080" timestamp="1601004275626" />
     <state width="1398" height="220" key="GridCell.Tab.1.right/0.23.1440.828@0.23.1440.828" timestamp="1602956799641" />
     <state width="1878" height="159" key="GridCell.Tab.1.right/0.23.1920.1008@0.23.1920.1008" timestamp="1601004547472" />
-    <state x="173" y="110" key="SettingsEditor" timestamp="1602860425801">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state x="231" y="127" key="SettingsEditor" timestamp="1603036301685">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="173" y="110" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1602860425801" />
+    <state x="231" y="127" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1603036301685" />
     <state x="231" y="132" key="SettingsEditor/0.0.1920.1080@0.0.1920.1080" timestamp="1600965798352" />
     <state x="230" y="146" key="SettingsEditor/0.23.1920.1008@0.23.1920.1008" timestamp="1600808918356" />
     <state width="720" height="450" key="XDebugger.FullValuePopup" timestamp="1602524660794">

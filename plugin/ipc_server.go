@@ -2,7 +2,7 @@ package plugin
 
 import (
 	"context"
-	messages "github.com/galeuliu/gateway-schema"
+	messages "gitee.com/liu_guilin/WebThings-schema"
 	"github.com/gorilla/websocket"
 	json "github.com/json-iterator/go"
 	"go.uber.org/zap"

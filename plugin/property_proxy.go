@@ -1,7 +1,7 @@
 package plugin
 
 import (
-	ipc "github.com/galeuliu/gateway-schema"
+	ipc "gitee.com/liu_guilin/WebThings-schema"
 	json "github.com/json-iterator/go"
 	"go.uber.org/zap"
 )

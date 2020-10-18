@@ -10,12 +10,12 @@ import (
 )
 
 var (
-	cfgDir        string
-	logRotateDays int
-	debug         bool
+	cfgDir        string //项目从此目录加载资源和配置
+	logRotateDays int    //日志保存的天数
+	debug         bool   //调试模式
 
-	showVersion bool
-	reset       bool
+	showVersion bool //版本
+	reset       bool //恢复配置
 )
 
 func init() {

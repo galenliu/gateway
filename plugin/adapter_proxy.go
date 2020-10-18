@@ -2,7 +2,7 @@ package plugin
 
 import (
 	"fmt"
-	messages "github.com/galeuliu/gateway-schema"
+	messages "gitee.com/liu_guilin/WebThings-schema"
 	"sync"
 )
 
