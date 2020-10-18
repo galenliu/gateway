@@ -92,10 +92,7 @@ func (s *PluginsServer) getPlugin(pluginId string) *Plugin {
 	defer s.locker.Unlock()
 	p := s.Plugins[pluginId]
 	if p == nil {
-		p = &Plugin{
-			pluginId:     pluginId,
-			pluginServer: s,
-		}
+		p = NewPlugin(pluginId, s, s.ctx)
 	}
 	return p
 }

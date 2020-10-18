@@ -24,7 +24,7 @@ func NewDevice(adapter *AdapterProxy, _id string) (dev *DeviceProxy) {
 	return
 }
 
-//Device GetId 的实现
+//Device GetId
 func (proxy *DeviceProxy) GetId() string {
 	return proxy.ID
 }

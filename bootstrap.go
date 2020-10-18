@@ -29,6 +29,7 @@ func CreateGateway(rc *RuntimeConfig) (gateway *HomeGateway, err error) {
 		Log.Error("open data base err", zap.Error(err))
 		return nil, err
 	}
+	Log.Info("database init success")
 
 	//update the gateway preferences
 	err = gateway.updatePreferences()
@@ -36,17 +37,21 @@ func CreateGateway(rc *RuntimeConfig) (gateway *HomeGateway, err error) {
 		Log.Error("update preferences err", zap.Error(err))
 		return
 	}
+	Log.Info("update preferences success")
 
 	err = gateway.addonManagerLoadAndRun()
 	if err != nil {
 		Log.Error("addon manager load err", zap.Error(err))
 		return nil, err
 	}
+	Log.Info("addon load success")
 
-	err = InitRouter("./static/", "../static/template/*", gateway.UserProfile.UploadDir, gateway.UserProfile.LogDir)
+	err = CollectRoute("./web", "./web/templates/*", gateway.UserProfile.UploadDir, gateway.UserProfile.LogDir,
+		gateway.AddonsManager, Log)
 	if err != nil {
 		return nil, err
 	}
+	Log.Info("web server running")
 
 	return
 }

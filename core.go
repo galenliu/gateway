@@ -69,7 +69,7 @@ func (gateway *HomeGateway) setUserProfile(baseDir string) {
 }
 
 func (gateway *HomeGateway) addonManagerLoadAndRun() error {
-	addonManager := plugin.NewAddonsManager(gateway.UserProfile, gateway.Preferences, Log)
+	addonManager := plugin.NewAddonsManager(gateway, Log)
 	gateway.AddonsManager = addonManager
 	addonManager.LoadAddons()
 	return nil
@@ -77,4 +77,15 @@ func (gateway *HomeGateway) addonManagerLoadAndRun() error {
 
 func (gateway *HomeGateway) Close() {
 
+}
+
+func (gateway *HomeGateway) GetUserProfile() *messages.UserProfile {
+	return &gateway.UserProfile
+}
+func (gateway *HomeGateway) GetPreferences() *messages.Preferences {
+	return &gateway.Preferences
+}
+
+func (gateway *HomeGateway) EnsureConfigPath(dir string, dirs ...string) {
+	EnsureConfigPath(dir)
 }

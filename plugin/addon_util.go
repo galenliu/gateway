@@ -2,43 +2,50 @@ package plugin
 
 import (
 	"fmt"
-	"github.com/BurntSushi/toml"
 	"go.uber.org/zap"
+	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"path"
 )
 
 const ManifestVersion = 1
-const ManifestFile = "manifest.toml"
+const ManifestFile = "manifest.yaml"
 
-type Manifest struct {
-	Author          string                 `toml:"author"`
-	Description     string                 `toml:"description,omitempty"`
-	Name            string                 `toml:"name"`
-	ID              string                 `toml:"id"`
-	ManifestVersion int                    `toml:"manifest_version"`
-	HomepageUrl     string                 `toml:"homepage_url,omitempty"`
-	Enabled         bool                   `toml:"enabled"`
-	Options         map[string]interface{} `toml:"options"`
-	Settings        Settings               `toml:"settings"`
+type AddonConfig struct {
+	AddonManifest
+	Enabled bool `json:"enabled"`
 }
 
-type Settings struct {
-	Exec       string `toml:"exec"`
-	MinVersion string `toml:"min_version"`
-	MaxVersion string `toml:"max_version"`
+func NewAddonConfig(manifest AddonManifest) *AddonConfig {
+	return &AddonConfig{AddonManifest: manifest, Enabled: true}
 }
 
-func LoadManifest(addonDir string, addonDirName string) (*Manifest, error) {
-	var manifest Manifest
+type AddonManifest struct {
+	ID               string      `yaml:"id"`
+	Name             string      `yaml:"name"`
+	Author           string      `yaml:"author"`
+	Description      string      `yaml:"description,omitempty"`
+	License          string      `yaml:"license"`
+	HomepageUrl      string      `yaml:"homepage_url,omitempty"`
+	ManifestVersion  int         `yaml:"manifest_version"`
+	Version          int         `yaml:"version"`
+	StrictMaxVersion int         `yaml:"strict_max_version"`
+	StrictMinVersion int         `yaml:"strict_min_version"`
+	Option           interface{} `yaml:"option"`
+	Exec             string      `yaml:"exec"`
+}
+
+func LoadManifest(addonDir string, addonDirName string) (*AddonManifest, error) {
+	var manifest AddonManifest
 	packetDir := path.Join(addonDir, addonDirName)
-	err := loadToml(packetDir, &manifest)
+	err := loadYaml(packetDir, &manifest)
 	if err != nil || &manifest == nil {
 		return nil, err
 	}
+	addonConfig := NewAddonConfig(manifest)
 
 	//First verify manifest version
-	if manifest.ManifestVersion != ManifestVersion {
+	if addonConfig.ManifestVersion != ManifestVersion {
 		err = fmt.Errorf("the manifest version(%v) for addon :%v does not match version",
 			manifest.ManifestVersion, ManifestVersion)
 		log.Warn("", zap.Error(err))
@@ -54,11 +61,11 @@ func LoadManifest(addonDir string, addonDirName string) (*Manifest, error) {
 	return &manifest, err
 }
 
-func loadToml(dirName string, in *Manifest) error {
+func loadYaml(dirName string, in *AddonManifest) error {
 	f, err := ioutil.ReadFile(path.Join(dirName, ManifestFile))
 	if err != nil {
 		return err
 	}
-	err = toml.Unmarshal(f, in)
+	err = yaml.Unmarshal(f, in)
 	return err
 }

@@ -5,19 +5,19 @@ import (
 	"gateway/controllers"
 	"gateway/plugin"
 	"github.com/gin-gonic/gin"
-
+	"go.uber.org/zap"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"path"
-	"strings"
 )
 
-func InitRouter(staticPath, template, upload, logDir string, manager *plugin.AddonsManager) error {
+func CollectRoute(staticPath, templates, upload, logDir string, manager *plugin.AddonsManager, _log *zap.Logger) error {
 
 	//init thingsController
-	thingsController := controllers.NewThingsController(manager)
+	thingsController := controllers.NewThingsController(manager, _log)
+	addonController := controllers.NewAddonController(manager, _log)
 
 	//thingsCtr := controllers.NewThingsController()
 	var router = gin.Default()
@@ -28,10 +28,16 @@ func InitRouter(staticPath, template, upload, logDir string, manager *plugin.Add
 	f, _ := os.Create(path.Join(logDir, "gin.log"))
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 
-	//router.Static("/static","/index.html")
-	//router.Static("/static", "./static")
-	router.LoadHTMLGlob("./static/templates/*")
-	//router.LoadHTMLGlob(template)
+	//html template
+	router.LoadHTMLGlob(templates)
+
+	//images,js
+	router.StaticFS("/images", http.Dir(staticPath+"/images"))
+	router.StaticFS("/js", http.Dir(staticPath+"/js"))
+	router.StaticFS("/css", http.Dir(staticPath+"/css"))
+	router.StaticFS("/fonts", http.Dir(staticPath+"/fonts"))
+
+	router.Static("/app.webmanifest", staticPath+"/app.webmanifest")
 
 	//curl -X POST http://localhost:8080/upload \
 	//-F "upload[]=@/Users/appleboy/test1.zip" \
@@ -52,27 +58,8 @@ func InitRouter(staticPath, template, upload, logDir string, manager *plugin.Add
 		c.String(http.StatusOK, fmt.Sprintf("%d files uploaded!", len(files)))
 	})
 
-	// 静态文件
-	router.Use(func(c *gin.Context) {
-		if c.Request.RequestURI == "/" && strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-			c.HTML(http.StatusOK, "index.tmpl", "")
-		}
-	})
-
-	//router handle api
-	router.Use(func(c *gin.Context) {
-		if (!strings.Contains(c.Request.Header.Get("Accept"), "text/html") &&
-			strings.Contains(c.Request.Header.Get("Accept"), "application/json")) ||
-			c.IsWebsocket() {
-
-			//c.Request.URL.Path = ApiPrefix + c.Request.URL.String()
-			//c.Request.RequestURI = c.Request.URL.String()
-			r, _ := http.NewRequest("GET", ApiPrefix+c.Request.URL.String(), nil)
-			c.Request = r
-			c.Next()
-
-		}
-	})
+	// root controller
+	router.GET("/", controllers.RootHandle())
 
 	//Things Controller
 	thingsGroup := router.Group(ThingsPath)
@@ -85,7 +72,7 @@ func InitRouter(staticPath, template, upload, logDir string, manager *plugin.Add
 		//get a thing
 		thingsGroup.GET("/:thingId", thingsController.HandleGetThing)
 		//get the properties of a thing
-		thingsGroup.GET(":thingId/properties", thingsController.HandleGetProperties)
+		thingsGroup.GET("/:thingId/properties", thingsController.HandleGetProperties)
 		//get a property of a thing
 		thingsGroup.GET("/:thingId/properties/:propertyName", thingsController.HandleGetProperty)
 
@@ -103,7 +90,13 @@ func InitRouter(staticPath, template, upload, logDir string, manager *plugin.Add
 	//Addons Controller
 	addonGroup := router.Group(AddonsPath)
 	{
-		addonGroup.GET("/", nil)
+		addonGroup.GET("/", addonController.HandlerGetInstalledAddons)
+	}
+
+	//Addons Controller
+	debugGroup := router.Group(DebugPath)
+	{
+		debugGroup.GET("/", nil)
 	}
 
 	_ = router.Run(":8080")

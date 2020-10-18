@@ -1,0 +1,121 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+#main-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 32rem;
+  background-color: #5288af;
+  margin: 0;
+  transition: transform 0.25s ease;
+  z-index: 1000;
+}
+
+#main-menu.hidden {
+  transform: translate(-32rem);
+}
+
+#main-menu ul {
+  list-style-type: none;
+  margin: 0;
+  margin-top: 9.6rem;
+  padding: 0;
+  height: calc(100% - 9.6rem);
+  max-height: calc(100% - 9.6rem);
+  overflow: auto;
+}
+
+#main-menu a,
+.log-out-button {
+  display: block;
+  padding: 2rem;
+  padding-left: 6.8rem;
+  font-size: 1.8rem;
+  color: #fff;
+  text-decoration: none;
+  background-size: 3.2rem;
+  background-repeat: no-repeat;
+  background-position: 2rem;
+  outline: 0;
+}
+
+.log-out-button {
+  background-color: unset;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  background-image: url('/images/log-out-icon.png');
+}
+
+#main-menu a:hover,
+#main-menu a.selected,
+.log-out-button:hover,
+.log-out-button.selected {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+#main-menu a.hidden {
+  display: none;
+}
+
+#main-menu #things-menu-item {
+  background-image: url('/images/things-icon.png');
+}
+
+#main-menu #settings-menu-item {
+  background-image: url('/images/settings-icon.png');
+}
+
+#main-menu #floorplan-menu-item {
+  background-image: url('/images/floorplan-icon.png');
+}
+
+#main-menu #rules-menu-item {
+  background-image: url('/images/rules-icon.png');
+}
+
+#main-menu #logs-menu-item {
+  background-image: url('/images/logs-icon.svg');
+}
+
+@keyframes show-scrim {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 0.5;
+  }
+}
+
+@keyframes hide-scrim {
+  from {
+    opacity: 0.5;
+    width: 100%;
+  }
+
+  to {
+    opacity: 0;
+    width: 100%;
+  }
+}
+
+#menu-scrim {
+  background-color: rgba(0, 0, 0);
+  opacity: 0.5;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  animation: show-scrim 0.25s ease 0s;
+  z-index: 999;
+}
+
+#menu-scrim.hidden {
+  animation: hide-scrim 0.25s ease 0s;
+  width: 0%;
+}

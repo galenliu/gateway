@@ -1,0 +1,282 @@
+{"level":"info","time":"2020-10-10T01:13:57.679+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-10T01:13:57.686+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":27663}
+{"level":"info","time":"2020-10-10T01:18:45.444+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-10T01:18:45.448+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-10T01:18:45.451+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-10T01:18:45.454+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":27729}
+{"level":"info","time":"2020-10-10T01:18:45.454+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-10T14:06:00.435+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-10T14:06:00.439+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-10T14:06:00.441+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-10T14:06:00.444+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":929}
+{"level":"info","time":"2020-10-10T14:06:00.444+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T21:48:58.137+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T21:48:58.141+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T21:48:58.145+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T21:48:58.149+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":13194}
+{"level":"info","time":"2020-10-12T21:48:58.150+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T21:53:32.601+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T21:53:32.604+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T21:53:32.608+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T21:53:32.612+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":13299}
+{"level":"info","time":"2020-10-12T21:53:32.612+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T21:54:15.691+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T21:54:15.695+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T21:54:15.697+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T21:54:15.700+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":13340}
+{"level":"info","time":"2020-10-12T21:54:15.700+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T21:55:47.602+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T21:55:47.605+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T21:55:47.608+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T21:55:47.610+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":13384}
+{"level":"info","time":"2020-10-12T21:55:47.610+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T21:56:26.136+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T21:56:26.139+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T21:56:26.141+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T21:56:26.144+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":13422}
+{"level":"info","time":"2020-10-12T21:56:26.144+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T22:00:31.969+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T22:00:31.972+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T22:00:31.975+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T22:00:31.978+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":13587}
+{"level":"info","time":"2020-10-12T22:00:31.978+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T22:01:11.741+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T22:01:11.743+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T22:01:11.745+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T22:01:11.747+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":13626}
+{"level":"info","time":"2020-10-12T22:01:11.747+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T22:02:52.119+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T22:02:52.122+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T22:02:52.124+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T22:02:52.126+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":13676}
+{"level":"info","time":"2020-10-12T22:02:52.126+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T22:03:13.474+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T22:03:13.476+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T22:03:13.478+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T22:03:13.480+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":13708}
+{"level":"info","time":"2020-10-12T22:03:13.480+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T22:04:14.628+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T22:04:14.632+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T22:04:14.634+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T22:04:14.636+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":13747}
+{"level":"info","time":"2020-10-12T22:04:14.637+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T22:06:38.045+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T22:06:38.048+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T22:06:38.050+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T22:06:38.053+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":13800}
+{"level":"info","time":"2020-10-12T22:06:38.053+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T22:08:12.190+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T22:08:12.193+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T22:08:12.196+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T22:08:12.198+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":13842}
+{"level":"info","time":"2020-10-12T22:08:12.198+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T22:08:26.192+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T22:08:26.194+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T22:08:26.197+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T22:08:26.199+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":13877}
+{"level":"info","time":"2020-10-12T22:08:26.199+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T22:08:47.074+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T22:08:47.077+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T22:08:47.080+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T22:08:47.082+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":13914}
+{"level":"info","time":"2020-10-12T22:08:47.082+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T22:11:35.244+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T22:11:35.247+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T22:11:35.250+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T22:11:35.253+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":13998}
+{"level":"info","time":"2020-10-12T22:11:35.253+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T22:12:10.844+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T22:12:10.848+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T22:12:10.850+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T22:12:10.852+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":14042}
+{"level":"info","time":"2020-10-12T22:12:10.853+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T22:13:06.745+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T22:13:06.748+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T22:13:06.751+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T22:13:06.753+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":14082}
+{"level":"info","time":"2020-10-12T22:13:06.753+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T22:15:17.062+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T22:15:17.065+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T22:15:17.068+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T22:15:17.071+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":14134}
+{"level":"info","time":"2020-10-12T22:15:17.071+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T22:19:28.458+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T22:19:28.461+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T22:19:28.464+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T22:19:28.467+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":14268}
+{"level":"info","time":"2020-10-12T22:19:28.468+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T22:20:08.091+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T22:20:08.095+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T22:20:08.098+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T22:20:08.100+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":14309}
+{"level":"info","time":"2020-10-12T22:20:08.100+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-12T22:20:59.894+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-12T22:20:59.896+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-12T22:20:59.898+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-12T22:20:59.902+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":14344}
+{"level":"info","time":"2020-10-12T22:20:59.902+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-13T00:56:48.709+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-13T00:56:48.713+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-13T00:56:48.717+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-13T00:56:48.722+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":14771}
+{"level":"info","time":"2020-10-13T00:56:48.722+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-13T01:01:13.973+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-13T01:01:13.977+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-13T01:01:13.981+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-13T01:01:13.986+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":14841}
+{"level":"info","time":"2020-10-13T01:01:13.986+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-13T01:02:08.473+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-13T01:02:08.476+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-13T01:02:08.478+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-13T01:02:08.480+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":14886}
+{"level":"info","time":"2020-10-13T01:02:08.480+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-13T01:05:34.217+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-13T01:05:34.220+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-13T01:05:34.223+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-13T01:05:34.225+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":14946}
+{"level":"info","time":"2020-10-13T01:05:34.225+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-13T01:07:42.673+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-13T01:07:42.677+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-13T01:07:42.679+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-13T01:07:42.683+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":15021}
+{"level":"info","time":"2020-10-13T01:07:42.683+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-13T01:10:12.046+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-13T01:10:12.049+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-13T01:10:12.052+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-13T01:10:12.058+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":15071}
+{"level":"info","time":"2020-10-13T01:10:12.059+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-13T01:37:44.702+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-13T01:37:44.706+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-13T01:37:44.708+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-13T01:37:44.711+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":15438}
+{"level":"info","time":"2020-10-13T01:37:44.711+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-13T01:40:52.637+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-13T01:40:52.641+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-13T01:40:52.643+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-13T01:40:52.646+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":15494}
+{"level":"info","time":"2020-10-13T01:40:52.646+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-13T01:43:18.465+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-13T01:43:18.469+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-13T01:43:18.471+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-13T01:43:18.474+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":15547}
+{"level":"info","time":"2020-10-13T01:43:18.474+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-13T01:45:36.568+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-13T01:45:36.570+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-13T01:45:36.574+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-13T01:45:36.577+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":15614}
+{"level":"info","time":"2020-10-13T01:45:36.577+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-13T01:47:44.791+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-13T01:47:44.795+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-13T01:47:44.797+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-13T01:47:44.800+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":15664}
+{"level":"info","time":"2020-10-13T01:47:44.800+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-13T01:53:05.122+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-13T01:53:05.125+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-13T01:53:05.128+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-13T01:53:05.131+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":15779}
+{"level":"info","time":"2020-10-13T01:53:05.131+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-13T01:53:40.796+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-13T01:53:40.799+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-13T01:53:40.803+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-13T01:53:40.806+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":15816}
+{"level":"info","time":"2020-10-13T01:53:40.806+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-13T01:54:38.511+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-13T01:54:38.513+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-13T01:54:38.515+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-13T01:54:38.517+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":15858}
+{"level":"info","time":"2020-10-13T01:54:38.517+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-13T01:54:41.530+0800","file":"controllers/things_controller.go:32","msg":"things controller handle get things"}
+{"level":"info","time":"2020-10-13T02:01:32.891+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-13T02:01:32.894+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-13T02:01:32.898+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-13T02:01:32.903+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":15937}
+{"level":"info","time":"2020-10-13T02:01:32.904+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-13T02:01:49.962+0800","file":"controllers/things_controller.go:54","msg":"things handler:GetThing","/:thingId":"123","method":"GET"}
+{"level":"info","time":"2020-10-13T02:04:18.694+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-13T02:04:18.697+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-13T02:04:18.699+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-13T02:04:18.701+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":15995}
+{"level":"info","time":"2020-10-13T02:04:18.702+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-13T02:06:08.998+0800","file":"controllers/things_controller.go:54","msg":"things handler:GetThing","/:thingId":"123","method":"GET"}
+{"level":"info","time":"2020-10-13T02:06:47.175+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-13T02:06:47.179+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-13T02:06:47.181+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-13T02:06:47.184+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":16075}
+{"level":"info","time":"2020-10-13T02:06:47.184+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-13T02:10:14.204+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-13T02:10:14.208+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-13T02:10:14.210+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-13T02:10:14.212+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":16155}
+{"level":"info","time":"2020-10-13T02:10:14.213+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-13T02:12:52.099+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"info","time":"2020-10-13T02:12:52.103+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"info","time":"2020-10-13T02:12:52.105+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"info","time":"2020-10-13T02:12:52.108+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":16245}
+{"level":"info","time":"2020-10-13T02:12:52.108+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"info","time":"2020-10-13T02:12:54.182+0800","file":"controllers/things_controller.go:90","msg":"things handler:GetProperties","thingId":"231212","method":"PUT"}
+{"level":"\u001b[34minfo\u001b[0m","time":"2020-10-13T04:25:17.977+0800","file":"gateway-wot/logger.go:61","msg":"logger 初始化成功"}
+{"level":"\u001b[34minfo\u001b[0m","time":"2020-10-13T04:25:17.981+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"\u001b[34minfo\u001b[0m","time":"2020-10-13T04:25:17.984+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"\u001b[34minfo\u001b[0m","time":"2020-10-13T04:25:17.987+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":27244}
+{"level":"\u001b[34minfo\u001b[0m","time":"2020-10-13T04:25:17.988+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-13T04:28:20.475+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-13T04:28:20.478+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-13T04:28:20.481+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-13T04:28:20.483+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":27295}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-13T04:28:20.484+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:04:38.411+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:04:38.415+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:04:38.417+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:04:38.420+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":32324}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:04:38.420+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:06:28.447+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:06:28.450+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:06:28.454+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:06:28.456+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":32391}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:06:28.456+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:20:39.163+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:20:39.167+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:20:39.170+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:20:39.172+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":32745}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:20:39.172+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:22:37.372+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:22:37.376+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:22:37.379+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:22:37.381+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":32825}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:22:37.381+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:25:12.537+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:25:12.540+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:25:12.543+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:25:12.545+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":32879}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:25:12.545+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:25:40.117+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:25:40.119+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:25:40.122+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:25:40.124+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":32911}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:25:40.124+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:55:40.488+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:55:40.492+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:55:40.495+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:55:40.500+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":33244}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-14T02:55:40.500+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:06:30.454+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:06:30.457+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:06:30.460+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:06:30.463+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":37982}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:06:30.463+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:08:28.579+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:08:28.582+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:08:28.585+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:08:28.588+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":38034}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:08:28.588+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:09:53.664+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:09:53.667+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:09:53.670+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:09:53.673+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":38094}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:09:53.674+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:14:34.214+0800","file":"gateway-wot/logger.go:59","msg":"logger 初始化成功"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:14:34.217+0800","file":"gateway-wot/bootstrap.go:32","msg":"database init success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:14:34.219+0800","file":"gateway-wot/bootstrap.go:40","msg":"update preferences success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:14:34.222+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":38202}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:14:34.222+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-17T00:59:18.242+0800","file":"controllers/things_controller.go:32","msg":"things controller handle get things"}

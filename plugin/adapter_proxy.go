@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"fmt"
 	messages "github.com/galeuliu/gateway-schema"
 	"sync"
 )
@@ -11,13 +12,15 @@ type AdapterProxy struct {
 	manager *AddonsManager
 	looker  *sync.Mutex
 	name    string
+
+	manifest interface{}
 }
 
 func NewAdapterProxy(manager *AddonsManager, adapterId string, name string, packetName string) *AdapterProxy {
 	proxy := &AdapterProxy{}
 	proxy.manager = manager
-	proxy.userProfile = &manager.userProfile
-	proxy.preferences = &manager.preferences
+	proxy.userProfile = manager.iGateway.GetUserProfile()
+	proxy.preferences = manager.iGateway.GetPreferences()
 	proxy.ID = adapterId
 	proxy.PackageName = packetName
 	proxy.name = name
@@ -37,6 +40,19 @@ func (adapter *AdapterProxy) getDevice(devId string) *DeviceProxy {
 	defer adapter.looker.Unlock()
 	device := adapter.devices[devId]
 	return device
+}
+
+func (adapter *AdapterProxy) removeThing(dev *DeviceProxy) {
+	log.Info(fmt.Sprintf("adapter delete thing Id: %v", dev.ID))
+	adapter.sendMessage(messages.MessageTypeAdapterRemoveDeviceRequest, messages.AdapterRemoveDeviceRequest{
+		AdapterId: adapter.ID,
+		PluginId:  adapter.PackageName,
+		DeviceId:  dev.ID,
+	})
+}
+
+func (adapter *AdapterProxy) pairing() {
+
 }
 
 func (adapter *AdapterProxy) sendMessage(messageType int, data interface{}) {

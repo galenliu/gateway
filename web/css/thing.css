@@ -1,0 +1,392 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+.thing {
+  width: 12.8rem;
+  text-align: center;
+  margin: 1rem;
+  display: inline-block;
+  text-decoration: none;
+  color: white;
+  box-sizing: border-box;
+  vertical-align: bottom;
+  opacity: 0.5;
+}
+
+.thing.connected {
+  opacity: 1;
+}
+
+.thing-ui-link {
+  box-sizing: border-box;
+  display: block;
+  position: relative;
+  z-index: 10;
+  background-color: #89b6d6;
+  background-size: 5rem;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url('/images/link-icon.svg');
+  border: 1px solid white;
+  border-radius: 2rem;
+  width: 4rem;
+  height: 4rem;
+  top: 4rem;
+  margin-top: -4rem;
+}
+
+.thing-details-link {
+  box-sizing: border-box;
+  display: block;
+  position: relative;
+  z-index: 10;
+  background-color: #89b6d6;
+  background-size: 2.4rem;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url('/images/thing-details-link.svg');
+  border: 1px solid white;
+  border-radius: 2rem;
+  width: 4rem;
+  height: 4rem;
+  top: 4rem;
+  left: 8.8rem;
+  margin-top: -4rem;
+}
+
+.thing-detail-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -5rem;
+  margin-top: -5rem;
+}
+
+.thing-detail {
+  width: 10rem;
+  height: 10rem;
+  border-radius: 5rem;
+  border: 2px solid white;
+  background: #89b6d6;
+  position: relative;
+}
+
+.thing-detail-contents {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.thing-detail-label {
+  text-align: center;
+  max-width: 10rem;
+  overflow-wrap: break-word;
+  background: #5d9bc7;
+  display: inline-block;
+}
+
+.thing-title {
+  color: white;
+  font-size: 1.3rem;
+  display: block;
+  width: 12.8rem;
+  height: 3.6rem;
+  overflow: hidden;
+  margin: 0.5rem 0;
+}
+
+.thing-detail-layout-links {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.5;
+}
+
+.thing-detail-layout-links.connected {
+  opacity: 1;
+}
+
+.thing-detail-layout-link {
+  stroke: white;
+  stroke-width: 2px;
+}
+
+#thing-title-container .hidden,
+#thing-title.hidden {
+  display: none;
+}
+
+#thing-title {
+  width: 100%;
+  text-align: center;
+  position: fixed;
+  top: 0;
+  height: 9.6rem;
+  display: flex;
+  align-items: center;
+}
+
+#thing-title-container {
+  white-space: nowrap;
+  overflow: hidden;
+  color: #fff;
+  text-overflow: ellipsis;
+  height: 100%;
+  line-height: 9.6rem;
+}
+
+#thing-title-custom-icon {
+  display: inline-block;
+  transform: scale(0.62);
+  position: relative;
+  top: 2.3rem;
+  left: 0.5rem;
+}
+
+#thing-title-icon {
+  display: inline-block;
+}
+
+#thing-title-icon:not(.custom-thing) {
+  height: 4rem;
+  width: 4rem;
+  border: 0.1rem solid white;
+  border-radius: 2rem;
+  background-size: 2rem;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: #ffffff64;
+  position: relative;
+  top: 1.3rem;
+  margin-right: 0.5rem;
+}
+
+#thing-title-title {
+  font-size: 1.6rem;
+}
+
+#thing-title-back-flex,
+#thing-title-right-flex {
+  flex: 1;
+  min-width: 9.6rem;
+  flex-shrink: 0;
+  height: 9.6rem;
+}
+
+#thing-title-right-flex {
+  flex: 1;
+  min-width: 0;
+}
+
+.generic-checkbox {
+  position: absolute;
+  left: -1000em;
+}
+
+.generic-checkbox + label::before {
+  content: '';
+  display: inline-block;
+  width: 3rem;
+  height: 3rem;
+  float: right;
+  margin: 0.1rem 0;
+  background: url('/images/checkbox-sprite.png') no-repeat 0 0;
+  background-size: 3rem auto;
+}
+
+.generic-checkbox:checked + label::before {
+  background-position: 0 -3rem;
+}
+
+.generic-checkbox:disabled + label::before {
+  background-position: 0 -6rem;
+}
+
+.generic-checkbox:checked:disabled + label::before {
+  background-position: 0 -9rem;
+}
+
+#things a {
+  text-decoration: none;
+}
+
+.action-button {
+  background-color: #698ba4;
+  text-transform: uppercase;
+  height: 4rem;
+  width: 8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  color: #fff;
+  z-index: 10;
+}
+
+.action-button::-moz-focus-inner {
+  border: 0;
+}
+
+.action-button:hover {
+  background-color: #59768a;
+}
+
+.action-button:active {
+  background-color: #496071;
+}
+
+.action-button:disabled {
+  background-color: #79a1bd;
+}
+
+.action-input {
+  max-width: 60rem;
+  margin: 0 auto;
+  text-align: left;
+  background-color: #5288af;
+  border-radius: 0.5rem;
+  padding: 3rem;
+}
+
+.action-input-title {
+  width: 100%;
+  text-align: center;
+  margin-top: -1rem;
+  margin-bottom: 2rem;
+  font-size: 2.8rem;
+}
+
+.action-input-form {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 1rem;
+  grid-auto-rows: minmax(4rem, auto);
+}
+
+.action-input-name {
+  margin-top: 0.4rem;
+  text-align: right;
+  font-size: 2rem;
+}
+
+.action-input-unit {
+  margin-top: 0.6rem;
+  text-align: left;
+}
+
+.action-input-enum {
+  height: 2.75rem;
+  background-color: #d2d9de;
+  border: none;
+  border-radius: 0.5rem;
+  margin: 0.5rem 0;
+  font-size: 1.6rem;
+  color: #333;
+}
+
+.action-input-string,
+.action-input-number {
+  width: 95%;
+  color: #333;
+}
+
+.action-input-checkbox {
+  display: none;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+.action-input-checkbox + label::before {
+  content: '';
+  display: inline-block;
+  width: 3rem;
+  height: 3rem;
+  margin: 0.1rem 0;
+  background: url('/images/checkbox-sprite.png') no-repeat 0 0;
+  background-size: 3rem auto;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+.action-input-checkbox:checked + label::before {
+  background-position: 0 -3rem;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+.action-input-checkbox:disabled + label::before {
+  background-position: 0 -6rem;
+}
+
+.action-input-checkbox:checked:disabled + label::before {
+  background-position: 0 -9rem;
+}
+
+#action-submit-button {
+  grid-column: 2;
+  width: auto;
+  margin-top: 2rem;
+}
+
+.event-list {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 2rem;
+  max-height: 100%;
+  text-align: left;
+}
+
+.event-item {
+  background-color: #5288af;
+  display: block;
+  font-size: 1.8rem;
+  list-style-type: none;
+  color: #fff;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 2rem;
+}
+
+.event-header {
+  width: 100%;
+}
+
+.event-name {
+  font-size: 2rem;
+}
+
+.event-time {
+  float: right;
+}
+
+.event-body {
+  padding-top: 1rem;
+}
+
+[draggable] {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: grab;
+}
+
+.drag-start::before {
+  content: '';
+  position: absolute;
+  margin-left: -7.5rem;
+  height: 12.8rem;
+  border-left: 0.2rem dashed white;
+}
+
+.drag-end::after {
+  content: '';
+  position: absolute;
+  margin-left: 7.3rem;
+  margin-top: -17.4rem;
+  height: 12.8rem;
+  border-right: 0.2rem dashed white;
+}

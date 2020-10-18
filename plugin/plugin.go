@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"context"
 	messages "github.com/galeuliu/gateway-schema"
 	json "github.com/json-iterator/go"
 	"go.uber.org/zap"
@@ -21,14 +22,21 @@ type Plugin struct {
 	ws           *Connection
 	pluginServer *PluginsServer
 	adapters     map[string]*AdapterProxy
+
+	ctx        context.Context
+	cancelFunc context.CancelFunc
 }
 
-func NewPlugin(pluginId string, s *PluginsServer, _verbose bool) (plugin *Plugin) {
+func NewPlugin(pluginId string, s *PluginsServer, _ctx context.Context) (plugin *Plugin) {
 	plugin = &Plugin{}
 	plugin.looker = new(sync.Mutex)
 	plugin.pluginId = pluginId
 	plugin.pluginServer = s
-	plugin.verbose = _verbose
+	if _ctx != nil {
+		plugin.ctx = _ctx
+	} else {
+		plugin.ctx = context.Background()
+	}
 	return
 }
 
@@ -89,7 +97,18 @@ func (plugin *Plugin) getAdapter(id string) *AdapterProxy {
 func (plugin *Plugin) run() {
 
 	command := strings.Replace(plugin.exec, "{path}", plugin.execPath, 1)
-	cmd := exec.Command("go", "run", command)
-	_ = cmd.Run()
+	var ctx context.Context
+	ctx, plugin.cancelFunc = context.WithCancel(plugin.ctx)
+	cmd := exec.CommandContext(ctx, command)
+	err := cmd.Start()
+	if err != nil {
+		log.Warn("plugin run failed", zap.String("plugin id", plugin.pluginId))
+	} else {
+		log.Info("plugin is running", zap.String("plugin id", plugin.pluginId), zap.Int("pid", cmd.Process.Pid))
+	}
+}
 
+func (plugin *Plugin) kill() {
+	plugin.cancelFunc()
+	plugin.registered = false
 }

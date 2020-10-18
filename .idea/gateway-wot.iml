@@ -11,6 +11,7 @@
     <content url="file://$MODULE_DIR$/../gateway-addon-golang" />
     <content url="file://$MODULE_DIR$/../gateway-schema" />
     <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$/../virtual-adapter" />
     <content url="file://$MODULE_DIR$/../yeelight-adapter" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

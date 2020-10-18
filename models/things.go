@@ -1,23 +1,32 @@
 package models
 
 import (
-	"gateway"
-	"gateway/plugin"
 	json "github.com/json-iterator/go"
-	"go.uber.org/zap"
+	logger "go.uber.org/zap"
 )
 
-var log *zap.Logger
+var log *logger.Logger
 
-type Things struct {
-	things       map[string]*Thing
-	AddonManager *plugin.AddonsManager
+type IAddonManager interface {
+	GetProperty(thingId, propName string) interface{}
+	SetProperty(thingId, propName string, value interface{})
+	RemoveThing(thingId string)
+	GetInstallAddons() map[string]interface{}
 }
 
-func NewThings(manager *plugin.AddonsManager) *Things {
-	log = gateway.GetLogger()
+type Things struct {
+	things  map[string]*Thing
+	Manager IAddonManager
+}
+
+func NewThings(manager IAddonManager, _log *logger.Logger) *Things {
+	if _log != nil {
+		log = _log
+	} else {
+		log = logger.L()
+	}
 	return &Things{
-		AddonManager: manager,
+		Manager: manager,
 	}
 }
 
@@ -46,9 +55,14 @@ func (ts *Things) ToJson() string {
 }
 
 func (ts *Things) GetThingProperty(thingId, propName string) interface{} {
-	return ts.AddonManager.GetProperty(thingId, propName)
+	return ts.Manager.GetProperty(thingId, propName)
 }
 
 func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) {
-	ts.AddonManager.SetProperty(thingId, propName, value)
+	ts.Manager.SetProperty(thingId, propName, value)
+}
+
+func (ts *Things) RemoveThing(thingId string) error {
+	//TODO: Delete thing from database
+	return nil
 }

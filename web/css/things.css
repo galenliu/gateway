@@ -1,0 +1,30 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+#things-view {
+  height: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+  padding: 7.6rem 0;
+}
+
+#things {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  max-height: 100%;
+  text-align: center;
+  font-size: 1.6rem;
+  color: #fff;
+}
+
+#add-button {
+  bottom: 2rem;
+  right: 2rem;
+  background: no-repeat center/100% url('/images/add.svg');
+}
+
+#add-thing-back-button {
+  background-color: transparent;
+}

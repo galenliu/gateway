@@ -15,7 +15,6 @@ type Info struct {
 }
 
 func EnsureConfigPath(baseDir string, dirs ...string) {
-
 	_, err := ioutil.ReadDir(baseDir)
 	if os.IsNotExist(err) {
 		_ = os.MkdirAll(baseDir, os.ModePerm)

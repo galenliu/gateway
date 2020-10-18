@@ -26,7 +26,7 @@ func InitLogger(logDir string, debug bool, logRotateDays int) {
 		CallerKey:      "file",
 		StacktraceKey:  "stacktrace",
 		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.LowercaseLevelEncoder,
+		EncodeLevel:    zapcore.CapitalColorLevelEncoder,
 		EncodeTime:     zapcore.ISO8601TimeEncoder,
 		EncodeDuration: zapcore.SecondsDurationEncoder,
 		EncodeCaller:   zapcore.ShortCallerEncoder, // 短路径编码器
@@ -53,11 +53,8 @@ func InitLogger(logDir string, debug bool, logRotateDays int) {
 	// 开启文件及行号
 	development := zap.Development()
 
-	// 设置初始化字段
-	field := zap.Fields(zap.String("appName", "smartassistant"))
-
 	// 构造日志
-	Log = zap.New(core, caller, development, field)
+	Log = zap.New(core, caller, development)
 	Log.Info("logger 初始化成功")
 
 }

@@ -17,6 +17,7 @@ const (
 	ApiPrefix  = "/api"
 	ThingsPath = "/things"
 	AddonsPath = "/addons"
+	DebugPath  = "/debug"
 )
 
 var (
