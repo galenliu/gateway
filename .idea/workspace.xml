@@ -22,40 +22,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a08ae3e9-f015-4381-ba90-10535610bd97" name="Default Changelist" comment="1008">
-      <change afterPath="$PROJECT_DIR$/web/css/font-awesome.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/font/demo.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/font/demo_index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/font/iconfont.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/font/iconfont.eot" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/font/iconfont.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/font/iconfont.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/font/iconfont.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/font/iconfont.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/font/iconfont.woff" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/font/iconfont.woff2" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_config/config/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/test_config/config/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_config/log/gin.log" beforeDir="false" afterPath="$PROJECT_DIR$/test_config/log/gin.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_config/log/log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/test_config/log/log.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/css/app.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/css/menu.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/css/menu.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/fonts/ZillaSlab-Bold.woff" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/fonts/ZillaSlab-Bold.woff2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/fonts/ZillaSlab-BoldItalic.woff" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/fonts/ZillaSlab-BoldItalic.woff2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/fonts/ZillaSlab-Regular.woff" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/fonts/ZillaSlab-Regular.woff2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/fonts/ZillaSlab-RegularItalic.woff" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/fonts/ZillaSlab-RegularItalic.woff2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/fonts/opensans-bold.woff" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/fonts/opensans-bold.woff2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/fonts/opensans-regular.woff" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/fonts/opensans-regular.woff2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/web/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/templates/index.html" afterDir="false" />
-    </list>
+    <list default="true" id="a08ae3e9-f015-4381-ba90-10535610bd97" name="Default Changelist" comment="1008" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
