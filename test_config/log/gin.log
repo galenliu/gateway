@@ -27,6 +27,3 @@
 [GIN-debug] GET    /addons/                  --> gateway/controllers.(*AddonController).HandlerGetInstalledAddons-fm (3 handlers)
 [GIN-debug] GET    /debug/                   -->  (3 handlers)
 [GIN-debug] Listening and serving HTTP on :8080
-[GIN-debug] redirecting request 301: /app.webmanifest/ --> /app.webmanifest/
-[GIN-debug] redirecting request 301: / --> /
-[GIN-debug] redirecting request 301: /things/ --> /things/

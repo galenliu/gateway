@@ -280,3 +280,13 @@
 {"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:14:34.222+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":38202}
 {"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-16T01:14:34.222+0800","file":"gateway-wot/bootstrap.go:47","msg":"addon load success"}
 {"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-17T00:59:18.242+0800","file":"controllers/things_controller.go:32","msg":"things controller handle get things"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-19T04:25:31.480+0800","file":"gateway/logger.go:58","msg":"logger 初始化成功"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-19T04:25:31.483+0800","file":"gateway/bootstrap.go:32","msg":"database init success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-19T04:25:31.485+0800","file":"gateway/bootstrap.go:40","msg":"update preferences success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-19T04:25:31.488+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":2915}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-19T04:25:31.488+0800","file":"gateway/bootstrap.go:47","msg":"addon load success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-20T19:14:37.574+0800","file":"gateway/logger.go:58","msg":"logger 初始化成功"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-20T19:14:37.578+0800","file":"gateway/bootstrap.go:32","msg":"database init success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-20T19:14:37.580+0800","file":"gateway/bootstrap.go:40","msg":"update preferences success"}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-20T19:14:37.583+0800","file":"plugin/plugin.go:107","msg":"plugin is running","plugin id":"yeelight-adapter","pid":3519}
+{"level":"\u001b[34mINFO\u001b[0m","time":"2020-10-20T19:14:37.583+0800","file":"gateway/bootstrap.go:47","msg":"addon load success"}

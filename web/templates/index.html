@@ -1,45 +1,28 @@
 <!DOCTYPE html>
-<!-- This Source Code Form is subject to the terms of the Mozilla Public
-   - License, v. 2.0. If a copy of the MPL was not distributed with this
-   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 <html>
-
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#75AACF">
-    <title data-l10n-id="webthings-gateway">WebThings Gateway</title>
-    <link rel="manifest" href="/app.webmanifest">
-    <link rel="icon" href="/images/icon.png" type="image/png"/>
-    <link rel="apple-touch-icon" href="/images/icon.png">
-    {{/*    <link rel="apple-touch-icon" sizes="512x512" href="/images/icon-2x.png">*/}}
-    <link rel="stylesheet" type="text/css" href="css/menu.css"/>
-    <link rel="stylesheet" type="text/css" href="css/app.css"/>
-
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>HomeAutomation</title>
+    <link rel="stylesheet" href="../css/menu.css">
+    <link rel="stylesheet" href="../css/app.css">
+    <link rel="stylesheet" href="../font/iconfont.css">
 </head>
-
 <body>
-
-
-<!-- Menu -->
+<header>
+</header>
 <div id="menu-scrim" class="hidden"></div>
-<aside>
-    <nav id="main-menu">
-        <img id="menu-wordmark" data-l10n-id="wordmark" src="/images/wordmark.svg"/>
-        <ul>
-            <li><a id="things-menu-item" data-l10n-id="things-menu-item" href="/things" class="selected"></a></li>
-            <li><a id="rules-menu-item" data-l10n-id="rules-menu-item" href="/rules"></a></li>
-            <li><a id="logs-menu-item" data-l10n-id="logs-menu-item" href="/logs"></a></li>
-            <li><a id="floorplan-menu-item" data-l10n-id="floorplan-menu-item" href="/floorplan"></a></li>
-            <li><a id="settings-menu-item" data-l10n-id="settings-menu-item" href="/settings"></a></li>
-            <li>
-                <form id="logout" class="log-out-form">
-                    <input type="button" class="log-out-button text-button" data-l10n-id="log-out-button">
-                </form>
-            </li>
-        </ul>
-    </nav>
-</aside>
+<nav id="main-menu" class="hidden">
+    <ul>
+        <li><a id="home-menu-item" href="#"><span class="iconfont">&#xe64e;</span>家庭</a></li>
+        <li><a id="rooms-menu-item" href="#"><span class="iconfont">&#xe8ed;</span>房间</a></li>
+        <li><a id="rules-menu-item" href="#"><span class="iconfont">&#xe788;</span>自动化</a></li>
+        <li><a id="logs-menu-item" href="#"><span class="iconfont">&#xe613;</span>日志</a></li>
+        <li><a id="settings-menu-item" href="#"><span class="iconfont">&#xe654;</span>设置</a></li>
+    </ul>
+</nav>
+<button id="menu-button" class="iconfont icon-button"> &#xe64b;</button>
 </body>
-
 </html>
