@@ -47,7 +47,14 @@
 
 #menu-scrim.hidden {
     animation: hide-scrim 0.25s ease 0s;
-    width: 0%;
+}
+
+#main-menu.hidden {
+    transform: translate(-32rem);
+}
+
+#menu-button.menu-show{
+    content: '&#xe620;'
 }
 
 

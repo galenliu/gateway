@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="fb4cf8c5-af5d-4e63-bda0-b49819259151" name="默认的" comment="">
+      <change afterPath="$PROJECT_DIR$/../init/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../init/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../init/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../init/public/favicon.ico" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../init/src/App.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../init/src/assets/logo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../init/src/components/HelloWorld.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../init/src/index.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../init/src/main.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/favicon.ico" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ref/gulu-ui-1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/App.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/assets/logo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/Sidenav.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/Topnav.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/index.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/shims-vue.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/Home.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../web/components/main-menu.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../web/js/menu.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../test_config/config/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/../test_config/config/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../test_config/log/log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../test_config/log/log.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/../web/css/app.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/css/font-awesome.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/css/lib/highlight-9.12.0.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/css/menu.css" beforeDir="false" afterPath="$PROJECT_DIR$/../web/css/menu.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/css/router-setup.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/css/rule.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/css/rules-common.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/css/rules.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/css/settings.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/css/subdomain-form.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/css/thing.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/css/things.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/css/user-form.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/css/wifi-setup.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/adapters-icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/add-on.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/add.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/add_arrayfield.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/arrowhead-left-16.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/arrowhead-right-16.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/authorization.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/back.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/background-small.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/background.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/check-16.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/checkbox-sprite.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/clear_arrayfield.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/close-16.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/close.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/alarm-alarm.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/alarm-ok.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/camera.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/door-sensor-closed.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/door-sensor-open.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/image.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/leak-sensor-dry.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/leak-sensor-leak.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/lock-jammed.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/lock-lock.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/lock-locked.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/lock-unknown.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/lock-unlock.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/lock-unlocked.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/motion-sensor-motion.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/motion-sensor-no-motion.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/on-off-switch-off.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/on-off-switch-on.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/push-button-not-pushed.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/push-button-pushed.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/smart-plug-off.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/smart-plug-on.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/temperature-sensor.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/thermostat-cooling.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/thermostat-heating.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/video-camera.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/component-icons/video.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/customize-16.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/delete-16.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/delete-button.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/developer-icon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/disable.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/domain-icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/done.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/edit-plain.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/edit.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/enable.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/ethernet.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/experiments-icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/floorplan-icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/floorplan.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/icon-2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/icon-maskable-2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/icon-maskable.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/icon-maskable.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/icon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/input-arrow.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/internet.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/link-icon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/loading.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/localization-icon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/lock.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/log-out-icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/logs-icon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/menu.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/network.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/new.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/on-off-switch.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/overflow.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/play.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/refresh.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/remove.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/right-arrow.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/rules-icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/select-arrow-dark.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/select-arrow.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/settings-icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/ssh-icon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/stop-16.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/stop.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-details-link.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/alarm.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/binary_sensor.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/camera.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/clock.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/color_control.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/door_sensor.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/energy_monitor.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/leak_sensor.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/light.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/lock.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/motion_sensor.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/multi_level_sensor.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/multi_level_switch.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/notification.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/on_off_switch.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/pin_required_icon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/push_button.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/smart_plug.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/temperature_sensor.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/thermostat.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/thing.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/video_camera.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/thing-icons/web_thing_icon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/things-icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/update-icon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/upload.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/user.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/users-icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/wifi-secure.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/wifi.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/images/wordmark.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/../web/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/../web/index.html" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="GOROOT" path="/usr/local/go" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectId" id="1jNU3PPuS8kE2MbsJIXHE2yXHCZ" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="foldersAlwaysOnTop" value="false" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+    <option name="sortByType" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="go.import.settings.migrated" value="true" />
+    <property name="go.sdk.automatically.set" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="fb4cf8c5-af5d-4e63-bda0-b49819259151" name="默认的" comment="" />
+      <created>1603843943812</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1603843943812</updated>
+      <workItem from="1603843945154" duration="517000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="221" y="89" key="SettingsEditor" timestamp="1603650333396">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="221" y="89" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1603650333396" />
+  </component>
+</project>

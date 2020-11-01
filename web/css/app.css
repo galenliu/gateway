@@ -1,11 +1,5 @@
 @font-face {
   font-family: 'iconfont';
-  src: url('iconfont.eot');
-  src: url('iconfont.eot?#iefix') format('embedded-opentype'),
-  url('iconfont.woff2') format('woff2'),
-  url('iconfont.woff') format('woff'),
-  url('iconfont.ttf') format('truetype'),
-  url('iconfont.svg#iconfont') format('svg');
 }
 .iconfont {
   font-family: "iconfont" !important;
@@ -27,7 +21,7 @@ header{
 #menu-button{
   top: 0;
   left: 0;
-  z-index: 0;
+  z-index: 100;
   margin: 0;
   padding: 0;
   color: white;
