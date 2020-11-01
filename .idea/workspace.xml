@@ -23,173 +23,441 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a08ae3e9-f015-4381-ba90-10535610bd97" name="Default Changelist" comment="1008">
-      <change afterPath="$PROJECT_DIR$/init/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/init/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/init/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/init/public/favicon.ico" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/init/src/App.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/init/src/assets/logo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/init/src/components/HelloWorld.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/init/src/index.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/init/src/main.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/public/favicon.ico" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/ref/gulu-ui-1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/App.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/logo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/components/Sidenav.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/components/Topnav.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/index.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/main.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/shims-vue.d.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/views/Home.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/components/main-menu.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/js/menu.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-app/src/assets/svg/exit_to_app-24px.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-app/src/assets/svg/home-24px.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-app/src/assets/svg/login-24px.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-app/src/assets/svg/menu-24px.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-app/src/assets/svg/menu_open-24px.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-app/src/assets/svg/rule-24px.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-app/src/assets/svg/rule_folder-24px.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-app/src/components/svg-icon.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/webResources.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_config/config/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/test_config/config/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_config/log/log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/test_config/log/log.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/css/app.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/css/font-awesome.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/css/lib/highlight-9.12.0.min.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/css/menu.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/css/menu.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/css/router-setup.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/css/rule.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/css/rules-common.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/css/rules.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/css/settings.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/css/subdomain-form.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/css/thing.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/css/things.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/css/user-form.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/css/wifi-setup.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/adapters-icon.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/add-on.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/add.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/add_arrayfield.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/arrowhead-left-16.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/arrowhead-right-16.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/authorization.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/back.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/background-small.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/background.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/check-16.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/checkbox-sprite.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/clear_arrayfield.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/close-16.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/close.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/alarm-alarm.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/alarm-ok.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/camera.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/door-sensor-closed.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/door-sensor-open.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/image.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/leak-sensor-dry.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/leak-sensor-leak.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/lock-jammed.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/lock-lock.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/lock-locked.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/lock-unknown.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/lock-unlock.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/lock-unlocked.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/motion-sensor-motion.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/motion-sensor-no-motion.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/on-off-switch-off.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/on-off-switch-on.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/push-button-not-pushed.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/push-button-pushed.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/smart-plug-off.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/smart-plug-on.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/temperature-sensor.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/thermostat-cooling.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/thermostat-heating.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/video-camera.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/component-icons/video.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/customize-16.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/delete-16.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/delete-button.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/developer-icon.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/disable.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/domain-icon.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/done.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/edit-plain.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/edit.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/enable.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/ethernet.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/experiments-icon.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/floorplan-icon.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/floorplan.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/icon-2x.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/icon-maskable-2x.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/icon-maskable.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/icon-maskable.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/icon.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/icon.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/input-arrow.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/internet.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/link-icon.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/loading.gif" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/localization-icon.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/lock.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/log-out-icon.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/logs-icon.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/menu.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/network.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/new.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/on-off-switch.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/overflow.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/play.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/refresh.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/remove.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/right-arrow.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/rules-icon.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/select-arrow-dark.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/select-arrow.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/settings-icon.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/ssh-icon.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/stop-16.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/stop.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-details-link.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/alarm.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/binary_sensor.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/camera.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/clock.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/color_control.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/door_sensor.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/energy_monitor.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/leak_sensor.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/light.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/lock.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/motion_sensor.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/multi_level_sensor.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/multi_level_switch.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/notification.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/on_off_switch.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/pin_required_icon.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/push_button.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/smart_plug.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/temperature_sensor.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/thermostat.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/thing.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/video_camera.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/thing-icons/web_thing_icon.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/things-icon.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/update-icon.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/upload.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/user.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/users-icon.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/wifi-secure.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/wifi.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/images/wordmark.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/web/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/init/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/init/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/init/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/init/public/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/init/src/App.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/init/src/assets/logo.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/init/src/components/HelloWorld.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/init/src/index.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/init/src/main.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/.idea/web-app.iml" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/.idea/web-app.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/ref/gulu-ui-1" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/src/App.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/src/components/Sidenav.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/src/components/Topnav.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/src/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/src/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/src/shims-vue.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/src/views/Home.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/app.webmanifest" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/components/main-menu.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/css/app.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/css/menu.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/font/demo.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/font/demo_index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/font/iconfont.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/font/iconfont.eot" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/font/iconfont.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/font/iconfont.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/font/iconfont.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/font/iconfont.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/font/iconfont.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/font/iconfont.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/js/api.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/js/app.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/js/menu.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/@material/animation" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/@material/base" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/@material/density" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/@material/dom" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/@material/drawer" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/@material/elevation" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/@material/feature-targeting" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/@material/list" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/@material/ripple" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/@material/rtl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/@material/shape" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/@material/theme" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/@material/typography" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/_functions.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/_functions.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/_index.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/_variables.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/_variables.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/dist/mdc.animation.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/dist/mdc.animation.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/dist/mdc.animation.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/dist/mdc.animation.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/index.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/index.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/node_modules/tslib" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/types.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/types.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/types.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/util.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/util.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_animation@7.0.0@@material/animation/util.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/_index.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/_mixins.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/_mixins.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/component.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/component.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/component.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/dist/mdc.base.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/dist/mdc.base.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/dist/mdc.base.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/dist/mdc.base.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/externs.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/externs.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/externs.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/foundation.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/foundation.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/foundation.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/index.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/index.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/node_modules/tslib" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/types.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/types.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_base@7.0.0@@material/base/types.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_density@7.0.0@@material/density/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_density@7.0.0@@material/density/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_density@7.0.0@@material/density/_functions.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_density@7.0.0@@material/density/_functions.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_density@7.0.0@@material/density/_index.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_density@7.0.0@@material/density/_variables.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_density@7.0.0@@material/density/_variables.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_density@7.0.0@@material/density/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/_index.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/_mixins.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/announce.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/announce.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/announce.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/dist/mdc.dom.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/dist/mdc.dom.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/dist/mdc.dom.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/dist/mdc.dom.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/events.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/events.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/events.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/focus-trap.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/focus-trap.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/focus-trap.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/index.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/index.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/keyboard.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/keyboard.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/keyboard.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/node_modules/@material/feature-targeting" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/node_modules/tslib" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/ponyfill.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/ponyfill.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_dom@7.0.0@@material/dom/ponyfill.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/_index.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/_mixins.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/_mixins.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/_variables.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/_variables.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/adapter.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/adapter.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/adapter.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/common.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/common.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/component.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/component.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/component.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/constants.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/constants.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/constants.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/dismissible/foundation.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/dismissible/foundation.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/dismissible/foundation.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/dismissible/mdc-drawer-dismissible.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/dismissible/mdc-drawer-dismissible.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/dist/mdc.drawer.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/dist/mdc.drawer.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/dist/mdc.drawer.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/dist/mdc.drawer.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/dist/mdc.drawer.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/dist/mdc.drawer.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/dist/mdc.drawer.min.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/dist/mdc.drawer.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/images/drawer-composite.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/images/drawer-hero.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/index.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/index.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/mdc-drawer.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/mdc-drawer.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/modal/foundation.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/modal/foundation.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/modal/foundation.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/modal/mdc-drawer-modal.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/modal/mdc-drawer-modal.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/node_modules/@material/animation" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/node_modules/@material/base" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/node_modules/@material/dom" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/node_modules/@material/elevation" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/node_modules/@material/feature-targeting" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/node_modules/@material/list" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/node_modules/@material/ripple" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/node_modules/@material/rtl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/node_modules/@material/shape" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/node_modules/@material/theme" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/node_modules/@material/typography" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/node_modules/tslib" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/util.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/util.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_drawer@7.0.0@@material/drawer/util.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/_functions.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/_functions.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/_index.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/_mixins.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/_mixins.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/_variables.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/_variables.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/common.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/common.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/dist/mdc.elevation.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/dist/mdc.elevation.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/dist/mdc.elevation.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/dist/mdc.elevation.min.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/mdc-elevation.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/mdc-elevation.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/node_modules/@material/animation" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/node_modules/@material/base" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/node_modules/@material/feature-targeting" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/node_modules/@material/theme" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/test/feature-targeting-any.test.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_elevation@7.0.0@@material/elevation/test/mdc-elevation.scss.test.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_feature-targeting@7.0.0@@material/feature-targeting/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_feature-targeting@7.0.0@@material/feature-targeting/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_feature-targeting@7.0.0@@material/feature-targeting/_functions.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_feature-targeting@7.0.0@@material/feature-targeting/_functions.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_feature-targeting@7.0.0@@material/feature-targeting/_index.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_feature-targeting@7.0.0@@material/feature-targeting/_mixins.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_feature-targeting@7.0.0@@material/feature-targeting/_mixins.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_feature-targeting@7.0.0@@material/feature-targeting/_variables.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_feature-targeting@7.0.0@@material/feature-targeting/_variables.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_feature-targeting@7.0.0@@material/feature-targeting/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/_index.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/_mixins.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/_mixins.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/_variables.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/_variables.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/adapter.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/adapter.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/adapter.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/component.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/component.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/component.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/constants.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/constants.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/constants.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/dist/mdc.list.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/dist/mdc.list.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/dist/mdc.list.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/dist/mdc.list.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/dist/mdc.list.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/dist/mdc.list.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/dist/mdc.list.min.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/dist/mdc.list.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/events.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/events.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/events.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/foundation.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/foundation.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/foundation.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/images/lists-types.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/index.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/index.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/mdc-list.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/mdc-list.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/node_modules/@material/base" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/node_modules/@material/density" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/node_modules/@material/dom" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/node_modules/@material/feature-targeting" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/node_modules/@material/ripple" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/node_modules/@material/rtl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/node_modules/@material/shape" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/node_modules/@material/theme" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/node_modules/@material/typography" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/node_modules/tslib" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/typeahead.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/typeahead.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/typeahead.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/types.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/types.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_list@7.0.0@@material/list/types.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/_functions.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/_functions.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/_index.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/_keyframes.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/_keyframes.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/_mixins.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/_mixins.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/_variables.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/_variables.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/adapter.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/adapter.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/adapter.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/common.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/common.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/component.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/component.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/component.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/constants.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/constants.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/constants.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/dist/mdc.ripple.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/dist/mdc.ripple.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/dist/mdc.ripple.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/dist/mdc.ripple.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/dist/mdc.ripple.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/dist/mdc.ripple.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/dist/mdc.ripple.min.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/dist/mdc.ripple.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/foundation.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/foundation.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/foundation.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/index.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/index.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/mdc-ripple.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/mdc-ripple.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/node_modules/@material/animation" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/node_modules/@material/base" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/node_modules/@material/dom" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/node_modules/@material/feature-targeting" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/node_modules/@material/theme" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/node_modules/tslib" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/types.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/types.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/types.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/util.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/util.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_ripple@7.0.0@@material/ripple/util.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_rtl@7.0.0@@material/rtl/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_rtl@7.0.0@@material/rtl/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_rtl@7.0.0@@material/rtl/_index.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_rtl@7.0.0@@material/rtl/_mixins.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_rtl@7.0.0@@material/rtl/_mixins.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_rtl@7.0.0@@material/rtl/_variables.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_rtl@7.0.0@@material/rtl/_variables.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_rtl@7.0.0@@material/rtl/node_modules/@material/theme" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_rtl@7.0.0@@material/rtl/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_rtl@7.0.0@@material/rtl/test/disable-include-rtl.scss.test.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_rtl@7.0.0@@material/rtl/test/disable-include-rtl.test.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_rtl@7.0.0@@material/rtl/test/theme.scss.test.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_rtl@7.0.0@@material/rtl/test/theme.test.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_shape@7.0.0@@material/shape/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_shape@7.0.0@@material/shape/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_shape@7.0.0@@material/shape/_functions.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_shape@7.0.0@@material/shape/_functions.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_shape@7.0.0@@material/shape/_index.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_shape@7.0.0@@material/shape/_mixins.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_shape@7.0.0@@material/shape/_mixins.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_shape@7.0.0@@material/shape/_variables.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_shape@7.0.0@@material/shape/_variables.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_shape@7.0.0@@material/shape/node_modules/@material/feature-targeting" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_shape@7.0.0@@material/shape/node_modules/@material/rtl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_shape@7.0.0@@material/shape/node_modules/@material/theme" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_shape@7.0.0@@material/shape/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_shape@7.0.0@@material/shape/test/feature-targeting-any.test.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_shape@7.0.0@@material/shape/test/mdc-shape.scss.test.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/_color-palette.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/_color-palette.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/_constants.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/_constants.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/_custom-properties.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/_functions.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/_functions.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/_gss.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/_index.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/_mixins.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/_mixins.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/_variables.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/_variables.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/dist/mdc.theme.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/dist/mdc.theme.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/dist/mdc.theme.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/dist/mdc.theme.min.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/mdc-theme.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/mdc-theme.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/node_modules/@material/feature-targeting" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/test/feature-targeting-any.test.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_theme@7.0.0@@material/theme/test/mdc-theme.scss.test.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/_functions.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/_functions.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/_index.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/_mixins.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/_mixins.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/_variables.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/_variables.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/dist/mdc.typography.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/dist/mdc.typography.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/dist/mdc.typography.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/dist/mdc.typography.min.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/mdc-typography.import.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/mdc-typography.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/node_modules/@material/feature-targeting" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/node_modules/@material/theme" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/test/feature-targeting-any.test.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/test/global-variables.test.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_@material_typography@7.0.0@@material/typography/test/mdc-typography.scss.test.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_tslib@1.14.1@tslib/CopyrightNotice.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_tslib@1.14.1@tslib/LICENSE.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_tslib@1.14.1@tslib/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_tslib@1.14.1@tslib/modules/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_tslib@1.14.1@tslib/modules/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_tslib@1.14.1@tslib/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_tslib@1.14.1@tslib/test/validateModuleExportsMatchCommonJS/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_tslib@1.14.1@tslib/test/validateModuleExportsMatchCommonJS/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_tslib@1.14.1@tslib/tslib.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_tslib@1.14.1@tslib/tslib.es6.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_tslib@1.14.1@tslib/tslib.es6.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_tslib@1.14.1@tslib/tslib.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/_tslib@1.14.1@tslib/tslib.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/node_modules/tslib" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -218,9 +486,6 @@
     <setting file="file://$PROJECT_DIR$/../gateway-addon-golang/go.mod" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="1hsmJoKxjrJtPVL4SIt5ywZ6PnI" />
-  <component name="ProjectLevelVcsManager">
-    <ConfirmationsSetting value="2" id="新增" />
-  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -237,7 +502,7 @@
     <property name="configurable.Project.GOPATH.is.expanded" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/web/font" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="goland.project.structure" />
     <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
@@ -300,7 +565,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Go 构建.runGateway">
+  <component name="RunManager" selected="Go 构建.go build yeelight-adapter">
     <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="WebThings" />
       <working_directory value="$PROJECT_DIR$/../WebThings-schema" />
@@ -322,7 +587,7 @@
     <configuration name="runGateway" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true">
       <module name="WebThings" />
       <working_directory value="$PROJECT_DIR$" />
-      <parameters value="-config $PROJECT_DIR$/test_config" />
+      <parameters value="-config $USER_HOME$/Code/gateway/test_config" />
       <kind value="FILE" />
       <filePath value="$PROJECT_DIR$/cmd/main.go" />
       <package value="gateway_addon_golang" />
@@ -339,23 +604,27 @@
       <filePath value="$PROJECT_DIR$/../WebThings-schema" />
       <method v="2" />
     </configuration>
-    <configuration name="api_text#1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" path="$PROJECT_DIR$/api_text.http" runType="运行单个请求">
+    <configuration name="api_text#1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" path="$PROJECT_DIR$/api_text.http">
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Go 构建.runGateway" />
       <item itemvalue="Go 构建.go build yeelight-adapter" />
+      <item itemvalue="Go 构建.runGateway" />
       <item itemvalue="HTTP 请求.api_text#1" />
     </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Go 构建.runGateway" />
-        <item itemvalue="HTTP 请求.api_text#1" />
-        <item itemvalue="Go 构建.go build yeelight-adapter" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="a08ae3e9-f015-4381-ba90-10535610bd97" name="Default Changelist" comment="1008" />
+      <created>1604219690300</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1604219690300</updated>
+      <workItem from="1604219692260" duration="81000" />
+    </task>
+    <servers />
+  </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
     <option name="exactExcludedFiles">
@@ -413,6 +682,10 @@
       <screen x="0" y="23" width="1920" height="1008" />
     </state>
     <state x="612" y="376" key="EnvironmentVariablesDialog/0.23.1920.1008@0.23.1920.1008" timestamp="1600808741939" />
+    <state x="1060" y="454" key="FileChooserDialogImpl" timestamp="1604222358592">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="1060" y="454" key="FileChooserDialogImpl/0.0.2560.1400@0.0.2560.1400" timestamp="1604222358592" />
     <state width="1398" height="220" key="GridCell.Tab.0.bottom" timestamp="1603479417436">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
@@ -469,11 +742,12 @@
     <state width="1878" height="159" key="GridCell.Tab.1.right/0.0.1920.1080@0.0.1920.1080" timestamp="1601004275626" />
     <state width="1398" height="220" key="GridCell.Tab.1.right/0.23.1440.828@0.23.1440.828" timestamp="1603312908615" />
     <state width="1878" height="159" key="GridCell.Tab.1.right/0.23.1920.1008@0.23.1920.1008" timestamp="1601004547472" />
-    <state x="230" y="41" key="SettingsEditor" timestamp="1603643776458">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state x="626" y="218" key="SettingsEditor" timestamp="1604222363021">
+      <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="230" y="41" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1603643776458" />
     <state x="231" y="132" key="SettingsEditor/0.0.1920.1080@0.0.1920.1080" timestamp="1600965798352" />
+    <state x="626" y="218" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1604222363021" />
     <state x="173" y="124" key="SettingsEditor/0.23.1440.828@0.23.1440.828" timestamp="1603224220232" />
     <state x="230" y="146" key="SettingsEditor/0.23.1920.1008@0.23.1920.1008" timestamp="1600808918356" />
     <state x="320" y="190" key="Vcs.Push.Dialog.v2" timestamp="1603395328922">
@@ -508,12 +782,5 @@
     <state x="1953" y="129" width="894" height="812" key="search.everywhere.popup/0.0.1440.900/1440.-106.1920.1080@1440.-106.1920.1080" timestamp="1601054496789" />
     <state x="385" y="196" width="670" height="676" key="search.everywhere.popup/0.0.1440.900@0.0.1440.900" timestamp="1602166178854" />
     <state x="513" y="235" width="894" height="812" key="search.everywhere.popup/0.0.1920.1080@0.0.1920.1080" timestamp="1600959334081" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <default-breakpoints>
-        <breakpoint type="DlvErrorBreakpoint" />
-      </default-breakpoints>
-    </breakpoint-manager>
   </component>
 </project>
