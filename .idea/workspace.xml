@@ -22,20 +22,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a08ae3e9-f015-4381-ba90-10535610bd97" name="Default Changelist" comment="1008">
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/svg/settings-24px.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/components/sidebar-item.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/components/sidebar-scroll.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/components/sidebar/main-menu.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/components/sidebar/sidebar.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/components/svg-btn.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-app/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-app/src/components/sidebar.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-app/src/components/svgIcon.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-app/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/src/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-app/src/views/home-view.vue" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/src/views/home-view.vue" afterDir="false" />
-    </list>
+    <list default="true" id="a08ae3e9-f015-4381-ba90-10535610bd97" name="Default Changelist" comment="1008" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -221,6 +208,7 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="0925" />
+    <MESSAGE value="1102" />
     <MESSAGE value="1008" />
     <option name="LAST_COMMIT_MESSAGE" value="1008" />
   </component>
@@ -322,10 +310,11 @@
     <state x="626" y="218" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1604327445671" />
     <state x="173" y="124" key="SettingsEditor/0.23.1440.828@0.23.1440.828" timestamp="1603224220232" />
     <state x="230" y="146" key="SettingsEditor/0.23.1920.1008@0.23.1920.1008" timestamp="1600808918356" />
-    <state x="320" y="190" key="Vcs.Push.Dialog.v2" timestamp="1603395328922">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state x="569" y="296" key="Vcs.Push.Dialog.v2" timestamp="1604348450370">
+      <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="320" y="190" key="Vcs.Push.Dialog.v2/0.0.1440.900@0.0.1440.900" timestamp="1603395328922" />
+    <state x="569" y="296" key="Vcs.Push.Dialog.v2/0.0.2560.1400@0.0.2560.1400" timestamp="1604348450370" />
     <state width="720" height="450" key="XDebugger.FullValuePopup" timestamp="1602524660794">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
