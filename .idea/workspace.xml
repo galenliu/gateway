@@ -23,13 +23,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a08ae3e9-f015-4381-ba90-10535610bd97" name="Default Changelist" comment="1008">
-      <change afterPath="$PROJECT_DIR$/web-app/.idea/sasslintPlugin.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/package-lock.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/svg/disabled_by_default-24px.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/svg/svg.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-app/src/assets/svg/settings-24px.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-app/src/components/sidebar-item.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-app/src/components/sidebar-scroll.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-app/src/components/sidebar/main-menu.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-app/src/components/sidebar/sidebar.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-app/src/components/svg-btn.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-app/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/src/components/sidebar.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/src/components/svgIcon.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/src/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/src/views/home-view.vue" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/src/views/home-view.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +48,7 @@
         <option value="Go File" />
         <option value="JavaScript File" />
         <option value="HTML File" />
+        <option value="Vue Single File Component" />
       </list>
     </option>
   </component>
@@ -74,26 +80,26 @@
     <property name="configurable.Project.GOPATH.is.expanded" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/web-app/src/assets/svg" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="goland.project.structure" />
     <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/web/font" />
-      <recent name="$PROJECT_DIR$/web" />
-      <recent name="$PROJECT_DIR$/web/css" />
-      <recent name="$PROJECT_DIR$/web/js" />
-      <recent name="$PROJECT_DIR$/../virtual-adapter" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\刘桂林\Documents\WebThings\gateway\web-app\src\components\sidebar" />
       <recent name="$PROJECT_DIR$/web-app/src/components/css" />
       <recent name="$PROJECT_DIR$/web" />
       <recent name="$PROJECT_DIR$/test_config/addons/yeelight-adapter" />
       <recent name="$PROJECT_DIR$/middleware" />
-      <recent name="$PROJECT_DIR$/static/template" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\刘桂林\Documents\WebThings\gateway\web-app\src\assets\svg" />
+      <recent name="$PROJECT_DIR$/web/font" />
+      <recent name="$PROJECT_DIR$/web" />
+      <recent name="$PROJECT_DIR$/web/css" />
+      <recent name="$PROJECT_DIR$/web/js" />
     </key>
   </component>
   <component name="RestClientSettings">
@@ -199,12 +205,6 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-    <option name="exactExcludedFiles">
-      <list>
-        <option value="$PROJECT_DIR$/node_modules/_ant-design-vue@2.0.0-beta.10@ant-design-vue/components/style/v2-compatible-reset.js" />
-        <option value="$PROJECT_DIR$/node_modules/_ant-design-vue@2.0.0-beta.10@ant-design-vue/components/style/index.js" />
-      </list>
-    </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -254,10 +254,10 @@
       <screen x="0" y="23" width="1920" height="1008" />
     </state>
     <state x="612" y="376" key="EnvironmentVariablesDialog/0.23.1920.1008@0.23.1920.1008" timestamp="1600808741939" />
-    <state x="1060" y="454" key="FileChooserDialogImpl" timestamp="1604255288770">
+    <state x="1060" y="454" key="FileChooserDialogImpl" timestamp="1604327440649">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="1060" y="454" key="FileChooserDialogImpl/0.0.2560.1400@0.0.2560.1400" timestamp="1604255288770" />
+    <state x="1060" y="454" key="FileChooserDialogImpl/0.0.2560.1400@0.0.2560.1400" timestamp="1604327440649" />
     <state width="1398" height="220" key="GridCell.Tab.0.bottom" timestamp="1603479417436">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
@@ -314,12 +314,12 @@
     <state width="1878" height="159" key="GridCell.Tab.1.right/0.0.1920.1080@0.0.1920.1080" timestamp="1601004275626" />
     <state width="1398" height="220" key="GridCell.Tab.1.right/0.23.1440.828@0.23.1440.828" timestamp="1603312908615" />
     <state width="1878" height="159" key="GridCell.Tab.1.right/0.23.1920.1008@0.23.1920.1008" timestamp="1601004547472" />
-    <state x="626" y="218" key="SettingsEditor" timestamp="1604255290653">
+    <state x="626" y="218" key="SettingsEditor" timestamp="1604327445671">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="230" y="41" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1603643776458" />
     <state x="231" y="132" key="SettingsEditor/0.0.1920.1080@0.0.1920.1080" timestamp="1600965798352" />
-    <state x="626" y="218" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1604255290653" />
+    <state x="626" y="218" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1604327445671" />
     <state x="173" y="124" key="SettingsEditor/0.23.1440.828@0.23.1440.828" timestamp="1603224220232" />
     <state x="230" y="146" key="SettingsEditor/0.23.1920.1008@0.23.1920.1008" timestamp="1600808918356" />
     <state x="320" y="190" key="Vcs.Push.Dialog.v2" timestamp="1603395328922">
