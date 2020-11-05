@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/WebThings.iml" filepath="$PROJECT_DIR$/.idea/WebThings.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/gateway.iml" filepath="$PROJECT_DIR$/.idea/gateway.iml" />
     </modules>
   </component>
 </project>

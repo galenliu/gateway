@@ -1,1 +1,0 @@
-request bad &v%!(EXTRA *http.Request=&{GET /api/things/12 HTTP/1.1 1 1 map[] <nil> <nil> 0 [] false  map[] map[] <nil> map[]   <nil> <nil> <nil> 0xc000038068})

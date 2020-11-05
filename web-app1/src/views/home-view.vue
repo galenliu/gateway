@@ -1,5 +1,6 @@
 <template>
   <sidebar></sidebar>
+
 </template>
 
 <script>

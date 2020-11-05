@@ -1,14 +1,15 @@
 <template>
-    <sidebar></sidebar>
+  <homeView></homeView>
 </template>
 
 <script>
-import sidebar from "./components/sidebar/sidebar.vue";
+import homeView from './views/home-view.vue'
+
 
 export default {
   name: 'App',
   components: {
-    sidebar,
+    homeView,
   }
 }
 </script>

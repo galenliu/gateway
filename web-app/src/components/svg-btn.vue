@@ -8,9 +8,9 @@
 <script lang="ts">
 
 
-import path from "path"
+import path from "../../../web-app1/node_modules/path"
 
-import {computed, reactive, toRefs,} from 'vue'
+import {computed, reactive, toRefs,} from '../../../web-app1/node_modules/vue'
 
 const resDir = "/src/assets/svg"
 

@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="AutoImportSettings">
-    <option name="autoReloadType" value="SELECTIVE" />
-  </component>
   <component name="BranchesTreeState">
     <expand>
       <path>
@@ -22,7 +19,36 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a08ae3e9-f015-4381-ba90-10535610bd97" name="Default Changelist" comment="1008" />
+    <list default="true" id="9f4f53eb-6f7f-48b5-82a2-b5196c9afd72" name="默认的" comment="">
+      <change afterPath="$PROJECT_DIR$/web-app/src/components/icon-button.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/liuguilin.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gateway-wot.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/httpRequests/2020-10-01T040406.400.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/httpRequests/2020-10-01T040440.400.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/httpRequests/2020-10-02T011241.400.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/httpRequests/2020-10-02T012847.400.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/httpRequests/2020-10-02T013005.400.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/httpRequests/2020-10-02T013211.400.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/httpRequests/http-client.cookies" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/httpRequests/http-requests-log.http" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/.idea/sasslintPlugin.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/.idea/web-app.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/src/App.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/src/assets/svg/exit_to_app-24px.svg" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/src/assets/svg/exit_to_app-24px.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/src/assets/svg/home-24px.svg" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/src/assets/svg/home-24px.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/src/components/sidebar/main-menu.vue" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/src/components/sidebar/main-menu.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/src/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app/src/views/home-view.vue" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/src/views/home-view.vue" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -31,162 +57,49 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="HTTP Request" />
-        <option value="Go File" />
-        <option value="JavaScript File" />
-        <option value="HTML File" />
+        <option value="package.json" />
         <option value="Vue Single File Component" />
       </list>
     </option>
   </component>
-  <component name="GOROOT" path="/usr/local/go" />
+  <component name="GOROOT" path="C:\Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
   </component>
-  <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/../gateway-addon-golang/property_proxy.go" root0="SKIP_INSPECTION" />
-    <setting file="file://$PROJECT_DIR$/../gateway-addon-golang/go.mod" root0="FORCE_HIGHLIGHTING" />
+  <component name="JupyterTrust" id="1dc2f251-25ea-4b2e-8afb-48f51c4c69e0" />
+  <component name="PackageJsonUpdateNotifier">
+    <dismissed value="$PROJECT_DIR$/web-app/package.json" />
   </component>
-  <component name="ProjectId" id="1hsmJoKxjrJtPVL4SIt5ywZ6PnI" />
+  <component name="ProjectId" id="1jm2mA3bK0GS7Pr1J1QEfTwdLMV" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
-    <option name="sortByType" value="true" />
   </component>
   <component name="PropertiesComponent">
-    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
-    <property name="DefaultGoTemplateProperty" value="Go File" />
-    <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="configurable.Global.GOPATH.is.expanded" value="true" />
-    <property name="configurable.Module.GOPATH.is.expanded" value="true" />
-    <property name="configurable.Project.GOPATH.is.expanded" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/web-app/src/assets/svg" />
+    <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="goland.project.structure" />
-    <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="ts.external.directory.path" value="C:\Program Files\JetBrains\GoLand 2020.2.3\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
     <property name="vue.rearranger.settings.migration" value="true" />
-  </component>
-  <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\刘桂林\Documents\WebThings\gateway\web-app\src\components\sidebar" />
-      <recent name="$PROJECT_DIR$/web-app/src/components/css" />
-      <recent name="$PROJECT_DIR$/web" />
-      <recent name="$PROJECT_DIR$/test_config/addons/yeelight-adapter" />
-      <recent name="$PROJECT_DIR$/middleware" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\刘桂林\Documents\WebThings\gateway\web-app\src\assets\svg" />
-      <recent name="$PROJECT_DIR$/web/font" />
-      <recent name="$PROJECT_DIR$/web" />
-      <recent name="$PROJECT_DIR$/web/css" />
-      <recent name="$PROJECT_DIR$/web/js" />
-    </key>
-  </component>
-  <component name="RestClientSettings">
-    <option name="REQUEST_HISTORY">
-      <list>
-        <RestClientRequest>
-          <option name="httpMethod" value="GET" />
-          <option name="urlBase" value="http://localhost:8080" />
-          <option name="urlPath" value="/things/12" />
-          <option name="headers">
-            <list>
-              <KeyValuePair>
-                <option name="key" value="Accept" />
-                <option name="value" value="application/json" />
-              </KeyValuePair>
-              <KeyValuePair>
-                <option name="key" value="Cache-Control" />
-                <option name="value" value="no-cache" />
-              </KeyValuePair>
-            </list>
-          </option>
-          <option name="parametersEnabled" value="true" />
-          <option name="textToSend" value="" />
-          <option name="filesToSend" value="" />
-        </RestClientRequest>
-        <RestClientRequest>
-          <option name="httpMethod" value="GET" />
-          <option name="urlBase" value="http://localhost:8080/things/12" />
-          <option name="urlPath" value="" />
-          <option name="headers">
-            <list>
-              <KeyValuePair>
-                <option name="key" value="Accept" />
-                <option name="value" value="application/json" />
-              </KeyValuePair>
-            </list>
-          </option>
-          <option name="textToSend" value="" />
-          <option name="filesToSend" value="" />
-        </RestClientRequest>
-      </list>
-    </option>
-  </component>
-  <component name="RunManager" selected="Go 构建.go build yeelight-adapter">
-    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
-      <module name="WebThings" />
-      <working_directory value="$PROJECT_DIR$/../WebThings-schema" />
-      <go_parameters value="-i" />
-      <kind value="FILE" />
-      <filePath value="$PROJECT_DIR$/../WebThings-schema" />
-      <directory value="$PROJECT_DIR$/../WebThings-schema" />
-      <method v="2" />
-    </configuration>
-    <configuration name="go build yeelight-adapter" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="WebThings" />
-      <working_directory value="$PROJECT_DIR$/../yeelight-adapter" />
-      <kind value="PACKAGE" />
-      <filePath value="$PROJECT_DIR$/../yeelight-adapter/main.go" />
-      <package value="yeelight-adapter" />
-      <directory value="$PROJECT_DIR$/../gateway-addon-golang" />
-      <method v="2" />
-    </configuration>
-    <configuration name="runGateway" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true">
-      <module name="WebThings" />
-      <working_directory value="$PROJECT_DIR$" />
-      <parameters value="-config $USER_HOME$/Code/gateway/test_config" />
-      <kind value="FILE" />
-      <filePath value="$PROJECT_DIR$/cmd/main.go" />
-      <package value="gateway_addon_golang" />
-      <directory value="$PROJECT_DIR$/../gateway-addon-golang" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
-      <module name="WebThings" />
-      <working_directory value="$PROJECT_DIR$/../WebThings-schema" />
-      <go_parameters value="-i" />
-      <framework value="gotest" />
-      <kind value="DIRECTORY" />
-      <directory value="$PROJECT_DIR$/../WebThings-schema" />
-      <filePath value="$PROJECT_DIR$/../WebThings-schema" />
-      <method v="2" />
-    </configuration>
-    <configuration name="api_text#1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" path="$PROJECT_DIR$/api_text.http">
-      <method v="2" />
-    </configuration>
-    <list>
-      <item itemvalue="Go 构建.go build yeelight-adapter" />
-      <item itemvalue="Go 构建.runGateway" />
-      <item itemvalue="HTTP 请求.api_text#1" />
-    </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="a08ae3e9-f015-4381-ba90-10535610bd97" name="Default Changelist" comment="1008" />
-      <created>1604219690300</created>
+      <created>1604479270190</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1604219690300</updated>
-      <workItem from="1604219692260" duration="81000" />
+      <updated>1604479270190</updated>
+      <workItem from="1604479271540" duration="1919000" />
+      <workItem from="1604481306951" duration="35000" />
     </task>
     <servers />
   </component>
@@ -206,142 +119,17 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="0925" />
-    <MESSAGE value="1102" />
-    <MESSAGE value="1008" />
-    <option name="LAST_COMMIT_MESSAGE" value="1008" />
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/web-app/src/assets/material-design-icons" />
+    </ignored-roots>
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="WindowStateProjectService">
-    <state x="760" y="205" key="#GOPATH" timestamp="1600926149985">
-      <screen x="0" y="0" width="1920" height="1080" />
-    </state>
-    <state x="760" y="205" key="#GOPATH/0.0.1920.1080@0.0.1920.1080" timestamp="1600926149985" />
-    <state x="184" y="112" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1601398523218">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state x="184" y="112" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1440.900@0.0.1440.900" timestamp="1601398523218" />
-    <state x="560" y="259" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1603643026592">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state x="560" y="259" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1440.900@0.0.1440.900" timestamp="1603643026592" />
-    <state x="320" y="98" key="#插件" timestamp="1602156168346">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state x="320" y="98" key="#插件/0.0.1440.900@0.0.1440.900" timestamp="1602156168345" />
-    <state width="939" height="466" key="DebuggerActiveHint" timestamp="1602525074684">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state width="939" height="466" key="DebuggerActiveHint/0.0.1440.900@0.0.1440.900" timestamp="1602525074684" />
-    <state width="1204" height="560" key="DebuggerActiveHint/0.0.1920.1080@0.0.1920.1080" timestamp="1600959518413" />
-    <state width="939" height="466" key="DebuggerActiveHint/0.23.1440.828@0.23.1440.828" timestamp="1602261262806" />
-    <state x="612" y="376" key="EnvironmentVariablesDialog" timestamp="1600808741939">
-      <screen x="0" y="23" width="1920" height="1008" />
-    </state>
-    <state x="612" y="376" key="EnvironmentVariablesDialog/0.23.1920.1008@0.23.1920.1008" timestamp="1600808741939" />
-    <state x="1060" y="454" key="FileChooserDialogImpl" timestamp="1604327440649">
+    <state x="494" y="192" key="SettingsEditor" timestamp="1604485574034">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="1060" y="454" key="FileChooserDialogImpl/0.0.2560.1400@0.0.2560.1400" timestamp="1604327440649" />
-    <state width="1398" height="220" key="GridCell.Tab.0.bottom" timestamp="1603479417436">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state width="1398" height="220" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1603479417436" />
-    <state width="1878" height="159" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1601004275626" />
-    <state width="1398" height="220" key="GridCell.Tab.0.bottom/0.23.1440.828@0.23.1440.828" timestamp="1603312908728" />
-    <state width="1878" height="159" key="GridCell.Tab.0.bottom/0.23.1920.1008@0.23.1920.1008" timestamp="1601004547471" />
-    <state width="1398" height="220" key="GridCell.Tab.0.center" timestamp="1603479417435">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state width="1398" height="220" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1603479417435" />
-    <state width="1878" height="159" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1601004275625" />
-    <state width="1398" height="220" key="GridCell.Tab.0.center/0.23.1440.828@0.23.1440.828" timestamp="1603312908726" />
-    <state width="1878" height="159" key="GridCell.Tab.0.center/0.23.1920.1008@0.23.1920.1008" timestamp="1601004547471" />
-    <state width="1398" height="220" key="GridCell.Tab.0.left" timestamp="1603479417434">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state width="1398" height="220" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1603479417434" />
-    <state width="1878" height="159" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1601004275625" />
-    <state width="1398" height="220" key="GridCell.Tab.0.left/0.23.1440.828@0.23.1440.828" timestamp="1603312908726" />
-    <state width="1878" height="159" key="GridCell.Tab.0.left/0.23.1920.1008@0.23.1920.1008" timestamp="1601004547462" />
-    <state width="1398" height="220" key="GridCell.Tab.0.right" timestamp="1603479417436">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state width="1398" height="220" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1603479417436" />
-    <state width="1878" height="159" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1601004275625" />
-    <state width="1398" height="220" key="GridCell.Tab.0.right/0.23.1440.828@0.23.1440.828" timestamp="1603312908727" />
-    <state width="1878" height="159" key="GridCell.Tab.0.right/0.23.1920.1008@0.23.1920.1008" timestamp="1601004547471" />
-    <state width="1398" height="220" key="GridCell.Tab.1.bottom" timestamp="1603479417439">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state width="1398" height="220" key="GridCell.Tab.1.bottom/0.0.1440.900@0.0.1440.900" timestamp="1603479417439" />
-    <state width="1878" height="159" key="GridCell.Tab.1.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1601004275627" />
-    <state width="1398" height="220" key="GridCell.Tab.1.bottom/0.23.1440.828@0.23.1440.828" timestamp="1603312908616" />
-    <state width="1878" height="159" key="GridCell.Tab.1.bottom/0.23.1920.1008@0.23.1920.1008" timestamp="1601004547472" />
-    <state width="1398" height="220" key="GridCell.Tab.1.center" timestamp="1603479417438">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state width="1398" height="220" key="GridCell.Tab.1.center/0.0.1440.900@0.0.1440.900" timestamp="1603479417438" />
-    <state width="1878" height="159" key="GridCell.Tab.1.center/0.0.1920.1080@0.0.1920.1080" timestamp="1601004275626" />
-    <state width="1398" height="220" key="GridCell.Tab.1.center/0.23.1440.828@0.23.1440.828" timestamp="1603312908615" />
-    <state width="1878" height="159" key="GridCell.Tab.1.center/0.23.1920.1008@0.23.1920.1008" timestamp="1601004547472" />
-    <state width="1398" height="220" key="GridCell.Tab.1.left" timestamp="1603479417437">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state width="1398" height="220" key="GridCell.Tab.1.left/0.0.1440.900@0.0.1440.900" timestamp="1603479417437" />
-    <state width="1878" height="159" key="GridCell.Tab.1.left/0.0.1920.1080@0.0.1920.1080" timestamp="1601004275626" />
-    <state width="1398" height="220" key="GridCell.Tab.1.left/0.23.1440.828@0.23.1440.828" timestamp="1603312908614" />
-    <state width="1878" height="159" key="GridCell.Tab.1.left/0.23.1920.1008@0.23.1920.1008" timestamp="1601004547472" />
-    <state width="1398" height="220" key="GridCell.Tab.1.right" timestamp="1603479417438">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state width="1398" height="220" key="GridCell.Tab.1.right/0.0.1440.900@0.0.1440.900" timestamp="1603479417438" />
-    <state width="1878" height="159" key="GridCell.Tab.1.right/0.0.1920.1080@0.0.1920.1080" timestamp="1601004275626" />
-    <state width="1398" height="220" key="GridCell.Tab.1.right/0.23.1440.828@0.23.1440.828" timestamp="1603312908615" />
-    <state width="1878" height="159" key="GridCell.Tab.1.right/0.23.1920.1008@0.23.1920.1008" timestamp="1601004547472" />
-    <state x="626" y="218" key="SettingsEditor" timestamp="1604327445671">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="230" y="41" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1603643776458" />
-    <state x="231" y="132" key="SettingsEditor/0.0.1920.1080@0.0.1920.1080" timestamp="1600965798352" />
-    <state x="626" y="218" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1604327445671" />
-    <state x="173" y="124" key="SettingsEditor/0.23.1440.828@0.23.1440.828" timestamp="1603224220232" />
-    <state x="230" y="146" key="SettingsEditor/0.23.1920.1008@0.23.1920.1008" timestamp="1600808918356" />
-    <state x="569" y="296" key="Vcs.Push.Dialog.v2" timestamp="1604348450370">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="320" y="190" key="Vcs.Push.Dialog.v2/0.0.1440.900@0.0.1440.900" timestamp="1603395328922" />
-    <state x="569" y="296" key="Vcs.Push.Dialog.v2/0.0.2560.1400@0.0.2560.1400" timestamp="1604348450370" />
-    <state width="720" height="450" key="XDebugger.FullValuePopup" timestamp="1602524660794">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state width="720" height="450" key="XDebugger.FullValuePopup/0.0.1440.900@0.0.1440.900" timestamp="1602524660794" />
-    <state x="521" y="371" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1603190801960">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state x="521" y="371" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.900@0.0.1440.900" timestamp="1603190801960" />
-    <state x="31" y="72" width="1438" height="828" key="dock-window-1" timestamp="1601029270455">
-      <screen x="0" y="23" width="1440" height="828" />
-    </state>
-    <state x="31" y="72" width="1438" height="828" key="dock-window-1/0.23.1440.828/1440.-106.1920.1080@1440.-106.1920.1080" timestamp="1601029270455" />
-    <state x="0" y="23" width="1438" height="828" maximized="true" key="dock-window-1/0.23.1440.828/1440.-83.1920.1057@1440.-83.1920.1057" timestamp="1601028641614" />
-    <state x="690" y="90" width="569" height="685" key="find.popup" timestamp="1601177674633">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state x="1766" y="23" width="598" height="822" key="find.popup/0.0.1440.900/1440.-106.1920.1080@1440.-106.1920.1080" timestamp="1601056344453" />
-    <state x="690" y="90" width="569" height="685" key="find.popup/0.0.1440.900@0.0.1440.900" timestamp="1601177674633" />
-    <state x="1897" y="207" key="refactoring.ChangeSignatureDialog" timestamp="1601056378272">
-      <screen x="1440" y="-106" width="1920" height="1080" />
-    </state>
-    <state x="1897" y="207" key="refactoring.ChangeSignatureDialog/0.0.1440.900/1440.-106.1920.1080@1440.-106.1920.1080" timestamp="1601056378272" />
-    <state x="385" y="196" width="670" height="676" key="search.everywhere.popup" timestamp="1602166178854">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state x="1953" y="129" width="894" height="812" key="search.everywhere.popup/0.0.1440.900/1440.-106.1920.1080@1440.-106.1920.1080" timestamp="1601054496789" />
-    <state x="385" y="196" width="670" height="676" key="search.everywhere.popup/0.0.1440.900@0.0.1440.900" timestamp="1602166178854" />
-    <state x="513" y="235" width="894" height="812" key="search.everywhere.popup/0.0.1920.1080@0.0.1920.1080" timestamp="1600959334081" />
+    <state x="494" y="192" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1604485574034" />
   </component>
 </project>

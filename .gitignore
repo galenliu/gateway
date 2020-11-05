@@ -6,7 +6,6 @@
 *.dylib
 
 /web-app/node_modules
-
 # Test binary, built with `go test -c`
 *.test
 

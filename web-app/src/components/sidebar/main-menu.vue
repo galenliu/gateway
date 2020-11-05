@@ -1,61 +1,90 @@
 <template>
   <div id="main-menu">
-    <svgBtn btn-style="menu"></svgBtn>
-    <span id="menu-btn-title"> {{ title }}</span>
+    <menu-unfold v-if="!unfold" class="menu-toggle-button" theme="outline"  size="24px"  fill="#333" @click=menuClick  />
+    <menu-fold v-if="unfold" class="menu-toggle-button" theme="outline"  size="24px"  fill="#333" @click=menuClick  />
+    <span v-if="unfold" id="menu-btn-title"> {{ title }}</span>
   </div>
 </template>
 
 <script>
-import svgBtn from "../svg-btn.vue"
-import {reactive, toRefs} from "vue";
+
+
+
+import { MenuFold } from '@icon-park/vue-next'
+import { MenuUnfold } from '@icon-park/vue-next'
+import {reactive, toRefs ,inject } from "vue";
 
 export default {
-  name: "main-menu",
+  name: "MainMenu",
 
   components: {
-    svgBtn: svgBtn
+    MenuFold,
+    MenuUnfold,
   },
 
   props: {
     title: {
       type: String,
       default: 'WebThings'
-    }
+    },
   },
 
-  setup(props) {
+  setup(props,context) {
     const menuReactiveData = reactive({
-      title: props.title
+      title: props.title,
+
     })
 
+    const menuClick =() => {
+       context.emit("menuClick")
+    }
+
+    const unfold =inject("sidebar-unfold")
     return {
+      menuClick,
+      unfold,
       ...toRefs(menuReactiveData)
     }
   }
 }
+
+
+
 </script>
 
-<style scoped>
-#main-menu {
-  display: inline-flex;
-  align-items: center;
-  background-color: #fafafa;
-  border-bottom-color: red;
-  overflow: hidden;
-  padding-left: 8px;
+<style lang="scss" scoped>
 
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-  border-right: 1px solid rgba(0, 0, 0, 0.12);
-  z-index: 10;
-}
-
-#menu-btn-title {
-  margin-right: 20px;
-  margin-left: 10px;
-}
+$menu-color: #fafafa;
 
 * {
   margin: 0;
   padding: 0;
 }
+
+#main-menu {
+  display: inline-flex;
+  box-sizing: border-box;
+  align-items: center;
+  border-bottom: solid 1px rgb(0,0,0,.12);
+  background-color: $menu-color;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.menu-toggle-button{
+  background-color: transparent;
+  margin: 8px;
+  padding: 12px;
+  &:hover{
+    background-color: rgb(0,0,0,.1);
+    border-radius: 50%;
+  }
+  &+span{
+    font-size: 1em;
+    margin-right: 1em;
+  }
+}
+
+
+
 </style>

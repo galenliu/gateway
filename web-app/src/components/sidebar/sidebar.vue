@@ -1,39 +1,55 @@
 <template>
   <aside class="sidebar">
-    <main-menu title="刘桂林的家庭自动化"></main-menu>
-    <sidebarScroll></sidebarScroll>
+    <main-menu @menuClick= toggleSidebar title="刘桂林的家庭世界"></main-menu>
+    <scroll-listbox></scroll-listbox>
   </aside>
 </template>
 
 <script lang="ts">
-import mainMenu from "../sidebar/main-menu.vue"
-import sidebarScroll from '../sidebar-scroll.vue'
-
+import MainMenu from "./main-menu.vue"
+import ScrollListbox from "./scroll-listbox.vue"
+import { provide , ref } from 'vue'
 export default {
   name: "sidebar",
 
   components: {
-    mainMenu,
-    sidebarScroll,
+    ScrollListbox,
+    MainMenu,
   },
   setup() {
 
-    return {}
+    const unfold = ref(true)
+    provide("sidebar-unfold", unfold)
+
+    const toggleSidebar = function (){
+      console.log("menu click")
+      unfold.value = !unfold.value
+      console.log(unfold.value)
+    }
+
+    return {
+      toggleSidebar,
+      unfold,
+    }
   }
 }
 </script>
 
 <style scoped>
 
-aside {
-  position: fixed;
-  display: flex;
-  flex-direction: column;
-  background-color: lavender;
-}
-
 * {
   margin: 0;
   padding: 0;
 }
+
+aside {
+  position: fixed;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border-right: solid 1px rgba(0,0,0,0.12);
+}
+
+
 </style>
