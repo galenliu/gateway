@@ -20,43 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="37193516-e607-4486-ad41-c638b83ce67d" name="默认的" comment="">
-      <change afterPath="$PROJECT_DIR$/src/assets/scss/index.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/assets/scss/var.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/TopNav.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/router.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/utils.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/Login.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/Overview.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/Profile.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/Rule.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/views/User.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../node_modules/.yarn-integrity" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/common/icon-button.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/common/list-item.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/common/list-item.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/sidebar/main-menu.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sidebar/main-menu.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/sidebar/scroll-listbox.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sidebar/scroll-listbox.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/sidebar/sidebar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/SideNav.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/svg-btn.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/hom.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/Home.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/material-design-icons" beforeDir="false" afterPath="$PROJECT_DIR$/../web-app1/src/assets/material-design-icons" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/svg/disabled_by_default-24px.svg" beforeDir="false" afterPath="$PROJECT_DIR$/svg/disabled_by_default-24px.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/svg/exit_to_app-24px.svg" beforeDir="false" afterPath="$PROJECT_DIR$/svg/exit_to_app-24px.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/svg/home-24px.svg" beforeDir="false" afterPath="$PROJECT_DIR$/svg/home-24px.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/svg/login-24px.svg" beforeDir="false" afterPath="$PROJECT_DIR$/svg/login-24px.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/svg/menu-24px.svg" beforeDir="false" afterPath="$PROJECT_DIR$/svg/menu-24px.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/svg/menu_open-24px.svg" beforeDir="false" afterPath="$PROJECT_DIR$/svg/menu_open-24px.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/svg/rule-24px.svg" beforeDir="false" afterPath="$PROJECT_DIR$/svg/rule-24px.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/svg/rule_folder-24px.svg" beforeDir="false" afterPath="$PROJECT_DIR$/svg/rule_folder-24px.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/svg/settings-24px.svg" beforeDir="false" afterPath="$PROJECT_DIR$/svg/settings-24px.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/svg/svg.ts" beforeDir="false" afterPath="$PROJECT_DIR$/svg/svg.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,7 +59,7 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="watcher.settings" />
+    <property name="settings.editor.selected.configurable" value="com.gitee.ui.GiteeSettingsConfigurable" />
     <property name="ts.external.directory.path" value="C:\Program Files\JetBrains\WebStorm 2020.2.3\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
@@ -116,7 +80,7 @@
       <option name="presentableId" value="Default" />
       <updated>1604495491949</updated>
       <workItem from="1604495493334" duration="24493000" />
-      <workItem from="1604660138708" duration="17134000" />
+      <workItem from="1604660138708" duration="17360000" />
     </task>
     <servers />
   </component>
@@ -148,9 +112,9 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="470" y="447" key="EditFileWatcherDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1604681798394" />
-    <state x="295" y="317" width="998" height="708" key="SettingsEditor" timestamp="1604681800478">
+    <state x="295" y="317" width="998" height="708" key="SettingsEditor" timestamp="1604732610470">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="295" y="317" width="998" height="708" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1604681800478" />
+    <state x="295" y="317" width="998" height="708" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1604732610470" />
   </component>
 </project>
