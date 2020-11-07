@@ -1,6 +1,10 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import './index.css'
+import './assets/scss/index.scss'
 import '@icon-park/vue-next/styles/index.css';
 
-createApp(App).mount('#app')
+import { router } from "./router"
+
+createApp(App)
+    .use(router)
+    .mount('#app')

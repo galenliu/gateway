@@ -79,6 +79,7 @@ $menu-color: #fafafa;
     background-color: rgb(0,0,0,.1);
     border-radius: 50%;
   }
+
   &+span{
     font-size: 1em;
     margin-right: 1em;

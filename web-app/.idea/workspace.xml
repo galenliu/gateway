@@ -1,51 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="37193516-e607-4486-ad41-c638b83ce67d" name="默认的" comment="">
-      <change afterPath="$PROJECT_DIR$/src/components/common/icon-button.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/views/hom.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/dictionaries/liuguilin.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/gateway-wot.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/httpRequests/2020-10-01T040406.400.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/httpRequests/2020-10-01T040440.400.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/httpRequests/2020-10-02T011241.400.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/httpRequests/2020-10-02T012847.400.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/httpRequests/2020-10-02T013005.400.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/httpRequests/2020-10-02T013211.400.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/httpRequests/http-client.cookies" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/httpRequests/http-requests-log.http" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/assets/scss/index.scss" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/assets/scss/var.scss" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/TopNav.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/router.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utils/utils.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/Login.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/Overview.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/Profile.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/Rule.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/User.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sasslintPlugin.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/web-app.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../node_modules/.yarn-integrity" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/assets/svg/disabled_by_default-24px.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/assets/svg/exit_to_app-24px.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/assets/svg/home-24px.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/assets/svg/login-24px.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/assets/svg/menu-24px.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/assets/svg/menu_open-24px.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/assets/svg/rule-24px.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/assets/svg/rule_folder-24px.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/assets/svg/settings-24px.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/assets/svg/svg.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/sidebar-item.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/common/list-item.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/sidebar-scroll.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sidebar/scroll-listbox.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/common/icon-button.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/common/list-item.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/common/list-item.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/sidebar/main-menu.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sidebar/main-menu.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/sidebar/sidebar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sidebar/sidebar.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/svg-btn.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/svg-btn.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sidebar/scroll-listbox.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sidebar/scroll-listbox.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sidebar/sidebar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/SideNav.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/svg-btn.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.css" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/home-view.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/hom.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/Home.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/material-design-icons" beforeDir="false" afterPath="$PROJECT_DIR$/../web-app1/src/assets/material-design-icons" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/svg/disabled_by_default-24px.svg" beforeDir="false" afterPath="$PROJECT_DIR$/svg/disabled_by_default-24px.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/svg/exit_to_app-24px.svg" beforeDir="false" afterPath="$PROJECT_DIR$/svg/exit_to_app-24px.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/svg/home-24px.svg" beforeDir="false" afterPath="$PROJECT_DIR$/svg/home-24px.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/svg/login-24px.svg" beforeDir="false" afterPath="$PROJECT_DIR$/svg/login-24px.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/svg/menu-24px.svg" beforeDir="false" afterPath="$PROJECT_DIR$/svg/menu-24px.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/svg/menu_open-24px.svg" beforeDir="false" afterPath="$PROJECT_DIR$/svg/menu_open-24px.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/svg/rule-24px.svg" beforeDir="false" afterPath="$PROJECT_DIR$/svg/rule-24px.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/svg/rule_folder-24px.svg" beforeDir="false" afterPath="$PROJECT_DIR$/svg/rule_folder-24px.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/svg/settings-24px.svg" beforeDir="false" afterPath="$PROJECT_DIR$/svg/settings-24px.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/svg/svg.ts" beforeDir="false" afterPath="$PROJECT_DIR$/svg/svg.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,6 +67,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Vue Single File Component" />
+        <option value="TypeScript File" />
+        <option value="SCSS File" />
       </list>
     </option>
   </component>
@@ -73,6 +86,8 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="list.type.of.created.stylesheet" value="SCSS" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -80,15 +95,16 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="reference.settings.ide.settings.web.browsers" />
-    <property name="ts.external.directory.path" value="C:\Program Files\JetBrains\WebStorm 203.5419.24\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
+    <property name="settings.editor.selected.configurable" value="watcher.settings" />
+    <property name="ts.external.directory.path" value="C:\Program Files\JetBrains\WebStorm 2020.2.3\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\WebThings\gateway\web-app\src\components" />
+      <recent name="D:\WebThings\gateway\web-app\src\assets\scss" />
       <recent name="D:\WebThings\gateway\web-app\src\components\sidebar" />
       <recent name="D:\WebThings\gateway\web-app\src\components\common" />
-      <recent name="D:\WebThings\gateway\web-app\src\components" />
     </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -100,6 +116,7 @@
       <option name="presentableId" value="Default" />
       <updated>1604495491949</updated>
       <workItem from="1604495493334" duration="24493000" />
+      <workItem from="1604660138708" duration="17134000" />
     </task>
     <servers />
   </component>
@@ -116,5 +133,24 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="470" y="553" key="#SCSS_Lint" timestamp="1604680686770">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="470" y="553" key="#SCSS_Lint/0.0.2560.1400@0.0.2560.1400" timestamp="1604680686770" />
+    <state x="370" y="449" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1604678880228">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="370" y="449" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1604678880228" />
+    <state x="470" y="447" key="EditFileWatcherDialog" timestamp="1604681798394">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="470" y="447" key="EditFileWatcherDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1604681798394" />
+    <state x="295" y="317" width="998" height="708" key="SettingsEditor" timestamp="1604681800478">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="295" y="317" width="998" height="708" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1604681800478" />
   </component>
 </project>
