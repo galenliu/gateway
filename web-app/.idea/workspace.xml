@@ -20,6 +20,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="37193516-e607-4486-ad41-c638b83ce67d" name="默认的" comment="">
+      <change afterPath="$PROJECT_DIR$/src/components/Sidebar/ScrollBox.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/Sidebar/index.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utils/Store.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/Layout.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/assets/scss/index.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/assets/scss/index.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/SideNav.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/TopNav.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Topbar.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/common/list-item.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Sidebar/ListItem.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sidebar/main-menu.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Sidebar/MainMenu.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sidebar/scroll-listbox.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/router.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/router.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/utils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/Utils.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/Home.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/Home.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/material-design-icons" beforeDir="false" afterPath="$PROJECT_DIR$/../web-app1/src/assets/material-design-icons" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -30,14 +49,14 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="SCSS File" />
         <option value="Vue Single File Component" />
         <option value="TypeScript File" />
-        <option value="SCSS File" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/z-vue3-ui" />
   </component>
   <component name="ProjectId" id="1jpKFQUY0esbmdavmpILjaJDjzK" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -65,9 +84,9 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\WebThings\gateway\web-app\src\components\sidebar" />
       <recent name="D:\WebThings\gateway\web-app\src\components" />
       <recent name="D:\WebThings\gateway\web-app\src\assets\scss" />
-      <recent name="D:\WebThings\gateway\web-app\src\components\sidebar" />
       <recent name="D:\WebThings\gateway\web-app\src\components\common" />
     </key>
   </component>
@@ -81,6 +100,8 @@
       <updated>1604495491949</updated>
       <workItem from="1604495493334" duration="24493000" />
       <workItem from="1604660138708" duration="17840000" />
+      <workItem from="1604759162890" duration="8656000" />
+      <workItem from="1604977663779" duration="37669000" />
     </task>
     <servers />
   </component>
@@ -100,14 +121,14 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="470" y="553" key="#SCSS_Lint" timestamp="1604680686770">
+    <state x="470" y="553" key="#SCSS_Lint" timestamp="1604994280647">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="470" y="553" key="#SCSS_Lint/0.0.2560.1400@0.0.2560.1400" timestamp="1604680686770" />
-    <state x="370" y="449" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1604678880228">
+    <state x="470" y="553" key="#SCSS_Lint/0.0.2560.1400@0.0.2560.1400" timestamp="1604994280647" />
+    <state x="370" y="449" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1604938700027">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="370" y="449" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1604678880228" />
+    <state x="370" y="449" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1604938700027" />
     <state x="470" y="447" key="EditFileWatcherDialog" timestamp="1604681798394">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
@@ -116,5 +137,9 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="295" y="317" width="998" height="708" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1604732693504" />
+    <state x="223" y="313" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1605014895045">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="223" y="313" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.2560.1400@0.0.2560.1400" timestamp="1605014895045" />
   </component>
 </project>
