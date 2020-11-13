@@ -5,6 +5,7 @@ const history = createWebHistory()
 const hashRouter = createWebHashHistory()
 
 import index from "./views/index.vue"
+import home from "./views/Home.vue"
 import Overview from './views/Overview.vue'
 import Rule from "./views/Rule.vue"
 import Profile from "./views/Profile.vue"
@@ -18,7 +19,7 @@ const router = createRouter( {
             path: '/',
             component: index,
             children: [
-                {path: 'home', component: index},
+                {path: 'home', component: home},
                 {path: 'overview', component: Overview},
                 {path: 'Rule', component: Rule},
                 {path: 'Profile', component: Profile},

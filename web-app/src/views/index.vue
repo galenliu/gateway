@@ -1,14 +1,16 @@
 <template>
   <layout>
     <template v-slot:sidebar>
-      <sidebar >
+      <sidebar :items="items" @goto="goto">
       </sidebar>
     </template>
     <template v-slot:top-bar>
       <top-bar></top-bar>
     </template>
-      <router-view v-slot: work-space>
+    <template v-slot:work-space>
+      <router-view>
       </router-view>
+    </template>
   </layout>
 
 </template>
@@ -19,27 +21,37 @@ import TopBar from '../components/Topbar.vue'
 import Sidebar from "../components/Sidebar/index.vue"
 
 
-
 import Layout from "./Layout.vue";
+import { reactive } from "vue";
+import {getMenuList} from "../utils/Utils";
+
+import "vue-router";
+import {router} from "../router";
+
 
 export default {
   name: "index",
 
 
-
   components: {
+
     Layout,
     TopBar,
     Sidebar,
   },
 
   setup() {
-    const itemSelected=function (){
-        console.log("1111111111111")
+
+    const items = getMenuList()
+
+    const goto= (name:String) =>{
+      router.push(name)
     }
-
+    return{
+      goto,
+      items,
+    }
   }
-
 
 }
 </script>

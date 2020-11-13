@@ -24,7 +24,6 @@ const getMenuList = function (): Object {
             selected: false
         },
     }
-
     return items
 }
 

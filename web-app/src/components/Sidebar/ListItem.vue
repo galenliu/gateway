@@ -1,5 +1,5 @@
 <template>
-  <div v-if="visible" class="scroll-item" :class="['scroll-item', {'selected':selected}]">
+  <div v-if="visible" class="scroll-item" >
     <a @click.prevent="OnClick" >
       <component class="item-icon" size="24px" v-bind:is="icon"/>
       <span v-if="store.state.sideUnfold" id="item-title">{{ title }} </span>
@@ -51,37 +51,19 @@ export default {
 
   components: {},
 
-
   setup(props, context) {
 
-    console.log(props)
-    const ScrollItemReactiveData = reactive({
-      icon: props.icon,
-      title: props.title,
-      visible: props.visible,
-      selected: props.selected,
-    })
+
 
     const OnClick = () => {
-      console.log("emit:ItemSelected")
-      context.emit("ItemSelected",props.name)
+      context.emit("ItemSelected")
     }
-    watchEffect(() => {
-      console.log(ScrollItemReactiveData.selected)
-
-    })
-
-
-    const doSelected = function () {
-      ScrollItemReactiveData.selected = !props.selected
-
-    };
 
 
     return {
       store,
       OnClick,
-      ...toRefs(ScrollItemReactiveData)
+
     }
   }
 }

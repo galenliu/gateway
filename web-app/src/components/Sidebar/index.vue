@@ -1,9 +1,10 @@
 <template>
   <aside class="sidebar">
-    <main-menu  title="刘桂林的家庭世界"></main-menu>
+    <main-menu title="刘桂林的家庭世界"></main-menu>
     <scroll-box>
-      <list-item v-for="(value,key,i) in items" :key=i :ref="key" :name= "key"
-                 :selected="key == selectedItemName ? true: false" :title=value.title :icon="value.icon" @ItemSelected="selectedItem">
+      <list-item v-for="(value,key,i) in items" :key=i :ref="el => {if(el) navItems[i] = el}" :name="key"
+                 :class="{'selected': selectedKey === i }"
+                 :title=value.title :icon="value.icon" @ItemSelected="onSelected(i,key,$event)">
       </list-item>
     </scroll-box>
   </aside>
@@ -12,11 +13,11 @@
 <script lang="ts">
 import MainMenu from "./MainMenu.vue"
 import ScrollBox from "./ScrollBox.vue"
-import  ListItem  from "./ListItem.vue"
-import {provide, ref, inject, reactive, toRefs }from 'vue'
-import { store } from "../../utils/Store.ts"
-import { getMenuList } from "../../utils/Utils.ts"
-
+import ListItem from "./ListItem.vue"
+import {provide, ref, inject, reactive, toRefs} from 'vue'
+import {store} from "../../utils/Store.ts"
+import {getMenuList} from "../../utils/Utils.ts"
+import {router} from "../../router";
 
 
 export default {
@@ -27,17 +28,36 @@ export default {
     ListItem,
     MainMenu,
   },
+
+  props: {
+    activeKey: {
+      type: Number,
+      default: 0
+    },
+    items: {
+      type: Object,
+      require: true,
+    }
+  },
+
   setup(props,context) {
 
-    const selectedItemName = ref("name")
+    const selectedKey= ref(props.activeKey)
+    const navItems = ref<ListItem[]>([])
 
-    const items = getMenuList()
+    //侧边栏有选项被选中时，执行方法，key表示第几项
+    const onSelected = (key:number,name:String,e) => {
+      selectedKey.value = key
+      context.emit("goto",name)
+
+    }
 
     return {
       store,
-      selectedItemName,
+      navItems,
+      selectedKey,
+      onSelected,
       ...toRefs(store),
-      items,
     }
   }
 }
