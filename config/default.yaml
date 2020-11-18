@@ -1,0 +1,11 @@
+prot:
+  https: 4443
+  http: 8080
+  ipc: 9500
+
+proFileDir: "~/.webthings"
+
+addonManager:
+  listUrls:
+    - "http://locahost:8080/addons"
+  testAddons: false

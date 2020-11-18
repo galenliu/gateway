@@ -20,17 +20,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="37193516-e607-4486-ad41-c638b83ce67d" name="默认的" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Api/Things.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/Card/BaseCard.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Sidebar/ListItem.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Sidebar/ListItem.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Sidebar/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Sidebar/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/router.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/router.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/Utils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/Utils.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/Home.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/Home.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/Profile.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/Profile.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../web-app1/src/assets/material-design-icons" beforeDir="false" afterPath="$PROJECT_DIR$/../web-app1/src/assets/material-design-icons" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Api/Things.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/Things.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/Layout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/Layout.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,6 +89,7 @@
       <workItem from="1604759162890" duration="8656000" />
       <workItem from="1604977663779" duration="37861000" />
       <workItem from="1605199817985" duration="8774000" />
+      <workItem from="1605292698409" duration="1485000" />
     </task>
     <servers />
   </component>

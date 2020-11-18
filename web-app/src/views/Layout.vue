@@ -2,7 +2,7 @@
 <div class="side">
 <slot name="sidebar"></slot>
 </div>
-  <div class="work-space">
+  <div class="right-space">
     <slot name="top-bar" ></slot>
     <slot name="work-space"></slot>
   </div>
@@ -19,9 +19,9 @@ name: "Layout"
 
 }
 
-.work-space{
+.right-space{
   display: flex;
-  flex-grow: 1;
+  width: 80%;
   flex-direction: column;
   background-color: #ffffff;
 }

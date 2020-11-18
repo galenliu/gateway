@@ -1,0 +1,32 @@
+[
+  {
+    "name": "yeelight-adapter",
+    "display_name": "yeelight-adapter",
+    "description": "allows you to easily discover and control an light bulb.",
+    "author": "galen",
+    "homepage": "https://gitee/com.liu_guilin/yeelight.zip",
+    "packages": {
+      "linux-arm": {
+        "version": "1.1.0",
+        "url": "https://gitee/com/liu_guilin/yeelight.zip",
+        "checksum": "25f66ffc2e701b2de174645589d118192ec30b11925947036ff28a467d7183eb"
+      },
+      "linux-arm64": {
+        "version": "1.1.0",
+        "url": "https://gitee.com/liu_guilin/yeelight.zip",
+        "checksum": "25f66ffc2e701b2de174645589d118192ec30b11925947036ff28a467d7183eb"
+      },
+      "linux-x64": {
+        "version": "1.1.0",
+        "url": "https://gitee.com/liu_guilin/yeelight.zip",
+        "checksum": "25f66ffc2e701b2de174645589d118192ec30b11925947036ff28a467d7183eb"
+      },
+      "darwin-x64": {
+        "version": "1.1.0",
+        "url": "https://gitee.com/liu_guilin/yeelight.zip",
+        "checksum": "25f66ffc2e701b2de174645589d118192ec30b11925947036ff28a467d7183eb"
+      }
+    },
+    "api": 2
+  }
+]
