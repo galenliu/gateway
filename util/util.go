@@ -1,21 +1,66 @@
 package util
 
 import (
+	"crypto/sha256"
+	"fmt"
+	"io"
 	"io/ioutil"
-	"log"
-	"path"
+	"os"
+	"strings"
 )
 
-var configPath = "/Users/liuguilin/Documents/web-things/gateway/config"
-
-func JsonToYaml(jsonFile,yamlFile string){
-
+type Info struct {
+	Name             string
+	SerialNumber     string
+	Manufacturer     string
+	Model            string
+	FirmwareRevision string
+	ID               uint64
 }
 
-func SavaToConfigDir(fileName string,data []byte){
-	file := path.Join(configPath,fileName)
-	err :=ioutil.WriteFile(file ,data,777)
-	if err != nil{
-		log.Print(err)
+func EnsureDir(baseDir string, dirs ...string) error {
+	_, err := ioutil.ReadDir(baseDir)
+	if os.IsNotExist(err) {
+		ee := os.MkdirAll(baseDir, os.ModePerm)
+		if ee != nil {
+			return ee
+		}
 	}
+	for _, dir := range dirs {
+		_, err := ioutil.ReadDir(dir)
+		if os.IsNotExist(err) {
+			_ = os.MkdirAll(dir, os.ModePerm)
+
+		}
+	}
+	return nil
+}
+
+func CheckSum(file string, checksum string) bool {
+
+	h := sha256.New()
+	f, _ := os.Open(file)
+	defer f.Close()
+	buf := make([]byte, 1<<20)
+	for {
+		n, err := io.ReadFull(f, buf)
+		if err == nil || err == io.ErrUnexpectedEOF {
+			_, err = h.Write(buf[0:n])
+			if err != nil {
+
+			}
+
+		} else if err == io.EOF {
+			break
+		} else {
+
+		}
+
+	}
+	r := h.Sum(nil)
+
+	sumCode := fmt.Sprintf("%x", r)
+
+	return sumCode == strings.ToLower(checksum)
+
 }

@@ -1,75 +1,63 @@
 package gateway
 
 import (
-	"gateway/db"
-	"gateway/plugin"
-	messages "gitee.com/liu_guilin/WebThings-schema"
-	"path"
+	"context"
+	"gateway/addons"
+	"gateway/util/database"
+	"gateway/util/logger"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
-type HomeGateway struct {
-	UserProfile   messages.UserProfile
-	Preferences   messages.Preferences
-	AddonsManager *plugin.AddonsManager
+var log logger.Logger
+
+type Units struct {
+	gorm.Model
+	Temperature string `gorm:"default: degree_celsius"`
 }
 
-func NewHomeGateway(baseDir string) *HomeGateway {
-	var gateway = &HomeGateway{}
-	gateway.setUserProfile(baseDir)
-	return gateway
+type Preferences struct {
+	gorm.Model
+	Language string `gorm:"default: zh-cn"`
+	Units    Units
+	UnitsID  int
+}
+
+type HomeGateway struct {
+	Rtc           *RuntimeConfig
+	Perf          Preferences
+	AddonsManager *addons.Manager
+	ctx           context.Context
 }
 
 func (gateway *HomeGateway) Run() error {
-	gateway.AddonsManager.Run()
+	//gateway.AddonsManager.Start()
 	return nil
 }
 
-func (gateway *HomeGateway) updatePreferences() error {
-	lang := "preferences.language"
-	temp := "preferences.units.temperature"
-	l, err := db.DB.SettingGet(lang)
-	if l == "" && err != nil {
-		l = "zh-CN"
-		err := db.DB.SettingSet(lang, l)
-		if err != nil {
-			return err
-		}
-	}
-	var t string
-	t, err = db.DB.SettingGet(temp)
-	if t == "" && err != nil {
-		t = "degree celsius"
-		err = db.DB.SettingSet(temp, t)
-		if err != nil {
-			return err
-		}
-	}
-	unit := messages.Units{Temperature: t}
-	preferences := messages.Preferences{
-		Language: l,
-		Units:    unit,
-	}
-	gateway.Preferences = preferences
-	return nil
-}
+func (gateway *HomeGateway) updatePreferences() {
 
-func (gateway *HomeGateway) setUserProfile(baseDir string) {
-	var profile = messages.UserProfile{
-		BaseDir:        baseDir,
-		DataDir:        path.Join(baseDir, DataDir),
-		AddonsDir:      path.Join(baseDir, AddonsDir),
-		ConfigDir:      path.Join(baseDir, ConfigDir),
-		MediaDir:       path.Join(baseDir, MediaDir),
-		UploadDir:      path.Join(baseDir, UploadDir),
-		LogDir:         path.Join(baseDir, LogDir),
-		GatewayVersion: Version,
+	//open database and create table
+	db := database.GetDB()
+	_ = db.AutoMigrate(&Preferences{})
+	_ = db.AutoMigrate(&Units{})
+
+	var p Preferences
+	result := db.First(&p)
+	if result.Error != nil {
+		u1 := Units{Temperature: PrefUnitsTempCelsius}
+		p1 := Preferences{Language: PrefLangCn}
+		p1.Units = u1
+		db.Debug().Create(&p1)
 	}
-	EnsureConfigPath(profile.BaseDir, profile.DataDir, profile.AddonsDir, profile.ConfigDir, profile.MediaDir, profile.UploadDir, profile.LogDir)
-	gateway.UserProfile = profile
+	var p2 Preferences
+	db.Preload(clause.Associations).Debug().First(&p2)
+	gateway.Perf = p2
+
 }
 
 func (gateway *HomeGateway) addonManagerLoadAndRun() error {
-	addonManager := plugin.NewAddonsManager(gateway, Log)
+	addonManager := addons.NewAddonsManager(gateway)
 	gateway.AddonsManager = addonManager
 	addonManager.LoadAddons()
 	return nil
@@ -77,15 +65,4 @@ func (gateway *HomeGateway) addonManagerLoadAndRun() error {
 
 func (gateway *HomeGateway) Close() {
 
-}
-
-func (gateway *HomeGateway) GetUserProfile() *messages.UserProfile {
-	return &gateway.UserProfile
-}
-func (gateway *HomeGateway) GetPreferences() *messages.Preferences {
-	return &gateway.Preferences
-}
-
-func (gateway *HomeGateway) EnsureConfigPath(dir string, dirs ...string) {
-	EnsureConfigPath(dir)
 }

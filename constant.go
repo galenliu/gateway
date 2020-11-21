@@ -12,12 +12,20 @@ const (
 	ConfigDir = "config"
 	MediaDir  = "media"
 	UploadDir = "upload"
-	LogDir    = "log"
+	LogDir    = "logger"
 
 	ApiPrefix  = "/api"
 	ThingsPath = "/things"
 	AddonsPath = "/addons"
 	DebugPath  = "/debug"
+
+	DbPrefLang      = "preferences.language"
+	PrefLangCn = "zh-CN"
+
+	DbPrefUnitsTemp = "preferences.units.temperature"
+	PrefUnitsTempCelsius = "degree celsius"
+
+
 )
 
 var (

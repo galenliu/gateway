@@ -14,7 +14,6 @@ func main() {
 
 	box = packr.New("config", "../config")
 	server()
-
 }
 
 func server() {

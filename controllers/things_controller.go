@@ -16,14 +16,10 @@ type ThingsController struct {
 	addonManager models.IAddonManager
 }
 
-func NewThingsController(manage models.IAddonManager, _log *zap.Logger) *ThingsController {
-	if _log != nil {
-		log = _log
-	} else {
-		log = zap.L()
-	}
+func NewThingsController(manage models.IAddonManager) *ThingsController {
+
 	return &ThingsController{
-		Container:    models.NewThings(manage, _log),
+		Container:    models.NewThings(manage),
 		addonManager: manage,
 	}
 }

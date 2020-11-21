@@ -1,11 +1,15 @@
-prot:
+ports:
   https: 4443
   http: 8080
   ipc: 9500
 
-proFileDir: "~/.webthings"
+profileDir: "/Users/liuguilin/Documents/web-things/gateway/profile"
 
 addonManager:
   listUrls:
-    - "http://locahost:8080/addons"
+    - "http://182.61.24.190:8443/addons"
   testAddons: false
+
+database:
+  logRotateDays: 30,
+  removeBeforeOpen: false,

@@ -3,7 +3,6 @@ package controllers
 import (
 	"gateway/models"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"net/http"
 )
 
@@ -11,12 +10,8 @@ type AddonController struct {
 	IAddon models.IAddonManager
 }
 
-func NewAddonController(iAddon models.IAddonManager, _log *zap.Logger) *AddonController {
-	if _log != nil {
-		log = _log
-	} else {
-		log = zap.L()
-	}
+func NewAddonController(iAddon models.IAddonManager) *AddonController {
+
 	return &AddonController{IAddon: iAddon}
 }
 

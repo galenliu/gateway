@@ -1,11 +1,16 @@
 package main
 
+/*
+下载米家所有API接口定义
+*/
+
 import (
 	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"gateway"
+	"gateway/util"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -58,7 +63,7 @@ func DownloadMiot() {
 		nSlice := strings.Split(v, "/")
 		name := nSlice[len(nSlice)-1]
 		p := path.Join(savaDir, name)
-		gateway.EnsureConfigPath(p)
+		util.EnsureDir(p)
 		fileName := name + ".json"
 		f := path.Join(p, fileName)
 		downloadJson(f, v)

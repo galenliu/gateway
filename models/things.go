@@ -19,12 +19,8 @@ type Things struct {
 	Manager IAddonManager
 }
 
-func NewThings(manager IAddonManager, _log *logger.Logger) *Things {
-	if _log != nil {
-		log = _log
-	} else {
-		log = logger.L()
-	}
+func NewThings(manager IAddonManager) *Things {
+
 	return &Things{
 		Manager: manager,
 	}

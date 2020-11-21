@@ -11,7 +11,7 @@ import (
 
 const (
 	YamlConfigFile = "configuration.yaml"
-	ConfDirName    = ".smartassistant"
+	ConfDirName    = ".gateway"
 )
 
 type Config struct {

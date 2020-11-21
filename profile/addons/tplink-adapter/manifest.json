@@ -1,0 +1,38 @@
+{
+  "author": "WebThingsIO",
+  "description": "TP-Link Kasa smart plug/bulb adapter plugin for WebThings Gateway",
+  "gateway_specific_settings": {
+    "webthings": {
+      "exec": "python3 {path}/main.py",
+      "primary_type": "adapter",
+      "strict_max_version": "*",
+      "strict_min_version": "0.10.0"
+    }
+  },
+  "homepage_url": "https://github.com/WebThingsIO/tplink-adapter",
+  "id": "tplink-adapter",
+  "license": "MPL-2.0",
+  "manifest_version": 1,
+  "name": "TP-Link Kasa",
+  "options": {
+    "default": {
+      "addresses": []
+    },
+    "schema": {
+      "type": "object",
+      "required": [
+        "addresses"
+      ],
+      "properties": {
+        "addresses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "short_name": "TP-Link Kasa",
+  "version": "0.6.2"
+}

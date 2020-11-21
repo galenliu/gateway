@@ -3,21 +3,19 @@ package gateway
 import (
 	"fmt"
 	"gateway/controllers"
-	"gateway/plugin"
+	"gateway/addons"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path"
 )
 
-func CollectRoute(staticPath, templates, upload, logDir string, manager *plugin.AddonsManager, _log *zap.Logger) error {
+func CollectRoute(staticPath, templates, upload, logDir string, manager *addons.Manager) error {
 
 	//init thingsController
-	thingsController := controllers.NewThingsController(manager, _log)
-	addonController := controllers.NewAddonController(manager, _log)
+	thingsController := controllers.NewThingsController(manager)
+	addonController := controllers.NewAddonController(manager)
 
 	//thingsCtr := controllers.NewThingsController()
 	var router = gin.Default()
@@ -25,7 +23,7 @@ func CollectRoute(staticPath, templates, upload, logDir string, manager *plugin.
 	gin.SetMode(gin.DebugMode)
 
 	//日志写入文件
-	f, _ := os.Create(path.Join(logDir, "gin.log"))
+	f, _ := os.Create(path.Join(logDir, "gin.logger"))
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 
 	//html template
@@ -50,7 +48,7 @@ func CollectRoute(staticPath, templates, upload, logDir string, manager *plugin.
 		files := form.File["upload[]"]
 
 		for _, file := range files {
-			log.Println(file.Filename)
+			log.Info(file.Filename)
 
 			// Upload the file to specific dst.
 			_ = c.SaveUploadedFile(file, upload)
