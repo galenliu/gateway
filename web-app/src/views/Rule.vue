@@ -1,5 +1,5 @@
 <template>
-<h1>Role</h1>
+<h1>Rule</h1>
 </template>
 
 <script>

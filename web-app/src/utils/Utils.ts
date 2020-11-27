@@ -13,12 +13,11 @@ const getMenuList = function (): Object {
             selected: true
         },
         "rule": {
-
             title: "规则",
             icon: CheckCorrect,
             selected: false,
         },
-        "profile": {
+        "settings": {
             title: "配置",
             icon: SettingConfig,
             selected: false

@@ -14,18 +14,13 @@ const (
 	UploadDir = "upload"
 	LogDir    = "logger"
 
-	ApiPrefix  = "/api"
-	ThingsPath = "/things"
-	AddonsPath = "/addons"
-	DebugPath  = "/debug"
 
-	DbPrefLang      = "preferences.language"
+
+	DbPrefLang = "preferences.language"
 	PrefLangCn = "zh-CN"
 
-	DbPrefUnitsTemp = "preferences.units.temperature"
+	DbPrefUnitsTemp      = "preferences.units.temperature"
 	PrefUnitsTempCelsius = "degree celsius"
-
-
 )
 
 var (

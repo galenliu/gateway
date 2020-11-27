@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"gateway/addons"
+	"gateway/app"
 	"gateway/util"
 	"gateway/util/database"
 	"gateway/util/logger"
@@ -9,6 +10,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"path"
+	"runtime"
 )
 
 type addonManger struct {
@@ -31,6 +33,8 @@ type RuntimeConfig struct {
 	ConfigDir  string `yaml:"configDir,omitempty"`
 	MediaDir   string `yaml:"mediaDir,omitempty"`
 	UploadDir  string `yaml:"uploadDir,omitempty"`
+
+	Architecture string
 
 	GatewayVersion string `yaml:"_"`
 }
@@ -94,23 +98,32 @@ func InitRuntime(config string) (*RuntimeConfig, error) {
 		log.Error("database init err")
 		return nil, err
 	}
+
+	arch := runtime.GOARCH
+	if arch == "amd64" {
+		arch = "x64"
+	}
+	rtc.Architecture = runtime.GOOS + "-" + arch
+
 	return &rtc, err
 }
 
-func CreateGateway(rtc *RuntimeConfig) (gateway *HomeGateway, err error) {
+func InitGateway(rtc *RuntimeConfig) (gateway *HomeGateway, err error) {
 
 	gateway = &HomeGateway{}
-	gateway.Rtc = rtc
+	gateway.Runtime = rtc
 	//update the gateway preferences
 	gateway.updatePreferences()
 	return gateway, err
 }
 
 func StartAddonsManager(gateway *HomeGateway) {
+	config := addons.ManagerConfig{
+		AddonsDir: gateway.Runtime.AddonsDir,
+		DataDir:   gateway.Runtime.DataDir,
+	}
 	if gateway.AddonsManager == nil {
-		gateway.AddonsManager = addons.NewAddonsManager(gateway)
-		gateway.AddonsManager.AddonPath = gateway.Rtc.AddonsDir
-		gateway.AddonsManager.DataPath = gateway.Rtc.DataDir
+		gateway.AddonsManager = addons.NewAddonsManager(config)
 	}
 	if gateway.AddonsManager.IsRunning {
 		gateway.AddonsManager.Stop()
@@ -118,12 +131,30 @@ func StartAddonsManager(gateway *HomeGateway) {
 
 	gateway.AddonsManager.LoadAddons()
 
-	_ = gateway.AddonsManager.InstallAddonFromUrl("tuya-adapter",
-		"https://gitee.com/liu_guilin/tuya-adapter/attach_files/525074/download/tuya-adapter-0.2.4.tgz",
-		"2905594a1893443385c4f1cd5ed254bbdd4022b5e87520212e5a7cd8c9d0ab25", true)
-	_ = gateway.AddonsManager.InstallAddonFromUrl("tplink-adapter",
-		"https://gitee.com/liu_guilin/tplink-adapter/attach_files/526851/download/tplink-adapter-0.6.2.tgz",
-		"3143e1866673bb838297c821a253a4bf4e5fc7de2f732a10cbe7fe458fabe719", true)
+	//_ = gateway.AddonsManager.InstallAddonFromUrl("tuya-adapter",
+	//	"https://gitee.com/liu_guilin/tuya-adapter/attach_files/525074/download/tuya-adapter-0.2.4.tgz",
+	//	"2905594a1893443385c4f1cd5ed254bbdd4022b5e87520212e5a7cd8c9d0ab25", true)
+	//_ = gateway.AddonsManager.InstallAddonFromUrl("tplink-adapter",
+	//	"https://gitee.com/liu_guilin/tplink-adapter/attach_files/526851/download/tplink-adapter-0.6.2.tgz",
+	//	"3143e1866673bb838297c821a253a4bf4e5fc7de2f732a10cbe7fe458fabe719", true)
+	//_ = gateway.AddonsManager.InstallAddonFromUrl("yeelight-adapter",
+	//	"https://gitee.com/liu_guilin/yeelight-adapter/attach_files/528153/download/yeelight-adapter-0.01.tgz",
+	//	"13cce1028286b2c21afa9f9d44881e2523a2bddc64422796e6ebd86cf547e8d8", true)
 
+	gateway.AddonsManager.LoadAddons()
 
+}
+
+func StartGatewayAPP(gw *HomeGateway) {
+	conf := app.Config{
+		HttpPort:    gw.Runtime.Ports["http"],
+		HttpsPort:   gw.Runtime.Ports["https"],
+		StaticDir:   "/Users/liuguilin/Documents/web-things/gateway/web-app/dist",
+		TemplateDir: "/Users/liuguilin/Documents/web-things/gateway/web-app/dist",
+		UploadDir:   gw.Runtime.UploadDir,
+		LogDir:      gw.Runtime.LogDir,
+	}
+	conf.HttpPort = gw.Runtime.Ports["http"]
+	webApp := app.NewApp(conf)
+	webApp.Start()
 }

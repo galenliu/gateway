@@ -12,6 +12,7 @@
     "vue-router": "^4.0.0-rc.2"
   },
   "devDependencies": {
+    "@types/nprogress": "^0.2.0",
     "@vue/compiler-sfc": "^3.0.2",
     "esbuild": "^0.8.4",
     "sass": "^1.28.0",

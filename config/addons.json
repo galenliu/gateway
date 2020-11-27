@@ -8,23 +8,23 @@
     "packages": {
       "linux-arm": {
         "version": "1.1.0",
-        "url": "https://gitee/com/liu_guilin/yeelight.zip",
-        "checksum": "25f66ffc2e701b2de174645589d118192ec30b11925947036ff28a467d7183eb"
+        "url": "https://gitee.com/liu_guilin/yeelight-adapter/attach_files/528153/download/yeelight-adapter-0.01.tgz",
+        "checksum": "13cce1028286b2c21afa9f9d44881e2523a2bddc64422796e6ebd86cf547e8d8"
       },
       "linux-arm64": {
         "version": "1.1.0",
-        "url": "https://gitee.com/liu_guilin/yeelight.zip",
-        "checksum": "25f66ffc2e701b2de174645589d118192ec30b11925947036ff28a467d7183eb"
+        "url": "https://gitee.com/liu_guilin/yeelight-adapter/attach_files/528153/download/yeelight-adapter-0.01.tgz",
+        "checksum": "13cce1028286b2c21afa9f9d44881e2523a2bddc64422796e6ebd86cf547e8d8"
       },
       "linux-x64": {
         "version": "1.1.0",
-        "url": "https://gitee.com/liu_guilin/yeelight.zip",
-        "checksum": "25f66ffc2e701b2de174645589d118192ec30b11925947036ff28a467d7183eb"
+        "url": "https://gitee.com/liu_guilin/yeelight-adapter/attach_files/528153/download/yeelight-adapter-0.01.tgz",
+        "checksum": "13cce1028286b2c21afa9f9d44881e2523a2bddc64422796e6ebd86cf547e8d8"
       },
       "darwin-x64": {
         "version": "1.1.0",
-        "url": "https://gitee.com/liu_guilin/yeelight.zip",
-        "checksum": "25f66ffc2e701b2de174645589d118192ec30b11925947036ff28a467d7183eb"
+        "url": "https://gitee.com/liu_guilin/yeelight-adapter/attach_files/528153/download/yeelight-adapter-0.01.tgz",
+        "checksum": "13cce1028286b2c21afa9f9d44881e2523a2bddc64422796e6ebd86cf547e8d8"
       }
     },
     "api": 2

@@ -1,12 +1,11 @@
 package addons
 
 import (
-	"encoding/json"
 	"fmt"
+	jsoniter "github.com/json-iterator/go"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"path"
-	"gorm.io/gorm"
 )
 
 const ManifestVersion = 1
@@ -23,26 +22,35 @@ func NewAddonConfig(manifest AddonManifest) *AddonConfig {
 }
 
 type AddonManifest struct {
-	gorm.Model
-	ID                      string    `json:"id"`
-	Name                    string    `json:"name"`
-	ShortName               string    `json:"short_name"`
-	Author                  string    `json:"author"`
-	Description             string    `json:"description,omitempty"`
-	License                 string    `json:"license"`
-	HomepageUrl             string    `json:"homepage_url,omitempty"`
-	ManifestVersion         int       `json:"manifest_version"`
-	Version                 int       `json:"version"`
-	StrictMaxVersion        int       `json:"strictMaxVersion"`
-	StrictMinVersion        int       `json:"strictMinVersion"`
-	Option                  Option    `json:"option"`
-	GatewaySpecificSettings WebThings `json:"gateway_specific_settings"`
-	Enable                  bool      `json:"enable"`
+	ID                      string               `json:"id"`
+	Name                    string               `json:"name"`
+	ShortName               string               `json:"short_name"`
+	Author                  string               `json:"author"`
+	Description             string               `json:"description,omitempty"`
+	License                 string               `json:"license"`
+	HomepageUrl             string               `json:"homepage_url,omitempty"`
+	ManifestVersion         int                  `json:"manifest_version"`
+	Version                 string               `json:"version"`
+	Options                 Option               `json:"options,omitempty"`
+	GatewaySpecificSettings map[string]WebThings `json:"gateway_specific_settings"`
+	Enable                  bool                 `json:"_"`
 }
 
 type Option struct {
-	Default interface{} `json:"default"`
-	Schema  interface{} `json:"schema"`
+	Default map[string]interface{} `json:"default"`
+	Schema  Schema                 `json:"schema"`
+}
+type Schema struct {
+	Type       string              `json:"type"`
+	Required   []string            `json:"required"`
+	Properties map[string]Property `json:"properties"`
+}
+type Property struct {
+	Title   string   `json:"title"`
+	Type    string   `json:"type"`
+	Default string   `json:"default,omitempty"`
+	Items   Schema   `json:"items,omitempty"`
+	Enum    []string `json:"enum,omitempty"`
 }
 
 type WebThings struct {
@@ -93,6 +101,8 @@ func loadYaml(dirName string, in *AddonManifest) error {
 
 func loadManifestJson(dirName string) (addonManifest *AddonManifest, err error) {
 	f, err := ioutil.ReadFile(path.Join(dirName, ManifestFileJson))
-	err = json.Unmarshal(f, addonManifest)
-	return
+
+	var manifest AddonManifest
+	err = jsoniter.Unmarshal(f, &manifest)
+	return &manifest, err
 }

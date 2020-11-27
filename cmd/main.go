@@ -38,10 +38,12 @@ func main() {
 	CheckError(err)
 
 	//create core instance
-	gw, err := core.CreateGateway(runtimeConfig)
+	gw, err := core.InitGateway(runtimeConfig)
 	CheckError(err)
 
 	core.StartAddonsManager(gw)
+
+	core.StartGatewayAPP(gw)
 
 	//handle signal
 	signal.Notify(c, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGTERM)
@@ -53,7 +55,7 @@ func main() {
 	go systemCall()
 
 	//run core
-	CheckError(gw.Run())
+	CheckError(gw.Start())
 
 }
 

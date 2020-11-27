@@ -26,6 +26,7 @@ type PluginsServer struct {
 func NewPluginServer(manager *Manager, _ctx context.Context) *PluginsServer {
 	server := &PluginsServer{}
 	server.ctx = _ctx
+	server.Plugins = make(map[string]*Plugin)
 	server.locker = new(sync.Mutex)
 	server.addonManager = manager
 	ctx, _ := context.WithCancel(server.ctx)
@@ -105,17 +106,18 @@ func (s *PluginsServer) sendMsg() {
 }
 
 func (s *PluginsServer) loadPlugin(name, exec string) {
-	plugin :=s.registerPlugin(name);if plugin==nil{
+	plugin := s.registerPlugin(name)
+	if plugin == nil {
 		return
 	}
-	plugin.exec=exec
+	plugin.exec = exec
 	plugin.start()
 }
 
 func (s *PluginsServer) registerPlugin(name string) *Plugin {
 	plugin := s.Plugins[name]
 	if plugin != nil {
-		log.Info(fmt.Sprintf("plugin ins exist:%v", name))
+		log.Info(fmt.Sprintf("plugin is exist:%v", name))
 		return nil
 	}
 	plugin = NewPlugin(name, s, s.ctx)

@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 	"gateway/util"
-	"gateway/util/database"
 	"gateway/util/logger"
 	"go.uber.org/zap"
 	"io"
@@ -17,34 +16,44 @@ import (
 	"strings"
 )
 
-type IGateway interface {
-}
+
 
 var log logger.Logger
+
+type ManagerConfig struct {
+	AddonsDir string
+	DataDir string
+
+}
+
 
 type Manager struct {
 	configPath    string
 	pluginServer  *PluginsServer
 	devices       map[string]*DeviceProxy
-	installAddons map[string]interface{} // {addonId: manifest}
+	installAddons map[string]*AddonManifest // {addonId: manifest}
+
+
 
 	IsRunning bool
 	IsLoaded  bool
 
-	AddonPath string
-	DataPath  string
+	AddonsDir string
+	DataDir  string
 	ctx       context.Context
-	iGateway  IGateway
 }
 
-func NewAddonsManager(gateway IGateway) *Manager {
+func NewAddonsManager(config ManagerConfig) *Manager {
 	am := &Manager{}
 	am.ctx = context.Background()
-	am.AddonPath = "/Users/liuguilin/Documents/web-things/gateway/profile/addons"
-	am.iGateway = gateway
+	am.AddonsDir = config.AddonsDir
+	am.DataDir = config.DataDir
+
+
 	am.IsLoaded = false
 	am.IsRunning = false
 	am.devices = make(map[string]*DeviceProxy)
+	am.installAddons = make(map[string]*AddonManifest)
 	am.pluginServer = NewPluginServer(am, am.ctx)
 	log = logger.GetLog()
 	return am
@@ -55,56 +64,59 @@ func (manager *Manager) LoadAddons() {
 		log.Info("addon manager is loaded")
 		return
 	}
-	fs, err := ioutil.ReadDir(manager.AddonPath)
+	fs, err := ioutil.ReadDir(manager.AddonsDir)
 	if err != nil {
 		log.Error("read addon dir err:", zap.Error(err))
 	}
 	for _, fi := range fs {
 		if fi.IsDir() {
 			addonId := fi.Name()
-			err := manager.loadAddon(addonId)
-			log.Error(fmt.Sprintf("load add-ons:%v err:", addonId), zap.Error(err))
+			err = manager.loadAddon(addonId)
+			if err != nil {
+				log.Error(fmt.Sprintf("load add-ons: %v err:", addonId), zap.Error(err))
+			}
 		}
 	}
 }
 
 func (manager *Manager) loadAddon(packageId string) error {
-	db := database.GetDB()
+	//db := database.GetDB()
 
-	manifest, err := LoadManifest(manager.AddonPath, packageId)
+	manifest, err := LoadManifest(manager.AddonsDir, packageId)
 	if err != nil {
 		return err
 	}
 
-	//get saved form db,
-	var saveManifest *AddonManifest
-	db.First(&saveManifest, packageId)
-
-	//update
-	if saveManifest != nil {
-		manifest.Enable = saveManifest.Enable
-	}
-	//saved
-	db.Create(manifest)
-
-	if !manifest.Enable {
-		err = fmt.Errorf("add-on is not enabled:%v", manifest.ID)
-		return err
-	}
-	if manifest.GatewaySpecificSettings.Exec == "" {
-		err = fmt.Errorf("add-on exec nil:%v", manifest.ID)
-		return err
-	}
+	////get saved form db,
+	//var saveManifest *AddonManifest
+	//db.First(&saveManifest, packageId)
+	//
+	////update
+	//if saveManifest != nil {
+	//	manifest.Enable = saveManifest.Enable
+	//}
+	////saved
+	//db.Create(manifest)s
+	//
+	//if !manifest.Enable {
+	//	err = fmt.Errorf("add-on is not enabled:%v", manifest.ID)
+	//	return err
+	//}
+	//if manifest.GatewaySpecificSettings["webthings"].Exec == "" {
+	//	err = fmt.Errorf("add-on exec nil:%v", manifest.ID)
+	//	return err
+	//}
 
 	//create addon date dir
-	err = util.EnsureDir(path.Join(manager.DataPath, manifest.ID))
+	err = util.EnsureDir(path.Join(manager.DataDir, manifest.ID))
 	if err != nil {
 		return err
 	}
 
 	manager.installAddons[packageId] = manifest
 
-	manager.pluginServer.loadPlugin(manifest.Name,manifest.GatewaySpecificSettings.Exec)
+	manager.pluginServer.loadPlugin(manifest.ID, manifest.GatewaySpecificSettings["webthings"].Exec)
+
 	//plugin := manager.pluginServer.getPlugin(manifest.ID)
 	//plugin.exec = manifest.GatewaySpecificSettings.Exec
 	//plugin.start()
@@ -118,7 +130,7 @@ func (manager *Manager) InstallAddonFromUrl(id, url, checksum string, enable boo
 	log.Info(fmt.Sprintf("fetching add-on %s as %s", url, destPath))
 	resp, err := http.Get(url)
 	if err != nil || resp.StatusCode != 200 {
-		log.Error("Http error")
+		log.Error("Download addon err:", zap.String("HTTP States:", resp.Status), zap.String("url", url))
 		return err
 	}
 	defer resp.Body.Close()
@@ -133,7 +145,7 @@ func (manager *Manager) InstallAddonFromUrl(id, url, checksum string, enable boo
 func (manager *Manager) installAddon(packageId, packagePath string, enable bool) {
 
 	if !manager.IsLoaded {
-		log.Warn("Cannot install add-on before other add-ons have been loaded")
+		log.Warn(fmt.Sprintf("Cannot install add-on:%v before other add-ons have been loaded", packageId))
 	}
 	f, _ := os.Open(packagePath)
 	defer f.Close()
@@ -147,7 +159,7 @@ func (manager *Manager) installAddon(packageId, packagePath string, enable bool)
 		// 读取文件信息
 		fi := hdr.FileInfo()
 		p := strings.Replace(hdr.Name, "package", packageId, 1)
-		localPath := manager.AddonPath + string(os.PathSeparator) + p
+		localPath := manager.AddonsDir + string(os.PathSeparator) + p
 		if fi.IsDir() {
 			fmt.Print("mkdir:" + p)
 			_ = os.MkdirAll(localPath, os.ModePerm)
@@ -162,7 +174,8 @@ func (manager *Manager) installAddon(packageId, packagePath string, enable bool)
 		if _, err := io.Copy(fw, tr); err != nil {
 			log.Error("create file err")
 		}
-		_ = os.Chmod(fi.Name(), fi.Mode().Perm())
+		//TODO 给下载的文件增加可执行权限
+		_ = os.Chmod(fi.Name(), 777)
 		_ = fw.Close()
 	}
 	err := manager.loadAddon(packageId)
@@ -192,7 +205,7 @@ func (manager *Manager) RemoveThing(thingId string) {
 }
 
 func (manager *Manager) GetInstallAddons() map[string]interface{} {
-	return manager.installAddons
+	return nil
 }
 
 func (manager *Manager) getDevice(thingId string) *DeviceProxy {

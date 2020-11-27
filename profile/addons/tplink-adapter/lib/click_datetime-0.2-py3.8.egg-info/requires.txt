@@ -1,4 +1,0 @@
-click
-
-[dev]
-wheel

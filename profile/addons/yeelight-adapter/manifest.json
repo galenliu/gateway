@@ -1,0 +1,19 @@
+{
+  "author": "liuguilin",
+  "description": "Yeelight smart bulb adapter plugin for WebThings Gateway",
+  "gateway_specific_settings": {
+    "webthings": {
+      "exec": "{path}/main",
+      "primary_type": "adapter",
+      "strict_max_version": "*",
+      "strict_min_version": "0.10.0"
+    }
+  },
+  "homepage_url": "https://gitee.com/liu_guilin/yeelight-adapter#readme",
+  "id": "yeelight-adapter",
+  "license": "MPL-2.0",
+  "manifest_version": 1,
+  "name": "Yeelight",
+  "short_name": "Yeelight",
+  "version": "0.0.1"
+}

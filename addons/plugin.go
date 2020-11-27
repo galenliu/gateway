@@ -2,10 +2,13 @@ package addons
 
 import (
 	"context"
+	"fmt"
 	messages "gitee.com/liu_guilin/WebThings-schema"
 	json "github.com/json-iterator/go"
 	"go.uber.org/zap"
+	"io/ioutil"
 	"os/exec"
+	"path"
 	"strings"
 	"sync"
 )
@@ -24,7 +27,7 @@ type Plugin struct {
 	ws           *Connection
 	pluginServer *PluginsServer
 	adapters     map[string]*AdapterProxy
-
+	packagePath string
 	ctx        context.Context
 	cancelFunc context.CancelFunc
 }
@@ -34,6 +37,7 @@ func NewPlugin(pluginId string, s *PluginsServer, _ctx context.Context) (plugin 
 	plugin.looker = new(sync.Mutex)
 	plugin.pluginId = pluginId
 	plugin.pluginServer = s
+	plugin.packagePath = path.Join(s.addonManager.AddonsDir,pluginId)
 	if _ctx != nil {
 		plugin.ctx = _ctx
 	} else {
@@ -98,16 +102,29 @@ func (plugin *Plugin) getAdapter(id string) *AdapterProxy {
 
 func (plugin *Plugin) start() {
 
-	command := strings.Replace(plugin.exec, "{path}", plugin.execPath, 1)
-
-	var ctx context.Context
-	ctx, plugin.cancelFunc = context.WithCancel(plugin.ctx)
-	cmd := exec.CommandContext(ctx, command)
-	err := cmd.Start()
+	command := strings.Replace(plugin.exec, "{path}", plugin.packagePath, 1)
+	//if !strings.HasPrefix(command,"python3"){
+	//	log.Warn(fmt.Sprintf("plugin:%v run falied，because it's not supported at the moment",plugin.pluginId))
+	//	return
+	//}
+	//var ctx context.Context
+	commands :=strings.Split(command," ")
+	//ctx, plugin.cancelFunc = context.WithCancel(plugin.ctx)
+	cmd := exec.Command(commands[0], commands...)
+	stdOut, err :=cmd.StdoutPipe();if err != nil{
+		fmt.Print(err)
+	}
+	err = cmd.Start()
 	if err != nil {
-		log.Warn("addons start failed")
+		log.Warn("addons start failed,err: ",zap.Error(err))
 	} else {
-		log.Info("addons is running")
+		fmt.Printf("start plugin: %v",plugin.pluginId)
+			out,err:= ioutil.ReadAll(stdOut);if err !=nil{
+				fmt.Print(err)
+			msg := string(out)
+			fmt.Print(msg)
+
+		}
 	}
 }
 

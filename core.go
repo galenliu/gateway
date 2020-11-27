@@ -23,14 +23,21 @@ type Preferences struct {
 	UnitsID  int
 }
 
+//gateway strut
+//
 type HomeGateway struct {
-	Rtc           *RuntimeConfig
-	Perf          Preferences
+	Runtime       *RuntimeConfig
+	Preferences   *Preferences
 	AddonsManager *addons.Manager
 	ctx           context.Context
 }
 
-func (gateway *HomeGateway) Run() error {
+type Event struct {
+	EventType string
+	thingsID  string
+}
+
+func (gateway *HomeGateway) Start() error {
 	//gateway.AddonsManager.Start()
 	return nil
 }
@@ -52,12 +59,16 @@ func (gateway *HomeGateway) updatePreferences() {
 	}
 	var p2 Preferences
 	db.Preload(clause.Associations).Debug().First(&p2)
-	gateway.Perf = p2
+	gateway.Preferences = &p2
 
 }
 
 func (gateway *HomeGateway) addonManagerLoadAndRun() error {
-	addonManager := addons.NewAddonsManager(gateway)
+
+	addonManagerConfig := addons.ManagerConfig{
+		AddonsDir: gateway.Runtime.AddonsDir,
+	}
+	addonManager := addons.NewAddonsManager(addonManagerConfig)
 	gateway.AddonsManager = addonManager
 	addonManager.LoadAddons()
 	return nil
