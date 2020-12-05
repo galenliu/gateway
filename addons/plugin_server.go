@@ -3,7 +3,6 @@ package addons
 //	addons server
 import (
 	"context"
-	"fmt"
 	messages "gitee.com/liu_guilin/WebThings-schema"
 	json "github.com/json-iterator/go"
 	"go.uber.org/zap"
@@ -16,14 +15,14 @@ const ADDR = ":9500"
 type PluginsServer struct {
 	Plugins      map[string]*Plugin
 	locker       *sync.Mutex
-	addonManager *Manager
+	addonManager *AddonsManager
 	ipc          *IpcServer
 	ctx          context.Context
 	verbose      bool
 	logger       **zap.Logger
 }
 
-func NewPluginServer(manager *Manager, _ctx context.Context) *PluginsServer {
+func NewPluginServer(manager *AddonsManager, _ctx context.Context) *PluginsServer {
 	server := &PluginsServer{}
 	server.ctx = _ctx
 	server.Plugins = make(map[string]*Plugin)
@@ -31,6 +30,7 @@ func NewPluginServer(manager *Manager, _ctx context.Context) *PluginsServer {
 	server.addonManager = manager
 	ctx, _ := context.WithCancel(server.ctx)
 	server.ipc = NewIpcServer(ctx, ADDR, PATH)
+	go server.Start()
 	return server
 }
 
@@ -78,9 +78,6 @@ func (s *PluginsServer) getPlugin(pluginId string) *Plugin {
 	s.locker.Lock()
 	defer s.locker.Unlock()
 	p := s.Plugins[pluginId]
-	if p == nil {
-		p = NewPlugin(pluginId, s, s.ctx)
-	}
 	return p
 }
 
@@ -105,37 +102,49 @@ func (s *PluginsServer) sendMsg() {
 
 }
 
-func (s *PluginsServer) loadPlugin(name, exec string) {
-	plugin := s.registerPlugin(name)
-	if plugin == nil {
-		return
+func (s *PluginsServer) loadPlugin(packageId, exec string, enabled bool) {
+	plugin := s.registerPlugin(packageId, exec)
+	if enabled {
+		plugin.start()
+	} else {
+		plugin.Stop()
 	}
-	plugin.exec = exec
-	plugin.start()
 }
 
-func (s *PluginsServer) registerPlugin(name string) *Plugin {
-	plugin := s.Plugins[name]
-	if plugin != nil {
-		log.Info(fmt.Sprintf("plugin is exist:%v", name))
-		return nil
+func (s *PluginsServer) uninstallPlugin(packageId string) {
+	pkg := s.getPlugin(packageId)
+	if pkg == nil {
+		return
+	} else {
+		pkg.Stop()
+		delete(s.Plugins, packageId)
 	}
-	plugin = NewPlugin(name, s, s.ctx)
-	s.Plugins[name] = plugin
+}
+
+func (s *PluginsServer) registerPlugin(packageId string, exec string) *Plugin {
+	plugin := s.Plugins[packageId]
+	if plugin == nil {
+		plugin = NewPlugin(s, packageId, exec, s.ctx)
+		s.Plugins[packageId] = plugin
+	}
 	return plugin
 }
 
-//开启goroutines处理ipc_server中ws
+//create goroutines handle ipc massage
 func (s *PluginsServer) Start() {
 	go s.ipc.Serve()
 	select {
 	case conn := <-s.ipc.wsChan:
 		go s.newConn(conn)
 	case <-s.ctx.Done():
-		s.close()
+		s.Stop()
 	}
 }
 
-func (s *PluginsServer) close() {
+//if server stop, also need to stop all of package
+func (s *PluginsServer) Stop() {
 	close(s.ipc.wsChan)
+	for _, v := range s.Plugins {
+		v.cancelFunc()
+	}
 }

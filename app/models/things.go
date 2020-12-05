@@ -1,7 +1,7 @@
 package models
 
 import (
-	"gateway/util/database"
+	"gateway/pkg/database"
 	json "github.com/json-iterator/go"
 	logger "go.uber.org/zap"
 )

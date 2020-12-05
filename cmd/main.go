@@ -4,6 +4,10 @@ import (
 	"flag"
 	"fmt"
 	core "gateway"
+	"gateway/addons"
+	"gateway/app"
+	"gateway/pkg/runtime"
+	"gateway/pkg/util"
 	"os"
 	"os/signal"
 	"syscall"
@@ -29,21 +33,25 @@ func main() {
 
 	//if version command then print version
 	if showVersion {
-		fmt.Print(core.Version)
+		fmt.Print(util.Version)
 		return
 	}
 
 	//init runtime
-	runtimeConfig, err := core.InitRuntime(proFile)
+	err = runtime.InitRuntime(proFile)
 	CheckError(err)
 
 	//create core instance
-	gw, err := core.InitGateway(runtimeConfig)
+	gw, err := core.NewGateway()
 	CheckError(err)
 
-	core.StartAddonsManager(gw)
+	gw.AddonsManager,err=addons.NewAddonsManager(gw.Ctx)
+	CheckError(err)
 
-	core.StartGatewayAPP(gw)
+
+	gw.Web =app.NewWebAPP(app.NewDefaultWebConfig())
+
+
 
 	//handle signal
 	signal.Notify(c, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGTERM)

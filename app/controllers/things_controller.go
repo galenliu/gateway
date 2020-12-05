@@ -3,7 +3,7 @@ package controllers
 import (
 	"fmt"
 	"gateway/app/models"
-	"gateway/util/logger"
+	"gateway/pkg/logger"
 	"github.com/gin-gonic/gin"
 	json "github.com/json-iterator/go"
 	"go.uber.org/zap"
@@ -61,7 +61,7 @@ func (ts *ThingsController) HandleCreateThing(c *gin.Context) {
 }
 
 func (ts *ThingsController) HandleGetThing(c *gin.Context) {
-	id := c.Param("thingId")
+	id := c.Param("thing_id")
 	t  :=ts.Container.GetThing(id);if t==nil{
 		c.JSON(http.StatusBadRequest, fmt.Sprintf("have not thing Id: %v",id))
 	}
@@ -72,7 +72,7 @@ func (ts *ThingsController) HandleGetThing(c *gin.Context) {
 //put property
 func (ts *ThingsController) HandleSetProperty(c *gin.Context) {
 
-	thingId := c.Param("thingId")
+	thingId := c.Param("thing_id")
 	propName := c.Param("propertyName")
 	log.Info("things handler:SetProperty", zap.String("propName", propName), zap.String("method", "PUT"))
 
@@ -87,15 +87,15 @@ func (ts *ThingsController) HandleSetProperty(c *gin.Context) {
 }
 
 func (ts *ThingsController) HandleGetProperty(c *gin.Context) {
-	thingId := c.Param("thingId")
-	propName := c.Param("propertyName")
+	thingId := c.Param("thing_id")
+	propName := c.Param("property_name")
 	value := ts.Container.GetThingProperty(thingId, propName)
 	data := map[string]interface{}{propName: value}
 	c.JSON(http.StatusOK, data)
 }
 
 func (ts *ThingsController) HandleGetProperties(c *gin.Context) {
-	thingId := c.Param("thingId")
+	thingId := c.Param("thing_id")
 	//thing := ts.Container.GetThing(thingId)
 	var props = make(map[string]interface{})
 	//for propName, _ := range thing.Properties {
@@ -106,7 +106,7 @@ func (ts *ThingsController) HandleGetProperties(c *gin.Context) {
 }
 
 func (ts *ThingsController) HandleSetThing(c *gin.Context) {
-	thingId := c.Param("thingId")
+	thingId := c.Param("thing_id")
 	thing := ts.Container.GetThing(thingId)
 
 	req, err := ioutil.ReadAll(c.Request.Body)
@@ -128,7 +128,7 @@ func (ts *ThingsController) HandleSetThing(c *gin.Context) {
 
 
 func (ts *ThingsController) HandleDeleteThing(c *gin.Context) {
-	thingId := c.Param("thingId")
+	thingId := c.Param("thing_id")
 	err := ts.Container.RemoveThing(thingId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, fmt.Sprintf("Failed to remove thing thingId: %v ,err: %v", thingId, err))

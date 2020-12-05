@@ -1,4 +1,0 @@
-GET http://localhost:8080/things/12
-Accept: application/json
-
-###

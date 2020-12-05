@@ -20,336 +20,43 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9f4f53eb-6f7f-48b5-82a2-b5196c9afd72" name="默认的" comment="">
-      <change afterPath="$PROJECT_DIR$/app/constant.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/controllers/settings_controller.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/models/addons.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/models/property.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/build.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/config" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/stage3/00-set-config/00-run.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/stage3/01-install-deps/00-packages" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/stage3/01-install-deps/01-run-chroot.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/stage3/02-systemd-units/00-run.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/stage3/02-systemd-units/files/etc/default/hostapd" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/stage3/02-systemd-units/files/etc/dnsmasq.conf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/stage3/02-systemd-units/files/etc/hostapd/hostapd.conf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/stage3/02-systemd-units/files/etc/init.d/gateway-iptables" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/stage3/02-systemd-units/files/etc/init.d/resize2fs_once" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/stage3/02-systemd-units/files/etc/systemd/system/webthings-gateway.check-for-update.service" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/stage3/02-systemd-units/files/etc/systemd/system/webthings-gateway.check-for-update.timer" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/stage3/02-systemd-units/files/etc/systemd/system/webthings-gateway.service" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/stage3/02-systemd-units/files/etc/systemd/system/webthings-gateway.update-rollback.service" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/stage3/02-systemd-units/files/etc/udev/98-co2mon.rules" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/stage3/03-add-gateway/00-run.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/stage3/03-add-gateway/01-run-chroot.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/stage3/EXPORT_IMAGE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/assets/image/stage3/prerun.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/components/Card/Discovered-addon-item.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/views/Settings.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web-app/src/views/settings/Add-ons.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/runtime/runtime.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gateway.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gateway.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/addons/adapter.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/adapter.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/addons/adapter_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/adapter_proxy.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/addons/addon_manager.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/addon_manager.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/addons/addon_util.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/addon_util.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/addons/plugin.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/plugin.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/addons/plugin_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/plugin_server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api_text.http" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/addon_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/addon_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/settings_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/settings_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/things_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/things_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/things.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/things.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/router.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/miot.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/miot.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/reg_service.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/addons.all.json" beforeDir="false" afterPath="$PROJECT_DIR$/config/addons.all.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/addons.json" beforeDir="false" afterPath="$PROJECT_DIR$/config/addons.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/addons.json" beforeDir="false" afterPath="$PROJECT_DIR$/config/addons_info.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/default.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/default.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/constant.go" beforeDir="false" afterPath="$PROJECT_DIR$/constant.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/addon_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/addon_controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/debug_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/debug_controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/root_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/root_controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/things_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/things_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/constant.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/util/constant.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core.go" beforeDir="false" afterPath="$PROJECT_DIR$/core.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp" beforeDir="false" afterPath="$PROJECT_DIR$/frp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/assets/frpc/statik/statik.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/assets/frpc/statik/statik.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/assets/frps/statik/statik.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/assets/frps/statik/statik.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/client/proxy/proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/client/proxy/proxy.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/client/proxy/proxy_wrapper.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/client/proxy/proxy_wrapper.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/client/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/client/service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/client/visitor.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/client/visitor.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/client/visitor_manager.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/client/visitor_manager.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/cmd/frpc/sub/http.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/cmd/frpc/sub/http.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/cmd/frpc/sub/https.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/cmd/frpc/sub/https.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/cmd/frpc/sub/root.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/cmd/frpc/sub/root.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/cmd/frpc/sub/stcp.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/cmd/frpc/sub/stcp.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/cmd/frpc/sub/sudp.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/cmd/frpc/sub/sudp.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/cmd/frpc/sub/tcp.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/cmd/frpc/sub/tcp.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/cmd/frpc/sub/tcpmux.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/cmd/frpc/sub/tcpmux.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/cmd/frpc/sub/udp.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/cmd/frpc/sub/udp.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/cmd/frpc/sub/xtcp.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/cmd/frpc/sub/xtcp.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/cmd/frps/root.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/cmd/frps/root.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/pkg/config/client_common.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/pkg/config/client_common.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/pkg/config/server_common.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/pkg/config/server_common.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/pkg/util/log/log.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/pkg/util/log/log.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/pkg/util/vhost/reverseproxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/pkg/util/vhost/reverseproxy.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/test/e2e/e2e.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/test/e2e/e2e.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/test/e2e/framework/cleanup.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/test/e2e/framework/cleanup.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/test/e2e/framework/framework.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/test/e2e/framework/framework.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/test/e2e/framework/mockservers.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/test/e2e/framework/mockservers.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/test/e2e/framework/test_context.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/test/e2e/framework/test_context.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frp/test/e2e/suites.go" beforeDir="false" afterPath="$PROJECT_DIR$/frp/test/e2e/suites.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/thing.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/thing.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/things.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/things.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/SHA256SUMS" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/bin/pyhs100" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click-7.1.2-py3.8.egg-info/PKG-INFO" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click-7.1.2-py3.8.egg-info/SOURCES.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click-7.1.2-py3.8.egg-info/dependency_links.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click-7.1.2-py3.8.egg-info/installed-files.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click-7.1.2-py3.8.egg-info/top_level.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click/_bashcomplete.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click/_compat.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click/_termui_impl.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click/_textwrap.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click/_unicodefun.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click/_winconsole.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click/core.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click/decorators.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click/exceptions.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click/formatting.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click/globals.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click/parser.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click/termui.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click/testing.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click/types.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click/utils.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click_datetime-0.2-py3.8.egg-info/PKG-INFO" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click_datetime-0.2-py3.8.egg-info/SOURCES.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click_datetime-0.2-py3.8.egg-info/dependency_links.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click_datetime-0.2-py3.8.egg-info/installed-files.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click_datetime-0.2-py3.8.egg-info/requires.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click_datetime-0.2-py3.8.egg-info/top_level.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/click_datetime/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/pyHS100-0.3.5.1-py3.8.egg-info/PKG-INFO" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/pyHS100-0.3.5.1-py3.8.egg-info/SOURCES.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/pyHS100-0.3.5.1-py3.8.egg-info/dependency_links.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/pyHS100-0.3.5.1-py3.8.egg-info/entry_points.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/pyHS100-0.3.5.1-py3.8.egg-info/installed-files.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/pyHS100-0.3.5.1-py3.8.egg-info/not-zip-safe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/pyHS100-0.3.5.1-py3.8.egg-info/requires.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/pyHS100-0.3.5.1-py3.8.egg-info/top_level.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/pyHS100/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/pyHS100/cli.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/pyHS100/discover.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/pyHS100/protocol.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/pyHS100/smartbulb.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/pyHS100/smartdevice.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/pyHS100/smartplug.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/lib/pyHS100/smartstrip.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/manifest.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/pkg/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/pkg/tplink_adapter.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/pkg/tplink_device.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/pkg/tplink_property.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tplink-adapter/pkg/util.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/LICENSE.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/SHA256SUMS" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/adapter.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/bin/pyhs100" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click-7.1.2-py3.8.egg-info/PKG-INFO" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click-7.1.2-py3.8.egg-info/SOURCES.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click-7.1.2-py3.8.egg-info/dependency_links.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click-7.1.2-py3.8.egg-info/installed-files.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click-7.1.2-py3.8.egg-info/top_level.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click/_bashcomplete.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click/_compat.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click/_termui_impl.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click/_textwrap.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click/_unicodefun.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click/_winconsole.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click/core.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click/decorators.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click/exceptions.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click/formatting.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click/globals.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click/parser.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click/termui.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click/testing.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click/types.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click/utils.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click_datetime-0.2-py3.8.egg-info/PKG-INFO" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click_datetime-0.2-py3.8.egg-info/SOURCES.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click_datetime-0.2-py3.8.egg-info/dependency_links.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click_datetime-0.2-py3.8.egg-info/installed-files.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click_datetime-0.2-py3.8.egg-info/requires.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click_datetime-0.2-py3.8.egg-info/top_level.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/click_datetime/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/devices/colourlight-device.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/devices/dimmer-device.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/devices/fireplace-heater-device.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/devices/generic-device.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/devices/light-device.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/devices/plug-device.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/devices/plug-energy-monitor-device.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/devices/plug-nightlight-device.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/devices/switch-device.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/devices/tuya-device.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/helpers.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/properties/boolean-property.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/properties/brightness-property.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/properties/colourlight/colour-property.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/properties/colourlight/hue-property.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/properties/colourlight/lightness-property.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/properties/colourlight/saturation-property.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/properties/level-property.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/properties/lighttemperature-property.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/properties/mode-property.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/properties/number-property.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/properties/plug-energy-monitor/current-monitor-property.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/properties/plug-energy-monitor/power-monitor-property.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/properties/plug-energy-monitor/voltage-monitor-property.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/properties/power-property.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/properties/string-property.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/properties/tuya-property.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/pyHS100-0.3.5.1-py3.8.egg-info/PKG-INFO" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/pyHS100-0.3.5.1-py3.8.egg-info/SOURCES.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/pyHS100-0.3.5.1-py3.8.egg-info/dependency_links.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/pyHS100-0.3.5.1-py3.8.egg-info/entry_points.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/pyHS100-0.3.5.1-py3.8.egg-info/installed-files.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/pyHS100-0.3.5.1-py3.8.egg-info/not-zip-safe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/pyHS100-0.3.5.1-py3.8.egg-info/requires.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/pyHS100-0.3.5.1-py3.8.egg-info/top_level.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/pyHS100/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/pyHS100/cli.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/pyHS100/discover.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/pyHS100/protocol.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/pyHS100/smartbulb.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/pyHS100/smartdevice.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/pyHS100/smartplug.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/lib/pyHS100/smartstrip.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/manifest.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/@types/retry/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/@types/retry/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/@types/retry/index.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/@types/retry/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/debug/CHANGELOG.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/debug/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/debug/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/debug/dist/debug.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/debug/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/debug/src/browser.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/debug/src/common.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/debug/src/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/debug/src/node.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/eventemitter3/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/eventemitter3/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/eventemitter3/index.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/eventemitter3/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/eventemitter3/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/eventemitter3/umd/eventemitter3.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/eventemitter3/umd/eventemitter3.min.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/eventemitter3/umd/eventemitter3.min.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/.travis.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/example/parse.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/readme.markdown" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/test/all_bool.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/test/bool.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/test/dash.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/test/default_bool.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/test/dotted.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/test/kv_short.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/test/long.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/test/num.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/test/parse.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/test/parse_modified.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/test/proto.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/test/short.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/test/stop_early.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/test/unknown.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/minimist/test/whitespace.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/ms/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/ms/license.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/ms/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/ms/readme.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-finally/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-finally/license" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-finally/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-finally/readme.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-queue/dist/index.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-queue/dist/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-queue/dist/lower-bound.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-queue/dist/lower-bound.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-queue/dist/options.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-queue/dist/options.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-queue/dist/priority-queue.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-queue/dist/priority-queue.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-queue/dist/queue.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-queue/dist/queue.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-queue/license" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-queue/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-queue/readme.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-retry/index.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-retry/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-retry/license" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-retry/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-retry/readme.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-timeout/index.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-timeout/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-timeout/license" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-timeout/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/p-timeout/readme.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/retry/.npmignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/retry/.travis.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/retry/License" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/retry/Makefile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/retry/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/retry/equation.gif" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/retry/example/dns.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/retry/example/stop.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/retry/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/retry/lib/retry.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/retry/lib/retry_operation.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/retry/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/retry/test/common.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/retry/test/integration/test-forever.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/retry/test/integration/test-retry-operation.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/retry/test/integration/test-retry-wrap.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/retry/test/integration/test-timeouts.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/tuyapi/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/tuyapi/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/tuyapi/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/tuyapi/lib/cipher.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/tuyapi/lib/config.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/tuyapi/lib/crc.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/tuyapi/lib/message-parser.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/tuyapi/lib/utils.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/node_modules/tuyapi/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/pkg/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/pkg/tplink_adapter.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/pkg/tplink_device.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/pkg/tplink_property.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/tuya-adapter/pkg/util.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/profile/addons/yeelight-adapter/lib/yeelight.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/profile/addons/yeelight-adapter/main" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/profile/addons/yeelight-adapter/main.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/profile/addons/yeelight-adapter/manifest.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/profile/config/database.sqlite3" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/profile/logger/logger.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runner.go" beforeDir="false" afterPath="$PROJECT_DIR$/runner.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/main_test.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-app/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-app/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-app/src/router.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/src/router.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-app/src/utils/Utils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/src/utils/Utils.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-app/src/views/Profile.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-app/src/views/Rule.vue" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/src/views/Rule.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-app/src/views/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/src/views/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-app/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/web-app/yarn.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/profile/logger/web.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/runner.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/database/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/database/db.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/database/settings.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/logger/log.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/logger/log.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/util.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/util/util.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -375,9 +82,6 @@
     <option name="indexEntireGoPath" value="false" />
   </component>
   <component name="JupyterTrust" id="1dc2f251-25ea-4b2e-8afb-48f51c4c69e0" />
-  <component name="PackageJsonUpdateNotifier">
-    <dismissed value="$PROJECT_DIR$/web-app/package.json" />
-  </component>
   <component name="ProjectId" id="1jm2mA3bK0GS7Pr1J1QEfTwdLMV" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -402,15 +106,15 @@
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/config" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/pkg/runtime" />
+      <recent name="$PROJECT_DIR$/pkg/util" />
+      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/web-app/dist/_assets/123" />
       <recent name="$PROJECT_DIR$/app" />
-      <recent name="$PROJECT_DIR$/util" />
-      <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/log" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/config" />
     </key>
   </component>
   <component name="RunManager" selected="Go 构建.go build main.go">
@@ -465,6 +169,7 @@
         <item itemvalue="Go 测试.go test gateway/test" />
         <item itemvalue="Go 测试.go test gateway/addons" />
         <item itemvalue="Go 构建.reg_service" />
+        <item itemvalue="Go 构建.go build miot.go" />
       </list>
     </recent_temporary>
   </component>
@@ -530,105 +235,114 @@
     </state>
     <state x="255" y="329" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1440.900@0.0.1440.900" timestamp="1606004078533" />
     <state x="453" y="526" key="#com.intellij.fileTypes.FileTypeChooser/0.0.2560.1440@0.0.2560.1440" timestamp="1605821575121" />
-    <state width="1120" height="780" key="DebuggerActiveHint" timestamp="1606115001681">
+    <state width="1120" height="780" key="DebuggerActiveHint" timestamp="1607053229169">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state width="1042" height="460" key="DebuggerActiveHint/0.0.1440.900@0.0.1440.900" timestamp="1606002675571" />
-    <state width="1120" height="780" key="DebuggerActiveHint/0.0.2560.1440@0.0.2560.1440" timestamp="1606115001681" />
+    <state width="1120" height="780" key="DebuggerActiveHint/0.0.2560.1440@0.0.2560.1440" timestamp="1607053229169" />
     <state width="651" height="454" key="DebuggerActiveHint/0.25.1440.809@0.25.1440.809" timestamp="1605841335935" />
     <state width="1120" height="780" key="DebuggerActiveHint/0.25.2560.1345@0.25.2560.1345" timestamp="1606066502008" />
     <state x="1054" y="577" key="FileChooserDialogImpl" timestamp="1604660115468">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="1054" y="577" key="FileChooserDialogImpl/0.0.2560.1400@0.0.2560.1400" timestamp="1604660115468" />
-    <state width="2518" height="306" key="GridCell.Tab.0.bottom" timestamp="1606160240607">
-      <screen x="0" y="0" width="2560" height="1440" />
+    <state width="2518" height="472" key="GridCell.Tab.0.bottom" timestamp="1607067728638">
+      <screen x="0" y="25" width="2560" height="1415" />
     </state>
     <state width="1398" height="175" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1606028642889" />
     <state width="1358" height="520" key="GridCell.Tab.0.bottom/0.0.2560.1440/0.25.2560.1345@0.25.2560.1345" timestamp="1605628794208" />
-    <state width="2518" height="306" key="GridCell.Tab.0.bottom/0.0.2560.1440@0.0.2560.1440" timestamp="1606160240607" />
+    <state width="2518" height="472" key="GridCell.Tab.0.bottom/0.0.2560.1440@0.0.2560.1440" timestamp="1607067278374" />
     <state width="1398" height="243" key="GridCell.Tab.0.bottom/0.25.1440.805@0.25.1440.805" timestamp="1605836307584" />
     <state width="1398" height="258" key="GridCell.Tab.0.bottom/0.25.1440.807@0.25.1440.807" timestamp="1605923024530" />
     <state width="1398" height="243" key="GridCell.Tab.0.bottom/0.25.1440.809@0.25.1440.809" timestamp="1605839374768" />
     <state width="1398" height="258" key="GridCell.Tab.0.bottom/0.25.1440.814/1440.25.2560.1415@0.25.1440.814" timestamp="1605965158935" />
-    <state width="2518" height="306" key="GridCell.Tab.0.bottom/0.25.2560.1345@0.25.2560.1345" timestamp="1606074198393" />
-    <state width="2518" height="306" key="GridCell.Tab.0.center" timestamp="1606160240606">
-      <screen x="0" y="0" width="2560" height="1440" />
+    <state width="2518" height="306" key="GridCell.Tab.0.bottom/0.25.2560.1345@0.25.2560.1345" timestamp="1606813299086" />
+    <state width="2518" height="472" key="GridCell.Tab.0.bottom/0.25.2560.1415@0.25.2560.1415" timestamp="1607067728638" />
+    <state width="2518" height="472" key="GridCell.Tab.0.center" timestamp="1607067728636">
+      <screen x="0" y="25" width="2560" height="1415" />
     </state>
     <state width="1398" height="175" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1606028642888" />
     <state width="1358" height="520" key="GridCell.Tab.0.center/0.0.2560.1440/0.25.2560.1345@0.25.2560.1345" timestamp="1605628794207" />
-    <state width="2518" height="306" key="GridCell.Tab.0.center/0.0.2560.1440@0.0.2560.1440" timestamp="1606160240606" />
+    <state width="2518" height="472" key="GridCell.Tab.0.center/0.0.2560.1440@0.0.2560.1440" timestamp="1607067278373" />
     <state width="1398" height="243" key="GridCell.Tab.0.center/0.25.1440.805@0.25.1440.805" timestamp="1605836307583" />
     <state width="1398" height="258" key="GridCell.Tab.0.center/0.25.1440.807@0.25.1440.807" timestamp="1605923024529" />
     <state width="1398" height="243" key="GridCell.Tab.0.center/0.25.1440.809@0.25.1440.809" timestamp="1605839374767" />
     <state width="1398" height="258" key="GridCell.Tab.0.center/0.25.1440.814/1440.25.2560.1415@0.25.1440.814" timestamp="1605965158932" />
-    <state width="2518" height="306" key="GridCell.Tab.0.center/0.25.2560.1345@0.25.2560.1345" timestamp="1606074198391" />
-    <state width="2518" height="306" key="GridCell.Tab.0.left" timestamp="1606160240605">
-      <screen x="0" y="0" width="2560" height="1440" />
+    <state width="2518" height="306" key="GridCell.Tab.0.center/0.25.2560.1345@0.25.2560.1345" timestamp="1606813299084" />
+    <state width="2518" height="472" key="GridCell.Tab.0.center/0.25.2560.1415@0.25.2560.1415" timestamp="1607067728636" />
+    <state width="2518" height="472" key="GridCell.Tab.0.left" timestamp="1607067728635">
+      <screen x="0" y="25" width="2560" height="1415" />
     </state>
     <state width="1398" height="175" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1606028642887" />
     <state width="1358" height="520" key="GridCell.Tab.0.left/0.0.2560.1440/0.25.2560.1345@0.25.2560.1345" timestamp="1605628794207" />
-    <state width="2518" height="306" key="GridCell.Tab.0.left/0.0.2560.1440@0.0.2560.1440" timestamp="1606160240605" />
+    <state width="2518" height="472" key="GridCell.Tab.0.left/0.0.2560.1440@0.0.2560.1440" timestamp="1607067278372" />
+    <state width="2518" height="306" key="GridCell.Tab.0.left/0.0.2560.1440@0.25.2560.1345" timestamp="1606813299080" />
     <state width="1398" height="243" key="GridCell.Tab.0.left/0.25.1440.805@0.25.1440.805" timestamp="1605836307582" />
     <state width="1398" height="258" key="GridCell.Tab.0.left/0.25.1440.807@0.25.1440.807" timestamp="1605923024529" />
     <state width="1398" height="243" key="GridCell.Tab.0.left/0.25.1440.809@0.25.1440.809" timestamp="1605839374766" />
     <state width="1398" height="258" key="GridCell.Tab.0.left/0.25.1440.814/1440.25.2560.1415@0.25.1440.814" timestamp="1605965158931" />
-    <state width="2518" height="306" key="GridCell.Tab.0.left/0.25.2560.1345@0.25.2560.1345" timestamp="1606074198390" />
-    <state width="2518" height="306" key="GridCell.Tab.0.right" timestamp="1606160240607">
-      <screen x="0" y="0" width="2560" height="1440" />
+    <state width="2518" height="306" key="GridCell.Tab.0.left/0.25.2560.1345@0.25.2560.1345" timestamp="1606594395609" />
+    <state width="2518" height="472" key="GridCell.Tab.0.left/0.25.2560.1415@0.25.2560.1415" timestamp="1607067728635" />
+    <state width="2518" height="472" key="GridCell.Tab.0.right" timestamp="1607067728636">
+      <screen x="0" y="25" width="2560" height="1415" />
     </state>
     <state width="1398" height="175" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1606028642888" />
     <state width="1358" height="520" key="GridCell.Tab.0.right/0.0.2560.1440/0.25.2560.1345@0.25.2560.1345" timestamp="1605628794208" />
-    <state width="2518" height="306" key="GridCell.Tab.0.right/0.0.2560.1440@0.0.2560.1440" timestamp="1606160240607" />
+    <state width="2518" height="472" key="GridCell.Tab.0.right/0.0.2560.1440@0.0.2560.1440" timestamp="1607067278374" />
     <state width="1398" height="243" key="GridCell.Tab.0.right/0.25.1440.805@0.25.1440.805" timestamp="1605836307584" />
     <state width="1398" height="258" key="GridCell.Tab.0.right/0.25.1440.807@0.25.1440.807" timestamp="1605923024530" />
     <state width="1398" height="243" key="GridCell.Tab.0.right/0.25.1440.809@0.25.1440.809" timestamp="1605839374767" />
     <state width="1398" height="258" key="GridCell.Tab.0.right/0.25.1440.814/1440.25.2560.1415@0.25.1440.814" timestamp="1605965158934" />
-    <state width="2518" height="306" key="GridCell.Tab.0.right/0.25.2560.1345@0.25.2560.1345" timestamp="1606074198392" />
-    <state width="2518" height="306" key="GridCell.Tab.1.bottom" timestamp="1606160240609">
-      <screen x="0" y="0" width="2560" height="1440" />
+    <state width="2518" height="306" key="GridCell.Tab.0.right/0.25.2560.1345@0.25.2560.1345" timestamp="1606813299085" />
+    <state width="2518" height="472" key="GridCell.Tab.0.right/0.25.2560.1415@0.25.2560.1415" timestamp="1607067728636" />
+    <state width="2518" height="472" key="GridCell.Tab.1.bottom" timestamp="1607067728547">
+      <screen x="0" y="25" width="2560" height="1415" />
     </state>
     <state width="1398" height="175" key="GridCell.Tab.1.bottom/0.0.1440.900@0.0.1440.900" timestamp="1606028644992" />
     <state width="1358" height="520" key="GridCell.Tab.1.bottom/0.0.2560.1440/0.25.2560.1345@0.25.2560.1345" timestamp="1605628794208" />
-    <state width="2518" height="306" key="GridCell.Tab.1.bottom/0.0.2560.1440@0.0.2560.1440" timestamp="1606160240609" />
+    <state width="2518" height="472" key="GridCell.Tab.1.bottom/0.0.2560.1440@0.0.2560.1440" timestamp="1607067278295" />
     <state width="1398" height="243" key="GridCell.Tab.1.bottom/0.25.1440.805@0.25.1440.805" timestamp="1605836311065" />
     <state width="1398" height="258" key="GridCell.Tab.1.bottom/0.25.1440.807@0.25.1440.807" timestamp="1605923024243" />
     <state width="1398" height="243" key="GridCell.Tab.1.bottom/0.25.1440.809@0.25.1440.809" timestamp="1605839374695" />
     <state width="1398" height="258" key="GridCell.Tab.1.bottom/0.25.1440.814/1440.25.2560.1415@0.25.1440.814" timestamp="1605965158939" />
-    <state width="2518" height="306" key="GridCell.Tab.1.bottom/0.25.2560.1345@0.25.2560.1345" timestamp="1606156014174" />
-    <state width="2518" height="306" key="GridCell.Tab.1.center" timestamp="1606160240608">
-      <screen x="0" y="0" width="2560" height="1440" />
+    <state width="2518" height="306" key="GridCell.Tab.1.bottom/0.25.2560.1345@0.25.2560.1345" timestamp="1606813299091" />
+    <state width="2518" height="472" key="GridCell.Tab.1.bottom/0.25.2560.1415@0.25.2560.1415" timestamp="1607067728547" />
+    <state width="2518" height="472" key="GridCell.Tab.1.center" timestamp="1607067728546">
+      <screen x="0" y="25" width="2560" height="1415" />
     </state>
     <state width="1398" height="175" key="GridCell.Tab.1.center/0.0.1440.900@0.0.1440.900" timestamp="1606028644992" />
     <state width="1358" height="520" key="GridCell.Tab.1.center/0.0.2560.1440/0.25.2560.1345@0.25.2560.1345" timestamp="1605628794208" />
-    <state width="2518" height="306" key="GridCell.Tab.1.center/0.0.2560.1440@0.0.2560.1440" timestamp="1606160240608" />
+    <state width="2518" height="472" key="GridCell.Tab.1.center/0.0.2560.1440@0.0.2560.1440" timestamp="1607067278294" />
     <state width="1398" height="243" key="GridCell.Tab.1.center/0.25.1440.805@0.25.1440.805" timestamp="1605836311064" />
     <state width="1398" height="258" key="GridCell.Tab.1.center/0.25.1440.807@0.25.1440.807" timestamp="1605923024242" />
     <state width="1398" height="243" key="GridCell.Tab.1.center/0.25.1440.809@0.25.1440.809" timestamp="1605839374694" />
     <state width="1398" height="258" key="GridCell.Tab.1.center/0.25.1440.814/1440.25.2560.1415@0.25.1440.814" timestamp="1605965158936" />
-    <state width="2518" height="306" key="GridCell.Tab.1.center/0.25.2560.1345@0.25.2560.1345" timestamp="1606156014173" />
-    <state width="2518" height="306" key="GridCell.Tab.1.left" timestamp="1606160240608">
-      <screen x="0" y="0" width="2560" height="1440" />
+    <state width="2518" height="306" key="GridCell.Tab.1.center/0.25.2560.1345@0.25.2560.1345" timestamp="1606813299087" />
+    <state width="2518" height="472" key="GridCell.Tab.1.center/0.25.2560.1415@0.25.2560.1415" timestamp="1607067728546" />
+    <state width="2518" height="472" key="GridCell.Tab.1.left" timestamp="1607067728546">
+      <screen x="0" y="25" width="2560" height="1415" />
     </state>
     <state width="1398" height="175" key="GridCell.Tab.1.left/0.0.1440.900@0.0.1440.900" timestamp="1606028644991" />
     <state width="1358" height="520" key="GridCell.Tab.1.left/0.0.2560.1440/0.25.2560.1345@0.25.2560.1345" timestamp="1605628794208" />
-    <state width="2518" height="306" key="GridCell.Tab.1.left/0.0.2560.1440@0.0.2560.1440" timestamp="1606160240608" />
+    <state width="2518" height="472" key="GridCell.Tab.1.left/0.0.2560.1440@0.0.2560.1440" timestamp="1607067278294" />
     <state width="1398" height="243" key="GridCell.Tab.1.left/0.25.1440.805@0.25.1440.805" timestamp="1605836311063" />
     <state width="1398" height="258" key="GridCell.Tab.1.left/0.25.1440.807@0.25.1440.807" timestamp="1605923024242" />
     <state width="1398" height="243" key="GridCell.Tab.1.left/0.25.1440.809@0.25.1440.809" timestamp="1605839374694" />
     <state width="1398" height="258" key="GridCell.Tab.1.left/0.25.1440.814/1440.25.2560.1415@0.25.1440.814" timestamp="1605965158935" />
-    <state width="2518" height="306" key="GridCell.Tab.1.left/0.25.2560.1345@0.25.2560.1345" timestamp="1606156014172" />
-    <state width="2518" height="306" key="GridCell.Tab.1.right" timestamp="1606160240608">
-      <screen x="0" y="0" width="2560" height="1440" />
+    <state width="2518" height="306" key="GridCell.Tab.1.left/0.25.2560.1345@0.25.2560.1345" timestamp="1606813299087" />
+    <state width="2518" height="472" key="GridCell.Tab.1.left/0.25.2560.1415@0.25.2560.1415" timestamp="1607067728546" />
+    <state width="2518" height="472" key="GridCell.Tab.1.right" timestamp="1607067728547">
+      <screen x="0" y="25" width="2560" height="1415" />
     </state>
     <state width="1398" height="175" key="GridCell.Tab.1.right/0.0.1440.900@0.0.1440.900" timestamp="1606028644992" />
     <state width="1358" height="520" key="GridCell.Tab.1.right/0.0.2560.1440/0.25.2560.1345@0.25.2560.1345" timestamp="1605628794208" />
-    <state width="2518" height="306" key="GridCell.Tab.1.right/0.0.2560.1440@0.0.2560.1440" timestamp="1606160240608" />
+    <state width="2518" height="472" key="GridCell.Tab.1.right/0.0.2560.1440@0.0.2560.1440" timestamp="1607067278295" />
     <state width="1398" height="243" key="GridCell.Tab.1.right/0.25.1440.805@0.25.1440.805" timestamp="1605836311065" />
     <state width="1398" height="258" key="GridCell.Tab.1.right/0.25.1440.807@0.25.1440.807" timestamp="1605923024243" />
     <state width="1398" height="243" key="GridCell.Tab.1.right/0.25.1440.809@0.25.1440.809" timestamp="1605839374695" />
     <state width="1398" height="258" key="GridCell.Tab.1.right/0.25.1440.814/1440.25.2560.1415@0.25.1440.814" timestamp="1605965158937" />
-    <state width="2518" height="306" key="GridCell.Tab.1.right/0.25.2560.1345@0.25.2560.1345" timestamp="1606156014173" />
+    <state width="2518" height="306" key="GridCell.Tab.1.right/0.25.2560.1345@0.25.2560.1345" timestamp="1606813299091" />
+    <state width="2518" height="472" key="GridCell.Tab.1.right/0.25.2560.1415@0.25.2560.1415" timestamp="1607067728547" />
     <state width="168" height="457" key="HiddenNamespacesPopup" timestamp="1605987878947">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
@@ -644,25 +358,29 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="239" y="432" key="Vcs.Push.Dialog.v2/0.0.2560.1400@0.0.2560.1400" timestamp="1604558322576" />
-    <state width="366" height="450" key="XDebugger.FullValuePopup" timestamp="1605999226972">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state width="649" height="720" key="XDebugger.FullValuePopup" timestamp="1606818508292">
+      <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state width="366" height="450" key="XDebugger.FullValuePopup/0.0.1440.900@0.0.1440.900" timestamp="1605999226972" />
-    <state width="649" height="720" key="XDebugger.FullValuePopup/0.0.2560.1440@0.0.2560.1440" timestamp="1605996508039" />
+    <state width="649" height="720" key="XDebugger.FullValuePopup/0.0.2560.1440@0.0.2560.1440" timestamp="1606818508292" />
     <state x="1389" y="0" width="1081" height="1100" key="dock-window-1" timestamp="1605994228854">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state x="312" y="63" width="933" height="805" key="dock-window-1/0.0.1440.900@0.0.1440.900" timestamp="1605730730525" />
     <state x="1389" y="0" width="1081" height="1100" key="dock-window-1/0.0.2560.1440@0.0.2560.1440" timestamp="1605994228854" />
     <state x="1280" y="25" width="933" height="1345" key="dock-window-1/0.25.2560.1345@0.25.2560.1345" timestamp="1605718997117" />
-    <state x="945" y="331" key="search.everywhere.popup" timestamp="1606154571642">
+    <state x="977" y="352" width="605" height="735" key="find.popup" timestamp="1606795145217">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
-    <state x="945" y="331" key="search.everywhere.popup/0.0.2560.1440@0.0.2560.1440" timestamp="1606154571642" />
-    <state x="280" y="398" key="vcs.readOnlyHandler.ReadOnlyStatusDialog" timestamp="1605914596229">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state x="977" y="352" width="605" height="735" key="find.popup/0.0.2560.1440@0.0.2560.1440" timestamp="1606795145217" />
+    <state x="945" y="331" width="670" height="676" key="search.everywhere.popup" timestamp="1607065931497">
+      <screen x="0" y="0" width="2560" height="1440" />
+    </state>
+    <state x="945" y="331" width="670" height="676" key="search.everywhere.popup/0.0.2560.1440@0.0.2560.1440" timestamp="1607065931497" />
+    <state x="498" y="636" key="vcs.readOnlyHandler.ReadOnlyStatusDialog" timestamp="1606795738988">
+      <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state x="280" y="398" key="vcs.readOnlyHandler.ReadOnlyStatusDialog/0.0.1440.900@0.0.1440.900" timestamp="1605914596229" />
-    <state x="498" y="636" key="vcs.readOnlyHandler.ReadOnlyStatusDialog/0.0.2560.1440@0.0.2560.1440" timestamp="1605795621902" />
+    <state x="498" y="636" key="vcs.readOnlyHandler.ReadOnlyStatusDialog/0.0.2560.1440@0.0.2560.1440" timestamp="1606795738988" />
   </component>
 </project>

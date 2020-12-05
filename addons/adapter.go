@@ -9,7 +9,7 @@ type Adapter struct {
 	PackageName string `json:"package_name"`
 	verbose     bool
 	devices     map[string]*DeviceProxy
-	manager     *Manager
+	manager     *AddonsManager
 	userProfile *messages.UserProfile
 	preferences *messages.Preferences
 }

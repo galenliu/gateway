@@ -18,7 +18,7 @@ const ExecPython3 = "{python}"
 //Plugin 管理Adapters
 //处理每一个plugin的请求
 type Plugin struct {
-	looker       *sync.Mutex
+	locker       *sync.Mutex
 	pluginId     string
 	exec         string
 	execPath     string
@@ -27,17 +27,17 @@ type Plugin struct {
 	ws           *Connection
 	pluginServer *PluginsServer
 	adapters     map[string]*AdapterProxy
-	packagePath string
-	ctx        context.Context
+	ctx          context.Context
 	cancelFunc context.CancelFunc
 }
 
-func NewPlugin(pluginId string, s *PluginsServer, _ctx context.Context) (plugin *Plugin) {
+func NewPlugin(s *PluginsServer,pluginId string, exec string, _ctx context.Context) (plugin *Plugin) {
 	plugin = &Plugin{}
-	plugin.looker = new(sync.Mutex)
+	plugin.locker = new(sync.Mutex)
+	plugin.exec = exec
 	plugin.pluginId = pluginId
 	plugin.pluginServer = s
-	plugin.packagePath = path.Join(s.addonManager.AddonsDir,pluginId)
+	plugin.execPath = path.Join(s.addonManager.AddonsDir,pluginId)
 	if _ctx != nil {
 		plugin.ctx = _ctx
 	} else {
@@ -86,15 +86,15 @@ func (plugin *Plugin) sendMessage(message messages.BaseMessage) {
 }
 
 func (plugin *Plugin) addAdapter(a *AdapterProxy) {
-	plugin.looker.Lock()
-	defer plugin.looker.Unlock()
+	plugin.locker.Lock()
+	defer plugin.locker.Unlock()
 	plugin.adapters[a.ID] = a
 
 }
 
 func (plugin *Plugin) getAdapter(id string) *AdapterProxy {
-	plugin.looker.Lock()
-	defer plugin.looker.Unlock()
+	plugin.locker.Lock()
+	defer plugin.locker.Unlock()
 	a := plugin.adapters[id]
 	return a
 
@@ -102,18 +102,32 @@ func (plugin *Plugin) getAdapter(id string) *AdapterProxy {
 
 func (plugin *Plugin) start() {
 
-	command := strings.Replace(plugin.exec, "{path}", plugin.packagePath, 1)
-	//if !strings.HasPrefix(command,"python3"){
-	//	log.Warn(fmt.Sprintf("plugin:%v run falied，because it's not supported at the moment",plugin.pluginId))
-	//	return
-	//}
-	//var ctx context.Context
-	commands :=strings.Split(command," ")
+	commandPath := strings.Replace(plugin.exec, "{path}", plugin.execPath, 1)
+	commandStr := strings.Replace(commandPath, "{nodeLoader}","node", 1)
+
+	commands :=strings.Split(commandStr," ")
+
+	var args []string
+	if len(commands)>1{
+		for i,arg :=range commands{
+			if i !=0{
+				args = append(args, arg)
+			}
+		}
+	}
 	//ctx, plugin.cancelFunc = context.WithCancel(plugin.ctx)
-	cmd := exec.Command(commands[0], commands...)
+	var cmd *exec.Cmd
+	if len(args)>0{
+		cmd = exec.Command(commands[0], args...)
+	}else {
+		cmd = exec.Command(commands[0])
+	}
+
+
 	stdOut, err :=cmd.StdoutPipe();if err != nil{
 		fmt.Print(err)
 	}
+
 	err = cmd.Start()
 	if err != nil {
 		log.Warn("addons start failed,err: ",zap.Error(err))
@@ -128,7 +142,8 @@ func (plugin *Plugin) start() {
 	}
 }
 
-func (plugin *Plugin) kill() {
+func (plugin *Plugin) Stop() {
+	//TODO Send stop nf
+	//plugin.sendMessage(12,"")
 	plugin.cancelFunc()
-	plugin.registered = false
 }

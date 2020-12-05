@@ -9,14 +9,14 @@ import (
 type AdapterProxy struct {
 	*Adapter
 	plugin  *Plugin
-	manager *Manager
+	manager *AddonsManager
 	looker  *sync.Mutex
 	name    string
 
 	manifest interface{}
 }
 
-func NewAdapterProxy(manager *Manager, adapterId string, name string, packetName string) *AdapterProxy {
+func NewAdapterProxy(manager *AddonsManager, adapterId string, name string, packetName string) *AdapterProxy {
 	proxy := &AdapterProxy{}
 	proxy.manager = manager
 	//proxy.userProfile = manager.iGateway.GetUserProfile()

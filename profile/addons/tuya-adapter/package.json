@@ -1,0 +1,52 @@
+{
+  "name": "tuya-adapter",
+  "display_name": "Tuya Smart Life",
+  "version": "0.2.4",
+  "description": "Tuya Smart Life IoT devices support",
+  "author": "bewee",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "keywords": [
+    "mozilla",
+    "iot",
+    "adapter",
+    "tuya",
+    "smart life"
+  ],
+  "homepage": "https://github.com/bewee/tuya-adapter",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bewee/tuya-adapter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bewee/tuya-adapter/issues"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.8.0"
+  },
+  "files": [
+    "LICENSE.md",
+    "README.md",
+    "SHA256SUMS",
+    "manifest.json",
+    "index.js",
+    "lib/"
+  ],
+  "moziot": {
+    "api": {
+      "min": 2,
+      "max": 2
+    },
+    "type": "adapter",
+    "plugin": true,
+    "exec": "{nodeLoader} {path}"
+  },
+  "dependencies": {
+    "minimist": "^1.2.5",
+    "tuyapi": "github:codetheweb/tuyapi"
+  }
+}

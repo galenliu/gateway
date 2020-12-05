@@ -9,8 +9,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"gateway"
-	"gateway/util"
+	"gateway/pkg/util"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -48,7 +47,7 @@ type types struct {
 }
 
 func init() {
-	flag.StringVar(&savaDir, "dir", gateway.GetDefaultConfigDir(), "download directory")
+	flag.StringVar(&savaDir, "dir", util.GetDefaultConfigDir(), "download directory")
 	flag.StringVar(&PJson, "json", "", "dir")
 }
 

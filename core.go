@@ -2,11 +2,15 @@ package gateway
 
 import (
 	"context"
+	"fmt"
 	"gateway/addons"
-	"gateway/util/database"
-	"gateway/util/logger"
+	"gateway/app"
+	"gateway/pkg/database"
+	"gateway/pkg/logger"
+	"gateway/pkg/util"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+	"time"
 )
 
 var log logger.Logger
@@ -26,10 +30,20 @@ type Preferences struct {
 //gateway strut
 //
 type HomeGateway struct {
-	Runtime       *RuntimeConfig
 	Preferences   *Preferences
-	AddonsManager *addons.Manager
-	ctx           context.Context
+	AddonsManager *addons.AddonsManager
+	Web           *app.WebApp
+	Ctx           context.Context
+}
+
+func NewGateway() (gateway *HomeGateway, err error) {
+
+	log = logger.GetLog()
+	gateway = &HomeGateway{}
+	gateway.Ctx = context.Background()
+	//update the gateway preferences
+	gateway.updatePreferences()
+	return gateway, err
 }
 
 type Event struct {
@@ -38,8 +52,18 @@ type Event struct {
 }
 
 func (gateway *HomeGateway) Start() error {
-	//gateway.AddonsManager.Start()
-	return nil
+
+	go gateway.Web.Start()
+	go gateway.AddonsManager.Start()
+	for {
+		select {
+		case <-gateway.Ctx.Done():
+			return fmt.Errorf("application exit")
+		default:
+			time.Sleep(2 * time.Second)
+		}
+	}
+
 }
 
 func (gateway *HomeGateway) updatePreferences() {
@@ -52,8 +76,8 @@ func (gateway *HomeGateway) updatePreferences() {
 	var p Preferences
 	result := db.First(&p)
 	if result.Error != nil {
-		u1 := Units{Temperature: PrefUnitsTempCelsius}
-		p1 := Preferences{Language: PrefLangCn}
+		u1 := Units{Temperature: util.PrefUnitsTempCelsius}
+		p1 := Preferences{Language: util.PrefLangCn}
 		p1.Units = u1
 		db.Debug().Create(&p1)
 	}
@@ -63,17 +87,7 @@ func (gateway *HomeGateway) updatePreferences() {
 
 }
 
-func (gateway *HomeGateway) addonManagerLoadAndRun() error {
-
-	addonManagerConfig := addons.ManagerConfig{
-		AddonsDir: gateway.Runtime.AddonsDir,
-	}
-	addonManager := addons.NewAddonsManager(addonManagerConfig)
-	gateway.AddonsManager = addonManager
-	addonManager.LoadAddons()
-	return nil
-}
 
 func (gateway *HomeGateway) Close() {
-
+	  gateway.Ctx.Done()
 }

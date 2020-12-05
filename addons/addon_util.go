@@ -2,6 +2,7 @@ package addons
 
 import (
 	"fmt"
+	"gateway/pkg/database"
 	jsoniter "github.com/json-iterator/go"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
@@ -24,7 +25,7 @@ func NewAddonConfig(manifest AddonManifest) *AddonConfig {
 type AddonManifest struct {
 	ID                      string               `json:"id"`
 	Name                    string               `json:"name"`
-	ShortName               string               `json:"short_name"`
+	ShortName               string               `json:"short_name,omitempty"`
 	Author                  string               `json:"author"`
 	Description             string               `json:"description,omitempty"`
 	License                 string               `json:"license"`
@@ -38,12 +39,12 @@ type AddonManifest struct {
 
 type Option struct {
 	Default map[string]interface{} `json:"default"`
-	Schema  Schema                 `json:"schema"`
+	Schema  Schema                 `json:"schema,omitempty"`
 }
 type Schema struct {
-	Type       string              `json:"type"`
-	Required   []string            `json:"required"`
-	Properties map[string]Property `json:"properties"`
+	Type       string              `json:"type,omitempty"`
+	Required   []string            `json:"required,omitempty"`
+	Properties map[string]Property `json:"properties,omitempty"`
 }
 type Property struct {
 	Title   string   `json:"title"`
@@ -58,6 +59,74 @@ type WebThings struct {
 	PrimaryType      string `json:"primary_type"`
 	StrictMaxVersion string `json:"strict_max_version"`
 	StrictMinVersion string `json:"strict_min_version"`
+}
+
+//author: "bewee"
+//description: "Tuya Smart Life IoT devices support"
+//enabled: true
+//exec: "{nodeLoader} {path}"
+//homepage_url: "https://github.com/bewee/tuya-adapter"
+//id: "tuya-adapter"
+//name: "Tuya Smart Life"
+//primary_type: "adapter"
+//schema: {type: "object", required: ["devices", "timeout", "log"], properties: {,…}}
+//version: "0.2.4"
+
+type AddonInfo struct {
+	ID          string      `json:"id"`
+	Name        string      `json:"name"`
+	ShortName   string      `json:"short_name"`
+	Author      string      `json:"author"`
+	Description string      `json:"description"`
+	License     string      `json:"license"`
+	HomepageUrl string      `json:"homepage_url"`
+	Version     string      `json:"version"`
+	Schema      interface{} `json:"schema,omitempty" gorm:"-"`
+	Exec        string      `json:"exec"`
+	Enabled     bool        `json:"enabled"`
+	PrimaryType string      `json:"primary_type" gorm:"default: adapter"`
+}
+
+func SaveAddonManifestToDB(m *AddonManifest, enable bool) *AddonInfo {
+	db := database.GetDB()
+	_ = db.AutoMigrate(&AddonInfo{})
+	addon := AddonInfo{
+		ID:          m.ID,
+		Name:        m.Name,
+		ShortName:   m.ShortName,
+		Author:      m.Author,
+		Description: m.Description,
+		License:     m.License,
+		HomepageUrl: m.HomepageUrl,
+		Version:     m.Version,
+		Schema:      m.Options.Schema,
+		Exec:        m.GatewaySpecificSettings["webthings"].Exec,
+		Enabled:     enable,
+		PrimaryType: m.GatewaySpecificSettings["webthings"].PrimaryType,
+	}
+	db.Save(addon)
+	return &addon
+}
+
+func SaveAddonInfo(a AddonInfo) {
+	db := database.GetDB()
+	_= db.AutoMigrate(AddonInfo{})
+	db.Save(a)
+}
+
+func GetAddonsInfoFromDB() []AddonInfo {
+	db := database.GetDB()
+	_= db.AutoMigrate(AddonInfo{})
+	var addons []AddonInfo
+	db.Find(&addons)
+	return addons
+}
+func GetAddonsInfoByIDFromDB(addonId string)*AddonInfo{
+	db := database.GetDB()
+	_= db.AutoMigrate(AddonInfo{})
+	var addonInfo AddonInfo
+	db.First(&addonInfo,addonId)
+	return &addonInfo
 }
 
 func LoadManifest(addonDir string, packetId string) (*AddonManifest, error) {

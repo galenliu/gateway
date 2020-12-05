@@ -1,8 +1,10 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"gateway/app/controllers"
+	"gateway/pkg/runtime"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
@@ -23,12 +25,13 @@ type Config struct {
 type WebApp struct {
 	*gin.Engine
 	config Config
+	ctx    context.Context
 }
 
-func NewApp(config Config) *WebApp {
+func NewWebAPP(conf Config) *WebApp {
 	app := WebApp{}
-	app.config = config
-	app.Engine = CollectRoute(config)
+	app.config = conf
+	app.Engine = CollectRoute(app.config)
 	return &app
 }
 
@@ -37,6 +40,7 @@ func CollectRoute(conf Config) *gin.Engine {
 	//init thingsController
 	thingsController := controllers.NewThingsController()
 	addonController := controllers.NewAddonController()
+	settingsController := controllers.NewSettingController()
 
 	//thingsCtr := controllers.NewThingsController()
 	var router = gin.Default()
@@ -48,16 +52,11 @@ func CollectRoute(conf Config) *gin.Engine {
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 
 	//html template
-	router.LoadHTMLGlob(path.Join(conf.TemplateDir,"index.html"))
+	//router.LoadHTMLGlob(path.Join(conf.TemplateDir,"index.html"))
 	//router.Static("/_assets",conf.StaticDir)
-	router.StaticFS("/_assets",http.Dir(path.Join(conf.StaticDir,"_assets")))
+	//router.StaticFS("/_assets",http.Dir(path.Join(conf.StaticDir,"_assets")))
 	//router.Static("/app",conf.StaticDir)
 
-
-	//curl -X POST http://localhost:8080/upload \
-	//-F "upload[]=@/Users/appleboy/test1.zip" \
-	//-F "upload[]=@/Users/appleboy/test2.zip" \
-	//-H "Content-Type: multipart/form-data"
 	router.POST("/upload", func(c *gin.Context) {
 		// 单文件
 		// Multipart form
@@ -65,11 +64,15 @@ func CollectRoute(conf Config) *gin.Engine {
 		files := form.File["upload[]"]
 
 		for _, file := range files {
-
 			// Upload the file to specific dst.
 			_ = c.SaveUploadedFile(file, conf.UploadDir)
 		}
 		c.String(http.StatusOK, fmt.Sprintf("%d files uploaded!", len(files)))
+	})
+
+	//ping controller
+	router.GET("/ping", func(c *gin.Context) {
+		c.Status(http.StatusNoContent)
 	})
 
 	// root controller
@@ -81,51 +84,65 @@ func CollectRoute(conf Config) *gin.Engine {
 	{
 		//Handle creating a new thing.
 		thingsGroup.POST("/", thingsController.HandleCreateThing)
-
-		//get a list of thingsController
 		thingsGroup.GET("/", thingsController.HandleGetThings)
 
 		//get a thing
-		thingsGroup.GET("/:thingId", thingsController.HandleGetThing)
+		thingsGroup.GET("/:thing_id", thingsController.HandleGetThing)
 
 		//get the properties of a thing
-		thingsGroup.GET("/:thingId/properties", thingsController.HandleGetProperties)
+		thingsGroup.GET("/:thing_id/properties", thingsController.HandleGetProperties)
 
 		//get a property of a thing
-		thingsGroup.GET("/:thingId/properties/:propertyName", thingsController.HandleGetProperty)
+		thingsGroup.GET("/:thing_id/properties/:propertyName", thingsController.HandleGetProperty)
 
 		//set a property of a thing.
-		thingsGroup.PUT("/:thingId/properties/:propertyName", thingsController.HandleSetProperty)
+		thingsGroup.PUT("/:thing_id/properties/:propertyName", thingsController.HandleSetProperty)
 
 		// Modify a Thing.
-		thingsGroup.PUT("/:thingId", thingsController.HandleSetThing)
+		thingsGroup.PUT("/:thing_id", thingsController.HandleSetThing)
 
 		thingsGroup.PATCH("/", thingsController.HandlePatchThings)
-		thingsGroup.PATCH("/:thingId", thingsController.HandlePatchThing)
+		thingsGroup.PATCH("/:thing_id", thingsController.HandlePatchThing)
 
-		thingsGroup.DELETE("/:thingId", thingsController.HandleDeleteThing)
+		thingsGroup.DELETE("/:thing_id", thingsController.HandleDeleteThing)
 	}
 
 	//Addons Controller
 	addonGroup := router.Group(AddonsPath)
 	{
-		addonGroup.GET("/", addonController.HandlerGetInstalledAddons)
+		addonGroup.GET("/", addonController.HandlerGetAddons)
+		addonGroup.PUT("/", addonController.HandlerInstallAddon)
+		addonGroup.PUT("/:addon_id", addonController.HandlerSetAddon)
+		addonGroup.GET("/:addon_id/config", addonController.HandlerGetAddonConfig)
+		addonGroup.PUT("/:addon_id/config", addonController.HandlerSetAddonConfig)
 	}
 
-	//Addons Controller
-	debugGroup := router.Group(DebugPath)
+	//settings Controller
+	debugGroup := router.Group(SettingsPath)
 	{
-		debugGroup.GET("/", nil)
+		debugGroup.GET("/addons_info", settingsController.HandleGetAddonsInfo)
 	}
-
-	//Settings Controller
-	//TODO
 
 	return router
 }
 
-func (app *WebApp) Start() {
+func (app *WebApp) Start() error {
 	httpPort := ":" + strconv.Itoa(app.config.HttpPort)
-	_ = app.Run(httpPort)
-	_ = app.Run(httpPort)
+	err := app.Run(httpPort)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func NewDefaultWebConfig() Config {
+	conf := Config{
+		HttpPort:    runtime.RuntimeConf.Ports["http"],
+		HttpsPort:   runtime.RuntimeConf.Ports["https"],
+		StaticDir:   "/Users/liuguilin/Documents/web-things/gateway/web-app/dist",
+		TemplateDir: "/Users/liuguilin/Documents/web-things/gateway/web-app/dist",
+		UploadDir:   runtime.RuntimeConf.UploadDir,
+		LogDir:      runtime.RuntimeConf.LogDir,
+	}
+	return conf
 }
