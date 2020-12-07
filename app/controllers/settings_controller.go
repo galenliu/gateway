@@ -4,8 +4,6 @@ import (
 	"gateway/pkg/runtime"
 	"gateway/pkg/util"
 	"github.com/gin-gonic/gin"
-	json "github.com/json-iterator/go"
-	"go.uber.org/zap"
 	"net/http"
 )
 
@@ -39,12 +37,12 @@ func (settings *SettingsController) HandleGetAddonsInfo(g *gin.Context) {
 		PythonVersion: util.GetPythonVersion(),
 		GolangVersion: util.GetGolangVersion(),
 	}
-	data, err := json.Marshal(addonInfo)
-	if err != nil {
-		log.Error("marshal err", zap.Error(err))
-		g.String(http.StatusInternalServerError, "marshal err")
-		return
-	}
-	g.JSON(http.StatusOK, string(data))
+	//data, err := json.Marshal(addonInfo)
+	//if err != nil {
+	//	log.Error("marshal err", zap.Error(err))
+	//	g.String(http.StatusInternalServerError, "marshal err")
+	//	return
+	//}
+	g.JSON(http.StatusOK,addonInfo )
 
 }

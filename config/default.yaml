@@ -3,11 +3,11 @@ ports:
   http: 9090
   ipc: 9500
 
-profileDir: "/Users/liuguilin/Documents/web-things/gateway/profile"
+profileDir: "./profile"
 
 addonManager:
   listUrls:
-    - "http://http://182.61.24.190:8443/addons"
+    - "http://182.61.24.190:8443/addons"
   testAddons: false
 
 database:

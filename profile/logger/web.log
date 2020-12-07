@@ -19,5 +19,3 @@
 [GIN-debug] PUT    /addons/:addon_id/config  --> gateway/app/controllers.(*AddonController).HandlerSetAddonConfig-fm (3 handlers)
 [GIN-debug] GET    /settings/addons_info     --> gateway/app/controllers.(*SettingsController).HandleGetAddonsInfo-fm (3 handlers)
 [GIN-debug] Listening and serving HTTP on :9090
-[GIN-debug] redirecting request 301: /addons/ --> /addons/
-[GIN-debug] redirecting request 301: /addons/ --> /addons/

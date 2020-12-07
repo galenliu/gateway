@@ -139,8 +139,8 @@ func NewDefaultWebConfig() Config {
 	conf := Config{
 		HttpPort:    runtime.RuntimeConf.Ports["http"],
 		HttpsPort:   runtime.RuntimeConf.Ports["https"],
-		StaticDir:   "/Users/liuguilin/Documents/web-things/gateway/web-app/dist",
-		TemplateDir: "/Users/liuguilin/Documents/web-things/gateway/web-app/dist",
+		StaticDir:   "./dist",
+		TemplateDir: "./dist",
 		UploadDir:   runtime.RuntimeConf.UploadDir,
 		LogDir:      runtime.RuntimeConf.LogDir,
 	}

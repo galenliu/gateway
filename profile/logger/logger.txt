@@ -350,3 +350,30 @@
 2020-12-04T15:42:10.555+0800	info	logger/log.go:62	log 初始化成功
 2020-12-04T15:42:10.567+0800	info	addons/ipc_server.go:82	listening	{"addr": ":9500"}
 2020-12-04T15:42:10.929+0800	warn	addons/plugin.go:133	addons start failed,err: 	{"error": "fork/exec /Users/liuguilin/Documents/web-things/gateway/profile/addons/yeelight-adapter/main: permission denied"}
+2020-12-05T11:54:44.730+0800	info	logger/log.go:62	log 初始化成功
+2020-12-05T11:54:44.742+0800	info	addons/ipc_server.go:82	listening	{"addr": ":9500"}
+2020-12-05T11:54:45.499+0800	warn	addons/plugin.go:133	addons start failed,err: 	{"error": "exec: \"profile/addons/yeelight-adapter/main\": file does not exist"}
+2020-12-05T11:59:02.468+0800	info	logger/log.go:62	log 初始化成功
+2020-12-05T11:59:02.475+0800	info	addons/ipc_server.go:82	listening	{"addr": ":9500"}
+2020-12-05T11:59:03.006+0800	warn	addons/plugin.go:133	addons start failed,err: 	{"error": "exec: \"profile/addons/yeelight-adapter/main\": file does not exist"}
+2020-12-05T19:20:47.348+0800	info	logger/log.go:62	log 初始化成功
+2020-12-05T19:20:47.366+0800	info	addons/ipc_server.go:82	listening	{"addr": ":9500"}
+2020-12-05T19:20:48.830+0800	warn	addons/plugin.go:133	addons start failed,err: 	{"error": "exec: \"profile/addons/yeelight-adapter/main\": file does not exist"}
+2020-12-07T13:30:40.294+0800	info	logger/log.go:62	log 初始化成功
+2020-12-07T13:30:40.305+0800	info	addons/ipc_server.go:82	listening	{"addr": ":9500"}
+2020-12-07T13:30:41.000+0800	warn	addons/plugin.go:133	addons start failed,err: 	{"error": "exec: \"profile/addons/yeelight-adapter/main\": file does not exist"}
+2020-12-07T14:38:02.142+0800	info	logger/log.go:62	log 初始化成功
+2020-12-07T14:38:02.151+0800	info	addons/ipc_server.go:82	listening	{"addr": ":9500"}
+2020-12-07T14:38:02.694+0800	warn	addons/plugin.go:133	addons start failed,err: 	{"error": "exec: \"profile/addons/yeelight-adapter/main\": file does not exist"}
+2020-12-07T15:50:16.146+0800	info	logger/log.go:62	log 初始化成功
+2020-12-07T15:50:16.154+0800	info	addons/ipc_server.go:82	listening	{"addr": ":9500"}
+2020-12-07T15:50:16.712+0800	warn	addons/plugin.go:133	addons start failed,err: 	{"error": "exec: \"profile/addons/yeelight-adapter/main\": file does not exist"}
+2020-12-07T15:51:00.993+0800	info	logger/log.go:62	log 初始化成功
+2020-12-07T15:51:01.001+0800	info	addons/ipc_server.go:82	listening	{"addr": ":9500"}
+2020-12-07T15:51:01.524+0800	warn	addons/plugin.go:133	addons start failed,err: 	{"error": "exec: \"profile/addons/yeelight-adapter/main\": file does not exist"}
+2020-12-07T15:51:19.232+0800	info	logger/log.go:62	log 初始化成功
+2020-12-07T15:51:19.240+0800	info	addons/ipc_server.go:82	listening	{"addr": ":9500"}
+2020-12-07T15:51:19.775+0800	warn	addons/plugin.go:133	addons start failed,err: 	{"error": "exec: \"profile/addons/yeelight-adapter/main\": file does not exist"}
+2020-12-07T18:21:05.162+0800	info	logger/log.go:62	log 初始化成功
+2020-12-07T18:21:05.171+0800	info	addons/ipc_server.go:82	listening	{"addr": ":9500"}
+2020-12-07T18:21:05.749+0800	warn	addons/plugin.go:133	addons start failed,err: 	{"error": "exec: \"profile/addons/yeelight-adapter/main\": file does not exist"}
