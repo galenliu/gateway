@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"gateway/pkg/runtime"
 	"gateway/pkg/util"
+	"gateway/config"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -30,7 +30,7 @@ func NewSettingController() *SettingsController {
 
 func (settings *SettingsController) HandleGetAddonsInfo(g *gin.Context) {
 	var addonInfo = addonInfo{
-		Urls:          runtime.GetAddonListUrls(),
+		Urls:          config.GetAddonListUrls(),
 		Architecture:  util.GetArch(),
 		Version:       util.Version,
 		NodeVersion:   util.GetNodeVersion(),

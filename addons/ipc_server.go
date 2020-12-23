@@ -2,9 +2,9 @@ package addons
 
 import (
 	"context"
-	messages "gitee.com/liu_guilin/WebThings-schema"
+	"fmt"
+	"gateway/pkg/log"
 	"github.com/gorilla/websocket"
-	json "github.com/json-iterator/go"
 	"go.uber.org/zap"
 	"net/http"
 )
@@ -39,20 +39,19 @@ type Connection struct {
 	connected bool
 }
 
-func (c *Connection) SendMessage(message messages.BaseMessage) {
-
-	data, _ := json.MarshalIndent(message, "", "	")
-	err := c.ws.WriteMessage(websocket.TextMessage, data)
+func (c *Connection) send(data []byte) {
+	log.Debug(fmt.Sprintf("send date : %s", string(data)))
+	err := c.ws.WriteMessage(websocket.BinaryMessage, data)
 	if err != nil {
 		c.connected = false
 	}
 }
 
-func (c *Connection) ReadMessage() (m messages.BaseMessage, err error) {
+func (c *Connection) ReadMessage() (data []byte, err error) {
 
-	err = c.ws.ReadJSON(&m)
+	_, data, err = c.ws.ReadMessage()
 	if err != nil {
-		log.Error("connetion read message err", zap.Error(err))
+		log.Error("connection read message err:", err.Error())
 		c.connected = false
 	}
 	return
@@ -63,7 +62,7 @@ func (server *IpcServer) handle(w http.ResponseWriter, r *http.Request) {
 
 	//升级协议时可能发生的错误
 	if err != nil {
-		log.Error("ipc server upgrade faild,err: %v", zap.Error(err))
+		log.Error("ipc server upgrade failed,err: %v", zap.Error(err))
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -78,8 +77,8 @@ func (server *IpcServer) Serve() {
 	sev := &http.Server{
 		Addr: server.addr,
 	}
-	http.HandleFunc(server.path, server.handle)
-	log.Info("listening", zap.String("addr", server.addr))
+	http.HandleFunc("/", server.handle)
+	log.Info(fmt.Sprintf("ipc server listening addr: %s", server.addr))
 
 	err := sev.ListenAndServe()
 	if err != nil {

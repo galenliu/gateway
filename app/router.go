@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 	"gateway/app/controllers"
-	"gateway/pkg/runtime"
+	"gateway/app/models"
+	"gateway/config"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
@@ -20,35 +21,35 @@ type Config struct {
 	TemplateDir string
 	UploadDir   string
 	LogDir      string
+	Ctx         context.Context
 }
 
 type WebApp struct {
 	*gin.Engine
 	config Config
 	ctx    context.Context
+	things *models.Things
 }
 
 func NewWebAPP(conf Config) *WebApp {
 	app := WebApp{}
+	app.things = models.NewThings()
 	app.config = conf
-	app.Engine = CollectRoute(app.config)
+	app.Engine = CollectRoute(&app)
 	return &app
 }
 
-func CollectRoute(conf Config) *gin.Engine {
+func CollectRoute(app *WebApp) *gin.Engine {
 
 	//init thingsController
-	thingsController := controllers.NewThingsController()
-	addonController := controllers.NewAddonController()
-	settingsController := controllers.NewSettingController()
 
-	//thingsCtr := controllers.NewThingsController()
+	//thingsCtr := controllers.NewThingsControllerFunc()
 	var router = gin.Default()
 
 	gin.SetMode(gin.DebugMode)
 
 	//日志写入文件
-	f, _ := os.Create(path.Join(conf.LogDir, "web.log"))
+	f, _ := os.Create(path.Join(app.config.LogDir, "web.log"))
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 
 	//html template
@@ -65,7 +66,7 @@ func CollectRoute(conf Config) *gin.Engine {
 
 		for _, file := range files {
 			// Upload the file to specific dst.
-			_ = c.SaveUploadedFile(file, conf.UploadDir)
+			_ = c.SaveUploadedFile(file, app.config.UploadDir)
 		}
 		c.String(http.StatusOK, fmt.Sprintf("%d files uploaded!", len(files)))
 	})
@@ -82,6 +83,7 @@ func CollectRoute(conf Config) *gin.Engine {
 	//Things Controller
 	thingsGroup := router.Group(ThingsPath)
 	{
+		thingsController := controllers.NewThingsControllerFunc()
 		//Handle creating a new thing.
 		thingsGroup.POST("/", thingsController.HandleCreateThing)
 		thingsGroup.GET("/", thingsController.HandleGetThings)
@@ -107,9 +109,17 @@ func CollectRoute(conf Config) *gin.Engine {
 		thingsGroup.DELETE("/:thing_id", thingsController.HandleDeleteThing)
 	}
 
+	newThingsController := controllers.NewNewThingsController(app.things)
+	newThingsGroup := router.Group(NewThingsPath)
+	{
+		newThingsGroup.GET("", newThingsController.HandleWebsocket)
+	}
+
+
 	//Addons Controller
 	addonGroup := router.Group(AddonsPath)
 	{
+		addonController := controllers.NewAddonController()
 		addonGroup.GET("/", addonController.HandlerGetAddons)
 		addonGroup.PUT("/", addonController.HandlerInstallAddon)
 		addonGroup.PUT("/:addon_id", addonController.HandlerSetAddon)
@@ -120,7 +130,17 @@ func CollectRoute(conf Config) *gin.Engine {
 	//settings Controller
 	debugGroup := router.Group(SettingsPath)
 	{
+		settingsController := controllers.NewSettingController()
 		debugGroup.GET("/addons_info", settingsController.HandleGetAddonsInfo)
+	}
+
+	//actions Controller
+	actionsGroup := router.Group(ActionsPath)
+	{
+
+		actionsController := controllers.NewActionsController()
+		actionsGroup.POST("/", actionsController.HandleActions)
+		actionsGroup.DELETE("/:actionName/:actionId", actionsController.HandleActions)
 	}
 
 	return router
@@ -135,14 +155,15 @@ func (app *WebApp) Start() error {
 	return nil
 }
 
-func NewDefaultWebConfig() Config {
+func NewDefaultWebConfig(ctx context.Context) Config {
 	conf := Config{
-		HttpPort:    runtime.RuntimeConf.Ports["http"],
-		HttpsPort:   runtime.RuntimeConf.Ports["https"],
+		HttpPort:    config.Conf.Ports["http"],
+		HttpsPort:   config.Conf.Ports["https"],
 		StaticDir:   "./dist",
 		TemplateDir: "./dist",
-		UploadDir:   runtime.RuntimeConf.UploadDir,
-		LogDir:      runtime.RuntimeConf.LogDir,
+		UploadDir:   config.Conf.UploadDir,
+		LogDir:      config.Conf.LogDir,
+		Ctx:         ctx,
 	}
 	return conf
 }

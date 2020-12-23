@@ -3,6 +3,7 @@ package addons
 import (
 	"context"
 	"fmt"
+	"gateway/pkg/log"
 	messages "gitee.com/liu_guilin/WebThings-schema"
 	json "github.com/json-iterator/go"
 	"go.uber.org/zap"
@@ -13,8 +14,9 @@ import (
 	"sync"
 )
 
-const ExecNode= "{nodeLoader}"
+const ExecNode = "{nodeLoader}"
 const ExecPython3 = "{python}"
+
 //Plugin 管理Adapters
 //处理每一个plugin的请求
 type Plugin struct {
@@ -24,20 +26,21 @@ type Plugin struct {
 	execPath     string
 	verbose      bool
 	registered   bool
-	ws           *Connection
+	conn         *Connection
 	pluginServer *PluginsServer
 	adapters     map[string]*AdapterProxy
 	ctx          context.Context
-	cancelFunc context.CancelFunc
+	cancelFunc   context.CancelFunc
 }
 
-func NewPlugin(s *PluginsServer,pluginId string, exec string, _ctx context.Context) (plugin *Plugin) {
+func NewPlugin(s *PluginsServer, pluginId string, exec string, _ctx context.Context) (plugin *Plugin) {
 	plugin = &Plugin{}
 	plugin.locker = new(sync.Mutex)
 	plugin.exec = exec
 	plugin.pluginId = pluginId
 	plugin.pluginServer = s
-	plugin.execPath = path.Join(s.addonManager.AddonsDir,pluginId)
+	plugin.adapters = make(map[string]*AdapterProxy)
+	plugin.execPath = path.Join(s.addonManager.AddonsDir, pluginId)
 	if _ctx != nil {
 		plugin.ctx = _ctx
 	} else {
@@ -47,25 +50,27 @@ func NewPlugin(s *PluginsServer,pluginId string, exec string, _ctx context.Conte
 }
 
 //传入的data=序列化后的 BaseMessage.Data
-func (plugin *Plugin) OnMessage(message messages.BaseMessage, data []byte) {
+func (plugin *Plugin) OnMessage(data []byte) {
 
-	log.Info("addons rev message", zap.Any("message", message))
+	var messageType = json.Get(data, "messageType").ToInt()
+	log.Debug(fmt.Sprintf("rev message:%s", string(data)))
 
 	// plugin消息, added
-	switch message.MessageType {
-	case messages.MessageTypeAdepterAddedNotification:
-		var m messages.AdapterAddedNotification
-		_ = json.Unmarshal(data, &m)
-		adapter := NewAdapterProxy(plugin.pluginServer.addonManager, m.AdapterId, m.Name, m.PackageName)
+	switch messageType {
+	case AdapterAddedNotification:
+		var adapterId = json.Get(data, "data", "adapterId").ToString()
+		var name = json.Get(data, "data", "name").ToString()
+		var packetName = json.Get(data, "data", "packetName").ToString()
+		adapter := NewAdapterProxy(plugin.pluginServer.addonManager,plugin, adapterId, name, packetName)
 		plugin.addAdapter(adapter)
-
+		log.Info(fmt.Sprintf("adapter：%s added",adapterId))
 	}
 
 	//再处理 adapter消息
-	adapter := plugin.getAdapter(json.Get(data, "plugin_id").ToString())
-	switch message.MessageType {
+	adapter := plugin.getAdapter(json.Get(data, "pluginId").ToString())
+	switch messageType {
 	//add device
-	case messages.MessageTypeDeviceAddedNotification:
+	case DeviceAddedNotification:
 		var m messages.DeviceAddedNotification
 		_ = json.Unmarshal(data, &m)
 		device := NewDeviceProxy(adapter, m.Device)
@@ -73,7 +78,7 @@ func (plugin *Plugin) OnMessage(message messages.BaseMessage, data []byte) {
 		break
 
 	//device change property
-	case messages.MessageTypeDevicePropertyChangedNotification:
+	case DevicePropertyChangedNotification:
 		var m messages.DevicePropertyChangedNotification
 		_ = json.Unmarshal(data, &m)
 		adapter.getDevice(m.DeviceId).doPropertyChanged(m.Property)
@@ -81,8 +86,9 @@ func (plugin *Plugin) OnMessage(message messages.BaseMessage, data []byte) {
 	}
 }
 
-func (plugin *Plugin) sendMessage(message messages.BaseMessage) {
-	plugin.ws.SendMessage(message)
+func (plugin *Plugin) sendData(data []byte) {
+
+	plugin.conn.send(data)
 }
 
 func (plugin *Plugin) addAdapter(a *AdapterProxy) {
@@ -103,47 +109,47 @@ func (plugin *Plugin) getAdapter(id string) *AdapterProxy {
 func (plugin *Plugin) start() {
 
 	commandPath := strings.Replace(plugin.exec, "{path}", plugin.execPath, 1)
-	commandStr := strings.Replace(commandPath, "{nodeLoader}","node", 1)
+	commandStr := strings.Replace(commandPath, "{nodeLoader}", "node", 1)
 
-	commands :=strings.Split(commandStr," ")
+	commands := strings.Split(commandStr, " ")
 
 	var args []string
-	if len(commands)>1{
-		for i,arg :=range commands{
-			if i !=0{
+	if len(commands) > 1 {
+		for i, arg := range commands {
+			if i != 0 {
 				args = append(args, arg)
 			}
 		}
 	}
 	//ctx, plugin.cancelFunc = context.WithCancel(plugin.ctx)
 	var cmd *exec.Cmd
-	if len(args)>0{
+	if len(args) > 0 {
 		cmd = exec.Command(commands[0], args...)
-	}else {
+	} else {
 		cmd = exec.Command(commands[0])
 	}
 
-
-	stdOut, err :=cmd.StdoutPipe();if err != nil{
+	stdOut, err := cmd.StdoutPipe()
+	if err != nil {
 		fmt.Print(err)
 	}
 
 	err = cmd.Start()
 	if err != nil {
-		log.Warn("addons start failed,err: ",zap.Error(err))
+		log.Error("addons start failed,err: ", zap.Error(err))
 	} else {
-		fmt.Printf("start plugin: %v",plugin.pluginId)
-			out,err:= ioutil.ReadAll(stdOut);if err !=nil{
-				fmt.Print(err)
+		log.Info("start plugin: %v", plugin.pluginId)
+		out, err := ioutil.ReadAll(stdOut)
+		if err != nil {
+			fmt.Print(err)
 			msg := string(out)
-			fmt.Print(msg)
-
+			log.Debug(msg)
 		}
 	}
 }
 
 func (plugin *Plugin) Stop() {
 	//TODO Send stop nf
-	//plugin.sendMessage(12,"")
+	//plugin.sendData(12,"")
 	plugin.cancelFunc()
 }

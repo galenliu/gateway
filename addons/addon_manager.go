@@ -5,9 +5,9 @@ import (
 	"compress/gzip"
 	"context"
 	"fmt"
-	"gateway/pkg/logger"
-	"gateway/pkg/runtime"
+	"gateway/pkg/log"
 	"gateway/pkg/util"
+	"gateway/config"
 	json "github.com/json-iterator/go"
 	"io"
 	"io/ioutil"
@@ -19,7 +19,10 @@ import (
 )
 
 var addonsManager *AddonsManager
-var log logger.Logger
+
+type IEvent interface {
+	OnPropertyChanged(thingId, propName string, value interface{})
+}
 
 type AddonsManager struct {
 	configPath    string
@@ -27,10 +30,14 @@ type AddonsManager struct {
 	devices       map[string]*DeviceProxy
 	installAddons map[string]*AddonInfo // {addonId: manifest}
 
+
+
 	IsRunning bool
 	IsLoaded  bool
 
 	pluginCancel context.CancelFunc
+
+	EventBus IEvent
 
 	AddonsDir string
 	DataDir   string
@@ -39,16 +46,16 @@ type AddonsManager struct {
 }
 
 func NewAddonsManager(ctx context.Context) (*AddonsManager, error) {
-	log = logger.GetLog()
 	am := &AddonsManager{}
 	addonsManager = am
 	am.ctx = ctx
-	am.AddonsDir = runtime.RuntimeConf.AddonsDir
-	am.DataDir = runtime.RuntimeConf.DataDir
+	am.AddonsDir = config.Conf.AddonsDir
+	am.DataDir = config.Conf.DataDir
 
 	am.IsRunning = false
 	am.devices = make(map[string]*DeviceProxy)
 	am.installAddons = make(map[string]*AddonInfo)
+
 	var c context.Context
 	c, am.pluginCancel = context.WithCancel(am.ctx)
 	am.pluginServer = NewPluginServer(am, c)
@@ -57,7 +64,6 @@ func NewAddonsManager(ctx context.Context) (*AddonsManager, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return am, nil
 }
 
@@ -123,7 +129,10 @@ func (manager *AddonsManager) InstallAddonFromUrl(id, url, checksum string, enab
 	if !util.CheckSum(destPath, checksum) {
 		return fmt.Errorf(fmt.Sprintf("checksum err,pakage id:%s", id))
 	}
-	manager.installAddon(id, destPath, enabled)
+	err = manager.installAddon(id, destPath, enabled)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -196,8 +205,12 @@ func (manager *AddonsManager) getDevice(thingId string) *DeviceProxy {
 	return nil
 }
 
-func (manager *AddonsManager) Start() {
+func (manager *AddonsManager) getDevices()map[string]*DeviceProxy {
+	return manager.devices
+}
 
+func (manager *AddonsManager) Start() {
+	go manager.pluginServer.Start()
 	manager.IsRunning = true
 }
 
@@ -253,6 +266,20 @@ func DisableAddon(addonId string) error {
 	return nil
 }
 
-func InstallAddonFromUrl(id, url, checksum string, enable bool) {
-	_ = addonsManager.InstallAddonFromUrl(id, url, checksum, enable)
+func GetThings()map[string]*DeviceProxy{
+	devs := addonsManager.getDevices()
+	return devs
+}
+
+func InstallAddonFromUrl(id, url, checksum string, enabled bool) {
+	_ = addonsManager.InstallAddonFromUrl(id, url, checksum, enabled)
+}
+
+func AddNewThing(pairingTimeout int) error {
+	for _, plugin := range addonsManager.pluginServer.Plugins {
+		for _,adapter := range plugin.adapters{
+			adapter.Pairing(pairingTimeout)
+		}
+	}
+	return nil
 }

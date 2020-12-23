@@ -29,6 +29,5 @@ var (
 )
 
 const (
-	YamlConfigFile = "configuration.yaml"
 	ConfDirName    = ".profile"
 )

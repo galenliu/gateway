@@ -42,11 +42,11 @@ type Option struct {
 	Schema  Schema                 `json:"schema,omitempty"`
 }
 type Schema struct {
-	Type       string              `json:"type,omitempty"`
-	Required   []string            `json:"required,omitempty"`
-	Properties map[string]Property `json:"properties,omitempty"`
+	Type       string                `json:"type,omitempty"`
+	Required   []string              `json:"required,omitempty"`
+	Properties map[string]Properties `json:"properties,omitempty"`
 }
-type Property struct {
+type Properties struct {
 	Title   string   `json:"title"`
 	Type    string   `json:"type"`
 	Default string   `json:"default,omitempty"`

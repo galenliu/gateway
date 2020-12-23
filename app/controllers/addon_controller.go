@@ -2,8 +2,9 @@ package controllers
 
 import (
 	"gateway/addons"
+	"gateway/pkg/log"
 	"github.com/gin-gonic/gin"
-	jsoniter "github.com/json-iterator/go"
+	json "github.com/json-iterator/go"
 	"io/ioutil"
 	"net/http"
 )
@@ -30,7 +31,7 @@ func (addon *AddonController) HandlerSetAddon(c *gin.Context) {
 	addonId := c.Param("addon_id")
 	var body map[string]bool
 	data, err := ioutil.ReadAll(c.Request.Body)
-	err = jsoniter.Unmarshal(data, body)
+	err = json.Unmarshal(data, body)
 	if err != nil {
 		c.String(400, err.Error())
 		return
@@ -57,7 +58,7 @@ func (addon *AddonController) HandlerInstallAddon(c *gin.Context) {
 	b, err := ioutil.ReadAll(c.Request.Body)
 	str := string(b)
 	log.Info(str)
-	err = jsoniter.Unmarshal(b, &data)
+	err = json.Unmarshal(b, &data)
 	if err != nil {
 		c.String(400, err.Error())
 		return

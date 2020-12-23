@@ -3,30 +3,79 @@ package controllers
 import (
 	"fmt"
 	"gateway/app/models"
-	"gateway/pkg/logger"
+	"gateway/pkg/log"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	json "github.com/json-iterator/go"
 	"go.uber.org/zap"
 	"io/ioutil"
 	"net/http"
 )
 
-var log *zap.Logger
+
 
 type ThingsController struct {
 	Container *models.Things
 }
 
-func NewThingsController() *ThingsController {
+func NewThingsControllerFunc() *ThingsController {
 	tc := &ThingsController{}
 	tc.Container = models.NewThings()
-	log = logger.GetLog()
 	return tc
 }
 
+func (ts *ThingsController) HandleWebsocket(c *gin.Context,thingId string) {
+
+	ts.wsHandler(c.Writer, c.Request,thingId)
+
+}
+
+//GET  /things
 func (ts *ThingsController) HandleGetThings(c *gin.Context) {
+	if c.IsWebsocket() {
+		ts.HandleWebsocket(c,"")
+		return
+	}
 	log.Info("things controller handle get things")
 	c.JSON(http.StatusOK, ts.Container.GetThings())
+}
+
+// POST /things
+func (ts *ThingsController) HandleCreateThing(c *gin.Context) {
+	data, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		c.String(http.StatusBadRequest, "bad request")
+	}
+	var thing models.Thing
+	err = json.Unmarshal(data, &thing)
+	if err != nil {
+		c.String(http.StatusBadRequest, "bad request")
+	}
+	err = ts.Container.CreateThing(thing)
+	if err != nil {
+		log.Error(fmt.Sprintf("create thing err: %v", err))
+	}
+	c.Status(http.StatusOK)
+}
+
+
+func (ts *ThingsController) HandleGetThing(c *gin.Context) {
+
+	thingId := c.Param("thing_id");if thingId == ""{
+		c.String(http.StatusBadRequest,"thing id invalid")
+		return
+	}
+	if c.IsWebsocket() {
+		ts.HandleWebsocket(c,thingId)
+		return
+	}
+	t ,err:= ts.Container.GetThing(thingId)
+	if err!=nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	log.Info("things handler:GetThing", zap.String("/:thingId", thingId), zap.String("method", "GET"))
+	c.JSON(http.StatusOK, t)
 }
 
 //patch /
@@ -41,33 +90,8 @@ func (ts *ThingsController) HandlePatchThing(c *gin.Context) {
 
 }
 
-func (ts *ThingsController) HandleCreateThing(c *gin.Context) {
-	data, err := ioutil.ReadAll(c.Request.Body)
-	if err != nil {
-		log.Error("read request body err ")
-		c.String(http.StatusBadRequest, "bad request")
-	}
-	var thing models.Thing
-	err = json.Unmarshal(data, &thing)
-	if err != nil {
-		log.Error("read request body err ")
-		c.String(http.StatusBadRequest, "bad request")
-	}
-	err = ts.Container.CreateThing(thing)
-	if err != nil {
-		log.Error(fmt.Sprintf("create thing err: %v", err))
-	}
-	c.Status(http.StatusOK)
-}
 
-func (ts *ThingsController) HandleGetThing(c *gin.Context) {
-	id := c.Param("thing_id")
-	t  :=ts.Container.GetThing(id);if t==nil{
-		c.JSON(http.StatusBadRequest, fmt.Sprintf("have not thing Id: %v",id))
-	}
-	log.Info("things handler:GetThing", zap.String("/:thingId", id), zap.String("method", "GET"))
-	c.JSON(http.StatusOK,t)
-}
+
 
 //put property
 func (ts *ThingsController) HandleSetProperty(c *gin.Context) {
@@ -107,7 +131,11 @@ func (ts *ThingsController) HandleGetProperties(c *gin.Context) {
 
 func (ts *ThingsController) HandleSetThing(c *gin.Context) {
 	thingId := c.Param("thing_id")
-	thing := ts.Container.GetThing(thingId)
+	thing,err := ts.Container.GetThing(thingId);
+	if err != nil {
+		c.String(http.StatusBadRequest,err.Error())
+		return
+	}
 
 	req, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
@@ -126,7 +154,6 @@ func (ts *ThingsController) HandleSetThing(c *gin.Context) {
 	}
 }
 
-
 func (ts *ThingsController) HandleDeleteThing(c *gin.Context) {
 	thingId := c.Param("thing_id")
 	err := ts.Container.RemoveThing(thingId)
@@ -136,4 +163,38 @@ func (ts *ThingsController) HandleDeleteThing(c *gin.Context) {
 	}
 	log.Info(fmt.Sprintf("Successfully deleted %v from database", thingId))
 	c.Status(http.StatusNoContent)
+}
+
+var wsUpgrade = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
+
+func (ts *ThingsController) wsHandler(w http.ResponseWriter, r *http.Request,thingId string) {
+	//conn, err := wsUpgrade.Upgrade(w, r, nil)
+	//if err != nil {
+	//}
+	//thing,err := ts.Container.GetThing(thingId);
+	//if err != nil {
+	//
+	//}
+
+}
+
+type ThingContext struct {
+	conn  *websocket.Conn
+	thingId string
+}
+
+func(c *ThingContext) handlePropertyChanged(thingId string,propName string,value interface{}){
+
+	var data = struct {
+		id string
+		messagesType string
+		data map[string]interface{}
+	}{id: thingId}
+	if c.thingId == thingId {
+		c.conn.WriteJSON(data)
+	}
+
 }

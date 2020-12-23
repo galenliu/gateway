@@ -1,14 +1,12 @@
 package addons
 
 import (
-	addon "gitee.com/liu_guilin/WebThings-schema"
 	json "github.com/json-iterator/go"
 )
 
 type DeviceProxy struct {
-	*addon.Device
+	*Device
 	adapter    *AdapterProxy
-	Properties map[string]*PropertyProxy
 }
 
 func NewDeviceProxy(proxy *AdapterProxy, device interface{}) *DeviceProxy {
@@ -20,7 +18,7 @@ func NewDevice(adapter *AdapterProxy, _id string) (dev *DeviceProxy) {
 	dev = &DeviceProxy{}
 	dev.adapter = adapter
 	dev.ID = _id
-	dev.AtContext = addon.Context
+	dev.AtContext = Context
 	return
 }
 
@@ -33,15 +31,15 @@ func (proxy *DeviceProxy) GetAdapter() *AdapterProxy {
 	return proxy.adapter
 }
 
-func (proxy *DeviceProxy) FindProperty(propName string) *PropertyProxy {
+func (proxy *DeviceProxy) FindProperty(propName string) *Property {
 	p := proxy.Properties[propName]
 	return p
 }
 
-func (proxy *DeviceProxy) AddProperty(props ...*PropertyProxy) {
+func (proxy *DeviceProxy) AddProperty(props ...*Property) {
 	for _, prop := range props {
 		prop.EventEmitter = proxy
-		proxy.Properties[prop.getName()] = prop
+		proxy.Properties[prop.Name] = prop
 	}
 }
 
@@ -64,7 +62,7 @@ func (proxy *DeviceProxy) OnPropertyChanged(prop interface{}) {
 }
 
 func (proxy *DeviceProxy) doPropertyChanged(message string) {
-	var m addon.Property
+	var m Property
 	_ = json.UnmarshalFromString(message, m)
 	p := proxy.FindProperty(m.Name)
 	p.Value = m.Value

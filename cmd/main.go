@@ -6,17 +6,19 @@ import (
 	core "gateway"
 	"gateway/addons"
 	"gateway/app"
-	"gateway/pkg/runtime"
 	"gateway/pkg/util"
+	"gateway/config"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
 var (
-	proFile  string
+	proFile     string
 	showVersion bool
 )
+
+
 
 func init() {
 	flag.StringVar(&proFile, "profile", "", "Profile directory")
@@ -37,21 +39,18 @@ func main() {
 		return
 	}
 
-	//init runtime
-	err = runtime.InitRuntime(proFile)
+	//init config
+	err = config.InitRuntime(proFile)
 	CheckError(err)
 
 	//create core instance
 	gw, err := core.NewGateway()
 	CheckError(err)
 
-	gw.AddonsManager,err=addons.NewAddonsManager(gw.Ctx)
+	gw.AddonsManager, err = addons.NewAddonsManager(gw.Ctx)
 	CheckError(err)
 
-
-	gw.Web =app.NewWebAPP(app.NewDefaultWebConfig())
-
-
+	gw.Web = app.NewWebAPP(app.NewDefaultWebConfig(gw.Ctx))
 
 	//handle signal
 	signal.Notify(c, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGTERM)

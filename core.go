@@ -6,31 +6,21 @@ import (
 	"gateway/addons"
 	"gateway/app"
 	"gateway/pkg/database"
-	"gateway/pkg/logger"
+	"gateway/pkg/log"
 	"gateway/pkg/util"
-	"gorm.io/gorm"
+	"gateway/config"
 	"gorm.io/gorm/clause"
 	"time"
 )
 
-var log logger.Logger
 
-type Units struct {
-	gorm.Model
-	Temperature string `gorm:"default: degree_celsius"`
-}
 
-type Preferences struct {
-	gorm.Model
-	Language string `gorm:"default: zh-cn"`
-	Units    Units
-	UnitsID  int
-}
+
 
 //gateway strut
-//
 type HomeGateway struct {
-	Preferences   *Preferences
+	Preferences   *config.Preferences
+	EventsBus     *EventsBus
 	AddonsManager *addons.AddonsManager
 	Web           *app.WebApp
 	Ctx           context.Context
@@ -38,9 +28,11 @@ type HomeGateway struct {
 
 func NewGateway() (gateway *HomeGateway, err error) {
 
-	log = logger.GetLog()
+
 	gateway = &HomeGateway{}
+	gateway.EventsBus = NewEventBus()
 	gateway.Ctx = context.Background()
+
 	//update the gateway preferences
 	gateway.updatePreferences()
 	return gateway, err
@@ -53,6 +45,7 @@ type Event struct {
 
 func (gateway *HomeGateway) Start() error {
 
+	log.Info("gateway start")
 	go gateway.Web.Start()
 	go gateway.AddonsManager.Start()
 	for {
@@ -70,24 +63,24 @@ func (gateway *HomeGateway) updatePreferences() {
 
 	//open database and create table
 	db := database.GetDB()
-	_ = db.AutoMigrate(&Preferences{})
-	_ = db.AutoMigrate(&Units{})
+	_ = db.AutoMigrate(&config.Preferences{})
+	_ = db.AutoMigrate(&config.Units{})
 
-	var p Preferences
+	var p config.Preferences
 	result := db.First(&p)
 	if result.Error != nil {
-		u1 := Units{Temperature: util.PrefUnitsTempCelsius}
-		p1 := Preferences{Language: util.PrefLangCn}
+		u1 := config.Units{Temperature: util.PrefUnitsTempCelsius}
+		p1 := config.Preferences{Language: util.PrefLangCn}
 		p1.Units = u1
 		db.Debug().Create(&p1)
 	}
-	var p2 Preferences
+	var p2 config.Preferences
 	db.Preload(clause.Associations).Debug().First(&p2)
 	gateway.Preferences = &p2
 
 }
 
-
 func (gateway *HomeGateway) Close() {
-	  gateway.Ctx.Done()
+	gateway.Ctx.Done()
 }
+

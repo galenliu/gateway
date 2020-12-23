@@ -3,13 +3,15 @@ package addons
 //	addons server
 import (
 	"context"
-	messages "gitee.com/liu_guilin/WebThings-schema"
+	"fmt"
+	"gateway/config"
+	"gateway/pkg/log"
 	json "github.com/json-iterator/go"
 	"go.uber.org/zap"
 	"sync"
 )
 
-const PATH = "/v1"
+const PATH = "/"
 const ADDR = ":9500"
 
 type PluginsServer struct {
@@ -30,46 +32,60 @@ func NewPluginServer(manager *AddonsManager, _ctx context.Context) *PluginsServe
 	server.addonManager = manager
 	ctx, _ := context.WithCancel(server.ctx)
 	server.ipc = NewIpcServer(ctx, ADDR, PATH)
-	go server.Start()
 	return server
 }
 
-func (s *PluginsServer) messageHandler(m messages.BaseMessage, c *Connection) {
-
-	//首先验证message是否合法,并且序列化
-	data, err := messages.CheckMessage(m)
-	if err != nil {
-
-		return
-
-	}
-	log.Info("addons server rev message ")
+func (s *PluginsServer) messageHandler(data []byte, c *Connection) {
 
 	//如果是注册请求的话，调用registerPlugin处理注册
-	if m.MessageType == messages.MessageTypePluginRegisterRequest {
-		s.registerHandler(m, data, c)
+	var messageType = json.Get(data, "messageType").ToInt()
 
+	log.Debug(fmt.Sprintf("plugin servier rev message:%s", string(data)))
+
+	if messageType == PluginRegisterRequest {
+		s.registerHandler(data, c)
 	} else {
 		//获取Plugin，并且把消息交由对应的Plugin处理
-		any := json.Get(data, "plugin_id")
-		pluginId := any.ToString()
-		plugin := s.getPlugin(pluginId)
-		plugin.OnMessage(m, data)
+		packetName := json.Get(data,"data" ,"packetName").ToString()
+		plugin := s.getPlugin(packetName)
+		if plugin == nil{
+			log.Error(fmt.Sprintf("plugin: %s can not find",packetName))
+			return
+		}
+		plugin.OnMessage(data)
 	}
 }
 
-func (s *PluginsServer) registerHandler(message messages.BaseMessage, data []byte, c *Connection) {
+func (s *PluginsServer) registerHandler(data []byte, c *Connection) {
 
-	pluginId := json.Get(data, "data").Get("plugin_id").ToString()
+	pluginId := json.Get(data, "data", "pluginId").ToString()
 	plugin := s.getPlugin(pluginId)
-	plugin.ws = c
-
-	m := messages.BaseMessage{
-		MessageType: messages.MessageTypePluginRegisterResponse,
+	if plugin == nil {
+		log.Error(fmt.Sprintf("plugin: %s no loading", pluginId))
+		return
 	}
-	plugin.ws.SendMessage(m)
-	plugin.registered = true
+	plugin.conn = c
 
+	m := struct {
+		MessageType int         `json:"messageType"`
+		Data        interface{} `json:"data"`
+	}{
+		MessageType: PluginRegisterResponse,
+		Data: struct {
+			PluginID    string              `json:"pluginId"`
+			UserProfile *config.UserProfile `json:"user_profile"`
+			Preferences *config.Preferences `json:"preferences"`
+		}{
+			PluginID:    pluginId,
+			UserProfile: config.GetUserProfile(),
+			Preferences: config.GetPreferences(),
+		},
+	}
+
+	data, _ = json.Marshal(m)
+	plugin.conn.send(data)
+	plugin.registered = true
+	log.Info(fmt.Sprintf("plugin: %s registered", pluginId))
 }
 
 func (s *PluginsServer) getPlugin(pluginId string) *Plugin {
@@ -82,19 +98,19 @@ func (s *PluginsServer) getPlugin(pluginId string) *Plugin {
 }
 
 //此处开启新协程，传入一个新的websocket连接,把读到的消息给MessageHandler
-func (s *PluginsServer) newConn(c *Connection) {
+func (s *PluginsServer) handleNewConnection(c *Connection) {
 	c.connected = true
 	for {
 		if !c.connected {
 			log.Info("lost connection")
 			return
 		}
-		m, err := c.ReadMessage()
+		d, err := c.ReadMessage()
 		if err != nil {
 			c.connected = false
 			continue
 		}
-		s.messageHandler(m, c)
+		s.messageHandler(d, c)
 	}
 }
 
@@ -105,7 +121,7 @@ func (s *PluginsServer) sendMsg() {
 func (s *PluginsServer) loadPlugin(packageId, exec string, enabled bool) {
 	plugin := s.registerPlugin(packageId, exec)
 	if enabled {
-		plugin.start()
+		go plugin.start()
 	} else {
 		plugin.Stop()
 	}
@@ -133,11 +149,13 @@ func (s *PluginsServer) registerPlugin(packageId string, exec string) *Plugin {
 //create goroutines handle ipc massage
 func (s *PluginsServer) Start() {
 	go s.ipc.Serve()
-	select {
-	case conn := <-s.ipc.wsChan:
-		go s.newConn(conn)
-	case <-s.ctx.Done():
-		s.Stop()
+	for {
+		select {
+		case conn := <-s.ipc.wsChan:
+			go s.handleNewConnection(conn)
+		case <-s.ctx.Done():
+			s.Stop()
+		}
 	}
 }
 

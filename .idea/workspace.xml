@@ -20,26 +20,51 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9f4f53eb-6f7f-48b5-82a2-b5196c9afd72" name="默认的" comment="">
+      <change afterPath="$PROJECT_DIR$/addons/device.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/addons/message_type.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/addons/property.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/controllers/actions_controller.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/controllers/new_things_controller.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/models/action.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/models/actions.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/eventbus.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/log/log.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/addons/adapter.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/adapter.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/addons/adapter_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/adapter_proxy.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/addons/addon_manager.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/addon_manager.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/addons/addon_util.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/addon_util.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/addons/device_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/device_proxy.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/addons/ipc_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/ipc_server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/addons/plugin.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/plugin.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/addons/plugin_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/plugin_server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/addons/property_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/property_proxy.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/constant.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/constant.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/addon_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/addon_controller.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/controllers/settings_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/settings_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/things_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/things_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/property.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/property.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/thing.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/thing.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/things.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/things.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/default.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/default.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core.go" beforeDir="false" afterPath="$PROJECT_DIR$/core.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/logger/log.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/runtime/runtime.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/util/constant.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/util/constant.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/profile/addons/insteon-adapter/node_modules/insteon-plm/node_modules/.cache/esm/.data.blob" beforeDir="false" afterPath="$PROJECT_DIR$/profile/addons/insteon-adapter/node_modules/insteon-plm/node_modules/.cache/esm/.data.blob" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/profile/addons/insteon-adapter/node_modules/insteon-plm/node_modules/.cache/esm/.data.json" beforeDir="false" afterPath="$PROJECT_DIR$/profile/addons/insteon-adapter/node_modules/insteon-plm/node_modules/.cache/esm/.data.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/insteon-adapter/node_modules/insteon-plm/node_modules/.cache/esm/187e6692d8dc1276.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/insteon-adapter/node_modules/insteon-plm/node_modules/.cache/esm/2240b99a794adf38.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/insteon-adapter/node_modules/insteon-plm/node_modules/.cache/esm/53f1e6cd54171eaa.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/insteon-adapter/node_modules/insteon-plm/node_modules/.cache/esm/5a7a822c54171eaa.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/insteon-adapter/node_modules/insteon-plm/node_modules/.cache/esm/6ccf365a71dbb7c5.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/insteon-adapter/node_modules/insteon-plm/node_modules/.cache/esm/89173347d8dc1276.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/insteon-adapter/node_modules/insteon-plm/node_modules/.cache/esm/a9f5aceca155e329.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/insteon-adapter/node_modules/insteon-plm/node_modules/.cache/esm/dc0d7a31794adf38.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/insteon-adapter/node_modules/insteon-plm/node_modules/.cache/esm/fca815a6d8dc1276.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/addons/insteon-adapter/node_modules/insteon-plm/node_modules/.cache/esm/fdf51a2254171eaa.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/profile/addons/yeelight-adapter/lib/yeelight.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/profile/addons/yeelight-adapter/main" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/profile/addons/yeelight-adapter/main.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/profile/config/database.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/profile/config/database.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/logger/logger.txt" beforeDir="false" afterPath="$PROJECT_DIR$/profile/logger/logger.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/logger/web.log" beforeDir="false" afterPath="$PROJECT_DIR$/profile/logger/web.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profile/logger/logger.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/profile/logger/web.log" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,7 +82,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" path="C:\Go" />
+  <component name="GOROOT" url="file:///usr/local/go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -76,28 +101,30 @@
     <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="configurable.全局.GOPATH.is.expanded" value="true" />
-    <property name="configurable.模块.GOPATH.is.expanded" value="false" />
-    <property name="configurable.项目.GOPATH.is.expanded" value="true" />
+    <property name="configurable..is.expanded" value="false" />
+    <property name="configurable.GoLibrariesConfigurable.is.expanded" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../addons" />
+    <property name="last_opened_file_path" value="$USER_HOME$" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="go.dep" />
     <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/pkg/runtime" />
-      <recent name="$PROJECT_DIR$/pkg/util" />
-      <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/web-app/dist/_assets/123" />
-      <recent name="$PROJECT_DIR$/app" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/pkg/runtime" />
+      <recent name="$PROJECT_DIR$/profile/addons/yeelight-adapter" />
+      <recent name="$PROJECT_DIR$/addons" />
       <recent name="$PROJECT_DIR$/config" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/config" />
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/profile/addons/yeelight-adapter" />
+      <recent name="$PROJECT_DIR$/profile/addons/tuya-adapter" />
+      <recent name="$PROJECT_DIR$/pkg/runtime" />
     </key>
   </component>
   <component name="RunManager" selected="Go 构建.go build main.go">
@@ -186,184 +213,11 @@
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
   </component>
-  <component name="WindowStateProjectService">
-    <state x="512" y="90" key="#GOPATH" timestamp="1605629412067">
-      <screen x="0" y="25" width="2560" height="1345" />
-    </state>
-    <state x="512" y="90" key="#GOPATH/0.25.2560.1345@0.25.2560.1345" timestamp="1605629412067" />
-    <state x="449" y="636" key="#GOROOT" timestamp="1607140347807">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="449" y="636" key="#GOROOT/0.0.2560.1400@0.0.2560.1400" timestamp="1607140347807" />
-    <state x="449" y="654" key="#GOROOT/0.0.2560.1440@0.0.2560.1440" timestamp="1605546587073" />
-    <state x="955" y="298" width="1092" height="772" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1607327398909">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="955" y="298" width="1092" height="772" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1607327398909" />
-    <state x="955" y="307" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.2560.1440@0.0.2560.1440" timestamp="1605987840856" />
-    <state x="255" y="329" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1606004078533">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state x="255" y="329" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1440.900@0.0.1440.900" timestamp="1606004078533" />
-    <state x="453" y="526" key="#com.intellij.fileTypes.FileTypeChooser/0.0.2560.1440@0.0.2560.1440" timestamp="1605821575121" />
-    <state x="960" y="434" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1607169369948">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="960" y="434" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1607169369948" />
-    <state width="1120" height="780" key="DebuggerActiveHint" timestamp="1607053229169">
-      <screen x="0" y="0" width="2560" height="1440" />
-    </state>
-    <state width="1042" height="460" key="DebuggerActiveHint/0.0.1440.900@0.0.1440.900" timestamp="1606002675571" />
-    <state width="1120" height="780" key="DebuggerActiveHint/0.0.2560.1440@0.0.2560.1440" timestamp="1607053229169" />
-    <state width="651" height="454" key="DebuggerActiveHint/0.25.1440.809@0.25.1440.809" timestamp="1605841335935" />
-    <state width="1120" height="780" key="DebuggerActiveHint/0.25.2560.1345@0.25.2560.1345" timestamp="1606066502008" />
-    <state x="1054" y="577" key="FileChooserDialogImpl" timestamp="1607323555232">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="1054" y="577" key="FileChooserDialogImpl/0.0.2560.1400@0.0.2560.1400" timestamp="1607323555232" />
-    <state width="2517" height="484" key="GridCell.Tab.0.bottom" timestamp="1607336464283">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state width="1398" height="175" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1606028642889" />
-    <state width="2517" height="484" key="GridCell.Tab.0.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1607336464283" />
-    <state width="1358" height="520" key="GridCell.Tab.0.bottom/0.0.2560.1440/0.25.2560.1345@0.25.2560.1345" timestamp="1605628794208" />
-    <state width="2518" height="472" key="GridCell.Tab.0.bottom/0.0.2560.1440@0.0.2560.1440" timestamp="1607138691254" />
-    <state width="1398" height="243" key="GridCell.Tab.0.bottom/0.25.1440.805@0.25.1440.805" timestamp="1605836307584" />
-    <state width="1398" height="258" key="GridCell.Tab.0.bottom/0.25.1440.807@0.25.1440.807" timestamp="1605923024530" />
-    <state width="1398" height="243" key="GridCell.Tab.0.bottom/0.25.1440.809@0.25.1440.809" timestamp="1605839374768" />
-    <state width="1398" height="258" key="GridCell.Tab.0.bottom/0.25.1440.814/1440.25.2560.1415@0.25.1440.814" timestamp="1605965158935" />
-    <state width="2518" height="306" key="GridCell.Tab.0.bottom/0.25.2560.1345@0.25.2560.1345" timestamp="1606813299086" />
-    <state width="2518" height="472" key="GridCell.Tab.0.bottom/0.25.2560.1415@0.25.2560.1415" timestamp="1607067728638" />
-    <state width="2517" height="484" key="GridCell.Tab.0.center" timestamp="1607336464283">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state width="1398" height="175" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1606028642888" />
-    <state width="2517" height="484" key="GridCell.Tab.0.center/0.0.2560.1400@0.0.2560.1400" timestamp="1607336464283" />
-    <state width="1358" height="520" key="GridCell.Tab.0.center/0.0.2560.1440/0.25.2560.1345@0.25.2560.1345" timestamp="1605628794207" />
-    <state width="2518" height="472" key="GridCell.Tab.0.center/0.0.2560.1440@0.0.2560.1440" timestamp="1607138691253" />
-    <state width="1398" height="243" key="GridCell.Tab.0.center/0.25.1440.805@0.25.1440.805" timestamp="1605836307583" />
-    <state width="1398" height="258" key="GridCell.Tab.0.center/0.25.1440.807@0.25.1440.807" timestamp="1605923024529" />
-    <state width="1398" height="243" key="GridCell.Tab.0.center/0.25.1440.809@0.25.1440.809" timestamp="1605839374767" />
-    <state width="1398" height="258" key="GridCell.Tab.0.center/0.25.1440.814/1440.25.2560.1415@0.25.1440.814" timestamp="1605965158932" />
-    <state width="2518" height="306" key="GridCell.Tab.0.center/0.25.2560.1345@0.25.2560.1345" timestamp="1606813299084" />
-    <state width="2518" height="472" key="GridCell.Tab.0.center/0.25.2560.1415@0.25.2560.1415" timestamp="1607067728636" />
-    <state width="2517" height="484" key="GridCell.Tab.0.left" timestamp="1607336464283">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state width="1398" height="175" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1606028642887" />
-    <state width="2517" height="484" key="GridCell.Tab.0.left/0.0.2560.1400@0.0.2560.1400" timestamp="1607336464283" />
-    <state width="1358" height="520" key="GridCell.Tab.0.left/0.0.2560.1440/0.25.2560.1345@0.25.2560.1345" timestamp="1605628794207" />
-    <state width="2518" height="472" key="GridCell.Tab.0.left/0.0.2560.1440@0.0.2560.1440" timestamp="1607138691253" />
-    <state width="2518" height="306" key="GridCell.Tab.0.left/0.0.2560.1440@0.25.2560.1345" timestamp="1606813299080" />
-    <state width="1398" height="243" key="GridCell.Tab.0.left/0.25.1440.805@0.25.1440.805" timestamp="1605836307582" />
-    <state width="1398" height="258" key="GridCell.Tab.0.left/0.25.1440.807@0.25.1440.807" timestamp="1605923024529" />
-    <state width="1398" height="243" key="GridCell.Tab.0.left/0.25.1440.809@0.25.1440.809" timestamp="1605839374766" />
-    <state width="1398" height="258" key="GridCell.Tab.0.left/0.25.1440.814/1440.25.2560.1415@0.25.1440.814" timestamp="1605965158931" />
-    <state width="2518" height="306" key="GridCell.Tab.0.left/0.25.2560.1345@0.25.2560.1345" timestamp="1606594395609" />
-    <state width="2518" height="472" key="GridCell.Tab.0.left/0.25.2560.1415@0.25.2560.1415" timestamp="1607067728635" />
-    <state width="2517" height="484" key="GridCell.Tab.0.right" timestamp="1607336464283">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state width="1398" height="175" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1606028642888" />
-    <state width="2517" height="484" key="GridCell.Tab.0.right/0.0.2560.1400@0.0.2560.1400" timestamp="1607336464283" />
-    <state width="1358" height="520" key="GridCell.Tab.0.right/0.0.2560.1440/0.25.2560.1345@0.25.2560.1345" timestamp="1605628794208" />
-    <state width="2518" height="472" key="GridCell.Tab.0.right/0.0.2560.1440@0.0.2560.1440" timestamp="1607138691253" />
-    <state width="1398" height="243" key="GridCell.Tab.0.right/0.25.1440.805@0.25.1440.805" timestamp="1605836307584" />
-    <state width="1398" height="258" key="GridCell.Tab.0.right/0.25.1440.807@0.25.1440.807" timestamp="1605923024530" />
-    <state width="1398" height="243" key="GridCell.Tab.0.right/0.25.1440.809@0.25.1440.809" timestamp="1605839374767" />
-    <state width="1398" height="258" key="GridCell.Tab.0.right/0.25.1440.814/1440.25.2560.1415@0.25.1440.814" timestamp="1605965158934" />
-    <state width="2518" height="306" key="GridCell.Tab.0.right/0.25.2560.1345@0.25.2560.1345" timestamp="1606813299085" />
-    <state width="2518" height="472" key="GridCell.Tab.0.right/0.25.2560.1415@0.25.2560.1415" timestamp="1607067728636" />
-    <state width="2517" height="484" key="GridCell.Tab.1.bottom" timestamp="1607336464137">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state width="1398" height="175" key="GridCell.Tab.1.bottom/0.0.1440.900@0.0.1440.900" timestamp="1606028644992" />
-    <state width="2517" height="484" key="GridCell.Tab.1.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1607336464137" />
-    <state width="1358" height="520" key="GridCell.Tab.1.bottom/0.0.2560.1440/0.25.2560.1345@0.25.2560.1345" timestamp="1605628794208" />
-    <state width="2518" height="472" key="GridCell.Tab.1.bottom/0.0.2560.1440@0.0.2560.1440" timestamp="1607138691255" />
-    <state width="1398" height="243" key="GridCell.Tab.1.bottom/0.25.1440.805@0.25.1440.805" timestamp="1605836311065" />
-    <state width="1398" height="258" key="GridCell.Tab.1.bottom/0.25.1440.807@0.25.1440.807" timestamp="1605923024243" />
-    <state width="1398" height="243" key="GridCell.Tab.1.bottom/0.25.1440.809@0.25.1440.809" timestamp="1605839374695" />
-    <state width="1398" height="258" key="GridCell.Tab.1.bottom/0.25.1440.814/1440.25.2560.1415@0.25.1440.814" timestamp="1605965158939" />
-    <state width="2518" height="306" key="GridCell.Tab.1.bottom/0.25.2560.1345@0.25.2560.1345" timestamp="1606813299091" />
-    <state width="2518" height="472" key="GridCell.Tab.1.bottom/0.25.2560.1415@0.25.2560.1415" timestamp="1607067728547" />
-    <state width="2517" height="484" key="GridCell.Tab.1.center" timestamp="1607336464137">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state width="1398" height="175" key="GridCell.Tab.1.center/0.0.1440.900@0.0.1440.900" timestamp="1606028644992" />
-    <state width="2517" height="484" key="GridCell.Tab.1.center/0.0.2560.1400@0.0.2560.1400" timestamp="1607336464137" />
-    <state width="1358" height="520" key="GridCell.Tab.1.center/0.0.2560.1440/0.25.2560.1345@0.25.2560.1345" timestamp="1605628794208" />
-    <state width="2518" height="472" key="GridCell.Tab.1.center/0.0.2560.1440@0.0.2560.1440" timestamp="1607138691255" />
-    <state width="1398" height="243" key="GridCell.Tab.1.center/0.25.1440.805@0.25.1440.805" timestamp="1605836311064" />
-    <state width="1398" height="258" key="GridCell.Tab.1.center/0.25.1440.807@0.25.1440.807" timestamp="1605923024242" />
-    <state width="1398" height="243" key="GridCell.Tab.1.center/0.25.1440.809@0.25.1440.809" timestamp="1605839374694" />
-    <state width="1398" height="258" key="GridCell.Tab.1.center/0.25.1440.814/1440.25.2560.1415@0.25.1440.814" timestamp="1605965158936" />
-    <state width="2518" height="306" key="GridCell.Tab.1.center/0.25.2560.1345@0.25.2560.1345" timestamp="1606813299087" />
-    <state width="2518" height="472" key="GridCell.Tab.1.center/0.25.2560.1415@0.25.2560.1415" timestamp="1607067728546" />
-    <state width="2517" height="484" key="GridCell.Tab.1.left" timestamp="1607336464137">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state width="1398" height="175" key="GridCell.Tab.1.left/0.0.1440.900@0.0.1440.900" timestamp="1606028644991" />
-    <state width="2517" height="484" key="GridCell.Tab.1.left/0.0.2560.1400@0.0.2560.1400" timestamp="1607336464137" />
-    <state width="1358" height="520" key="GridCell.Tab.1.left/0.0.2560.1440/0.25.2560.1345@0.25.2560.1345" timestamp="1605628794208" />
-    <state width="2518" height="472" key="GridCell.Tab.1.left/0.0.2560.1440@0.0.2560.1440" timestamp="1607138691254" />
-    <state width="1398" height="243" key="GridCell.Tab.1.left/0.25.1440.805@0.25.1440.805" timestamp="1605836311063" />
-    <state width="1398" height="258" key="GridCell.Tab.1.left/0.25.1440.807@0.25.1440.807" timestamp="1605923024242" />
-    <state width="1398" height="243" key="GridCell.Tab.1.left/0.25.1440.809@0.25.1440.809" timestamp="1605839374694" />
-    <state width="1398" height="258" key="GridCell.Tab.1.left/0.25.1440.814/1440.25.2560.1415@0.25.1440.814" timestamp="1605965158935" />
-    <state width="2518" height="306" key="GridCell.Tab.1.left/0.25.2560.1345@0.25.2560.1345" timestamp="1606813299087" />
-    <state width="2518" height="472" key="GridCell.Tab.1.left/0.25.2560.1415@0.25.2560.1415" timestamp="1607067728546" />
-    <state width="2517" height="484" key="GridCell.Tab.1.right" timestamp="1607336464137">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state width="1398" height="175" key="GridCell.Tab.1.right/0.0.1440.900@0.0.1440.900" timestamp="1606028644992" />
-    <state width="2517" height="484" key="GridCell.Tab.1.right/0.0.2560.1400@0.0.2560.1400" timestamp="1607336464137" />
-    <state width="1358" height="520" key="GridCell.Tab.1.right/0.0.2560.1440/0.25.2560.1345@0.25.2560.1345" timestamp="1605628794208" />
-    <state width="2518" height="472" key="GridCell.Tab.1.right/0.0.2560.1440@0.0.2560.1440" timestamp="1607138691255" />
-    <state width="1398" height="243" key="GridCell.Tab.1.right/0.25.1440.805@0.25.1440.805" timestamp="1605836311065" />
-    <state width="1398" height="258" key="GridCell.Tab.1.right/0.25.1440.807@0.25.1440.807" timestamp="1605923024243" />
-    <state width="1398" height="243" key="GridCell.Tab.1.right/0.25.1440.809@0.25.1440.809" timestamp="1605839374695" />
-    <state width="1398" height="258" key="GridCell.Tab.1.right/0.25.1440.814/1440.25.2560.1415@0.25.1440.814" timestamp="1605965158937" />
-    <state width="2518" height="306" key="GridCell.Tab.1.right/0.25.2560.1345@0.25.2560.1345" timestamp="1606813299091" />
-    <state width="2518" height="472" key="GridCell.Tab.1.right/0.25.2560.1415@0.25.2560.1415" timestamp="1607067728547" />
-    <state width="168" height="457" key="HiddenNamespacesPopup" timestamp="1605987878947">
-      <screen x="0" y="0" width="2560" height="1440" />
-    </state>
-    <state width="168" height="457" key="HiddenNamespacesPopup/0.0.2560.1440@0.0.2560.1440" timestamp="1605987878947" />
-    <state x="494" y="192" key="SettingsEditor" timestamp="1607140310412">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="278" y="86" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1605389136778" />
-    <state x="494" y="192" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1607140310412" />
-    <state x="278" y="102" key="SettingsEditor/0.25.1440.805@0.25.1440.805" timestamp="1605292677121" />
-    <state x="666" y="154" key="SettingsEditor/0.25.2560.1345@0.25.2560.1345" timestamp="1605521181580" />
-    <state x="239" y="432" key="Vcs.Push.Dialog.v2" timestamp="1604558322576">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="239" y="432" key="Vcs.Push.Dialog.v2/0.0.2560.1400@0.0.2560.1400" timestamp="1604558322576" />
-    <state width="649" height="720" key="XDebugger.FullValuePopup" timestamp="1606818508292">
-      <screen x="0" y="0" width="2560" height="1440" />
-    </state>
-    <state width="366" height="450" key="XDebugger.FullValuePopup/0.0.1440.900@0.0.1440.900" timestamp="1605999226972" />
-    <state width="649" height="720" key="XDebugger.FullValuePopup/0.0.2560.1440@0.0.2560.1440" timestamp="1606818508292" />
-    <state x="1389" y="0" width="1081" height="1100" key="dock-window-1" timestamp="1605994228854">
-      <screen x="0" y="0" width="2560" height="1440" />
-    </state>
-    <state x="312" y="63" width="933" height="805" key="dock-window-1/0.0.1440.900@0.0.1440.900" timestamp="1605730730525" />
-    <state x="1389" y="0" width="1081" height="1100" key="dock-window-1/0.0.2560.1440@0.0.2560.1440" timestamp="1605994228854" />
-    <state x="1280" y="25" width="933" height="1345" key="dock-window-1/0.25.2560.1345@0.25.2560.1345" timestamp="1605718997117" />
-    <state x="977" y="352" width="605" height="735" key="find.popup" timestamp="1606795145217">
-      <screen x="0" y="0" width="2560" height="1440" />
-    </state>
-    <state x="977" y="352" width="605" height="735" key="find.popup/0.0.2560.1440@0.0.2560.1440" timestamp="1606795145217" />
-    <state x="945" y="331" width="670" height="676" key="search.everywhere.popup" timestamp="1607065931497">
-      <screen x="0" y="0" width="2560" height="1440" />
-    </state>
-    <state x="945" y="331" width="670" height="676" key="search.everywhere.popup/0.0.2560.1440@0.0.2560.1440" timestamp="1607065931497" />
-    <state x="498" y="636" key="vcs.readOnlyHandler.ReadOnlyStatusDialog" timestamp="1606795738988">
-      <screen x="0" y="0" width="2560" height="1440" />
-    </state>
-    <state x="280" y="398" key="vcs.readOnlyHandler.ReadOnlyStatusDialog/0.0.1440.900@0.0.1440.900" timestamp="1605914596229" />
-    <state x="498" y="636" key="vcs.readOnlyHandler.ReadOnlyStatusDialog/0.0.2560.1440@0.0.2560.1440" timestamp="1606795738988" />
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <default-breakpoints>
+        <breakpoint type="DlvErrorBreakpoint" />
+      </default-breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
