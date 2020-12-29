@@ -5,9 +5,10 @@ import (
 	"compress/gzip"
 	"context"
 	"fmt"
+	"gateway/config"
+	"gateway/event"
 	"gateway/pkg/log"
 	"gateway/pkg/util"
-	"gateway/config"
 	json "github.com/json-iterator/go"
 	"io"
 	"io/ioutil"
@@ -30,8 +31,6 @@ type AddonsManager struct {
 	devices       map[string]*DeviceProxy
 	installAddons map[string]*AddonInfo // {addonId: manifest}
 
-
-
 	IsRunning bool
 	IsLoaded  bool
 
@@ -53,8 +52,8 @@ func NewAddonsManager(ctx context.Context) (*AddonsManager, error) {
 	am.DataDir = config.Conf.DataDir
 
 	am.IsRunning = false
-	am.devices = make(map[string]*DeviceProxy)
-	am.installAddons = make(map[string]*AddonInfo)
+	am.devices = make(map[string]*DeviceProxy, 50)
+	am.installAddons = make(map[string]*AddonInfo, 50)
 
 	var c context.Context
 	c, am.pluginCancel = context.WithCancel(am.ctx)
@@ -89,20 +88,18 @@ func (manager *AddonsManager) LoadAddons() error {
 func (manager *AddonsManager) loadAddon(packageId string, enabled bool) error {
 	//db := database.GetDB()
 
-	manifest, err := LoadManifest(manager.AddonsDir, packageId)
+	addonInfo, err := LoadManifest(manager.AddonsDir, packageId)
 	if err != nil {
 		return err
 	}
 
-	err = util.EnsureDir(path.Join(manager.DataDir, manifest.ID))
+	err = util.EnsureDir(path.Join(manager.DataDir, addonInfo.ID))
 	if err != nil {
 		return err
 	}
-	saveAddonInfo := GetAddonsInfoByIDFromDB(packageId)
-	if saveAddonInfo != nil {
-		manifest.Enable = enabled
+	err =addonInfo.UpdateOrCreateFormDb();if err !=nil{
+		return err
 	}
-	addonInfo := SaveAddonManifestToDB(manifest, true)
 	manager.installAddons[packageId] = addonInfo
 	manager.pluginServer.loadPlugin(addonInfo.ID, manager.installAddons[packageId].Exec, enabled)
 
@@ -112,6 +109,13 @@ func (manager *AddonsManager) loadAddon(packageId string, enabled bool) error {
 func (manager *AddonsManager) unloadAddon(packageId string) error {
 
 	return nil
+}
+
+func (manager *AddonsManager) handlerDeviceAdded(dev *DeviceProxy) {
+	if dev.ID != "" {
+		manager.devices[dev.ID] = dev
+	}
+	event.FireDiscoverNewDevice(dev.Device)
 }
 
 // get package from url, checksum
@@ -173,40 +177,8 @@ func (manager *AddonsManager) installAddon(packageId, packagePath string, enable
 
 }
 
-func (manager *AddonsManager) GetProperty(thingId, propName string) interface{} {
-	dev := manager.getDevice(thingId)
-	return dev.GetProperty(propName)
-}
-
-func (manager *AddonsManager) SetProperty(thingId, propName string, value interface{}) {
-	dev := manager.getDevice(thingId)
-	prop := dev.FindProperty(propName)
-	prop.setValue(value)
-
-}
-
-func (manager *AddonsManager) RemoveThing(thingId string) {
-	dev := manager.getDevice(thingId)
-	adapter := dev.GetAdapter()
-	adapter.removeThing(dev)
-}
-
 func (manager *AddonsManager) GetInstallAddons() map[string]interface{} {
 	return nil
-}
-
-func (manager *AddonsManager) getDevice(thingId string) *DeviceProxy {
-	if len(manager.devices) > 0 {
-		dev := manager.devices[thingId]
-		if dev != nil {
-			return dev
-		}
-	}
-	return nil
-}
-
-func (manager *AddonsManager) getDevices()map[string]*DeviceProxy {
-	return manager.devices
 }
 
 func (manager *AddonsManager) Start() {
@@ -241,9 +213,9 @@ func EnableAddon(addonId string) error {
 	if addonInfo == nil {
 		return fmt.Errorf("addon not exit")
 	}
-	addonInfo.Enabled = true
-	SaveAddonInfo(*addonInfo)
-	err := addonsManager.loadAddon(addonId, true)
+
+	err := addonInfo.UpdateAddonInfoToDB(true)
+	err = addonsManager.loadAddon(addonId, true)
 	if err != nil {
 		return err
 	}
@@ -257,27 +229,35 @@ func DisableAddon(addonId string) error {
 	if addonInfo == nil {
 		return fmt.Errorf("addon not installed")
 	}
-	addonInfo.Enabled = false
-	SaveAddonInfo(*addonInfo)
-	err := addonsManager.unloadAddon(addonId)
+	err := addonInfo.UpdateAddonInfoToDB(false)
+	err = addonsManager.unloadAddon(addonId)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func GetThings()map[string]*DeviceProxy{
-	devs := addonsManager.getDevices()
-	return devs
+func GetThings() map[string]*DeviceProxy {
+	return addonsManager.devices
 }
 
 func InstallAddonFromUrl(id, url, checksum string, enabled bool) {
 	_ = addonsManager.InstallAddonFromUrl(id, url, checksum, enabled)
 }
 
+func SetThingProperty(thingId, propName string, value interface{}) (interface{}, error) {
+	device, ok := addonsManager.devices[thingId]
+	if !ok {
+		return value, fmt.Errorf("invalid thingId")
+	}
+
+	return device.SetProperty(propName, value)
+
+}
+
 func AddNewThing(pairingTimeout int) error {
 	for _, plugin := range addonsManager.pluginServer.Plugins {
-		for _,adapter := range plugin.adapters{
+		for _, adapter := range plugin.adapters {
 			adapter.Pairing(pairingTimeout)
 		}
 	}

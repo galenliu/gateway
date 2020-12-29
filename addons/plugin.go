@@ -4,9 +4,7 @@ import (
 	"context"
 	"fmt"
 	"gateway/pkg/log"
-	messages "gitee.com/liu_guilin/WebThings-schema"
 	json "github.com/json-iterator/go"
-	"go.uber.org/zap"
 	"io/ioutil"
 	"os/exec"
 	"path"
@@ -39,7 +37,7 @@ func NewPlugin(s *PluginsServer, pluginId string, exec string, _ctx context.Cont
 	plugin.exec = exec
 	plugin.pluginId = pluginId
 	plugin.pluginServer = s
-	plugin.adapters = make(map[string]*AdapterProxy)
+	plugin.adapters = make(map[string]*AdapterProxy, 30)
 	plugin.execPath = path.Join(s.addonManager.AddonsDir, pluginId)
 	if _ctx != nil {
 		plugin.ctx = _ctx
@@ -55,39 +53,63 @@ func (plugin *Plugin) OnMessage(data []byte) {
 	var messageType = json.Get(data, "messageType").ToInt()
 	log.Debug(fmt.Sprintf("rev message:%s", string(data)))
 
-	// plugin消息, added
+	var adapterId = json.Get(data, "data", "adapterId").ToString()
+	// plugin handler
 	switch messageType {
+	//adapter add notify
 	case AdapterAddedNotification:
-		var adapterId = json.Get(data, "data", "adapterId").ToString()
 		var name = json.Get(data, "data", "name").ToString()
 		var packetName = json.Get(data, "data", "packetName").ToString()
-		adapter := NewAdapterProxy(plugin.pluginServer.addonManager,plugin, adapterId, name, packetName)
+		adapter := NewAdapterProxy(plugin.pluginServer.addonManager, plugin, adapterId, name, packetName)
 		plugin.addAdapter(adapter)
-		log.Info(fmt.Sprintf("adapter：%s added",adapterId))
+		log.Info(fmt.Sprintf("adapter：%s added", adapterId))
+		break
 	}
 
-	//再处理 adapter消息
-	adapter := plugin.getAdapter(json.Get(data, "pluginId").ToString())
+	//adapter handler
+	adapter, ok := plugin.adapters[adapterId]
+	if !ok {
+		log.Error("adapter(%s) not registered", adapterId)
+		return
+	}
 	switch messageType {
 	//add device
 	case DeviceAddedNotification:
-		var m messages.DeviceAddedNotification
-		_ = json.Unmarshal(data, &m)
-		device := NewDeviceProxy(adapter, m.Device)
+		//messages.DeviceAddedNotification
+		deviceInfo := json.Get(data, "data", "device").ToString()
+
+		var dev Device
+		err := json.Unmarshal([]byte(deviceInfo), &dev)
+		if err != nil {
+			log.Info("device unmarshal err : %s", err.Error())
+			return
+		}
+		device := NewDeviceProxy(adapter, &dev)
 		adapter.handlerDeviceAdded(device)
 		break
 
-	//device change property
+	//device property changed notify
 	case DevicePropertyChangedNotification:
-		var m messages.DevicePropertyChangedNotification
-		_ = json.Unmarshal(data, &m)
-		adapter.getDevice(m.DeviceId).doPropertyChanged(m.Property)
+		deviceId := json.Get(data, "data", "deviceId").ToString()
+		device, ok := plugin.pluginServer.addonManager.devices[deviceId]
+		if !ok {
+			log.Info("device(%s) not find", deviceId)
+		}
+		propInfo := json.Get(data, "data", "property").ToString()
+		//var m messages.DevicePropertyChangedNotification
+		var newProp Property
+		_ = json.UnmarshalFromString(propInfo, &newProp)
+		prop, ok := device.Properties[newProp.Name]
+		if !ok {
+			log.Info("device(%s) not find prop(%s)", deviceId, prop.Name)
+			return
+		}
+		prop.doPropertyChanged(&newProp)
 		break
 	}
 }
 
 func (plugin *Plugin) sendData(data []byte) {
-
 	plugin.conn.send(data)
 }
 
@@ -136,9 +158,9 @@ func (plugin *Plugin) start() {
 
 	err = cmd.Start()
 	if err != nil {
-		log.Error("addons start failed,err: ", zap.Error(err))
+		log.Error("plugin("+plugin.pluginId+") start failed,err: ", err.Error())
 	} else {
-		log.Info("start plugin: %v", plugin.pluginId)
+		log.Info("start plugin:(%s)", plugin.pluginId)
 		out, err := ioutil.ReadAll(stdOut)
 		if err != nil {
 			fmt.Print(err)

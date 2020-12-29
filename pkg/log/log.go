@@ -60,7 +60,7 @@ func InitLogger(logDir string, debug bool, logRotateDays int) {
 	// 构造日志
 	Logger = zap.New(core, caller, development,zap.AddCallerSkip(1))
 
-	Logger.Info("log 初始化成功")
+	Debug("logger init succeed")
 
 }
 

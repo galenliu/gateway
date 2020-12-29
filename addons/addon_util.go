@@ -1,16 +1,17 @@
 package addons
 
 import (
+	"errors"
 	"fmt"
 	"gateway/pkg/database"
+	"gateway/pkg/log"
 	jsoniter "github.com/json-iterator/go"
-	"gopkg.in/yaml.v3"
+	"gorm.io/gorm"
 	"io/ioutil"
 	"path"
 )
 
 const ManifestVersion = 1
-const ManifestFile = "manifest.yaml"
 const ManifestFileJson = "manifest.json"
 
 type AddonConfig struct {
@@ -73,6 +74,7 @@ type WebThings struct {
 //version: "0.2.4"
 
 type AddonInfo struct {
+	gorm.Model
 	ID          string      `json:"id"`
 	Name        string      `json:"name"`
 	ShortName   string      `json:"short_name"`
@@ -87,52 +89,68 @@ type AddonInfo struct {
 	PrimaryType string      `json:"primary_type" gorm:"default: adapter"`
 }
 
-func SaveAddonManifestToDB(m *AddonManifest, enable bool) *AddonInfo {
-	db := database.GetDB()
-	_ = db.AutoMigrate(&AddonInfo{})
-	addon := AddonInfo{
-		ID:          m.ID,
-		Name:        m.Name,
-		ShortName:   m.ShortName,
-		Author:      m.Author,
-		Description: m.Description,
-		License:     m.License,
-		HomepageUrl: m.HomepageUrl,
-		Version:     m.Version,
-		Schema:      m.Options.Schema,
-		Exec:        m.GatewaySpecificSettings["webthings"].Exec,
-		Enabled:     enable,
-		PrimaryType: m.GatewaySpecificSettings["webthings"].PrimaryType,
+func (addonInfo *AddonInfo) UpdateOrCreateFormDb() error {
+
+	db, err := database.GetDB()
+	if err != nil {
+		return err
 	}
-	db.Save(addon)
-	return &addon
+	err = db.AutoMigrate(&AddonInfo{})
+	if err != nil {
+		return err
+	}
+	var a =AddonInfo{}
+	rst := db.Where("id = ?",addonInfo.ID).First(&a)
+	if errors.Is(rst.Error,gorm.ErrRecordNotFound){
+		db.Create(addonInfo)
+		log.Info("create new addonInfo(%s) record", addonInfo.ID)
+		return nil
+	}
+	addonInfo.Enabled = a.Enabled
+	return nil
 }
 
-func SaveAddonInfo(a AddonInfo) {
-	db := database.GetDB()
-	_= db.AutoMigrate(AddonInfo{})
-	db.Save(a)
+func (addonInfo *AddonInfo) UpdateAddonInfoToDB(enable bool) error {
+	db, err := database.GetDB()
+	if err != nil {
+		return err
+	}
+	_ = db.AutoMigrate(&AddonInfo{})
+	addonInfo.Enabled = enable
+	tx := db.Save(addonInfo)
+	if tx.Error != nil {
+		return tx.Error
+	}
+	return nil
 }
 
 func GetAddonsInfoFromDB() []AddonInfo {
-	db := database.GetDB()
-	_= db.AutoMigrate(AddonInfo{})
+	db, _ := database.GetDB()
+	_ = db.AutoMigrate(AddonInfo{})
 	var addons []AddonInfo
 	db.Find(&addons)
 	return addons
 }
-func GetAddonsInfoByIDFromDB(addonId string)*AddonInfo{
-	db := database.GetDB()
-	_= db.AutoMigrate(AddonInfo{})
+func GetAddonInfoByIDFromDB(packageId string) (*AddonInfo, error) {
+	db, err := database.GetDB()
+	if err != nil {
+		return nil, err
+	}
+	err = db.AutoMigrate(AddonInfo{})
+	if err != nil {
+		return nil, err
+	}
 	var addonInfo AddonInfo
-	db.First(&addonInfo,addonId)
-	return &addonInfo
+	tx := db.Find(&addonInfo, packageId)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return &addonInfo, nil
 }
 
-func LoadManifest(addonDir string, packetId string) (*AddonManifest, error) {
+func LoadManifest(addonDir string, packetId string) (*AddonInfo, error) {
 
 	destPath := path.Join(addonDir, packetId)
-
 	//load manifest.json
 	manifest, err := loadManifestJson(destPath)
 	if err != nil || &manifest == nil {
@@ -153,19 +171,24 @@ func LoadManifest(addonDir string, packetId string) (*AddonManifest, error) {
 			manifest.ID, packetId)
 		return nil, err
 	}
-
 	//TODO :checksum every file.
 	//TODO: Verify that manifest filed schema
-	return manifest, err
-}
 
-func loadYaml(dirName string, in *AddonManifest) error {
-	f, err := ioutil.ReadFile(path.Join(dirName, ManifestFile))
-	if err != nil {
-		return err
+	addonInfo := AddonInfo{
+		ID:          manifest.ID,
+		Name:        manifest.Name,
+		ShortName:   manifest.ShortName,
+		Author:      manifest.Author,
+		Description: manifest.Description,
+		License:     manifest.License,
+		HomepageUrl: manifest.HomepageUrl,
+		Version:     manifest.Version,
+		Schema:      manifest.Options.Schema,
+		Exec:        manifest.GatewaySpecificSettings["webthings"].Exec,
+		Enabled:     true,
+		PrimaryType: manifest.GatewaySpecificSettings["webthings"].PrimaryType,
 	}
-	err = yaml.Unmarshal(f, in)
-	return err
+	return &addonInfo, nil
 }
 
 func loadManifestJson(dirName string) (addonManifest *AddonManifest, err error) {

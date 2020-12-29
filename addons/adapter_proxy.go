@@ -14,7 +14,6 @@ type AdapterProxy struct {
 	plugin      *Plugin
 	manager     *AddonsManager
 	looker      *sync.Mutex
-	devices     map[string]*DeviceProxy
 	manifest    interface{}
 }
 
@@ -25,23 +24,13 @@ func NewAdapterProxy(manager *AddonsManager, plugin *Plugin, adapterId string, n
 	proxy.plugin = plugin
 	proxy.ID = adapterId
 	proxy.Name = name
+	proxy.looker = new(sync.Mutex)
 	proxy.PackageName = packetName
 	return proxy
 }
 
 func (adapter *AdapterProxy) handlerDeviceAdded(dev *DeviceProxy) {
-	adapter.looker.Lock()
-	defer adapter.looker.Unlock()
-	if dev.GetId() != "" {
-		adapter.devices[dev.GetId()] = dev
-	}
-}
-
-func (adapter *AdapterProxy) getDevice(devId string) *DeviceProxy {
-	adapter.looker.Lock()
-	defer adapter.looker.Unlock()
-	device := adapter.devices[devId]
-	return device
+	adapter.manager.handlerDeviceAdded(dev)
 }
 
 func (adapter *AdapterProxy) removeThing(dev *DeviceProxy) {

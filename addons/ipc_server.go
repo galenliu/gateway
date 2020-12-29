@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"gateway/pkg/log"
 	"github.com/gorilla/websocket"
-	"go.uber.org/zap"
 	"net/http"
 )
 
@@ -62,7 +61,7 @@ func (server *IpcServer) handle(w http.ResponseWriter, r *http.Request) {
 
 	//升级协议时可能发生的错误
 	if err != nil {
-		log.Error("ipc server upgrade failed,err: %v", zap.Error(err))
+		log.Error("ipc server upgrade failed,err: ", err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -82,7 +81,7 @@ func (server *IpcServer) Serve() {
 
 	err := sev.ListenAndServe()
 	if err != nil {
-		log.Error("ipc server fail", zap.Error(err))
+		log.Error("ipc server fail,err: ", err.Error())
 	}
 
 }

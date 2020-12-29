@@ -1,6 +1,9 @@
 package addons
 
-import _ "github.com/asaskevich/govalidator"
+import (
+	"fmt"
+	_ "github.com/asaskevich/govalidator"
+)
 
 const (
 	Alarm                    = "Alarm"
@@ -26,30 +29,49 @@ const (
 	Thermostat               = "Thermostat"
 	VideoCamera              = "VideoCamera"
 
-	Context = "https://www.w3.org/2019/wot/td/v1"
+	Context = "https://webthings.io/schemas"
 )
 
 type Device struct {
-	AtContext    string   `json:"@context" valid:"url,required"`
-	AtType       []string `json:"@type" valid:"url"`
-	Title        string   `json:"title,required"`
-	Titles       []string `json:"titles,omitempty"`
-	Description  string   `json:"description,omitempty"`
-	ID           string   `json:"id"`
-	Descriptions []string `json:"descriptions,omitempty"`
-	Version      string   `json:"version,omitempty"`
-	Created      string   `json:"created,omitempty"`
-	Modified     string   `json:"modified,omitempty"`
-	Support      string   `json:"support,omitempty"`
-	Properties   map[string]*Property
+	adapter Adapter
+
+	AtContext   string                    `json:"@context" valid:"url,required"`
+	Title       string                    `json:"title,required"`
+	AtType      []string                  `json:"@type"`
+	Description string                    `json:"description,omitempty"`
+	ID          string                    `json:"id"`
+	Properties  map[string]*Property `json:"properties"`
 }
 
-func (proxy *Device) FindProperty(propName string) *Property {
-	prop := proxy.Properties[propName]
-	return prop
+func NewDevice(id, title string) *Device {
+	device := &Device{}
+	device.ID = id
+	device.Title = title
+	device.Properties = make(map[string]*Property)
+	return device
 }
 
-func (proxy *Device) GetProperty(propName string) interface{} {
-	prop := proxy.FindProperty(propName)
-	return prop.Value
+func (device *Device) AddProperties(props ...*Property) {
+	for _, p := range props {
+		device.Properties[p.Name] = p
+	}
 }
+
+
+func (device *Device) AddTypes(types ...string) {
+	for _, t := range types {
+		device.AtType = append(device.AtType, t)
+	}
+}
+
+
+func (device *Device) SetProperty(propName string, value interface{}) (interface{}, error) {
+	prop, ok := device.Properties[propName]
+	if !ok {
+		return nil, fmt.Errorf("can find prop(%s) form device(%s)", device.ID, propName)
+	}
+	prop.setValue(value)
+	return prop.Value, nil
+}
+
+

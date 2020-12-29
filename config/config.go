@@ -2,12 +2,16 @@ package config
 
 import (
 	_ "embed"
+	"errors"
 	"gateway/pkg/database"
 	"gateway/pkg/log"
 	"gateway/pkg/util"
+	"gateway/properties"
 	"gopkg.in/yaml.v3"
+	"gorm.io/gorm"
 	"io/ioutil"
 	"path"
+	"time"
 )
 
 var Conf *Config
@@ -34,39 +38,45 @@ type UserProfile struct {
 }
 
 type Units struct {
-	Temperature string `gorm:"default: degree_celsius" json:"temperature"`
+	gorm.Model
+	Temperature   string
+	PreferencesID string
 }
 
 type Preferences struct {
-	Language string `gorm:"default: zh-cn" json:"language"`
-	Units    Units  `json:"units"`
-	UnitsID  int    `json:"-"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Name      string `gorm:"primarykey"`
+	Language  string
+	Units     Units `gorm:"foreignKey:PreferencesID"`
 }
 
-func GetUserProfile() *UserProfile {
-	return userProfile
-}
+func UpdateOrCreatePreferences(pref *Preferences) error {
 
-func GetPreferences() *Preferences {
-	return preferences
-}
-
-func UpdatePreferences() *Preferences {
-	//open database and create table
-	db := database.GetDB()
-	_ = db.AutoMigrate(&Preferences{})
-	_ = db.AutoMigrate(&Units{})
-
-	var pref Preferences
-	result := db.First(&pref)
-	if result.Error != nil {
-		u1 := Units{Temperature: util.PrefUnitsTempCelsius}
-		pref = Preferences{Language: util.PrefLangCn}
-		pref.Units = u1
-		db.Debug().Create(&pref)
-		_ = db.First(&pref)
+	db, err := database.GetDB()
+	if err != nil {
+		return err
 	}
-	return &pref
+	err = db.AutoMigrate(&Preferences{}, &Units{})
+	if err != nil {
+		return err
+	}
+	if pref != nil {
+		tx := db.Save(&pref)
+		return tx.Error
+	}
+	var p Preferences
+	rst := db.Where("name = ?", "preferences").First(&p)
+	if errors.Is(rst.Error, gorm.ErrRecordNotFound) {
+		p = Preferences{
+			Name: "preferences",
+			Language: "zh-cn",
+			Units:    Units{Temperature: properties.UnitCelsius},
+		}
+		db.Create(&p)
+	}
+	preferences = &p
+	return nil
 }
 
 type Config struct {
@@ -85,8 +95,7 @@ type Config struct {
 	MediaDir   string `yaml:"mediaDir,omitempty"`
 	UploadDir  string `yaml:"uploadDir,omitempty"`
 
-	Architecture string
-
+	Architecture   string
 	GatewayVersion string `yaml:"_"`
 }
 
@@ -159,8 +168,14 @@ func InitRuntime(config string) error {
 		return err
 	}
 	Conf = &rtc
-
-	preferences = UpdatePreferences()
-
+	err = UpdateOrCreatePreferences(nil)
 	return err
+}
+
+func GetUserProfile() *UserProfile {
+	return userProfile
+}
+
+func GetPreferences() *Preferences {
+	return preferences
 }

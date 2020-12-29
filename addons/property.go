@@ -1,5 +1,7 @@
 package addons
 
+import "fmt"
+
 const (
 	STRING  = "string"
 	BOOLEAN = "boolean"
@@ -59,8 +61,9 @@ type Property struct {
 
 	Minimum interface{} `json:"minimum,omitempty,string"`
 	Maximum interface{} `json:"maximum,omitempty,string"`
-	Value   interface{}
+	Value   interface{} `json:"value"`
 	Enum    []interface{}
+	Device DeviceProxy
 }
 
 func NewStringProperty(name string, atType string) *Property {
@@ -132,26 +135,48 @@ func NewIntegerProperty(name string, atType string) *Property {
 	return p
 }
 
-func (prop *Property) setValue(value interface{}) bool {
+func (prop *Property) setValue(value interface{}) (interface{},error,) {
 
-	var oldValue = prop.Value
+	switch prop.Type {
+	case INTEGER:
+		newValue, ok := value.(int64)
+		if !ok {
+			return prop.Value,fmt.Errorf("value type err")
+		}
+		prop.setCachedValue(newValue)
+	case NUMBER:
+		newValue, ok := value.(int64)
+		if !ok {
+			return prop.Value,fmt.Errorf("value type err")
+		}
+		prop.setCachedValue(newValue)
+	case STRING:
+		newValue, ok := value.(string)
+		if !ok {
+			return prop.Value,fmt.Errorf("value type err")
+		}
+		prop.setCachedValue(newValue)
+	case BOOLEAN:
+		newValue, ok := value.(bool)
+		if !ok {
+			return prop.Value,fmt.Errorf("value type err")
+		}
+		prop.setCachedValue(newValue)
 
-	var hasChanged = value != oldValue
-	if hasChanged {
-		prop.setCachedValueAndNotify(value)
 	}
-	return hasChanged
+	return prop.Value,nil
 }
 
-func (prop *Property) setCachedValueAndNotify(value interface{}) {
-	prop.setCachedValue(value)
+func (prop *Property) setCachedValueAndNotify(value interface{}) error {
+
 	prop.EventEmitter.OnPropertyChanged(value)
+	return nil
 }
 
 func (prop *Property) setCachedValue(value interface{}) {
-	if prop.Type == BOOLEAN {
-		prop.Value = value.(bool)
-		return
-	}
 	prop.Value = value
+}
+
+func (prop *Property) doPropertyChanged(p *Property) {
+	prop.setCachedValue(p.Value)
 }

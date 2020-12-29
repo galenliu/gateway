@@ -11,3 +11,7 @@ type Adapter struct {
 	userProfile *messages.UserProfile
 	preferences *messages.Preferences
 }
+
+
+
+

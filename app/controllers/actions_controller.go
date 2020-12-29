@@ -21,7 +21,11 @@ func NewActionsController() *ActionsController {
 	}
 }
 
+
+
 func (controller *ActionsController) HandleActions(c *gin.Context) {
+
+	// POST /actions
 
 	data, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
@@ -31,31 +35,39 @@ func (controller *ActionsController) HandleActions(c *gin.Context) {
 	log.Debug(fmt.Sprintf("Handler: %s %s body: %s", c.Request.Method, c.Request.URL.String(), data))
 
 	var action *models.Action
-	var input json.Any
 
-	if pair := json.Get(data, "pair").ToString(); pair != "" {
-		input = json.Get(data, "pair", "input")
-		if input == nil {
-			c.String(http.StatusBadRequest, "action input err")
-			return
-		}
+	var a map[string]struct {
+		Input interface{} `json:"input"`
 	}
-	thingId := c.Param("thingId")
+	err = json.Unmarshal(data, &a)
+	if err != nil {
+		c.String(http.StatusBadRequest, "action input err")
+		return
+	}
+
+	var actionName string
+	var thingId = c.Param("thingId")
+	var input interface{}
+
+	for k, _ := range a {
+		actionName = k
+		input = a[k].Input
+	}
 
 	if thingId != "" {
-		action = models.NewThingAction()
+		action = models.NewThingAction(thingId,actionName,input)
 	} else {
-		action = models.NewAction("pair", input)
+		action = models.NewAction(actionName, input)
 	}
 	controller.Actions.AddAction(action)
 
-	var dataDesc []byte
-	dataDesc, err = action.GetDescription()
+	var actionDesc []byte
+	actionDesc, err = action.GetDescription()
 	if err != nil {
 		c.String(http.StatusBadGateway, err.Error())
 		return
 	}
-	c.String(http.StatusOK, string(dataDesc))
+	c.String(http.StatusOK, string(actionDesc))
 }
 
 func (controller *ActionsController) HandleDeleteAction(c *gin.Context) {

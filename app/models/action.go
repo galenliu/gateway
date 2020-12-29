@@ -1,19 +1,28 @@
 package models
 
 import (
+	"gateway/event"
 	json "github.com/json-iterator/go"
 	"time"
 )
 
+const (
+	Created   = "created"
+	Completed = "completed"
+	Error     = "error"
+)
+
 type Action struct {
-	ID            int      `json:"-"`
-	Name          string   `json:"name"`
-	Input         json.Any `json:"input"`
-	Href          string   `json:"href"`
-	Status        string   `json:"status"`
-	TimeRequested string   `json:"time_requested"`
-	TimeCompleted string   `json:"time_completed,omitempty"`
-	Error         string   `json:"error,omitempty"`
+	ID            int         `json:"-"`
+	Name          string      `json:"name"`
+	Input         interface{} `json:"input"`
+	Href          string      `json:"href"`
+	Status        string      `json:"status"`
+	TimeRequested string      `json:"time_requested"`
+	TimeCompleted string      `json:"time_completed,omitempty"`
+	Error         string      `json:"error,omitempty"`
+
+	ThingID string `json:"-"`
 }
 
 type Input struct {
@@ -21,7 +30,7 @@ type Input struct {
 	ID      int    `json:"id,omitempty"`
 }
 
-func NewAction(name string, input json.Any) *Action {
+func NewAction(name string, input interface{}) *Action {
 	nextId := generateId()
 	return &Action{
 		ID:            nextId,
@@ -33,13 +42,14 @@ func NewAction(name string, input json.Any) *Action {
 	}
 }
 
-func NewThingAction() *Action {
+func NewThingAction(thingId, actionName string, input interface{}) *Action {
 	return &Action{
 		ID:            0,
 		Name:          "",
 		Input:         nil,
 		Href:          "",
 		Status:        "",
+		ThingID:       thingId,
 		TimeRequested: time.Now().String(),
 		TimeCompleted: "",
 		Error:         "",
@@ -60,5 +70,6 @@ func (action *Action) updateStatus(newStatus string) {
 	if newStatus == "completed" {
 		action.TimeCompleted = time.Now().String()
 	}
+    event.FireAction(action)
 	action.Status = newStatus
 }

@@ -17,7 +17,6 @@ func NewNewThingsController(things *models.Things) *NewThingsController {
 	return &NewThingsController{things: things}
 }
 
-
 func (newThings *NewThingsController) HandleGetThing(c *gin.Context) {
 
 	newThings.things.GetNewThings()
@@ -30,11 +29,10 @@ func (newThings *NewThingsController) HandleGetThing(c *gin.Context) {
 }
 
 var upGrader = websocket.Upgrader{
-	CheckOrigin: func (r *http.Request) bool {
+	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
 }
-
 
 func (newThings *NewThingsController) HandleWebsocket(c *gin.Context) {
 
@@ -43,12 +41,15 @@ func (newThings *NewThingsController) HandleWebsocket(c *gin.Context) {
 	}
 	conn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		c.String(http.StatusBadGateway,err.Error())
+		c.String(http.StatusBadGateway, err.Error())
 		return
 	}
 	newThing := newThings.things.GetNewThings()
 	newThings.things.RegisterWebsocket(conn)
-	err = conn.WriteJSON(newThing)
+	for _, v := range newThing {
+		err = conn.WriteJSON(v)
+	}
+
 	if err != nil {
 		c.String(http.StatusBadGateway, fmt.Sprint("websocket err:", err.Error()))
 

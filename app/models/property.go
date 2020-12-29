@@ -1,12 +1,11 @@
 package models
 
 import (
+	"fmt"
 	"gateway/addons"
-	"gorm.io/gorm"
 )
 
 type Property struct {
-	gorm.Model
 	Name        string `json:"name"`
 	AtType      string `json:"@type"` //引用的类型
 	Type        string `json:"type"`  //数据的格式
@@ -14,20 +13,22 @@ type Property struct {
 	Description string `json:"description,omitempty"`
 
 	Unit     string `json:"unit,omitempty"` //属性的单位
-	ReadOnly bool   `json:"read_only"`
+	ReadOnly bool   `json:"readOnly"`
 	Visible  bool   `json:"visible"`
 
-	Minimum interface{} `json:"minimum,omitempty,string"`
-	Maximum interface{} `json:"maximum,omitempty,string"`
-	Value   interface{} `json:"value" gorm:"_"`
-	Enum    []interface{}
+	Minimum interface{}   `json:"minimum,omitempty,string"`
+	Maximum interface{}   `json:"maximum,omitempty,string"`
+	Value   interface{}   `json:"value" gorm:"_"`
+	Enum    []interface{} `json:"enum,omitempty"`
 
-	ThingID int
+	Links []string `json:"links"`
+	Href  string   `json:"href"`
+
+	ThingID string
 }
 
-func devPropToThingProp(p *addons.Property) *Property {
+func devPropToThingProp(p *addons.Property, deviceId string) *Property {
 	prop := &Property{
-		Model:       gorm.Model{},
 		Name:        p.Name,
 		AtType:      p.AtType,
 		Type:        p.Type,
@@ -40,6 +41,7 @@ func devPropToThingProp(p *addons.Property) *Property {
 		Maximum:     p.Maximum,
 		Value:       p.Value,
 		Enum:        p.Enum,
+		Href:        fmt.Sprintf("/things/%s/properties/%s", deviceId, p.Name),
 	}
 	return prop
 }

@@ -89,24 +89,24 @@ func CollectRoute(app *WebApp) *gin.Engine {
 		thingsGroup.GET("/", thingsController.HandleGetThings)
 
 		//get a thing
-		thingsGroup.GET("/:thing_id", thingsController.HandleGetThing)
+		thingsGroup.GET("/:thingId", thingsController.HandleGetThing)
 
 		//get the properties of a thing
-		thingsGroup.GET("/:thing_id/properties", thingsController.HandleGetProperties)
+		thingsGroup.GET("/:thingId/properties", thingsController.HandleGetProperties)
 
 		//get a property of a thing
-		thingsGroup.GET("/:thing_id/properties/:propertyName", thingsController.HandleGetProperty)
+		thingsGroup.GET("/:thingId/properties/:propertyName", thingsController.HandleGetProperty)
 
 		//set a property of a thing.
-		thingsGroup.PUT("/:thing_id/properties/:propertyName", thingsController.HandleSetProperty)
+		thingsGroup.PUT("/:thingId/properties/:propertyName", thingsController.HandleSetProperty)
 
-		// Modify a Thing.
-		thingsGroup.PUT("/:thing_id", thingsController.HandleSetThing)
+		// Modify a ThingInfo.
+		thingsGroup.PUT("/:thingId", thingsController.HandleSetThing)
 
 		thingsGroup.PATCH("/", thingsController.HandlePatchThings)
-		thingsGroup.PATCH("/:thing_id", thingsController.HandlePatchThing)
+		thingsGroup.PATCH("/:thingId", thingsController.HandlePatchThing)
 
-		thingsGroup.DELETE("/:thing_id", thingsController.HandleDeleteThing)
+		thingsGroup.DELETE("/:thingId", thingsController.HandleDeleteThing)
 	}
 
 	newThingsController := controllers.NewNewThingsController(app.things)
@@ -137,7 +137,6 @@ func CollectRoute(app *WebApp) *gin.Engine {
 	//actions Controller
 	actionsGroup := router.Group(ActionsPath)
 	{
-
 		actionsController := controllers.NewActionsController()
 		actionsGroup.POST("/", actionsController.HandleActions)
 		actionsGroup.DELETE("/:actionName/:actionId", actionsController.HandleActions)

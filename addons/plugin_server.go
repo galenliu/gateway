@@ -8,11 +8,11 @@ import (
 	"gateway/pkg/log"
 	json "github.com/json-iterator/go"
 	"go.uber.org/zap"
+	"strconv"
 	"sync"
 )
 
 const PATH = "/"
-const ADDR = ":9500"
 
 type PluginsServer struct {
 	Plugins      map[string]*Plugin
@@ -27,11 +27,11 @@ type PluginsServer struct {
 func NewPluginServer(manager *AddonsManager, _ctx context.Context) *PluginsServer {
 	server := &PluginsServer{}
 	server.ctx = _ctx
-	server.Plugins = make(map[string]*Plugin)
+	server.Plugins = make(map[string]*Plugin, 30)
 	server.locker = new(sync.Mutex)
 	server.addonManager = manager
 	ctx, _ := context.WithCancel(server.ctx)
-	server.ipc = NewIpcServer(ctx, ADDR, PATH)
+	server.ipc = NewIpcServer(ctx, ":"+strconv.Itoa(config.Conf.Ports["ipc"]), PATH)
 	return server
 }
 
@@ -46,10 +46,10 @@ func (s *PluginsServer) messageHandler(data []byte, c *Connection) {
 		s.registerHandler(data, c)
 	} else {
 		//获取Plugin，并且把消息交由对应的Plugin处理
-		packetName := json.Get(data,"data" ,"packetName").ToString()
-		plugin := s.getPlugin(packetName)
-		if plugin == nil{
-			log.Error(fmt.Sprintf("plugin: %s can not find",packetName))
+		pluginId := json.Get(data, "data", "pluginId").ToString()
+		plugin, ok := s.Plugins[pluginId]
+		if !ok {
+			log.Error(fmt.Sprintf("plugin(%s) can not find", pluginId))
 			return
 		}
 		plugin.OnMessage(data)
@@ -59,8 +59,8 @@ func (s *PluginsServer) messageHandler(data []byte, c *Connection) {
 func (s *PluginsServer) registerHandler(data []byte, c *Connection) {
 
 	pluginId := json.Get(data, "data", "pluginId").ToString()
-	plugin := s.getPlugin(pluginId)
-	if plugin == nil {
+	plugin, ok := s.Plugins[pluginId]
+	if !ok {
 		log.Error(fmt.Sprintf("plugin: %s no loading", pluginId))
 		return
 	}
@@ -81,9 +81,8 @@ func (s *PluginsServer) registerHandler(data []byte, c *Connection) {
 			Preferences: config.GetPreferences(),
 		},
 	}
-
 	data, _ = json.Marshal(m)
-	plugin.conn.send(data)
+	plugin.sendData(data)
 	plugin.registered = true
 	log.Info(fmt.Sprintf("plugin: %s registered", pluginId))
 }
@@ -114,10 +113,6 @@ func (s *PluginsServer) handleNewConnection(c *Connection) {
 	}
 }
 
-func (s *PluginsServer) sendMsg() {
-
-}
-
 func (s *PluginsServer) loadPlugin(packageId, exec string, enabled bool) {
 	plugin := s.registerPlugin(packageId, exec)
 	if enabled {
@@ -128,13 +123,13 @@ func (s *PluginsServer) loadPlugin(packageId, exec string, enabled bool) {
 }
 
 func (s *PluginsServer) uninstallPlugin(packageId string) {
-	pkg := s.getPlugin(packageId)
-	if pkg == nil {
-		return
-	} else {
-		pkg.Stop()
-		delete(s.Plugins, packageId)
+	plugin, ok := s.Plugins[packageId]
+	if !ok {
+		log.Error("plugin not exist")
 	}
+	plugin.Stop()
+	delete(s.Plugins, packageId)
+
 }
 
 func (s *PluginsServer) registerPlugin(packageId string, exec string) *Plugin {
@@ -163,6 +158,6 @@ func (s *PluginsServer) Start() {
 func (s *PluginsServer) Stop() {
 	close(s.ipc.wsChan)
 	for _, v := range s.Plugins {
-		v.cancelFunc()
+		v.Stop()
 	}
 }

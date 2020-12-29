@@ -15,7 +15,12 @@ func (proxy *PropertyProxy) getName() string {
 }
 
 func (proxy *PropertyProxy) setValue(value interface{}) {
-
+	proxy.device.adapter.sendMessage(DeviceSetPropertyCommand, struct {
+		AdapterId     string `json:"adapterId"`
+		DeviceId      string `json:"deviceId"`
+		PropertyName  string `json:"propertyName"`
+		PropertyValue interface{}
+	}{AdapterId: proxy.device.adapter.ID, DeviceId: proxy.device.ID, PropertyName: proxy.Name, PropertyValue: value})
 }
 
 func (proxy *PropertyProxy) AsDict() (d string) {
