@@ -1,13 +1,17 @@
 package event
 
 import (
-	"gateway/addons"
-	"gateway/app/models"
+	addon "gitee.com/liu_guilin/gateway-addon-golang"
 	"sync"
 )
 
-type OnPropertyValueChangedFunc func(value interface{})
-type OnDiscoverNewDeviceFunc func(addons.Device)
+type AdapterProxy interface {
+}
+
+type PropertyProxy interface {
+}
+type OnPropertyChangedFunc func(value interface{})
+type OnDiscoverNewDeviceFunc func(proxy addon.Device)
 type OnActionStatusFunc func()
 type RemoveFunc func()
 
@@ -17,8 +21,8 @@ var Bus *EventBus
 var eid int
 
 type EventBus struct {
-	OnPropertyValueChangedListener map[string]map[string]map[int]OnPropertyValueChangedFunc
-	OnDiscoverNewDeviceListener    map[int]OnDiscoverNewDeviceFunc
+	OnPropertyChangedListener   map[string]map[string]map[int]OnPropertyChangedFunc
+	OnDiscoverNewDeviceListener map[int]OnDiscoverNewDeviceFunc
 }
 
 func InitEventBus() {
@@ -26,23 +30,25 @@ func InitEventBus() {
 		func() {
 			eid = 0
 			Bus = &EventBus{
-				OnPropertyValueChangedListener: make(map[string]map[string]map[int]OnPropertyValueChangedFunc, 20),
-				OnDiscoverNewDeviceListener:    make(map[int]OnDiscoverNewDeviceFunc, 20),
+				OnPropertyChangedListener:   make(map[string]map[string]map[int]OnPropertyChangedFunc, 20),
+				OnDiscoverNewDeviceListener: make(map[int]OnDiscoverNewDeviceFunc, 20),
 			}
 		},
 	)
 
 }
 
-func FirePropertyValueChanged(deviceId, PropName string, value interface{}) {
-	for _, e := range Bus.OnPropertyValueChangedListener[deviceId][PropName] {
-		e(value)
-	}
+func FireAdapterAdded(adapter interface{}) {
+
 }
 
-func ListenPropertyValueChanged(deviceId, PropName string, f OnPropertyValueChangedFunc) func() {
+func FirePropertyChanged(property interface{}) {
+
+}
+
+func ListenPropertyValueChanged(deviceId, PropName string, f OnPropertyChangedFunc) func() {
 	eid++
-	var events = Bus.OnPropertyValueChangedListener[deviceId][PropName]
+	var events = Bus.OnPropertyChangedListener[deviceId][PropName]
 	events[eid] = f
 	removeFunc := func() {
 		delete(events, eid)
@@ -51,15 +57,15 @@ func ListenPropertyValueChanged(deviceId, PropName string, f OnPropertyValueChan
 }
 
 func ListenDiscoverNewDevice(f OnDiscoverNewDeviceFunc) func() {
-	eid++
-	Bus.OnDiscoverNewDeviceListener[eid] = f
+	//eid++
+	//Bus.OnDiscoverNewDeviceListener[eid] = f
 	removeFunc := func() {
-		delete(Bus.OnDiscoverNewDeviceListener, eid)
+		//delete(Bus.OnDiscoverNewDeviceListener, eid)
 	}
 	return removeFunc
 }
 
-func FireDiscoverNewDevice(device *addons.Device) {
+func FireDiscoverNewDevice(device *addon.Device) {
 	for _, f := range Bus.OnDiscoverNewDeviceListener {
 		f(*device)
 	}
@@ -69,6 +75,6 @@ func ListenAction() {
 
 }
 
-func FireAction(action *models.Action) {
+func FireAction() {
 
 }

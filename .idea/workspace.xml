@@ -20,44 +20,40 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9f4f53eb-6f7f-48b5-82a2-b5196c9afd72" name="默认的" comment="">
-      <change afterPath="$PROJECT_DIR$/app/models/event.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config/newThing.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config/thingSave.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/event/eventbus.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitmodules" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/addons/action_proxy.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gateway-addon-golang" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gateway-addon-golang/device_proxy.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gateway-addon-golang/property_proxy.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/addons/adapter.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/adapter.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/addons/adapter.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/addons/adapter_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/adapter_proxy.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/addons/addon_manager.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/addon_manager.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/addons/addon_test.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/addons/addon_util.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/addon_util.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/addons/device.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/device.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/addons/device.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/addons/device_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/device_proxy.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/addons/ipc_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/ipc_server.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/addons/plugin.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/plugin.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/addons/plugin_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/plugin_server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/addons/property.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/property.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/addons/property.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/addons/property_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/addons/property_proxy.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/controllers/actions_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/actions_controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/controllers/new_things_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/new_things_controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/controllers/things_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/things_controller.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/models/action.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/action.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/actions.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/actions.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/models/property.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/property.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/models/thing.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/thing.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/models/things.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/things.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/router.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/default.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/default.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core.go" beforeDir="false" afterPath="$PROJECT_DIR$/core.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eventbus.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/event/eventbus.go" beforeDir="false" afterPath="$PROJECT_DIR$/event/eventbus.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway-addon-golang/adapter.go" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-addon-golang/adapter.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway-addon-golang/addon_manager_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-addon-golang/addon_manager_proxy.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway-addon-golang/device.go" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-addon-golang/device.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway-addon-golang/device_info.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway-addon-golang/lighbulb.go" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-addon-golang/lighbulb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway-addon-golang/property.go" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-addon-golang/property.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/database/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/database/db.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/log/log.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/log/log.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/profile/config/database.sqlite3" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/properties/int.go" beforeDir="false" afterPath="$PROJECT_DIR$/properties/int.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/properties/constant.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/properties/int.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/properties/miot_property_type.json" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

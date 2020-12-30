@@ -15,21 +15,21 @@ import (
 const PATH = "/"
 
 type PluginsServer struct {
-	Plugins      map[string]*Plugin
-	locker       *sync.Mutex
-	addonManager *AddonsManager
-	ipc          *IpcServer
-	ctx          context.Context
-	verbose      bool
-	logger       **zap.Logger
+	Plugins map[string]*Plugin
+	locker  *sync.Mutex
+	manager *AddonManager
+	ipc     *IpcServer
+	ctx     context.Context
+	verbose bool
+	logger  **zap.Logger
 }
 
-func NewPluginServer(manager *AddonsManager, _ctx context.Context) *PluginsServer {
+func NewPluginServer(manager *AddonManager, _ctx context.Context) *PluginsServer {
 	server := &PluginsServer{}
 	server.ctx = _ctx
 	server.Plugins = make(map[string]*Plugin, 30)
 	server.locker = new(sync.Mutex)
-	server.addonManager = manager
+	server.manager = manager
 	ctx, _ := context.WithCancel(server.ctx)
 	server.ipc = NewIpcServer(ctx, ":"+strconv.Itoa(config.Conf.Ports["ipc"]), PATH)
 	return server
@@ -94,6 +94,10 @@ func (s *PluginsServer) getPlugin(pluginId string) *Plugin {
 	defer s.locker.Unlock()
 	p := s.Plugins[pluginId]
 	return p
+}
+
+func (s *PluginsServer)addAdapter(proxy *AdapterProxy){
+	s.manager.addAdapter(proxy)
 }
 
 //此处开启新协程，传入一个新的websocket连接,把读到的消息给MessageHandler

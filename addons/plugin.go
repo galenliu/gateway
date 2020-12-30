@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"gateway/pkg/log"
+	addon "gitee.com/liu_guilin/gateway-addon-golang"
 	json "github.com/json-iterator/go"
 	"io/ioutil"
 	"os/exec"
@@ -38,7 +39,7 @@ func NewPlugin(s *PluginsServer, pluginId string, exec string, _ctx context.Cont
 	plugin.pluginId = pluginId
 	plugin.pluginServer = s
 	plugin.adapters = make(map[string]*AdapterProxy, 30)
-	plugin.execPath = path.Join(s.addonManager.AddonsDir, pluginId)
+	plugin.execPath = path.Join(s.manager.AddonsDir, pluginId)
 	if _ctx != nil {
 		plugin.ctx = _ctx
 	} else {
@@ -59,9 +60,13 @@ func (plugin *Plugin) OnMessage(data []byte) {
 	//adapter add notify
 	case AdapterAddedNotification:
 		var name = json.Get(data, "data", "name").ToString()
-		var packetName = json.Get(data, "data", "packetName").ToString()
-		adapter := NewAdapterProxy(plugin.pluginServer.addonManager, plugin, adapterId, name, packetName)
+		var packetName = json.Get(data, "data", "packageName").ToString()
+		if packetName == "" {
+			return
+		}
+		adapter := NewAdapterProxy(plugin.pluginServer.manager, plugin, adapterId, name, packetName)
 		plugin.addAdapter(adapter)
+		plugin.pluginServer.addAdapter(adapter)
 		log.Info(fmt.Sprintf("adapter：%s added", adapterId))
 		break
 	}
@@ -72,39 +77,41 @@ func (plugin *Plugin) OnMessage(data []byte) {
 		log.Error("adapter(%s) not registered", adapterId)
 		return
 	}
+
 	switch messageType {
-	//add device
+	//add deviceProxy
 	case DeviceAddedNotification:
 		//messages.DeviceAddedNotification
 		deviceInfo := json.Get(data, "data", "device").ToString()
 
-		var dev Device
-		err := json.Unmarshal([]byte(deviceInfo), &dev)
+		var model NewDeviceModel
+		err := json.UnmarshalFromString(deviceInfo, &model)
 		if err != nil {
-			log.Info("device unmarshal err : %s", err.Error())
+			log.Info("deviceProxy unmarshal err : %s", err.Error())
 			return
 		}
-		device := NewDeviceProxy(adapter, &dev)
+		device := NewDeviceProxy(adapter, &model)
 		adapter.handlerDeviceAdded(device)
 		break
 
-	//device property changed notify
+	//deviceProxy property changed notify
 	case DevicePropertyChangedNotification:
 		deviceId := json.Get(data, "data", "deviceId").ToString()
-		device, ok := plugin.pluginServer.addonManager.devices[deviceId]
+		deviceProxy, ok := plugin.pluginServer.manager.devices[deviceId]
 		if !ok {
-			log.Info("device(%s) not find", deviceId)
+			log.Info("deviceProxy(%s) not find", deviceId)
 		}
 		propInfo := json.Get(data, "data", "property").ToString()
 		//var m messages.DevicePropertyChangedNotification
-		var newProp Property
+		var newProp addon.Property
 		_ = json.UnmarshalFromString(propInfo, &newProp)
-		prop, ok := device.Properties[newProp.Name]
+		propProxy, ok := deviceProxy.Properties[newProp.Name]
 		if !ok {
-			log.Info("device(%s) not find prop(%s)", deviceId, prop.Name)
+			log.Info("deviceProxy(%s) not find prop(%s)", deviceId, propProxy.Name)
 			return
 		}
-		prop.doPropertyChanged(&newProp)
+		propProxy.DoPropertyChanged(&newProp)
+		deviceProxy.notifyPropertyChanged(propProxy)
 		break
 	}
 }
@@ -113,11 +120,10 @@ func (plugin *Plugin) sendData(data []byte) {
 	plugin.conn.send(data)
 }
 
-func (plugin *Plugin) addAdapter(a *AdapterProxy) {
+func (plugin *Plugin) addAdapter(adapter *AdapterProxy) {
 	plugin.locker.Lock()
 	defer plugin.locker.Unlock()
-	plugin.adapters[a.ID] = a
-
+	plugin.adapters[adapter.ID] = adapter
 }
 
 func (plugin *Plugin) getAdapter(id string) *AdapterProxy {

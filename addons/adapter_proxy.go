@@ -3,34 +3,33 @@ package addons
 import (
 	"fmt"
 	"gateway/pkg/log"
+	addon "gitee.com/liu_guilin/gateway-addon-golang"
 	json "github.com/json-iterator/go"
 	"sync"
 )
 
 type AdapterProxy struct {
-	ID          string
-	PackageName string
-	Name        string
-	plugin      *Plugin
-	manager     *AddonsManager
-	looker      *sync.Mutex
-	manifest    interface{}
+	*addon.Adapter
+	plugin       *Plugin
+	addonManager *AddonManager
+	looker       *sync.Mutex
+	manifest     interface{}
 }
 
-func NewAdapterProxy(manager *AddonsManager, plugin *Plugin, adapterId string, name, packetName string) *AdapterProxy {
+func NewAdapterProxy(manager *AddonManager, plugin *Plugin, adapterId string, name, packageName string) *AdapterProxy {
 	proxy := &AdapterProxy{}
-
-	proxy.manager = manager
+	proxy.PackageName = packageName
 	proxy.plugin = plugin
+	proxy.addonManager = manager
 	proxy.ID = adapterId
-	proxy.Name = name
+	proxy.PackageName = name
 	proxy.looker = new(sync.Mutex)
-	proxy.PackageName = packetName
 	return proxy
 }
 
 func (adapter *AdapterProxy) handlerDeviceAdded(dev *DeviceProxy) {
-	adapter.manager.handlerDeviceAdded(dev)
+	adapter.addonManager.handlerDeviceAdded(dev)
+
 }
 
 func (adapter *AdapterProxy) removeThing(dev *DeviceProxy) {

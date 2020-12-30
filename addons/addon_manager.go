@@ -19,17 +19,19 @@ import (
 	"sync"
 )
 
-var addonsManager *AddonsManager
+var addonsManager *AddonManager
 
 type IEvent interface {
 	OnPropertyChanged(thingId, propName string, value interface{})
 }
 
-type AddonsManager struct {
-	configPath    string
-	pluginServer  *PluginsServer
+type AddonManager struct {
+	configPath   string
+	pluginServer *PluginsServer
+
 	devices       map[string]*DeviceProxy
-	installAddons map[string]*AddonInfo // {addonId: manifest}
+	adapters      map[string]*AdapterProxy
+	installAddons map[string]*AddonInfo
 
 	IsRunning bool
 	IsLoaded  bool
@@ -44,8 +46,8 @@ type AddonsManager struct {
 	locker    *sync.Mutex
 }
 
-func NewAddonsManager(ctx context.Context) (*AddonsManager, error) {
-	am := &AddonsManager{}
+func NewAddonsManager(ctx context.Context) (*AddonManager, error) {
+	am := &AddonManager{}
 	addonsManager = am
 	am.ctx = ctx
 	am.AddonsDir = config.Conf.AddonsDir
@@ -54,6 +56,7 @@ func NewAddonsManager(ctx context.Context) (*AddonsManager, error) {
 	am.IsRunning = false
 	am.devices = make(map[string]*DeviceProxy, 50)
 	am.installAddons = make(map[string]*AddonInfo, 50)
+	am.adapters = make(map[string]*AdapterProxy)
 
 	var c context.Context
 	c, am.pluginCancel = context.WithCancel(am.ctx)
@@ -66,7 +69,7 @@ func NewAddonsManager(ctx context.Context) (*AddonsManager, error) {
 	return am, nil
 }
 
-func (manager *AddonsManager) LoadAddons() error {
+func (manager *AddonManager) LoadAddons() error {
 
 	fs, err := ioutil.ReadDir(manager.AddonsDir)
 	if err != nil {
@@ -85,7 +88,7 @@ func (manager *AddonsManager) LoadAddons() error {
 	return nil
 }
 
-func (manager *AddonsManager) loadAddon(packageId string, enabled bool) error {
+func (manager *AddonManager) loadAddon(packageId string, enabled bool) error {
 	//db := database.GetDB()
 
 	addonInfo, err := LoadManifest(manager.AddonsDir, packageId)
@@ -97,7 +100,8 @@ func (manager *AddonsManager) loadAddon(packageId string, enabled bool) error {
 	if err != nil {
 		return err
 	}
-	err =addonInfo.UpdateOrCreateFormDb();if err !=nil{
+	err = addonInfo.UpdateOrCreateFormDb()
+	if err != nil {
 		return err
 	}
 	manager.installAddons[packageId] = addonInfo
@@ -106,20 +110,27 @@ func (manager *AddonsManager) loadAddon(packageId string, enabled bool) error {
 	return nil
 }
 
-func (manager *AddonsManager) unloadAddon(packageId string) error {
+func (manager *AddonManager) unloadAddon(packageId string) error {
 
 	return nil
 }
 
-func (manager *AddonsManager) handlerDeviceAdded(dev *DeviceProxy) {
+func (manager *AddonManager) handlerDeviceAdded(dev *DeviceProxy) {
 	if dev.ID != "" {
 		manager.devices[dev.ID] = dev
 	}
 	event.FireDiscoverNewDevice(dev.Device)
 }
 
+func (manager *AddonManager) addAdapter(proxy *AdapterProxy) {
+	manager.locker.Lock()
+	defer manager.locker.Unlock()
+	manager.adapters[proxy.ID] = proxy
+	event.FireAdapterAdded(proxy)
+}
+
 // get package from url, checksum
-func (manager *AddonsManager) InstallAddonFromUrl(id, url, checksum string, enabled bool) error {
+func (manager *AddonManager) InstallAddonFromUrl(id, url, checksum string, enabled bool) error {
 
 	destPath := path.Join(os.TempDir(), id+".tar.gz")
 	log.Info(fmt.Sprintf("fetching add-on %s as %s", url, destPath))
@@ -141,7 +152,7 @@ func (manager *AddonsManager) InstallAddonFromUrl(id, url, checksum string, enab
 }
 
 //tar package to addon from the temp dir,
-func (manager *AddonsManager) installAddon(packageId, packagePath string, enabled bool) error {
+func (manager *AddonManager) installAddon(packageId, packagePath string, enabled bool) error {
 
 	log.Info(fmt.Sprintf("start instll package id: %s ", packageId))
 	f, _ := os.Open(packagePath)
@@ -177,16 +188,16 @@ func (manager *AddonsManager) installAddon(packageId, packagePath string, enable
 
 }
 
-func (manager *AddonsManager) GetInstallAddons() map[string]interface{} {
+func (manager *AddonManager) GetInstallAddons() map[string]interface{} {
 	return nil
 }
 
-func (manager *AddonsManager) Start() {
+func (manager *AddonManager) Start() {
 	go manager.pluginServer.Start()
 	manager.IsRunning = true
 }
 
-func (manager *AddonsManager) Stop() {
+func (manager *AddonManager) Stop() {
 	//停止
 	manager.pluginServer.Stop()
 	manager.IsRunning = false
@@ -237,22 +248,24 @@ func DisableAddon(addonId string) error {
 	return nil
 }
 
-func GetThings() map[string]*DeviceProxy {
-	return addonsManager.devices
+func GetThings() []*DeviceProxy {
+	var devs = make([]*DeviceProxy, len(addonsManager.devices))
+	for _, proxy := range addonsManager.devices {
+		devs = append(devs, proxy)
+	}
+	return devs
 }
 
 func InstallAddonFromUrl(id, url, checksum string, enabled bool) {
 	_ = addonsManager.InstallAddonFromUrl(id, url, checksum, enabled)
 }
 
-func SetThingProperty(thingId, propName string, value interface{}) (interface{}, error) {
+func SetDeviceProperty(thingId, propName string, value interface{}) (interface{}, error) {
 	device, ok := addonsManager.devices[thingId]
 	if !ok {
 		return value, fmt.Errorf("invalid thingId")
 	}
-
 	return device.SetProperty(propName, value)
-
 }
 
 func AddNewThing(pairingTimeout int) error {

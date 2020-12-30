@@ -55,9 +55,9 @@ func (t *Thing) SetSelectedCapability(selectedCapability string) {
 	t.SelectedCapability = selectedCapability
 }
 
-func deviceToThing(devices map[string]*addons.DeviceProxy) map[string]*ThingInfo {
+func deviceToThing(devices []*addons.DeviceProxy) map[string]*ThingInfo {
 	var thingsMap = make(map[string]*ThingInfo)
-	for key, dev := range devices {
+	for _, dev := range devices {
 		thing := &ThingInfo{
 			ID:                  dev.ID,
 			AtContext:           dev.AtContext,
@@ -73,11 +73,11 @@ func deviceToThing(devices map[string]*addons.DeviceProxy) map[string]*ThingInfo
 
 		var props = make(map[string]*Property)
 		for _, p := range dev.Properties {
-			thingProp := devPropToThingProp(p.Property, thing.ID)
+			thingProp := devPropToThingProp(p, thing.ID)
 			props[thingProp.Name] = thingProp
 		}
 		thing.Properties = props
-		thingsMap[key] = thing
+		thingsMap[dev.ID] = thing
 	}
 	return thingsMap
 }

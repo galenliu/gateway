@@ -3,7 +3,6 @@ module gateway
 go 1.15
 
 require (
-	gitee.com/liu_guilin/WebThings-schema v1.0.0
 	github.com/asaskevich/govalidator v0.0.0-20200907205600-7a23bdc65eef
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.6.3
@@ -22,7 +21,8 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
 	gorm.io/driver/sqlite v1.1.4
 	gorm.io/gorm v1.20.7
+	gitee.com/liu_guilin/gateway-addon-golang v1.0.0
 
 )
 
-replace gitee.com/liu_guilin/WebThings-schema v1.0.0 => ../gateway-schema
+replace gitee.com/liu_guilin/gateway-addon-golang v1.0.0 => ./gateway-addon-golang

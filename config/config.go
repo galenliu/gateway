@@ -6,12 +6,15 @@ import (
 	"gateway/pkg/database"
 	"gateway/pkg/log"
 	"gateway/pkg/util"
-	"gateway/properties"
 	"gopkg.in/yaml.v3"
 	"gorm.io/gorm"
 	"io/ioutil"
 	"path"
 	"time"
+)
+
+const (
+	UnitCelsius = "celsius"
 )
 
 var Conf *Config
@@ -71,7 +74,7 @@ func UpdateOrCreatePreferences(pref *Preferences) error {
 		p = Preferences{
 			Name: "preferences",
 			Language: "zh-cn",
-			Units:    Units{Temperature: properties.UnitCelsius},
+			Units:    Units{Temperature: UnitCelsius},
 		}
 		db.Create(&p)
 	}

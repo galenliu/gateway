@@ -70,6 +70,6 @@ func (action *Action) updateStatus(newStatus string) {
 	if newStatus == "completed" {
 		action.TimeCompleted = time.Now().String()
 	}
-    event.FireAction(action)
+    event.FireAction()
 	action.Status = newStatus
 }

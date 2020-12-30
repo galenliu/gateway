@@ -5,6 +5,7 @@ import (
 	"gateway/addons"
 	"gateway/event"
 	"gateway/pkg/database"
+	addon "gitee.com/liu_guilin/gateway-addon-golang"
 	"github.com/gorilla/websocket"
 	"sync"
 )
@@ -64,7 +65,7 @@ func (ts *Things) GetNewThings() map[string]*ThingInfo {
 	return thingsMap
 }
 
-func (ts *Things) HandleNewThing(device addons.Device) {
+func (ts *Things) HandleNewThing(device addon.Device) {
 	for i, c := range ts.websockets {
 		err := c.WriteJSON(device)
 		if err != nil {
@@ -95,7 +96,7 @@ func (ts *Things) GetThingProperty(thingId, propName string) *Property {
 }
 
 func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) (interface{}, error) {
-	return addons.SetThingProperty(thingId, propName, value)
+	return addons.SetDeviceProperty(thingId, propName, value)
 }
 
 func (ts *Things) RemoveThing(thingId string) error {

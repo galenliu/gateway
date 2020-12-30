@@ -27,7 +27,7 @@ type Property struct {
 	ThingID string
 }
 
-func devPropToThingProp(p *addons.Property, deviceId string) *Property {
+func devPropToThingProp(p *addons.PropertyProxy, deviceId string) *Property {
 	prop := &Property{
 		Name:        p.Name,
 		AtType:      p.AtType,

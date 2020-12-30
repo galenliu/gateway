@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"gateway/pkg/database"
 	"gateway/pkg/log"
-	jsoniter "github.com/json-iterator/go"
+	json "github.com/json-iterator/go"
 	"gorm.io/gorm"
 	"io/ioutil"
 	"path"
@@ -195,6 +195,6 @@ func loadManifestJson(dirName string) (addonManifest *AddonManifest, err error) 
 	f, err := ioutil.ReadFile(path.Join(dirName, ManifestFileJson))
 
 	var manifest AddonManifest
-	err = jsoniter.Unmarshal(f, &manifest)
+	err = json.Unmarshal(f, &manifest)
 	return &manifest, err
 }
