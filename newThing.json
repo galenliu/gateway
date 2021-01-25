@@ -1,0 +1,62 @@
+{
+  "title": "Yeelight Bulb",
+  "@type": [
+    "Light",
+    "OnOffSwitch"
+  ],
+  "id": "0x0000000010e2fa00",
+  "properties": {
+    "ColorMode": {
+      "@type": "ColorModeProperty",
+      "type": "integer",
+      "name": "ColorMode",
+      "read_only": true,
+      "visible": true,
+      "value": "HSV"
+    },
+    "ColorProperty": {
+      "@type": "ColorProperty",
+      "type": "string",
+      "name": "ColorProperty",
+      "read_only": false,
+      "visible": true,
+      "value": 30
+    },
+    "brightness": {
+      "@type": "BrightnessProperty",
+      "type": "integer",
+      "name": "brightness",
+      "read_only": false,
+      "visible": true,
+      "minimum": 0,
+      "maximum": 100,
+      "value": 100
+    },
+    "ct": {
+      "@type": "ColorTemperatureProperty",
+      "type": "integer",
+      "name": "ct",
+      "unit": "kelvin",
+      "read_only": false,
+      "visible": true,
+      "minimum": 170000,
+      "maximum": 680000,
+      "value": 1700
+    },
+    "on": {
+      "@type": "OnOffProperty",
+      "type": "boolean",
+      "name": "on",
+      "read_only": false,
+      "visible": true,
+      "value": true
+    }
+  },
+  "actions": {},
+  "evnets": null,
+  "pin": {
+    "Required": false,
+    "Pattern": null
+  },
+  "selectedCapability": "Light"
+}

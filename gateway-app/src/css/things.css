@@ -1,0 +1,356 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+#add-thing-content {
+    text-align: center;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    max-height: 100%;
+}
+
+#add-adapters-hint.hidden,
+#add-thing-status.hidden {
+    display: none;
+}
+
+#add-adapters-hint-anchor:link,
+#add-adapters-hint-anchor:visited,
+#add-adapters-hint-anchor:hover,
+#add-adapters-hint-anchor:active {
+    color: #fff;
+}
+
+.new-thing-custom-icon-label {
+    -moz-appearance: button;
+    font-size: 1.5rem;
+}
+
+.new-thing-custom-icon-label,
+.new-web-thing-cancel-button,
+.new-web-thing-submit-button,
+.new-web-thing-save-button,
+.new-thing-cancel-button,
+.new-thing-submit-button,
+.new-thing-save-button {
+    height: 4rem;
+    background-color: #7f93a1;
+    margin: 1.25rem 0;
+}
+
+.new-thing-custom-icon-input:disabled + label,
+.new-thing-custom-icon-input:disabled:hover + label,
+.new-thing-custom-icon-input:hover:active + label,
+.new-web-thing-cancel-button:disabled,
+.new-web-thing-cancel-button:disabled:hover,
+.new-web-thing-cancel-button:hover:active,
+.new-web-thing-submit-button:disabled,
+.new-web-thing-submit-button:disabled:hover,
+.new-web-thing-submit-button:hover:active,
+.new-web-thing-save-button:disabled,
+.new-web-thing-save-button:disabled:hover,
+.new-web-thing-save-button:hover:active,
+.new-thing-cancel-button:disabled,
+.new-thing-cancel-button:disabled:hover,
+.new-thing-cancel-button:hover:active,
+.new-thing-submit-button:disabled,
+.new-thing-submit-button:disabled:hover,
+.new-thing-submit-button:hover:active,
+.new-thing-save-button:disabled,
+.new-thing-save-button:disabled:hover,
+.new-thing-save-button:hover:active {
+    background-color: #597285;
+}
+
+.spinner {
+    width: 3.2rem;
+    height: 3.2rem;
+    margin: 1rem;
+    vertical-align: middle;
+}
+
+#new-things {
+    position: absolute;
+    margin: 2rem auto;
+    overflow: scroll;
+    width: 100%;
+    max-height: 100%;
+}
+
+#property-item {
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+#thing-card{
+
+}
+
+#things-view {
+    margin-top: 10rem;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#thing-add-view {
+    overflow: scroll;
+}
+
+
+.new-thing {
+    width: 50%;
+    min-width: 28rem;
+    max-width: 65rem;
+    margin: 1rem auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: row;
+    border-radius: 0.5rem;
+}
+
+.new-thing:not(.custom-thing) .new-thing-icon {
+    width: 6.2rem;
+    height: 6.2rem;
+    background-size: 3.2rem;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: #ffffff64;
+    border: 0.1rem solid white;
+    border-radius: 3.2rem;
+}
+
+.new-thing-metadata {
+    flex: 1;
+    padding: 1rem 1rem 0 1rem;
+    text-align: left;
+}
+
+.new-web-thing-url,
+.new-web-thing-title,
+.new-thing-initial-title,
+.new-thing-credentials-error,
+.new-thing-pin-error,
+.new-thing-title {
+    display: block;
+    width: calc(100% - 1rem);
+}
+
+.new-thing-username,
+.new-thing-password,
+.new-thing-pin {
+    width: 14rem;
+}
+
+.new-web-thing-url:disabled,
+.new-web-thing-title:disabled,
+.new-thing-title:disabled {
+    background-color: #597285;
+    color: #fff;
+    padding: 0;
+}
+
+.new-thing-type {
+    display: inline-block;
+    text-align: left;
+    color: #fff;
+    background-color: #7f93a1;
+    margin: 1rem 0;
+    font-size: 1.5rem;
+    width: 50%;
+    border: none;
+    border-radius: 0.5rem;
+    height: 4rem;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url('../images/select-arrow.svg');
+    background-repeat: no-repeat;
+    background-size: 1.25rem;
+    background-position: calc(100% - 1rem);
+    padding-left: 1rem;
+}
+
+.new-thing-label,
+.new-web-thing-label {
+    display: block;
+    text-align: left;
+    color: #ccc;
+    margin: 1rem 0;
+    font-size: 1.5rem;
+}
+
+.new-thing-credentials-error,
+.new-thing-pin-error,
+.new-thing-label.error,
+.new-web-thing-label.error {
+    color: orange;
+}
+
+.new-web-thing-origin {
+    display: block;
+    color: #ccc;
+    font-size: 1.3rem;
+}
+
+
+.new-thing.credentials-required .new-thing-icon,
+.new-thing.pin-required .new-thing-icon {
+    background-image: url('../images/thing-icons/pin_required_icon.svg');
+}
+
+.new-thing.web-thing .new-thing-icon {
+    background-image: url('../images/thing-icons/web_thing_icon.svg');
+}
+
+.new-thing.on-off-switch .new-thing-icon {
+    background-image: url('../images/thing-icons/on_off_switch.svg');
+}
+
+.new-thing.multi-level-switch .new-thing-icon {
+    background-image: url('../images/thing-icons/multi_level_switch.svg');
+}
+
+.new-thing-custom-icon-input {
+    display: none;
+}
+
+.new-thing.custom-thing .new-thing-icon {
+    background-image: url('../images/thing-icons/web_thing_icon.svg');
+}
+
+.new-thing.binary-sensor .new-thing-icon {
+    background-image: url('../images/thing-icons/binary_sensor.svg');
+}
+
+.new-thing.multi-level-sensor .new-thing-icon,
+.new-thing.humidity-sensor .new-thing-icon,
+.new-thing.air-quality-sensor .new-thing-icon,
+.new-thing.barometric-pressure-sensor .new-thing-icon {
+    background-image: url('../images/thing-icons/multi_level_sensor.svg');
+}
+
+.new-thing.light .new-thing-icon {
+    background-image: url('../images/thing-icons/light.svg');
+}
+
+.new-thing.smart-plug .new-thing-icon {
+    background-image: url('../images/thing-icons/smart_plug.svg');
+}
+
+.new-thing.color-sensor .new-thing-icon,
+.new-thing.color-control .new-thing-icon {
+    background-image: url('../images/thing-icons/color_control.svg');
+}
+
+.new-thing.energy-monitor .new-thing-icon {
+    background-image: url('../images/thing-icons/energy_monitor.svg');
+}
+
+.new-thing.door-sensor .new-thing-icon {
+    background-image: url('../images/thing-icons/door_sensor.svg');
+}
+
+.new-thing.motion-sensor .new-thing-icon {
+    background-image: url('../images/thing-icons/motion_sensor.svg');
+}
+
+.new-thing.leak-sensor .new-thing-icon {
+    background-image: url('../images/thing-icons/leak_sensor.svg');
+}
+
+.new-thing.push-button .new-thing-icon {
+    background-image: url('../images/thing-icons/push_button.svg');
+}
+
+.new-thing.video-camera .new-thing-icon {
+    background-image: url('../images/thing-icons/video_camera.svg');
+}
+
+.new-thing.temperature-sensor .new-thing-icon {
+    background-image: url('../images/thing-icons/temperature_sensor.svg');
+}
+
+.new-thing.camera .new-thing-icon {
+    background-image: url('../images/thing-icons/camera.svg');
+}
+
+.new-thing.alarm .new-thing-icon {
+    background-image: url('../images/thing-icons/alarm.svg');
+}
+
+.new-thing.thermostat .new-thing-icon {
+    background-image: url('../images/thing-icons/thermostat.svg');
+}
+
+.new-thing.lock .new-thing-icon {
+    background-image: url('../images/thing-icons/lock.svg');
+}
+
+#add-by-url-anchor:link,
+#add-by-url-anchor:visited,
+#add-by-url-anchor:hover,
+#add-by-url-anchor:active {
+    color: #ccc;
+}
+
+#add-by-url-anchor.hidden,
+.new-thing-credentials-error.hidden,
+.new-thing-pin-error.hidden,
+.new-thing-label.hidden,
+.new-web-thing-label.hidden,
+.new-thing-type.hidden,
+.new-thing .hidden {
+    display: none;
+}
+
+.new-web-thing-controls {
+    text-align: right;
+    margin-top: -1rem;
+}
+
+@media only screen and (max-width: 800px) {
+    .new-thing-spacer {
+        display: block;
+        margin-top: 1rem;
+    }
+
+    .new-thing-type {
+        width: 100%;
+    }
+
+    .new-web-thing-controls {
+        margin-top: 0;
+    }
+}
+
+@media only screen and (max-width: 580px) {
+    .new-thing-username,
+    .new-thing-password,
+    .new-thing-pin {
+        width: 6rem;
+    }
+}
+
+@media only screen and (min-width: 580px) and (max-width: 610px) {
+    .new-thing-username,
+    .new-thing-password,
+    .new-thing-pin {
+        width: 8rem;
+    }
+}
+
+@media only screen and (min-width: 610px) and (max-width: 660px) {
+    .new-thing-username,
+    .new-thing-password,
+    .new-thing-pin {
+        width: 10rem;
+    }
+}
+
+@media only screen and (min-width: 660px) and (max-width: 700px) {
+    .new-thing-username,
+    .new-thing-password,
+    .new-thing-pin {
+        width: 12rem;
+    }
+}

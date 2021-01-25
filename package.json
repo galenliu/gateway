@@ -1,0 +1,58 @@
+{
+  "messageType": 8192,
+  "data": {
+    "pluginId": "yeelight-adapter",
+    "adapterId": "yeelight-adapter",
+    "device": {
+      "title": "Yeelight",
+      "@type": [
+        "Light",
+        "OnOffSwitch"
+      ],
+      "id": "yee-light",
+      "properties": {
+        "ColorMode": {
+          "@type": "ColorModeProperty",
+          "type": "integer",
+          "name": "ColorMode",
+          "read_only": true,
+          "visible": true,
+          "Value": "temperature",
+          "device": null
+        },
+        "brightness": {
+          "@type": "BrightnessProperty",
+          "type": "integer",
+          "name": "brightness",
+          "read_only": false,
+          "visible": true,
+          "minimum": "0",
+          "maximum": "100",
+          "Value": 100,
+          "device": null
+        },
+        "ct": {
+          "@type": "ColorProperty",
+          "type": "string",
+          "name": "ct",
+          "read_only": false,
+          "visible": true,
+          "Value": 0,
+          "device": null
+        },
+        "on": {
+          "@type": "OnOffProperty",
+          "type": "boolean",
+          "name": "on",
+          "read_only": false,
+          "visible": true,
+          "Value": true,
+          "device": null
+        }
+      },
+      "actions": {}
+    }
+  }
+}
+
+

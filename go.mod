@@ -1,14 +1,17 @@
 module gateway
 
-go 1.15
+go 1.16
 
 require (
-	github.com/asaskevich/govalidator v0.0.0-20200907205600-7a23bdc65eef
+	addon v1.0.0
+	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.6.3
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/gorilla/websocket v1.4.2
 	github.com/json-iterator/go v1.1.10
+	github.com/lib/pq v1.9.0
+	github.com/mattn/go-sqlite3 v1.14.5
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -21,8 +24,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
 	gorm.io/driver/sqlite v1.1.4
 	gorm.io/gorm v1.20.7
-	gitee.com/liu_guilin/gateway-addon-golang v1.0.0
 
 )
 
-replace gitee.com/liu_guilin/gateway-addon-golang v1.0.0 => ./gateway-addon-golang
+replace addon v1.0.0 => ../addon

@@ -5,9 +5,7 @@
 *.so
 *.dylib
 
-/frp
-/web-app/node_modules
-/web-app/z-vue3-ui
+/gateway-app/node_modules
 # Test binary, built with `go test -c`
 *.test
 

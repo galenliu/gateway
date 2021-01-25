@@ -11,15 +11,6 @@ import (
 	"strings"
 )
 
-type Info struct {
-	Name             string
-	SerialNumber     string
-	Manufacturer     string
-	Model            string
-	FirmwareRevision string
-	ID               uint64
-}
-
 func EnsureDir(baseDir string, dirs ...string) error {
 	_, err := ioutil.ReadDir(baseDir)
 	if os.IsNotExist(err) {

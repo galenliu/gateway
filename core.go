@@ -3,25 +3,22 @@ package gateway
 import (
 	"context"
 	"fmt"
-	"gateway/addons"
-	"gateway/app"
 	"gateway/config"
-	"gateway/event"
 	"gateway/pkg/log"
+	"gateway/plugin"
+	"gateway/server"
 	"time"
 )
 
 //gateway strut
 type HomeGateway struct {
 	Preferences   *config.Preferences
-	EventsBus     *event.EventBus
-	AddonsManager *addons.AddonManager
-	Web           *app.WebApp
+	AddonsManager *plugin.AddonManager
+	Web           *server.WebApp
 	Ctx           context.Context
 }
 
 func NewGateway() (gateway *HomeGateway, err error) {
-
 
 	gateway = &HomeGateway{}
 	gateway.Ctx = context.Background()
@@ -30,9 +27,8 @@ func NewGateway() (gateway *HomeGateway, err error) {
 	return gateway, err
 }
 
-
 func (gateway *HomeGateway) Start() error {
-	event.InitEventBus()
+
 	log.Info("gateway start.....")
 	go gateway.Web.Start()
 	go gateway.AddonsManager.Start()
@@ -46,8 +42,6 @@ func (gateway *HomeGateway) Start() error {
 	}
 }
 
-
 func (gateway *HomeGateway) Close() {
 	gateway.Ctx.Done()
 }
-

@@ -1,0 +1,431 @@
+#domain-settings-link {
+    background-image: url('../images/domain-icon.png');
+}
+
+#domain-settings-local-link {
+    background-image: url('../images/domain-icon.png');
+}
+
+#network-settings-link {
+    background-image: url('../images/network.svg');
+}
+
+#user-settings-link {
+    background-image: url('../images/users-icon.png');
+}
+
+#adapter-settings-link {
+    background-image: url('../images/adapters-icon.png');
+}
+
+#addon-settings-link {
+    background-image: url('../images/add-on.svg');
+}
+
+#experiment-settings-link {
+    background-image: url('../images/experiments-icon.png');
+}
+
+#localization-settings-link {
+    background-image: url('../images/localization-icon.svg');
+}
+
+#update-settings-link {
+    background-image: url('../images/update-icon.svg');
+}
+
+#authorization-settings-link {
+    background-image: url('../images/authorization.svg');
+}
+
+#developer-settings-link {
+    background-image: url('../images/developer-icon.svg');
+}
+
+.settings-section {
+    position: absolute;
+    top: 50%;
+    transform: translate(0%, -50%);
+    display: block;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.25s ease;
+    padding: 0;
+    padding-bottom: 9.6rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+#settings-menu ul {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 60rem;
+    margin: 0 auto;
+    padding: 0 2rem 2rem 2rem;
+}
+
+.settings-item {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    background-color: #5288af;
+    border-radius: 0.5rem;
+    background-image: url('../images/right-arrow.png');
+    background-size: auto 2rem;
+    background-repeat: no-repeat;
+    background-position: right 2.8rem center;
+}
+
+.developer-link-item a,
+.settings-item a {
+    display: block;
+    margin: 1rem 0;
+    padding: 2rem 2rem 2rem 5.5rem;
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.8rem;
+    background-position: 1rem;
+    background-size: 3.2rem;
+    background-repeat: no-repeat;
+    outline: 0;
+}
+
+/* settings 顶层容器 */
+#settings-menu {
+    position: fixed;
+    padding: 5rem;
+}
+
+
+.addon-settings-header {
+    padding: 2rem 2rem 0.5rem 6.5rem;
+    background-size: 4rem;
+    background-repeat: no-repeat;
+    background-position: 1.8rem 2.8rem;
+}
+
+
+.addon-settings-header {
+    padding: 2rem 2rem 0.5rem 6.5rem;
+    background-size: 4rem;
+    background-repeat: no-repeat;
+    background-position: 1.8rem 2.8rem;
+}
+
+.user-settings-header {
+    background-image: url('../images/user.svg');
+}
+
+.adapter-settings-header {
+    background-image: url('../images/adapters-icon.png');
+}
+
+.addon-settings-header,
+.addon-settings-header.extension {
+    background-image: url('../images/add-on.svg');
+}
+
+.addon-settings-header.adapter {
+    background-image: url('../images/adapters-icon.png');
+}
+
+.addon-settings-header.notifier {
+    background-image: url('../images/thing-icons/notification.svg');
+}
+
+.addon-settings-header.service {
+    /* TODO */
+}
+
+.user-settings-name,
+.adapter-settings-name {
+    display: block;
+}
+
+.addon-settings-version {
+    float: right;
+}
+
+.settings-section {
+    position: absolute;
+    top: 50%;
+    transform: translate(0%, -50%);
+    display: block;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.25s ease;
+    padding: 0;
+    padding-bottom: 9.6rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+/*每一个设置项的样式*/
+.settings-subsection {
+    display: block;
+    overflow: auto;
+}
+
+.addon-updating {
+    margin-right: 0.8rem;
+}
+
+.user-settings-description,
+.adapter-settings-description,
+.addon-settings-description,
+.domain-settings-description {
+    display: block;
+    color: #ccc;
+}
+
+.addon-settings-license,
+.addon-settings-author {
+    font-size: 1.4rem;
+    font-style: italic;
+}
+
+.settings-section {
+    position: absolute;
+    top: 50%;
+    transform: translate(0%, -50%);
+    display: block;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.25s ease;
+    padding: 0;
+    padding-bottom: 9.6rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+#settings-view {
+    background-color: #5d9bc7;
+    height: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+#discovered-addons-list {
+    overflow: auto;
+}
+
+#back-button {
+    background-image: url('../images/back.png');
+}
+
+.addon-settings-name {
+    color: #282c34;
+}
+
+
+#addon-main-settings ul,
+#addon-discovery-container,
+#developer-settings ul {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 60rem;
+    padding: 9.6rem 2rem;
+    max-height: 100%;
+}
+
+
+#discover-addons-button {
+    background-image: url('../images/add.svg');
+}
+
+
+.network-item,
+.wireless-network-item,
+.user-item,
+.adapter-item,
+.addon-item,
+.authorization-item,
+.discovered-addon-item,
+.domain-item {
+    display: block;
+    font-size: 1.8rem;
+    list-style-type: none;
+    color: #fff;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    border: #5d9bc7 solid 1px;
+}
+
+.addon-settings-update.hidden {
+    display: none;
+}
+
+.adapter-settings-disable,
+.addon-settings-disable {
+    background-image: url('../images/disable.svg');
+}
+
+.adapter-settings-enable,
+.addon-settings-enable {
+    background-image: url('../images/enable.svg');
+}
+
+.user-settings-edit {
+    background-image: url('../images/edit-plain.svg');
+}
+
+
+.addon-settings-remove,
+.user-settings-remove {
+    margin-right: 0.8rem;
+    background-image: url('../images/remove.svg');
+}
+
+#addon-discovery-settings.hidden,
+#addon-main-settings.hidden {
+    display: none;
+}
+
+
+.network-settings-list-item-button,
+.user-settings-edit,
+.user-settings-remove,
+.adapter-settings-disable,
+.adapter-settings-enable,
+.addon-settings-config,
+.addon-settings-update,
+.addon-settings-disable,
+.addon-settings-enable,
+.addon-settings-remove,
+.domain-settings-update {
+    background-color: #48779a;
+}
+
+.addon-discovery-settings-add {
+    background-color: #7f93a1;
+    background-image: url('../images/new.svg');
+}
+
+.addon-settings-config {
+    background-size: 2rem;
+    background-repeat: no-repeat;
+    background-position: 0.5em;
+    padding-left: 4rem;
+    margin-right: 0.8rem;
+    background-image: url('../images/settings-icon.png');
+}
+
+
+.network-settings-list-item-button,
+.user-settings-edit,
+.user-settings-remove,
+.adapter-settings-disable,
+.adapter-settings-enable,
+.addon-settings-disable,
+.addon-settings-enable,
+.addon-discovery-settings-add,
+.addon-discovery-settings-installing,
+.addon-discovery-settings-install-failed,
+.addon-settings-remove {
+    background-size: 2rem;
+    background-repeat: no-repeat;
+    background-position: 0.5em;
+    padding-left: 4rem;
+}
+
+.addon-settings-update {
+    background-size: 2rem;
+    background-repeat: no-repeat;
+    background-position: 0.5em;
+    padding-left: 4rem;
+    margin-right: 0.8rem;
+    background-image: url('../images/update-icon.svg');
+}
+
+
+.adapter-settings-disable,
+.adapter-settings-enable,
+.addon-settings-disable,
+.addon-settings-enable,
+.addon-discovery-settings-add,
+.addon-discovery-settings-installing,
+.addon-discovery-settings-install-failed,
+.addon-settings-remove {
+    background-size: 2rem;
+    background-repeat: no-repeat;
+    background-position: 0.5em;
+    padding-left: 4rem;
+}
+
+#addon-settings {
+    overflow: scroll;
+}
+
+.network-item,
+.wireless-network-item,
+.user-item,
+.adapter-item,
+.addon-item,
+.authorization-item,
+.discovered-addon-item,
+.domain-item {
+    display: block;
+    font-size: 1.8rem;
+    list-style-type: none;
+    color: #fff;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.network-item,
+.wireless-network-item,
+.user-item,
+.adapter-item,
+.addon-item,
+.authorization-item,
+.domain-item {
+    background-color: #5288af;
+}
+
+.network-settings-list-item-button,
+.user-settings-edit,
+.user-settings-remove,
+.adapter-settings-disable,
+.adapter-settings-enable,
+.addon-settings-disable,
+.addon-settings-enable,
+.addon-discovery-settings-add,
+.addon-discovery-settings-installing,
+.addon-discovery-settings-install-failed,
+.addon-settings-remove {
+    background-size: 2rem;
+    background-repeat: no-repeat;
+    background-position: 0.5em;
+    padding-left: 4rem;
+}
+
+.addon-settings-header,
+.addon-settings-header.extension {
+    background-image: url('../images/add-on.svg');
+}
+
+.addon-settings-header.adapter {
+    background-image: url('../images/adapters-icon.png');
+}
+
+.addon-settings-header.notifier {
+    background-image: url('../images/thing-icons/notification.svg');
+}
+
+.wireless-network-item,
+.discovered-addon-item {
+    background-color: #597285;
+}
+
+.user-settings-controls,
+.adapter-settings-controls,
+.addon-settings-controls {
+    padding: 0 1rem 1rem 1rem;
+    text-align: right;
+}
+
+
