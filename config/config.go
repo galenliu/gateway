@@ -80,8 +80,9 @@ type Config struct {
 
 	AddonManager addonManger `yaml:"addonManager"`
 
-	RemoveBeforeOpen bool `yaml:"removeBeforeOpen"`
-	LogRotateDays    int  `yaml:"logRotateDays"`
+	RemoveBeforeOpen bool   `yaml:"removeBeforeOpen"`
+	LogRotateDays    int    `yaml:"logRotateDays"`
+	NodeLoader       string `yaml:"nodeLoader"`
 
 	ProfileDir string `yaml:"profileDir"`
 	AddonsDir  string `yaml:"addonDir,omitempty"`
@@ -113,7 +114,7 @@ func InitRuntime(config string) error {
 	if err != nil {
 		return err
 	}
-	if !path.IsAbs(rtc.ProfileDir){
+	if !path.IsAbs(rtc.ProfileDir) {
 		rtc.ProfileDir, _ = filepath.Abs(rtc.ProfileDir)
 	}
 
@@ -121,23 +122,23 @@ func InitRuntime(config string) error {
 		rtc.ProfileDir = util.GetDefaultConfigDir()
 	}
 	if rtc.AddonsDir == "" {
-		rtc.AddonsDir =rtc.ProfileDir+string(os.PathSeparator)+util.AddonsDir
+		rtc.AddonsDir = rtc.ProfileDir + string(os.PathSeparator) + util.AddonsDir
 	}
 	if rtc.LogDir == "" {
-		rtc.LogDir =rtc.ProfileDir+string(os.PathSeparator)+util.LogDir
+		rtc.LogDir = rtc.ProfileDir + string(os.PathSeparator) + util.LogDir
 
 	}
 	if rtc.DataDir == "" {
-		rtc.DataDir =rtc.ProfileDir+string(os.PathSeparator)+util.DataDir
+		rtc.DataDir = rtc.ProfileDir + string(os.PathSeparator) + util.DataDir
 	}
 	if rtc.ConfigDir == "" {
-		rtc.ConfigDir =rtc.ProfileDir+string(os.PathSeparator)+util.ConfigDir
+		rtc.ConfigDir = rtc.ProfileDir + string(os.PathSeparator) + util.ConfigDir
 	}
 	if rtc.MediaDir == "" {
-		rtc.MediaDir =rtc.ProfileDir+string(os.PathSeparator)+util.MediaDir
+		rtc.MediaDir = rtc.ProfileDir + string(os.PathSeparator) + util.MediaDir
 	}
 	if rtc.UploadDir == "" {
-		rtc.UploadDir =rtc.ProfileDir+string(os.PathSeparator)+util.UploadDir
+		rtc.UploadDir = rtc.ProfileDir + string(os.PathSeparator) + util.UploadDir
 	}
 	if rtc.GatewayVersion == "" {
 		rtc.GatewayVersion = util.Version
@@ -155,21 +156,19 @@ func InitRuntime(config string) error {
 		UploadDir:  rtc.UploadDir,
 		MediaDir:   rtc.MediaDir,
 		LogDir:     rtc.LogDir,
-		GatewayDir: rtc.GatewayVersion,
+		GatewayDir: rtc.ProfileDir,
 	}
-
 
 	//init logger
 	log.InitLogger(rtc.LogDir, true, rtc.LogRotateDays)
 
-	log.Info(fmt.Sprintf("gateway start path: %s",rtc.ProfileDir))
+	log.Info(fmt.Sprintf("gateway start path: %s", rtc.ProfileDir))
 
 	//init database
 	if rtc.RemoveBeforeOpen {
 		database.ResetDB(rtc.ConfigDir)
 	}
 	err = database.InitDB(rtc.ConfigDir)
-
 
 	if err != nil {
 		return err

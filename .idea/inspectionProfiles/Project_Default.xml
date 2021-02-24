@@ -17,6 +17,7 @@
         <method importPath="io" receiver="ReadCloser" name="Close" />
         <method importPath="gateway/app" receiver="*WebApp" name="Start" />
         <method importPath="database/sql" receiver="*Stmt" name="Close" />
+        <method importPath="os/exec" receiver="*Cmd" name="Start" />
       </methods>
     </inspection_tool>
   </profile>

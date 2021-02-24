@@ -18,8 +18,6 @@ var (
 	showVersion bool
 )
 
-
-
 func init() {
 	flag.StringVar(&proFile, "profile", "", "Profile directory")
 	flag.BoolVar(&showVersion, "version", false, "version")

@@ -20,8 +20,196 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9f4f53eb-6f7f-48b5-82a2-b5196c9afd72" name="默认的" comment="">
+      <change afterPath="$PROJECT_DIR$/app/src/component/capability/lightbulb-on.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/i18n.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/i18n/en-us.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/i18n/zh-cn.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/js/things-reducer.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/mock/room.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/mock/things.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/LICENSE" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/action.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/action.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/action.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/action.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/adapter.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/adapter.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/adapter.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/adapter.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/addon-manager-proxy.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/addon-manager-proxy.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/addon-manager-proxy.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/addon-manager-proxy.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/api-handler.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/api-handler.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/api-handler.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/api-handler.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/constants.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/constants.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/constants.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/constants.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/database.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/database.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/database.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/database.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/deferred.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/deferred.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/deferred.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/deferred.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/device.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/device.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/device.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/device.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/event.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/event.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/event.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/event.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/index.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/index.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/index.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/index.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/ipc.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/ipc.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/ipc.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/ipc.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/message-type.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/message-type.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/message-type.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/message-type.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/notifier.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/notifier.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/notifier.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/notifier.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/outlet.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/outlet.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/outlet.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/outlet.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/plugin-client.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/plugin-client.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/plugin-client.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/plugin-client.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/property.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/property.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/property.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/property.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/schema.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/schema.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/schema.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/schema.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/utils.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/utils.d.ts.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/utils.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/lib/utils.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/.github/workflows/pythonapplication.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/LICENSE" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/check-schemas.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/adapter-added-notification.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/adapter-cancel-pairing-command.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/adapter-cancel-remove-device-command.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/adapter-pairing-prompt-notification.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/adapter-remove-device-request.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/adapter-remove-device-response.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/adapter-start-pairing-command.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/adapter-unload-request.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/adapter-unload-response.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/adapter-unpairing-prompt-notification.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/api-handler-added-notification.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/api-handler-api-request.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/api-handler-api-response.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/api-handler-unload-request.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/api-handler-unload-response.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/definitions.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/device-action-status-notification.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/device-added-notification.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/device-connected-state-notification.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/device-debug-command.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/device-event-notification.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/device-property-changed-notification.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/device-remove-action-request.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/device-remove-action-response.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/device-request-action-request.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/device-request-action-response.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/device-saved-notification.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/device-set-credentials-request.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/device-set-credentials-response.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/device-set-pin-request.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/device-set-pin-response.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/device-set-property-command.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/mock-adapter-add-device-request.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/mock-adapter-add-device-response.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/mock-adapter-clear-state-request.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/mock-adapter-clear-state-response.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/mock-adapter-pair-device-command.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/mock-adapter-remove-device-request.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/mock-adapter-remove-device-response.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/mock-adapter-unpair-device-command.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/notifier-added-notification.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/notifier-unload-request.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/notifier-unload-response.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/outlet-added-notification.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/outlet-notify-request.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/outlet-notify-response.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/outlet-removed-notification.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/plugin-error-notification.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/plugin-register-request.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/plugin-register-response.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/plugin-unload-request.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/messages/plugin-unload-response.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/schema/schema.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/src/action.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/src/adapter.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/src/addon-manager-proxy.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/src/api-handler.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/src/constants.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/src/database.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/src/deferred.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/src/device.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/src/event.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/src/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/src/ipc.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/src/message-type.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/src/notifier.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/src/outlet.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/src/plugin-client.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/src/property.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/src/schema.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/gateway-addon/src/utils.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/homekit/bridge_proxy.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/homekit/constant.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/homekit/models/characteristic.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/homekit/models/service.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/bus/constant.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/thing/constant.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gateway.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gateway.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/default.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/default.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway-app/.eslintcache" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-app/.eslintcache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway-app/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-app/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway-app/src/components/new-thing.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-app/src/components/new-thing.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway-app/src/components/thing.js" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-app/src/components/thing.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway-app/src/setupProxy.js" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-app/src/setupProxy12.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway-app/src/views/thing-add.js" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-app/src/views/thing-add.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/database/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/database/db.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/util/util.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/util/util.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/adapter_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/adapter_proxy.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/addon_util.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/addon_util.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/api.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/manager_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/manager_proxy.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/plugin.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/plugin.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/plugin_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/plugin_server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/settings_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/settings_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/models/things.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/models/things.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,11 +223,12 @@
         <option value="TypeScript File" />
         <option value="package.json" />
         <option value="JavaScript File" />
+        <option value="Python Script" />
         <option value="Go File" />
       </list>
     </option>
   </component>
-  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../../Go" />
+  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../../Program Files/Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -65,16 +254,17 @@
     <property name="DatabaseDriversLRU" value="sqlite" />
     <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="configurable..is.expanded" value="true" />
     <property name="configurable.GoLibrariesConfigurable.is.expanded" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../virtual-adapter" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
-    <property name="ts.external.directory.path" value="C:\Users\刘桂林\Documents\web-things\gateway\gateway-app\node_modules\typescript\lib" />
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
+    <property name="ts.external.directory.path" value="$PROJECT_DIR$/gateway-app/node_modules/typescript/lib" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="ReaderModeSettings">
@@ -82,21 +272,21 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/gateway-app/src" />
+      <recent name="$PROJECT_DIR$/config" />
+      <recent name="$PROJECT_DIR$/profile/addons" />
       <recent name="C:\Users\刘桂林\Documents\web-things\gateway\gateway-addon-golang\event" />
       <recent name="C:\Users\刘桂林\Documents\web-things\gateway\gateway-addon-golang\action" />
-      <recent name="C:\Users\刘桂林\Documents\web-things\gateway\gateway-addon-golang\deivce" />
-      <recent name="C:\Users\刘桂林\Documents\web-things\gateway\gateway-addon-golang\property" />
-      <recent name="$PROJECT_DIR$" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/profile/addons" />
       <recent name="$PROJECT_DIR$/app/models/thing" />
       <recent name="C:\Users\刘桂林\Documents\web-things\gateway\gateway-addon-golang\device" />
       <recent name="C:\Users\刘桂林\Documents\web-things\gateway\gateway-addon-golang\property" />
       <recent name="$PROJECT_DIR$/app/models" />
-      <recent name="$PROJECT_DIR$/event" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="npm.dev">
     <configuration name="gateway" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true">
       <module name="gateway" />
       <working_directory value="$PROJECT_DIR$" />
@@ -105,9 +295,52 @@
       <directory value="$PROJECT_DIR$" />
       <method v="2" />
     </configuration>
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="gateway" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/profile/addons/tplink-adapter" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/profile/addons/tplink-adapter/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/app/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="start" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/gateway-app/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="npm.dev" />
         <item itemvalue="Go 构建.gateway" />
+        <item itemvalue="npm.start" />
       </list>
     </recent_temporary>
   </component>
@@ -136,6 +369,13 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+    <option name="exactExcludedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/gateway-app/src/dashboard/Title.js" />
+        <option value="$PROJECT_DIR$/gateway-app/src/dashboard/Orders.js" />
+        <option value="$PROJECT_DIR$/gateway-app/src/dashboard/Deposits.js" />
+      </list>
+    </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -152,6 +392,13 @@
   <component name="VcsManagerConfiguration">
     <ignored-roots>
       <path value="$PROJECT_DIR$/web-app/src/assets/material-design-icons" />
+      <path value="$PROJECT_DIR$/addon" />
+      <path value="$PROJECT_DIR$/addons" />
+      <path value="$PROJECT_DIR$/frp" />
+      <path value="$PROJECT_DIR$/gateway-addon-golang" />
+      <path value="$PROJECT_DIR$/profile/addons/yeelight-adapter/yeelight-adapter" />
+      <path value="$PROJECT_DIR$/web-app/z-vue3-ui" />
+      <path value="$PROJECT_DIR$/web-app1/src/assets/material-design-icons" />
     </ignored-roots>
   </component>
   <component name="VgoProject">
@@ -159,6 +406,28 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file:///usr/local/go/src/runtime/panic.go</url>
+          <line>1166</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/server/controllers/addon_controller.go</url>
+          <line>57</line>
+          <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/server/models/things.go</url>
+          <line>63</line>
+          <option name="timeStamp" value="22" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/server/models/things.go</url>
+          <line>65</line>
+          <option name="timeStamp" value="23" />
+        </line-breakpoint>
+      </breakpoints>
       <default-breakpoints>
         <breakpoint type="DlvErrorBreakpoint" />
       </default-breakpoints>

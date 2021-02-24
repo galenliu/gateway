@@ -12,7 +12,6 @@ import (
 	"sync"
 )
 
-
 type PluginsServer struct {
 	Plugins map[string]*Plugin
 	locker  *sync.Mutex
@@ -51,35 +50,15 @@ func (s *PluginsServer) messageHandler(data []byte, c *Connection) {
 	} else {
 		//获取Plugin，并且把消息交由对应的Plugin处理
 		pluginId := json.Get(data, "data", "pluginId").ToString()
-		plugin, err := s.getPlugin(pluginId)
-		if err != nil {
-			log.Error(err.Error())
-			c.connected = false
-			return
-		}
+		plugin := s.registerPlugin(pluginId)
 		go plugin.handleMessage(data)
 	}
 }
 
 func (s *PluginsServer) registerHandler(data []byte, c *Connection) {
 	pluginId := json.Get(data, "data", "pluginId").ToString()
-	plugin, ok := s.Plugins[pluginId]
-	if !ok {
-		plugin = NewPlugin(s, pluginId)
-		s.Plugins[pluginId] = plugin
-	}
+	plugin := s.registerPlugin(pluginId)
 	plugin.handleConnection(c)
-}
-
-func (s *PluginsServer) getPlugin(pluginId string) (*Plugin, error) {
-	//通过读写锁获取plugin
-	s.locker.Lock()
-	defer s.locker.Unlock()
-	p, ok := s.Plugins[pluginId]
-	if !ok {
-		return nil, fmt.Errorf("plugin(%s) not found", pluginId)
-	}
-	return p, nil
 }
 
 //此处开启新协程，传入一个新的websocket连接,把读到的消息给MessageHandler
@@ -99,30 +78,29 @@ func (s *PluginsServer) readConnectionLoop(c *Connection) {
 	}
 }
 
-func (s *PluginsServer) loadPlugin(packageId, exec string, enabled bool) {
-	plugin := s.registerPlugin(packageId, exec)
-	if enabled {
-		go plugin.start()
-	} else {
-		plugin.Stop()
-	}
+func (s *PluginsServer) loadPlugin(addonPath, id, exec string) {
+	plugin := s.registerPlugin(id)
+	plugin.exec = exec
+	plugin.execPath = addonPath
+	go plugin.start()
+
 }
 
 func (s *PluginsServer) uninstallPlugin(packageId string) {
 	plugin, ok := s.Plugins[packageId]
 	if !ok {
 		log.Error("plugin not exist")
+		return
 	}
 	plugin.Stop()
 	delete(s.Plugins, packageId)
 
 }
 
-func (s *PluginsServer) registerPlugin(packageId string, exec string) *Plugin {
-	plugin := s.Plugins[packageId]
-	if plugin == nil {
+func (s *PluginsServer) registerPlugin(packageId string) *Plugin {
+	plugin, ok := s.Plugins[packageId]
+	if !ok {
 		plugin = NewPlugin(s, packageId)
-		plugin.exec = exec
 		s.Plugins[packageId] = plugin
 	}
 	return plugin
@@ -130,7 +108,6 @@ func (s *PluginsServer) registerPlugin(packageId string, exec string) *Plugin {
 
 //create goroutines handle ipc massage
 func (s *PluginsServer) Start() {
-
 	go s.ipc.Serve()
 	for {
 		select {

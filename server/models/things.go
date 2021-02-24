@@ -67,7 +67,10 @@ func (ts *Things) GetThings() []*thing.Thing {
 
 //get things with out database
 func (ts *Things) GetNewThings() []*thing.Thing {
-	connectedThings := plugin.GetThings()
+	var connectedThings []*thing.Thing
+	//connectedThings = plugin.GetThings()
+	bus.Publish(bus.TopicGetThings,&connectedThings)
+
 	storedThings := ts.GetThings()
 	var things []*thing.Thing
 	var newList []*thing.Thing

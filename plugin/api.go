@@ -47,10 +47,10 @@ func DisableAddon(addonId string) error {
 		return fmt.Errorf("addon not installed")
 	}
 	err := addonInfo.UpdateAddonInfoToDB(false)
-	err = manager.unloadAddon(addonId)
 	if err != nil {
 		return err
 	}
+	manager.unloadAddon(addonId)
 	return nil
 }
 
@@ -79,6 +79,7 @@ func FindDevice(deviceId string) (*addon.Device, error) {
 	}
 	return device, nil
 }
+
 func SetProperValue(deviceId, propName string, newValue interface{}) error {
 	manager.handleSetPropertyValue(deviceId, propName, newValue)
 	return nil

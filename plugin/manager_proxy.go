@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"addon"
 	"archive/tar"
 	"compress/gzip"
 	"context"
@@ -10,8 +11,6 @@ import (
 	"gateway/pkg/log"
 	"gateway/pkg/util"
 	"gateway/server/models/thing"
-
-	"addon"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -76,6 +75,10 @@ func NewAddonsManager(ctx context.Context) (*AddonManager, error) {
 	am.installAddons = make(map[string]*AddonInfo, 50)
 	am.adapters = make(map[string]*AdapterProxy, 20)
 
+	bus.Subscribe(bus.TopicSetProperty, am.handleSetPropertyValue)
+	bus.Subscribe(bus.TopicGetDevices, am.handleGetDevices)
+	bus.Subscribe(bus.TopicGetThings, am.handleGetThings)
+
 	var c context.Context
 	c, am.pluginCancel = context.WithCancel(am.ctx)
 	am.pluginServer = NewPluginServer(am, c)
@@ -109,7 +112,9 @@ func (manager *AddonManager) LoadAddons() error {
 func (manager *AddonManager) loadAddon(packageId string, enabled bool) error {
 	//db := database.GetDB()
 
-	addonInfo, err := loadManifest(manager.AddonsDir, packageId)
+	addonPath := path.Join(manager.AddonsDir, packageId)
+
+	addonInfo, err := loadManifest(addonPath, packageId)
 	if err != nil {
 		return err
 	}
@@ -118,19 +123,18 @@ func (manager *AddonManager) loadAddon(packageId string, enabled bool) error {
 	if err != nil {
 		return err
 	}
-	err = addonInfo.UpdateFromDB()
+	err = addonInfo.UpdateAddonInfoToDB(enabled)
 	if err != nil {
 		return err
 	}
 	manager.installAddons[packageId] = addonInfo
-	manager.pluginServer.loadPlugin(addonInfo.ID, manager.installAddons[packageId].Exec, enabled)
+	manager.pluginServer.loadPlugin(addonPath, addonInfo.ID, addonInfo.Exec)
 
 	return nil
 }
 
-func (manager *AddonManager) unloadAddon(packageId string) error {
-
-	return nil
+func (manager *AddonManager) unloadAddon(packageId string) {
+	manager.pluginServer.uninstallPlugin(packageId)
 }
 
 func (manager *AddonManager) HandleDeviceAdded(device *addon.Device) {
@@ -246,6 +250,19 @@ func (manager *AddonManager) handleSetPropertyValue(deviceId, propName string, s
 	adapter := manager.getAdapterByDeviceId(deviceId)
 	property := adapter.GetDevice(deviceId).GetProperty(propName)
 	adapter.setPropertyValue(property, setValue)
+}
+
+func (manager *AddonManager) handleGetDevices(devs []*addon.Device) {
+	for _, d := range manager.devices {
+		devs = append(devs, d)
+		devs = append(devs, d)
+	}
+}
+func (manager *AddonManager)handleGetThings(ts []*thing.Thing)  {
+	for _, d := range manager.devices {
+		var t = asThing(d)
+		ts = append(ts, t)
+	}
 }
 
 func (manager *AddonManager) getAdapterByDeviceId(deviceId string) *AdapterProxy {

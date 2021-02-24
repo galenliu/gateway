@@ -11,8 +11,8 @@ import (
 	"path"
 )
 
-const FileName = "database.sqlite3"
-const dbFileName = "db.sqlite3"
+const dbFileName = "database.sqlite3"
+
 
 var db *gorm.DB
 var database *sql.DB

@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/WebThingsIO/gateway-addon-ipc-schema/master/messages/outlet-removed-notification.json",
+  "title": "Outlet Removed Notification",
+  "description": "Notification that an outlet has been removed from a notifier",
+  "type": "object",
+  "required": [
+    "messageType",
+    "data"
+  ],
+  "properties": {
+    "messageType": {
+      "type": "integer",
+      "title": "Message Type",
+      "description": "The message type, used by the IPC client and server to differentiate messages",
+      "const": 16385
+    },
+    "data": {
+      "type": "object",
+      "title": "Outlet Removed Notification Message Data",
+      "description": "Message-specific data",
+      "required": [
+        "pluginId",
+        "notifierId",
+        "outletId"
+      ],
+      "properties": {
+        "pluginId": {
+          "type": "string",
+          "title": "Plugin ID",
+          "description": "ID of the plugin"
+        },
+        "notifierId": {
+          "type": "string",
+          "title": "Notifier ID",
+          "description": "ID of the notifier"
+        },
+        "outletId": {
+          "type": "string",
+          "title": "Outlet ID",
+          "description": "ID of the outlet which was removed"
+        }
+      }
+    }
+  }
+}

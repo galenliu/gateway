@@ -64,13 +64,10 @@ func GetArch() string {
 }
 
 func GetPythonVersion() string {
-	return "3.9"
+	return "3.5"
 }
 
 func GetNodeVersion() string {
-	return "1.5.2"
-}
-func GetGolangVersion() string {
 	return "1.5.2"
 }
 

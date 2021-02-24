@@ -5,8 +5,9 @@ import (
 	"context"
 	"fmt"
 	"gateway/pkg/log"
-	json "github.com/json-iterator/go"
 	"sync"
+
+	json "github.com/json-iterator/go"
 )
 
 type pairingFunc func(ctx context.Context, cancelFunc func())

@@ -27,7 +27,6 @@ export default function Thing(props) {
 
     }
 
-
     function RenderThing() {
         const data = props.thing
         console.log("thing render data:",data)

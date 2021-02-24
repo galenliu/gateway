@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/WebThingsIO/gateway-addon-ipc-schema/master/messages/plugin-unload-request.json",
+  "title": "Plugin Unload Request",
+  "description": "Unload a plugin from the gateway",
+  "type": "object",
+  "required": [
+    "messageType",
+    "data"
+  ],
+  "properties": {
+    "messageType": {
+      "type": "integer",
+      "title": "Message Type",
+      "description": "The message type, used by the IPC client and server to differentiate messages",
+      "const": 2
+    },
+    "data": {
+      "type": "object",
+      "title": "Plugin Unload Request Message Data",
+      "description": "Message-specific data",
+      "required": [
+        "pluginId"
+      ],
+      "properties": {
+        "pluginId": {
+          "type": "string",
+          "title": "Plugin ID",
+          "description": "ID of the plugin being unloaded"
+        }
+      }
+    }
+  }
+}

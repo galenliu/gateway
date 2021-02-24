@@ -1,0 +1,124 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/WebThingsIO/gateway-addon-ipc-schema/master/messages/plugin-register-response.json",
+  "title": "Plugin Register Response",
+  "description": "Acknowledgement that the gateway has registered a plugin",
+  "type": "object",
+  "required": [
+    "messageType",
+    "data"
+  ],
+  "properties": {
+    "messageType": {
+      "type": "integer",
+      "title": "Message Type",
+      "description": "The message type, used by the IPC client and server to differentiate messages",
+      "const": 1
+    },
+    "data": {
+      "type": "object",
+      "title": "Plugin Register Response Message Data",
+      "description": "Message-specific data",
+      "required": [
+        "pluginId",
+        "gatewayVersion",
+        "userProfile",
+        "preferences"
+      ],
+      "properties": {
+        "pluginId": {
+          "type": "string",
+          "title": "Plugin ID",
+          "description": "ID of the plugin which has been registered"
+        },
+        "gatewayVersion": {
+          "type": "string",
+          "title": "Gateway Version",
+          "description": "Version of the running gateway"
+        },
+        "userProfile": {
+          "type": "object",
+          "title": "User Profile",
+          "description": "User profile information, e.g. file paths of various things",
+          "required": [
+            "addonsDir",
+            "baseDir",
+            "configDir",
+            "dataDir",
+            "mediaDir",
+            "logDir",
+            "gatewayDir"
+          ],
+          "properties": {
+            "addonsDir": {
+              "type": "string",
+              "title": "Add-ons Directory",
+              "description": "Add-ons directory, e.g. \"/home/pi/.webthings/addons\""
+            },
+            "baseDir": {
+              "type": "string",
+              "title": "Base Directory",
+              "description": "Base user profile directory, e.g. \"/home/pi/.webthings\""
+            },
+            "configDir": {
+              "type": "string",
+              "title": "Configuration Directory",
+              "description": "Configuration directory, e.g. \"/home/pi/.webthings/config\""
+            },
+            "dataDir": {
+              "type": "string",
+              "title": "Data Directory",
+              "description": "Data directory, e.g. \"/home/pi/.webthings/data\""
+            },
+            "mediaDir": {
+              "type": "string",
+              "title": "Media Directory",
+              "description": "Media directory, e.g. \"/home/pi/.webthings/media\""
+            },
+            "logDir": {
+              "type": "string",
+              "title": "Log Directory",
+              "description": "Log directory, e.g. \"/home/pi/.webthings/log\""
+            },
+            "gatewayDir": {
+              "type": "string",
+              "title": "Gateway Directory",
+              "description": "Gateway directory, e.g. \"/home/pi/webthings/gateway\""
+            }
+          }
+        },
+        "preferences": {
+          "type": "object",
+          "title": "Preferences",
+          "description": "User preferences",
+          "required": [
+            "language",
+            "units"
+          ],
+          "properties": {
+            "language": {
+              "type": "string",
+              "title": "Language",
+              "description": "User's preferred language, e.g. \"en-US\""
+            },
+            "units": {
+              "type": "object",
+              "title": "Units",
+              "description": "User's preferred units",
+              "required": [
+                "temperature"
+              ],
+              "properties": {
+                "temperature": {
+                  "type": "string",
+                  "title": "Temperature",
+                  "description": "Preferred temperature unit, e.g. \"degree celsius\""
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

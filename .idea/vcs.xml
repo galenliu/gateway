@@ -2,12 +2,5 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/addon" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/addons" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/frp" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/gateway-addon-golang" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/profile/addons/yeelight-adapter/yeelight-adapter" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/web-app/z-vue3-ui" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/web-app1/src/assets/material-design-icons" vcs="Git" />
   </component>
 </project>

@@ -3,19 +3,23 @@ import "../css/things.css";
 import API from "../api";
 import NewThing from "../components/new-thing";
 import {Link} from "react-router-dom";
-import Container from '@material-ui/core/Container';
 import {makeStyles} from "@material-ui/core/styles";
 import useWebSocket, {ReadyState} from "react-use-websocket";
+import Grid from "@material-ui/core/Grid";
+import {Avatar, Paper} from "@material-ui/core";
+
 
 
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
+        overflow: 'auto',
+        padding: theme.spacing(0, 3),
     },
     paper: {
+        maxWidth: 800,
+        margin: `${theme.spacing(1)}px auto`,
         padding: theme.spacing(2),
-        textAlign: 'center',
-        color: theme.palette.text.secondary,
     },
 }));
 
@@ -118,10 +122,9 @@ export default function ThingsAdd() {
     }
 
     function addThingRequest(thing) {
-        console.log("addThingRequestaddThingRequestaddThingRequestaddThingRequestaddThingRequest")
         try {
-            if(thing){
-                API.addThing(thing).catch(e =>{
+            if (thing) {
+                API.addThing(thing).catch(e => {
                     console.log(e)
                 })
             }
@@ -136,10 +139,18 @@ export default function ThingsAdd() {
         for (let thing of availableThings) {
             if (thing.hasOwnProperty("id")) {
                 console.log("render thing", thing)
-                const newThing = <NewThing key={thing.id}
-                                           thing={thing}
-                                           addNewThingRequest={addThingRequest}
-                />
+                const newThing = <Paper className={classes.paper}>
+                    <Grid container wrap="nowrap" spacing={2}>
+                        <Grid item>
+                            <Avatar>W</Avatar>
+                        </Grid>
+                        <Grid item xs>
+                    <NewThing key={thing.id} thing={thing}
+                              addNewThingRequest={addThingRequest}/>
+                        </Grid>
+
+                    </Grid>
+                </Paper>
                 list.push(newThing)
             }
         }
@@ -152,10 +163,12 @@ export default function ThingsAdd() {
             <Link to="/things">
                 <button id="back-button" className="icon-button"/>
             </Link>
-            <div id="thing-add-view" className={classes.root}>
-                <Container className="thing-add-view-container" maxWidth="sm">
-                    {RenderAvailableThings()}
-                </Container>
+            <div className={classes.root}>
+
+            <Grid container wrap="nowrap"  alignItems="center" justify="center" direction="column" spacing={1}>
+                {RenderAvailableThings()}
+            </Grid>
+
             </div>
         </>
     )

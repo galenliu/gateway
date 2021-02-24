@@ -4,9 +4,24 @@ import "../css/things.css"
 import Utils from "../util"
 import Card from '@material-ui/core/Card';
 import {Button} from "@material-ui/core";
+import {classes} from "istanbul-lib-coverage";
+import {makeStyles} from "@material-ui/core/styles";
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+        flexGrow: 1,
+    },
+    paper: {
+        padding: theme.spacing(2),
+        textAlign: 'center',
+        color: theme.palette.text.secondary,
+    },
+}));
+
 
 export default function NewThing(props) {
 
+    const classes = useStyles();
 
     let {t, i18n} = useTranslation()
 
@@ -35,11 +50,7 @@ export default function NewThing(props) {
 
     })
 
-
-
-
-    return <Card variant="outlined" className={"new-thing " + Utils.getClassFromCapability(selectedCapability)}>
-        <div className="new-thing-icon"/>
+    return <Card className={classes.root} id={"new-thing " + Utils.getClassFromCapability(selectedCapability)}>
         <div className=" new-thing-metadata">
             <input type=" text" name="thing-title" readOnly={false} onChange={(e) => setTitle(e.target.value)}
                    className=" new-thing-title" value={props.thing.title}/>

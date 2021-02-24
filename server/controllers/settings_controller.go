@@ -13,7 +13,6 @@ type addonInfo struct {
 	Version       string   `json:"version"`
 	NodeVersion   string   `json:"node_version"`
 	PythonVersion string   `json:"python_version"`
-	GolangVersion string   `json:"golang_version"`
 }
 
 type SettingsController struct {
@@ -30,7 +29,6 @@ func (settings *SettingsController) HandleGetAddonsInfo(g *gin.Context) {
 		Version:       util.Version,
 		NodeVersion:   util.GetNodeVersion(),
 		PythonVersion: util.GetPythonVersion(),
-		GolangVersion: util.GetGolangVersion(),
 	}
 	//data, err := json.Marshal(addonInfo)
 	//if err != nil {
@@ -39,5 +37,4 @@ func (settings *SettingsController) HandleGetAddonsInfo(g *gin.Context) {
 	//	return
 	//}
 	g.JSON(http.StatusOK, addonInfo)
-
 }

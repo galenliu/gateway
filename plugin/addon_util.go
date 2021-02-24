@@ -111,39 +111,30 @@ func (addonInfo *AddonInfo) UpdateAddonInfoToDB(enable bool) error {
 	return database.SetSetting(GetAddonKey(addonInfo.ID), s)
 }
 
-func GetAddonsInfoFromDB() []AddonInfo {
-	db, _ := database.GetDB()
-	_ = db.AutoMigrate(AddonInfo{})
-	var addons []AddonInfo
-	db.Find(&addons)
-	return addons
-}
-func GetAddonInfoByIDFromDB(packageId string) (*AddonInfo, error) {
-	db, err := database.GetDB()
+func GetAddonInfoFromDB(id string) (*AddonInfo, error) {
+	value, err := database.GetSetting(GetAddonKey(id))
 	if err != nil {
 		return nil, err
 	}
-	err = db.AutoMigrate(AddonInfo{})
+	var a AddonInfo
+	err = json.UnmarshalFromString(value, a)
 	if err != nil {
 		return nil, err
 	}
-	var addonInfo AddonInfo
-	tx := db.Find(&addonInfo, packageId)
-	if tx.Error != nil {
-		return nil, tx.Error
-	}
-	return &addonInfo, nil
+	return &a, nil
 }
 
-func loadManifest(addonDir string, packetId string) (*AddonInfo, error) {
+func loadManifest(destPath ,packetId string) (*AddonInfo, error) {
 
-	destPath := path.Join(addonDir, packetId)
-
-	//load manifest.json
-	manifest, err := loadManifestJson(destPath)
-	if err != nil || &manifest == nil {
-		e := fmt.Errorf("connot load manifest.js form %s", destPath)
-		return nil, e
+	//load manifest.json\
+	f, err := ioutil.ReadFile(path.Join(destPath, FileName))
+	if err != nil {
+		return nil, err
+	}
+	var manifest ManifestJson
+	err = json.Unmarshal(f, &manifest)
+	if err != nil {
+		return nil, err
 	}
 
 	//First verify manifest version
@@ -176,14 +167,6 @@ func loadManifest(addonDir string, packetId string) (*AddonInfo, error) {
 		PrimaryType: manifest.GatewaySpecificSettings.WebThings.PrimaryType,
 	}
 	return &addonInfo, nil
-}
-
-func loadManifestJson(dirName string) (addonManifest *ManifestJson, err error) {
-	f, err := ioutil.ReadFile(path.Join(dirName, FileName))
-
-	var manifest ManifestJson
-	err = json.Unmarshal(f, &manifest)
-	return &manifest, err
 }
 
 func asThing(device *addon.Device) *thing.Thing {

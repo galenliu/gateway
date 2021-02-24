@@ -9,7 +9,7 @@ import (
 	"gateway/pkg/log"
 	"gateway/pkg/util"
 	json "github.com/json-iterator/go"
-	"io/ioutil"
+	"io"
 	"os/exec"
 	"path"
 	"strings"
@@ -201,10 +201,12 @@ func (plugin *Plugin)addAdapter(adapter *AdapterProxy){
 
 func (plugin *Plugin) start() {
 
-	commandPath := strings.Replace(plugin.exec, "{path}", plugin.execPath, 1)
-	commandStr := strings.Replace(commandPath, "{nodeLoader}", "node", 1)
 
-	commands := strings.Split(commandStr, " ")
+	command := strings.Replace(plugin.exec, "{path}", plugin.execPath, 1)
+	command = strings.Replace(command,"{nodeLoader}",config.Conf.NodeLoader,1)
+
+
+	commands := strings.Split(command, " ")
 
 	var args []string
 	if len(commands) > 1 {
@@ -214,6 +216,25 @@ func (plugin *Plugin) start() {
 			}
 		}
 	}
+
+	var syncLog =func (reader io.ReadCloser) {
+
+		buf := make([]byte, 1024, 1024)
+		for {
+			strNum, err := reader.Read(buf)
+			if strNum > 0 {
+				outputByte := buf[:strNum]
+				log.Info(fmt.Sprintf("plugin(%s) out: %s \t\n",plugin.pluginId,string(outputByte)))
+			}
+			if err != nil {
+				//读到结尾
+				if err == io.EOF || strings.Contains(err.Error(), "file already closed") {
+					err = nil
+				}
+			}
+		}
+	}
+
 	//ctx, plugin.cancelFunc = context.WithCancel(plugin.ctx)
 	var cmd *exec.Cmd
 	if len(args) > 0 {
@@ -222,23 +243,16 @@ func (plugin *Plugin) start() {
 		cmd = exec.Command(commands[0])
 	}
 
-	stdOut, err := cmd.StdoutPipe()
-	if err != nil {
-		fmt.Print(err)
-	}
+	stdout,_ := cmd.StdoutPipe()
+	stderr, _ := cmd.StderrPipe()
+	//stdOut, err := cmd.StdoutPipe()
 
-	err = cmd.Start()
-	if err != nil {
-		log.Error("plugin("+plugin.pluginId+") start failed,err: ", err.Error())
-	} else {
-		log.Info("start plugin:(%s)", plugin.pluginId)
-		out, err := ioutil.ReadAll(stdOut)
-		if err != nil {
-			fmt.Print(err)
-			msg := string(out)
-			log.Debug(msg)
-		}
-	}
+	go cmd.Start()
+
+	log.Debug(fmt.Sprintf("plugin(%s) start \t\n",plugin.pluginId))
+	go syncLog(stdout)
+	go syncLog(stderr)
+
 }
 
 func (plugin *Plugin) Stop() {
@@ -271,3 +285,5 @@ func (plugin *Plugin) handleConnection(c *Connection) {
 	plugin.registered = true
 	log.Info(fmt.Sprintf("plugin: %s registered", plugin.pluginId))
 }
+
+

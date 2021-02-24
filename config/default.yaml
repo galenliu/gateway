@@ -5,11 +5,12 @@ ports:
 
 profileDir: "./profile"
 gatewayVersion: "0.1.0"
+nodeLoader: "node /Users/liuguilin/Documents/github/gateway/src/addon-loader.js"
 
 addonManager:
   listUrls:
-    - "http://182.61.24.190:8443/addon"
-  testAddons: false
+    - "http://182.61.24.190:8443/addons"
+  testAddons: ture
 
 database:
   logRotateDays: 30,

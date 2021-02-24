@@ -10,12 +10,14 @@ import ThingsAdd from "./views/thing-add";
 import './i18n'
 
 
+
 function App() {
     //const [state, dispatch] = useReducer(goto, {path: "/things"})
 
     return (
         <Router>
             <Switch>
+
                 <Route exact path="/things">
                     <Menu/>
                     <Home/>
