@@ -40,12 +40,7 @@ type AddonManager struct {
 
 	isPairing bool
 
-	//onDeviceAddedFuncs     map[interface{}]func(device *addon.Device)
-	//onDeviceConnectedFuncs map[interface{}]func(device *addon.Device, connected bool)
-	//onActionUpdateFuncs    map[interface{}]func(action *addon.Action)
-	//onEventFuncs           map[interface{}]func(action *addon.Event)
-	//onDeviceRemovedFuncs   map[interface{}]func(device *addon.Device)
-	//onPropertyChangedFuncs map[interface{}]func(property *addon.Property)
+
 
 	pluginCancel context.CancelFunc
 
@@ -62,12 +57,7 @@ func NewAddonsManager(ctx context.Context) (*AddonManager, error) {
 	am.AddonsDir = config.Conf.AddonsDir
 	am.DataDir = config.Conf.DataDir
 
-	//am.onDeviceAddedFuncs = make(map[interface{}]func(device *addon.Device))
-	//am.onDeviceConnectedFuncs = make(map[interface{}]func(device *addon.Device, connected bool))
-	//am.onActionUpdateFuncs = make(map[interface{}]func(action *addon.Action))
-	//am.onEventFuncs = make(map[interface{}]func(action *addon.Event))
-	//am.onDeviceRemovedFuncs = make(map[interface{}]func(device *addon.Device))
-	//am.onPropertyChangedFuncs = make(map[interface{}]func(property *addon.Property))
+
 
 	am.isRunning = false
 	am.isPairing = false
