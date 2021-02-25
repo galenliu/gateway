@@ -2,6 +2,7 @@ import React, {useEffect, useReducer,useCallback} from "react";
 import Thing from "../component/thing.jsx";
 import Grid from "@material-ui/core/Grid";
 import mock from "../mock/things.json"
+import API from "../js/api";
 
 import ThingsReducer,{Actions} from "../js/things-reducer";
 
@@ -9,13 +10,19 @@ export const ThingsContext = React.createContext()
 
 function Home() {
 
-    const [things, setThings] = useReducer(ThingsReducer, [])
+    const [things, thingsDispatch] = useReducer(ThingsReducer, [])
 
     useEffect(() => {
+        API.getThings().then((data)=>{
+            console.log("data",data)
+        }).catch((e)=>{
+            console.log(e)
+            return
+        })
         console.log("things",things)
         mock.forEach((thing) => {
             console.log(thing)
-            setThings({messageType: Actions.addThing, thing: thing})
+            thingsDispatch({messaegType: Actions.addThing, thing: thing})
         })
     })
 

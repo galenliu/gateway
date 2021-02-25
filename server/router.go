@@ -3,9 +3,10 @@ package server
 import (
 	"context"
 	"fmt"
+	"gateway/config"
 	"gateway/server/controllers"
 	"gateway/server/models"
-	"gateway/config"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
@@ -48,6 +49,14 @@ func CollectRoute(app *WebApp) *gin.Engine {
 
 	gin.SetMode(gin.DebugMode)
 
+	//解决跨域问题 仅测试
+	if gin.Mode() == gin.DebugMode {
+		conf := cors.DefaultConfig()
+		conf.AllowAllOrigins = true //允许所有域名
+		conf.AllowMethods = []string{"GET", "POST", "OPTIONS"}//允许请求的方法
+		conf.AllowHeaders = []string{"tus-resumable", "upload-length", "upload-metadata", "cache-control", "x-requested-with", "*"}//允许的Header
+		router.Use(cors.New(conf))
+	}
 
 	//日志写入文件
 	f, _ := os.Create(path.Join(app.config.LogDir, "web.log"))
@@ -95,7 +104,6 @@ func CollectRoute(app *WebApp) *gin.Engine {
 
 		thingsGroup.GET("/", thingsController.HandleGetThings)
 		thingsGroup.GET("/:thingId", thingsController.HandleGetThing)
-
 
 		//get the properties of a thing
 		thingsGroup.GET("/:thingId/properties", thingsController.HandleGetProperties)

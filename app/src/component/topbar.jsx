@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React from 'react';
 import {fade, makeStyles, useTheme} from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -16,7 +16,6 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import Drawer from "@material-ui/core/Drawer";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import Divider from "@material-ui/core/Divider";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -29,7 +28,6 @@ import {useTranslation} from 'react-i18next';
 import Home from "../page/home.jsx";
 import clsx from "clsx";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import SideBar from "./sideBar";
 
 const drawerWidth = 240;
 
@@ -56,21 +54,6 @@ const useStyles = makeStyles((theme) => ({
         }),
     },
 
-    drawer: {
-        width: drawerWidth,
-        flexShrink: 0,
-    },
-    drawerPaper: {
-        width: drawerWidth,
-    },
-    drawerHeader: {
-        display: 'flex',
-        alignItems: 'center',
-        padding: theme.spacing(0, 1),
-        // necessary for content to be below app bar
-        ...theme.mixins.toolbar,
-        justifyContent: 'flex-end',
-    },
     menuButton: {
         marginRight: theme.spacing(2),
     },
@@ -97,31 +80,6 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: 0,
     },
 
-    search: {
-        position: 'relative',
-        borderRadius: theme.shape.borderRadius,
-        backgroundColor: fade(theme.palette.common.white, 0.15),
-        '&:hover': {
-            backgroundColor: fade(theme.palette.common.white, 0.25),
-        },
-        marginRight: theme.spacing(2),
-        marginLeft: 0,
-
-        width: '100%',
-        [theme.breakpoints.up('sm')]: {
-            marginLeft: theme.spacing(3),
-            width: 'auto',
-        },
-    },
-    searchIcon: {
-        padding: theme.spacing(0, 2),
-        height: '100%',
-        position: 'absolute',
-        pointerEvents: 'none',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
     inputRoot: {
         color: 'inherit',
     },
@@ -150,15 +108,13 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Navbar() {
+export default function Topbar() {
     const classes = useStyles();
     const {t, i18n} = useTranslation();
     const theme = useTheme();
 
-
     //侧边栏打开、关闭状态
     const [open, setOpen] = React.useState(false);
-
     const handleDrawerOpen = () => {
         setOpen(true);
     };
@@ -251,7 +207,6 @@ export default function Navbar() {
     return (
         <div className={classes.root}>
             <CssBaseline/>
-
             <AppBar position="fixed"
                     className={clsx(classes.appBar, {
                         [classes.appBarShift]: open,
@@ -270,19 +225,6 @@ export default function Navbar() {
                         Web of Things
                     </Typography>
 
-                    <div className={classes.search}>
-                        <div className={classes.searchIcon}>
-                            <SearchIcon/>
-                        </div>
-                        <InputBase
-                            placeholder="Search…"
-                            classes={{
-                                root: classes.inputRoot,
-                                input: classes.inputInput,
-                            }}
-                            inputProps={{'aria-label': 'search'}}
-                        />
-                    </div>
                     <div className={classes.grow}/>
                     <div className={classes.sectionDesktop}>
                         <IconButton aria-label="show 4 new mails" color="inherit">
@@ -320,59 +262,6 @@ export default function Navbar() {
                 </Toolbar>
             </AppBar>
 
-            <SideBar handleClose ={handleDrawerClose} open={open}/>
-
-            {/*<Drawer*/}
-            {/*    className={classes.drawer}*/}
-            {/*    width={drawerWidth}*/}
-            {/*    variant="persistent"*/}
-            {/*    anchor="left"*/}
-            {/*    open={open}*/}
-            {/*    classes={{*/}
-            {/*        paper: classes.drawerPaper,*/}
-            {/*    }}*/}
-            {/*>*/}
-            {/*    <div className={classes.drawerHeader}>*/}
-            {/*        <IconButton onClick={handleDrawerClose}>*/}
-            {/*            {theme.direction === 'ltr' ? <ChevronLeftIcon/> : <ChevronRightIcon/>}*/}
-            {/*        </IconButton>*/}
-            {/*    </div>*/}
-            {/*    <Divider/>*/}
-
-            {/*    <List>*/}
-            {/*        <ListItem button key={"home"}>*/}
-            {/*            <ListItemIcon>*/}
-            {/*                <HomeIcon/>*/}
-            {/*            </ListItemIcon>*/}
-            {/*            <ListItemText primary={t('Home')}/>*/}
-            {/*        </ListItem>*/}
-
-            {/*        <ListItem button key={"rules"}>*/}
-            {/*            <ListItemIcon>*/}
-            {/*                <AlarmOnIcon/>*/}
-            {/*            </ListItemIcon>*/}
-            {/*            <ListItemText primary={t('Rules')}/>*/}
-            {/*        </ListItem>*/}
-
-
-            {/*        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (*/}
-            {/*            <ListItem button key={text}>*/}
-            {/*                <ListItemIcon>{index % 2 === 0 ? <InboxIcon/> : <MailIcon/>}</ListItemIcon>*/}
-            {/*                <ListItemText primary={text}/>*/}
-            {/*            </ListItem>*/}
-            {/*        ))}*/}
-            {/*    </List>*/}
-            {/*    <Divider/>*/}
-            {/*    <List>*/}
-            {/*        {['All mail', 'Trash', 'Spam'].map((text, index) => (*/}
-            {/*            <ListItem button key={text}>*/}
-            {/*                <ListItemIcon>{index % 2 === 0 ? <InboxIcon/> : <MailIcon/>}</ListItemIcon>*/}
-            {/*                <ListItemText primary={text}/>*/}
-            {/*            </ListItem>*/}
-            {/*        ))}*/}
-            {/*    </List>*/}
-            {/*</Drawer>*/}
-
 
 
             {renderMobileMenu}
@@ -382,7 +271,7 @@ export default function Navbar() {
                     [classes.contentShift]: open,
                 })}
             >
-                <div className={classes.drawerHeader}  />
+                <div className={classes.drawerHeader} />
                 <Home/>
             </main>
 

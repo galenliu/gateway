@@ -10,6 +10,7 @@ nodeLoader: "node /Users/liuguilin/Documents/github/gateway/src/addon-loader.js"
 addonManager:
   listUrls:
     - "http://182.61.24.190:8443/addons"
+    - 'https://api.webthings.io:8443/addons'
   testAddons: ture
 
 database:

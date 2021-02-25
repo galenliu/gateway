@@ -35,12 +35,8 @@ type AddonManager struct {
 	adapters      map[string]*AdapterProxy
 	installAddons map[string]*AddonInfo
 
-	isRunning bool
 	isLoaded  bool
-
 	isPairing bool
-
-
 
 	pluginCancel context.CancelFunc
 
@@ -57,9 +53,6 @@ func NewAddonsManager(ctx context.Context) (*AddonManager, error) {
 	am.AddonsDir = config.Conf.AddonsDir
 	am.DataDir = config.Conf.DataDir
 
-
-
-	am.isRunning = false
 	am.isPairing = false
 	am.devices = make(map[string]*addon.Device, 50)
 	am.installAddons = make(map[string]*AddonInfo, 50)
@@ -248,7 +241,7 @@ func (manager *AddonManager) handleGetDevices(devs []*addon.Device) {
 		devs = append(devs, d)
 	}
 }
-func (manager *AddonManager)handleGetThings(ts []*thing.Thing)  {
+func (manager *AddonManager) handleGetThings(ts []*thing.Thing) {
 	for _, d := range manager.devices {
 		var t = asThing(d)
 		ts = append(ts, t)
@@ -282,11 +275,10 @@ func (manager *AddonManager) findDevice(deviceId string) (*addon.Device, error) 
 
 func (manager *AddonManager) Start() {
 	go manager.pluginServer.Start()
-	manager.isRunning = true
+	manager.AddonManager.Start()
 }
 
 func (manager *AddonManager) Stop() {
-	//停止
 	manager.pluginServer.Stop()
-	manager.isRunning = false
+	manager.AddonManager.Stop()
 }

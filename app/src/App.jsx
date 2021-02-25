@@ -1,7 +1,7 @@
 import './App.css';
 import React from "react";
 import Navbar from "./component/navbar";
-
+import "./i18n"
 
 function App() {
     return (
