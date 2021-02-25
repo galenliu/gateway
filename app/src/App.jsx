@@ -1,14 +1,39 @@
 import './App.css';
-import React from "react";
-import Navbar from "./component/navbar";
+import React, {useState} from "react";
+import SideBar from "./component/sideBar";
 import "./i18n"
+import {HashRouter as Router, Route, Switch} from 'react-router-dom'
+import Home from "./page/home";
+
+export const AppContext = React.createContext()
+
 
 function App() {
+
+    const [open, setOpen] = useState(false)
+
+    function handleDrawerClose(){
+        setOpen(false)
+    }
+    function handleDrawerOpen(){
+        setOpen(true)
+    }
+
     return (
-        <>
-            <h1>APP</h1>
-            <Navbar/>
-        </>
+        <AppContext.Provider value={{drawerOpenState: open,drawerClose: handleDrawerClose}}>
+            <Router>
+                <Switch>
+                    <Route exact path="/things">
+                        <SideBar/>
+                        <Home/>
+                    </Route>
+                    <Route path="/">
+                        <SideBar/>
+                        <Home/>
+                    </Route>
+                </Switch>
+            </Router>
+        </AppContext.Provider>
     );
 }
 

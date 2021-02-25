@@ -21,3 +21,6 @@ const SmokeSensor = "SmokeSensor"
 const TemperatureSensor = "TemperatureSensor"
 const Thermostat = "Thermostat"
 const VideoCamera = "VideoCamera"
+
+
+export const drawerWidth = 240;

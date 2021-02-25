@@ -3,7 +3,7 @@ import Light from "./capability/light";
 import Grid from "@material-ui/core/Grid";
 import Modal from '@material-ui/core/Modal';
 import Card from "@material-ui/core/Card";
-import {ThingsContext} from "../page/home"
+import {HomeContext} from "../page/home"
 import {makeStyles} from "@material-ui/core/styles";
 
 function rand() {
@@ -90,7 +90,7 @@ export default function Thing(props) {
 
 
 
-    const {handleSendMessage} = useContext(ThingsContext)
+    const {handleSendMessage} = useContext(HomeContext)
 
 
     const setPropertyValue = useCallback((property) => {

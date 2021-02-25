@@ -1,33 +1,22 @@
-import React from 'react';
-import {fade, makeStyles, useTheme} from '@material-ui/core/styles';
+import React, {useContext} from 'react';
+import {makeStyles, useTheme} from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
-import InputBase from '@material-ui/core/InputBase';
 import Badge from '@material-ui/core/Badge';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import MenuIcon from '@material-ui/icons/Menu';
-import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MailIcon from '@material-ui/icons/Mail';
+import AddIcon from '@material-ui/icons/Add';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
-import Drawer from "@material-ui/core/Drawer";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import Divider from "@material-ui/core/Divider";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import HomeIcon from "@material-ui/icons/Home";
-import AlarmOnIcon from '@material-ui/icons/AlarmOn';
-import ListItemText from "@material-ui/core/ListItemText";
-import InboxIcon from "@material-ui/icons/MoveToInbox";
 import {useTranslation} from 'react-i18next';
 import Home from "../page/home.jsx";
 import clsx from "clsx";
-import CssBaseline from "@material-ui/core/CssBaseline";
+import {AppContext} from "../App";
 
 const drawerWidth = 240;
 
@@ -63,22 +52,7 @@ const useStyles = makeStyles((theme) => ({
             display: 'block',
         },
     },
-    content: {
-        flexGrow: 1,
-        padding: theme.spacing(3),
-        transition: theme.transitions.create('margin', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-        marginLeft: -drawerWidth,
-    },
-    contentShift: {
-        transition: theme.transitions.create('margin', {
-            easing: theme.transitions.easing.easeOut,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-        marginLeft: 0,
-    },
+
 
     inputRoot: {
         color: 'inherit',
@@ -108,19 +82,14 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Topbar() {
+export default function TopBar(props) {
     const classes = useStyles();
     const {t, i18n} = useTranslation();
     const theme = useTheme();
 
-    //侧边栏打开、关闭状态
-    const [open, setOpen] = React.useState(false);
-    const handleDrawerOpen = () => {
-        setOpen(true);
-    };
-    const handleDrawerClose = () => {
-        setOpen(false);
-    };
+    const {drawerOpenState} = useContext(AppContext)
+    const {drawerClose} = useContext(AppContext)
+
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -205,11 +174,10 @@ export default function Topbar() {
     );
 
     return (
-        <div className={classes.root}>
-            <CssBaseline/>
+        <>
             <AppBar position="fixed"
                     className={clsx(classes.appBar, {
-                        [classes.appBarShift]: open,
+                        [classes.appBarShift]: drawerOpenState,
                     })}>
                 <Toolbar>
                     <IconButton
@@ -217,7 +185,7 @@ export default function Topbar() {
                         className={classes.menuButton}
                         color="inherit"
                         aria-label="open drawer"
-                        onClick={handleDrawerOpen}
+                        onClick={() => drawerClose()}
                     >
                         <MenuIcon/>
                     </IconButton>
@@ -227,25 +195,10 @@ export default function Topbar() {
 
                     <div className={classes.grow}/>
                     <div className={classes.sectionDesktop}>
-                        <IconButton aria-label="show 4 new mails" color="inherit">
-                            <Badge badgeContent={4} color="secondary">
-                                <MailIcon/>
+                        <IconButton aria-label="show 4 new mails" color="inherit" onClick={()=>{props.addNewThings()}}>
+                            <Badge badgeContent={0} color="secondary">
+                                <AddIcon/>
                             </Badge>
-                        </IconButton>
-                        <IconButton aria-label="show 17 new notifications" color="inherit">
-                            <Badge badgeContent={17} color="secondary">
-                                <NotificationsIcon/>
-                            </Badge>
-                        </IconButton>
-                        <IconButton
-                            edge="end"
-                            aria-label="account of current user"
-                            aria-controls={menuId}
-                            aria-haspopup="true"
-                            onClick={handleProfileMenuOpen}
-                            color="inherit"
-                        >
-                            <AccountCircle/>
                         </IconButton>
                     </div>
                     <div className={classes.sectionMobile}>
@@ -263,19 +216,18 @@ export default function Topbar() {
             </AppBar>
 
 
-
             {renderMobileMenu}
             {renderMenu}
-            <main
-                className={clsx(classes.content, {
-                    [classes.contentShift]: open,
-                })}
-            >
-                <div className={classes.drawerHeader} />
-                <Home/>
-            </main>
+            {/*<main*/}
+            {/*    className={clsx(classes.content, {*/}
+            {/*        [classes.contentShift]: props.open,*/}
+            {/*    })}*/}
+            {/*>*/}
+            {/*    <div className={classes.drawerHeader}/>*/}
+            {/*    <Home/>*/}
+            {/*</main>*/}
 
 
-        </div>
+        </>
     );
 }
