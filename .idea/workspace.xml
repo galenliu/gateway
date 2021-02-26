@@ -23,18 +23,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9f4f53eb-6f7f-48b5-82a2-b5196c9afd72" name="默认的" comment="">
+      <change afterPath="$PROJECT_DIR$/app/src/page/addThings.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/App.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/component/navbar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/navbar.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/component/newThingCard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/newThingCard.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/component/sideBar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/sideBar.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/component/thing.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/thing.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/component/topbar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/topBar.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/js/constant.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/js/constant.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/component/topBar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/topBar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/js/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/js/api.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/page/home.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/page/home.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/page/newThings.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/page/newThings.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/page/newThings.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/setupProxy.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/vite.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/vite.config.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/app/yarn.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/actions_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/actions_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/new_things_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/new_things_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/models/things.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/models/things.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/router.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,7 +90,7 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/src/mock" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../virtual-adapter" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -118,7 +122,7 @@
       <recent name="$PROJECT_DIR$/app/models/thing" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.dev">
+  <component name="RunManager" selected="Go 构建.gateway">
     <configuration name="gateway" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true">
       <module name="gateway" />
       <working_directory value="$PROJECT_DIR$" />
@@ -143,8 +147,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.dev" />
         <item itemvalue="Go 构建.gateway" />
+        <item itemvalue="npm.dev" />
       </list>
     </recent_temporary>
   </component>
@@ -213,16 +217,6 @@
           <url>file://$PROJECT_DIR$/server/controllers/addon_controller.go</url>
           <line>57</line>
           <option name="timeStamp" value="18" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/server/models/things.go</url>
-          <line>63</line>
-          <option name="timeStamp" value="22" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/server/models/things.go</url>
-          <line>65</line>
-          <option name="timeStamp" value="23" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

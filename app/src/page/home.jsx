@@ -1,9 +1,9 @@
-import React, {useCallback, useContext, useEffect, useReducer, useState} from "react";
+import React, {useCallback, useEffect, useReducer, useState} from "react";
 import Thing from "../component/thing.jsx";
 import Grid from "@material-ui/core/Grid";
 import mock from "../mock/things.json"
 import API from "../js/api";
-import NewThingsDialog from "./newThings";
+import NewThingsDialog from "./addThings";
 
 import ThingsReducer, {Actions} from "../js/things-reducer";
 import TopBar from "../component/topBar";
@@ -13,14 +13,15 @@ export const HomeContext = React.createContext()
 function Home() {
 
     const [things, thingsDispatch] = useReducer(ThingsReducer, [])
-    const [newThingsAdd, setNewThingsAdd] = useState(false)
+    const [newThingsShow, setNewThingsShow] = useState(false)
 
 
     function handleNewThingsAddClose() {
-        setNewThingsAdd(false)
+        setNewThingsShow(false)
     }
+
     function handleNewThingsAddOpen() {
-        setNewThingsAdd(true)
+        setNewThingsShow(true)
     }
 
     useEffect(() => {
@@ -54,17 +55,20 @@ function Home() {
     }
 
 
-
     return (
 
-        <HomeContext.Provider value={{open: newThingsAdd,close: handleNewThingsAddClose,handleSendMessage:handleSendMessage}}>
+        <HomeContext.Provider value={{
+            open: newThingsShow,
+            setNewThingsClose: handleNewThingsAddClose,
+            setNewThingsOpen: handleNewThingsAddOpen
+        }}>
             <>
                 <TopBar/>
                 <Grid container spacing={1}>
                     {RenderThingsView()}
                 </Grid>
             </>
-            <NewThingsDialog />
+            <NewThingsDialog/>
         </HomeContext.Provider>
     );
 }

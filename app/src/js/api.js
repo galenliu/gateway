@@ -1,10 +1,18 @@
 let debug = true;
 
-function getUrl(url){
-    if(debug){
-        return "http://localhost:9090"+url
-    }else {
-       return url
+export function getUrl(url) {
+    if (debug) {
+        return "http://localhost:9090" + url
+    } else {
+        return url
+    }
+}
+
+export function getWsUrl(url) {
+    if (debug) {
+        return "ws://localhost:9090" + url
+    } else {
+        return url
     }
 }
 
@@ -29,13 +37,11 @@ const API = {
     },
 
     getJson(url) {
-
-        url = getUrl(url)
         const opts = {
             method: 'GET',
             headers: this.headers(),
         };
-
+        console.log("url:",url)
         return fetch(url, opts).then((res) => {
             console.log("fetch getJson api:", url)
             if (!res.ok) {
@@ -46,7 +52,7 @@ const API = {
     },
 
     putJson(url, data) {
-        url = getUrl(url)
+
         const opts = {
             method: 'PUT',
             headers: this.headers('application/json'),
@@ -62,7 +68,7 @@ const API = {
     },
 
     postJson(url, data) {
-        url = getUrl(url)
+
         const opts = {
             method: 'POST',
             headers: this.headers('application/json'),
@@ -79,7 +85,7 @@ const API = {
     },
 
     delete(url) {
-        url = getUrl(url)
+
         const opts = {
             method: 'DELETE',
             headers: this.headers(),

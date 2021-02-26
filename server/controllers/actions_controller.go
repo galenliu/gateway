@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"fmt"
+	"gateway/pkg/log"
 	"gateway/server/models"
 	"gateway/server/models/thing"
-	"gateway/pkg/log"
 	"github.com/gin-gonic/gin"
 	json "github.com/json-iterator/go"
 	"io/ioutil"
@@ -50,6 +50,7 @@ func (controller *ActionsController) HandleActions(c *gin.Context) {
 		actionName = k
 		input = v.Input
 	}
+
 
 	if thingId != "" {
 		action = thing.NewThingAction(thingId, actionName, input)

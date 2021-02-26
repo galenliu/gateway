@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"gateway/pkg/bus"
 	"gateway/pkg/util"
 	"gateway/server/models"
@@ -45,9 +44,6 @@ func (controller *NewThingsController) HandleWebsocket(c *gin.Context) {
 	if !c.IsWebsocket() {
 		c.Next()
 	}
-	fmt.Printf("is websocket %v", c.IsWebsocket())
-	fmt.Printf("c.gin %v", c.Request)
-
 	conn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		c.String(http.StatusBadGateway, err.Error())
@@ -61,6 +57,9 @@ func (controller *NewThingsController) HandleWebsocket(c *gin.Context) {
 		controller.handleNewThing(t)
 	}
 
+	bus.Subscribe(util.ThingAdded, controller.handleNewThing)
+	bus.SubscribeOnce(util.PairingTimeout, controller.Close)
+
 	for {
 		select {
 		case <-controller.closeChan:
@@ -69,7 +68,7 @@ func (controller *NewThingsController) HandleWebsocket(c *gin.Context) {
 		default:
 			_, data, e := conn.ReadMessage()
 			controller.checkErr(e)
-			log.Print(data)
+			log.Print("new thing data:", data)
 		}
 
 	}
@@ -87,15 +86,15 @@ func (controller *NewThingsController) handleNewThing(thing *thing.Thing) {
 func (controller *NewThingsController) checkErr(err error) {
 	if err != nil {
 		log.Print(err.Error())
-		controller.closeChan <- struct{}{}
+		controller.Close()
 		return
 	}
-
 }
 
 func (controller *NewThingsController) Close() {
 	controller.locker.Lock()
 	defer controller.locker.Unlock()
 	bus.Unsubscribe(util.ThingAdded, controller.handleNewThing)
+	controller.closeChan <- struct{}{}
 	_ = controller.ws.Close()
 }

@@ -1,5 +1,5 @@
-import React from 'react';
-import {fade, makeStyles, useTheme} from '@material-ui/core/styles';
+import React, {useContext} from 'react';
+import {makeStyles, useTheme} from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import MailIcon from '@material-ui/icons/Mail';
 import Drawer from "@material-ui/core/Drawer";
@@ -17,7 +17,6 @@ import {useTranslation} from 'react-i18next';
 import Home from "../page/home.jsx";
 import {drawerWidth} from "../js/constant"
 import {AppContext} from "../App"
-
 
 
 const useStyles = makeStyles((theme) => ({
@@ -46,11 +45,13 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-export default function SideBar() {
+export default function SideBar(props) {
 
     const classes = useStyles();
 
-    console.log("layout sidebar",props.open)
+    const {open, setOpen, setClose} = useContext(AppContext)
+
+    console.log("layout sidebar", open)
     const {t, i18n} = useTranslation();
     const theme = useTheme();
 
@@ -58,16 +59,16 @@ export default function SideBar() {
         <>
             <Drawer
                 className={classes.drawer}
-                width={drawerWidth}
+                width="240"
                 variant="persistent"
                 anchor="left"
-                open={props.open}
+                open={open}
                 classes={{
                     paper: classes.drawerPaper,
                 }}
             >
                 <div className={classes.drawerHeader}>
-                    <IconButton onClick={()=>props.handleClose()}>
+                    <IconButton onClick={() => setClose()}>
                         {theme.direction === 'ltr' ? <ChevronLeftIcon/> : <ChevronRightIcon/>}
                     </IconButton>
                 </div>

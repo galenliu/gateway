@@ -51,11 +51,7 @@ func CollectRoute(app *WebApp) *gin.Engine {
 
 	//解决跨域问题 仅测试
 	if gin.Mode() == gin.DebugMode {
-		conf := cors.DefaultConfig()
-		conf.AllowAllOrigins = true //允许所有域名
-		conf.AllowMethods = []string{"GET", "POST", "OPTIONS"}//允许请求的方法
-		conf.AllowHeaders = []string{"tus-resumable", "upload-length", "upload-metadata", "cache-control", "x-requested-with", "*"}//允许的Header
-		router.Use(cors.New(conf))
+		router.Use(cors.Default())
 	}
 
 	//日志写入文件

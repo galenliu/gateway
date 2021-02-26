@@ -14,7 +14,7 @@ import AddIcon from '@material-ui/icons/Add';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import {useTranslation} from 'react-i18next';
-import Home from "../page/home.jsx";
+import {HomeContext} from "../page/home.jsx";
 import clsx from "clsx";
 import {AppContext} from "../App";
 
@@ -83,13 +83,17 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function TopBar(props) {
+
     const classes = useStyles();
     const {t, i18n} = useTranslation();
     const theme = useTheme();
 
-    const {drawerOpenState} = useContext(AppContext)
-    const {drawerClose} = useContext(AppContext)
+    const {open, setOpen} = useContext(AppContext)
+    const {setNewThingsOpen} = useContext(HomeContext)
 
+    function handleNewThings() {
+
+    }
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -177,7 +181,7 @@ export default function TopBar(props) {
         <>
             <AppBar position="fixed"
                     className={clsx(classes.appBar, {
-                        [classes.appBarShift]: drawerOpenState,
+                        [classes.appBarShift]: open,
                     })}>
                 <Toolbar>
                     <IconButton
@@ -185,7 +189,7 @@ export default function TopBar(props) {
                         className={classes.menuButton}
                         color="inherit"
                         aria-label="open drawer"
-                        onClick={() => drawerClose()}
+                        onClick={() => setOpen()}
                     >
                         <MenuIcon/>
                     </IconButton>
@@ -195,7 +199,9 @@ export default function TopBar(props) {
 
                     <div className={classes.grow}/>
                     <div className={classes.sectionDesktop}>
-                        <IconButton aria-label="show 4 new mails" color="inherit" onClick={()=>{props.addNewThings()}}>
+                        <IconButton aria-label="show 4 new mails" color="inherit" onClick={() => {
+                            setNewThingsOpen()
+                        }}>
                             <Badge badgeContent={0} color="secondary">
                                 <AddIcon/>
                             </Badge>

@@ -10,17 +10,18 @@ export const AppContext = React.createContext()
 
 function App() {
 
-    const [open, setOpen] = useState(false)
+    const [drawerOpen, setDrawerOpen] = useState(false)
 
-    function handleDrawerClose(){
-        setOpen(false)
+    function handleDrawerClose() {
+        setDrawerOpen(false)
     }
-    function handleDrawerOpen(){
-        setOpen(true)
+
+    function handleDrawerOpen() {
+        setDrawerOpen(true)
     }
 
     return (
-        <AppContext.Provider value={{drawerOpenState: open,drawerClose: handleDrawerClose}}>
+        <AppContext.Provider value={{open: drawerOpen, setOpen: handleDrawerOpen, setClose: handleDrawerClose}}>
             <Router>
                 <Switch>
                     <Route exact path="/things">
