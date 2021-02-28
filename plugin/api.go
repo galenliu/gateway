@@ -136,62 +136,30 @@ func CancelAddNewThing() {
 	return
 }
 
-func SetThingPin(thingId string, pin interface{}) error {
-	device, err := manager.findDevice(thingId)
-	if err != nil {
-		return err
+func CancelRemoveThing(deviceId string) {
+	dev := manager.getDevice(deviceId)
+	if dev == nil {
+		return
 	}
-	err = device.SetPin(pin)
+	adapter := manager.getAdapter(dev.ID)
+	if adapter!=nil{
+		adapter.cancelRemoveThing(dev.ID)
+	}
+}
+
+func SetThingPin(thingId string, pin interface{}) error {
+	device := manager.getDevice(thingId)
+	if device == nil {
+		return fmt.Errorf("con not finid device:"+thingId)
+	}
+	err := device.SetPin(pin)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-//func SubscriptionDeviceAdded(key interface{}, f func(*addon.Device)) func() {
-//	manager.onDeviceAddedFuncs[key] = f
-//	var removeFunc = func() {
-//		delete(manager.onDeviceAddedFuncs, key)
-//	}
-//	return removeFunc
-//}
-//
-//func SubscriptionDeviceConnected(key interface{}, f func(*addon.Device, bool)) func() {
-//	manager.onDeviceConnectedFuncs[key] = f
-//	var removeFunc = func() {
-//		delete(manager.onPropertyChangedFuncs, key)
-//	}
-//	return removeFunc
-//}
-//
-//func SubscriptionActionUpdate(key interface{}, f func(*addon.Action)) func() {
-//	manager.onActionUpdateFuncs[key] = f
-//	var removeFunc = func() {
-//		delete(manager.onPropertyChangedFuncs, key)
-//	}
-//	return removeFunc
-//}
-//
-//func SubscriptionEvent(key interface{}, f func(*addon.Event)) func() {
-//	manager.onEventFuncs[key] = f
-//	var removeFunc = func() {
-//		delete(manager.onPropertyChangedFuncs, key)
-//	}
-//	return removeFunc
-//}
-//
-//func SubscriptionDeviceRemoved(key interface{}, f func(*addon.Device)) func() {
-//	manager.onDeviceRemovedFuncs[key] = f
-//	var removeFunc = func() {
-//		delete(manager.onPropertyChangedFuncs, key)
-//	}
-//	return removeFunc
-//}
-//
-//func SubscriptionPropertyChanged(key interface{}, f func(*addon.Property)) func() {
-//	manager.onPropertyChangedFuncs[key] = f
-//	var removeFunc = func() {
-//		delete(manager.onPropertyChangedFuncs, key)
-//	}
-//	return removeFunc
-//}
+func RemoveAction(thingId, actionId, actionName string) error {
+	//TODO
+	return nil
+}

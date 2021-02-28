@@ -23,5 +23,9 @@
   "chooseIcon" : "choose icon",
   "Light": "Light",
   "OnOffSwitch": "OnOffSwitch",
-  "Custom": "Custom"
+  "Custom": "Custom",
+
+  "AddNewThings": "Add new things",
+  "Open": "Open",
+  "Close": "Close"
 }

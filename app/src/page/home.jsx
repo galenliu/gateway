@@ -29,7 +29,6 @@ function Home() {
             console.log("data", data)
         }).catch((e) => {
             console.log(e)
-            return
         })
         console.log("things", things)
         mock.forEach((thing) => {

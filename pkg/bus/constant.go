@@ -1,8 +1,11 @@
 package bus
 
-
 const (
-	TopicSetProperty = "TopicSetProperty"
-	TopicGetDevices  = "TopicGetDevices"
-	TopicGetThings   = "TopicGetThings"
+	SetProperty = "SetProperty"
+	GetDevices  = "GetDevices"
+	GetThings   = "GetThings"
+
+	Pair    = "pair"
+	Unpair  = "unpair"
+	Pending = "pending"
 )

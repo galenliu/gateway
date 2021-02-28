@@ -145,7 +145,7 @@ func CollectRoute(app *WebApp) *gin.Engine {
 	{
 		actionsController := controllers.NewActionsController()
 		actionsGroup.POST("/", actionsController.HandleActions)
-		actionsGroup.DELETE("/:actionName/:actionId", actionsController.HandleActions)
+		actionsGroup.DELETE("/:actionName/:actionId", actionsController.HandleDeleteAction)
 	}
 
 	return router

@@ -41,7 +41,7 @@ const API = {
             method: 'GET',
             headers: this.headers(),
         };
-        console.log("url:",url)
+        console.log("url:", url)
         return fetch(url, opts).then((res) => {
             console.log("fetch getJson api:", url)
             if (!res.ok) {
@@ -85,7 +85,6 @@ const API = {
     },
 
     delete(url) {
-
         const opts = {
             method: 'DELETE',
             headers: this.headers(),

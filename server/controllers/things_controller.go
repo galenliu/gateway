@@ -6,7 +6,6 @@ import (
 	"gateway/server/models"
 	thing2 "gateway/server/models/thing"
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
 	json "github.com/json-iterator/go"
 	"go.uber.org/zap"
 	"io/ioutil"
@@ -23,7 +22,7 @@ func NewThingsControllerFunc() *ThingsController {
 	return tc
 }
 
-// POST /container
+// POST /things
 func (tc *ThingsController) HandleCreateThing(c *gin.Context) {
 
 	data, err := ioutil.ReadAll(c.Request.Body)
@@ -51,6 +50,19 @@ func (tc *ThingsController) HandleCreateThing(c *gin.Context) {
 	}
 	c.String(http.StatusCreated, fmt.Sprintf("create thing(%s) succeed", id))
 }
+
+func (tc *ThingsController) HandleDeleteThing(c *gin.Context) {
+	thingId := c.Param("thingId")
+	err := tc.Container.RemoveThing(thingId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, fmt.Sprintf("Failed to remove thing thingId: %v ,err: %v", thingId, err))
+		return
+	}
+	log.Info(fmt.Sprintf("Successfully deleted %v from database", thingId))
+	c.Status(http.StatusNoContent)
+}
+
+
 
 func (tc *ThingsController) HandleGetThing(c *gin.Context) {
 	if c.IsWebsocket() {
@@ -164,18 +176,5 @@ func (tc *ThingsController) HandleSetThing(c *gin.Context) {
 
 }
 
-func (tc *ThingsController) HandleDeleteThing(c *gin.Context) {
-	thingId := c.Param("thing_id")
-	err := tc.Container.RemoveThing(thingId)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, fmt.Sprintf("Failed to remove thing thingId: %v ,err: %v", thingId, err))
-		return
-	}
-	log.Info(fmt.Sprintf("Successfully deleted %v from database", thingId))
-	c.Status(http.StatusNoContent)
-}
 
-type ThingContext struct {
-	conn    *websocket.Conn
-	thingId string
-}
+

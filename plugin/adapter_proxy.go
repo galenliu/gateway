@@ -88,6 +88,19 @@ func (adapter *AdapterProxy) cancelPairing() {
 	})
 }
 
+func (adapter *AdapterProxy) cancelRemoveThing(deviceId string) {
+	log.Info(fmt.Sprintf("adapter: %s start pairing", adapter.ID))
+	adapter.sendMessage(AdapterCancelRemoveDeviceCommand, struct {
+		PluginId  string `json:"pluginId"`
+		AdapterID string `json:"adapterId"`
+		DeviceId  string `json:"deviceId"`
+	}{
+		PluginId:  adapter.pluginId,
+		AdapterID: adapter.ID,
+		DeviceId:  deviceId,
+	})
+}
+
 func (adapter *AdapterProxy) getManager() *AddonManager {
 	return adapter.plugin.pluginServer.manager
 }

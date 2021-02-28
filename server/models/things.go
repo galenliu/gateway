@@ -8,7 +8,6 @@ import (
 	"gateway/pkg/util"
 	"gateway/plugin"
 	"gateway/server/models/thing"
-	json "github.com/json-iterator/go"
 	"sync"
 )
 
@@ -16,9 +15,7 @@ var once sync.Once
 var things *Things
 
 type Things struct {
-	things                         map[string]*thing.Thing
-	onNewThingAddSubscriptionFuncs map[interface{}]func(thing *thing.Thing)
-	removeSubscriptionFuncs        []func()
+	things map[string]*thing.Thing
 }
 
 func NewThings() *Things {
@@ -67,9 +64,10 @@ func (ts *Things) GetThings() []*thing.Thing {
 
 //get things with out database
 func (ts *Things) GetNewThings() []*thing.Thing {
-	var connectedThings = make([]*thing.Thing,0)
+	var connectedThings []*thing.Thing
+	//connectedThings = new([]*thing.Thing)
 	connectedThings = plugin.GetThings()
-	//bus.Publish(bus.TopicGetThings,connectedThings)
+	//bus.Publish(bus.GetThings, &connectedThings)
 	storedThings := ts.GetThings()
 	var things []*thing.Thing
 	var newList []*thing.Thing
@@ -88,8 +86,6 @@ func (ts *Things) HasThing(thingId string) bool {
 	return ok
 }
 
-
-
 func (ts *Things) CreateThing(id string, description []byte) error {
 	var th = thing.NewThing(id, description)
 	if th == nil {
@@ -97,7 +93,25 @@ func (ts *Things) CreateThing(id string, description []byte) error {
 	}
 	th.SetConnected(true)
 	err := database.CreateThing(th.ID, th.GetDescription())
-	return err
+	if err != nil {
+		return err
+	}
+	ts.things[th.ID] = th
+	return nil
+}
+
+func (ts *Things) RemoveThing(thingId string) error {
+	//TODO: Delete Thing from database
+	t := ts.GetThing(thingId)
+	if t == nil {
+		return fmt.Errorf("thing not found")
+	}
+	err := database.RemoveThing(t.ID)
+	if err != nil {
+		return err
+	}
+	delete(ts.things, thingId)
+	return nil
 }
 
 func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) {
@@ -112,22 +126,6 @@ func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) 
 	_ = plugin.SetProperValue(thingId, propName, value)
 }
 
-func (ts *Things) RemoveThing(thingId string) error {
-	//TODO: Delete Thing from database
-	t := ts.GetThing(thingId)
-	if t == nil {
-		return fmt.Errorf("thing not found")
-	}
-	t.Remove()
-	delete(ts.things, thingId)
-	return nil
-}
-
-func (ts *Things) AddThing(thing *thing.Thing) error {
-	//TODO: Delete Thing from database
-	return nil
-}
-
 func (ts *Things) onPropertyChanged(property *addon.Property) {
 	for _, th := range ts.things {
 		if th.ID == property.DeviceId {
@@ -140,23 +138,6 @@ func (ts *Things) onPropertyChanged(property *addon.Property) {
 	}
 }
 
-func (ts *Things) AddNewThingSubscription(key interface{}, f func(thing *thing.Thing)) func() {
-	if ts.onNewThingAddSubscriptionFuncs == nil {
-		ts.onNewThingAddSubscriptionFuncs = make(map[interface{}]func(thing *thing.Thing), 2)
-	}
-	ts.onNewThingAddSubscriptionFuncs[key] = f
-	var removeFunc = func() {
-		delete(ts.onNewThingAddSubscriptionFuncs, key)
-	}
-	return removeFunc
-}
-
-func GetThingById(thingId string) (thing *thing.Thing, err error) {
-	var t string
-	t, err = database.QueryValue(thingId)
-	err = json.UnmarshalFromString(t, thing)
-	return
-}
 
 func GetThingsFormDataBase() (list []*thing.Thing) {
 

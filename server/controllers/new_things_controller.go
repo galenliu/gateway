@@ -64,7 +64,6 @@ func (controller *NewThingsController) HandleWebsocket(c *gin.Context) {
 		select {
 		case <-controller.closeChan:
 			return
-
 		default:
 			_, data, e := conn.ReadMessage()
 			controller.checkErr(e)

@@ -27,6 +27,8 @@ func NewGateway() (gateway *HomeGateway, err error) {
 	return gateway, err
 }
 
+
+
 func (gateway *HomeGateway) Start() error {
 
 	log.Info("gateway start.....")

@@ -23,7 +23,7 @@ export default defineConfig({
                 ws:true,
                 // rewrite: (path) => path.replace(/^\/things/, '')
             },
-            '/action': {
+            '/actions': {
                 target: 'http://localhost:9090',
                 changeOrigin: true,
                 secure: false,

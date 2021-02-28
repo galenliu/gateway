@@ -58,9 +58,9 @@ func NewAddonsManager(ctx context.Context) (*AddonManager, error) {
 	am.installAddons = make(map[string]*AddonInfo, 50)
 	am.adapters = make(map[string]*AdapterProxy, 20)
 
-	bus.Subscribe(bus.TopicSetProperty, am.handleSetPropertyValue)
-	bus.Subscribe(bus.TopicGetDevices, am.handleGetDevices)
-	bus.Subscribe(bus.TopicGetThings, am.handleGetThings)
+	bus.Subscribe(bus.SetProperty, am.handleSetPropertyValue)
+	bus.Subscribe(bus.GetDevices, am.handleGetDevices)
+	bus.Subscribe(bus.GetThings, am.handleGetThings)
 
 	var c context.Context
 	c, am.pluginCancel = context.WithCancel(am.ctx)
@@ -122,9 +122,8 @@ func (manager *AddonManager) unloadAddon(packageId string) {
 
 func (manager *AddonManager) HandleDeviceAdded(device *addon.Device) {
 	manager.devices[device.ID] = device
-	if bus.HasCallBack(util.ThingAdded) {
-		bus.Publish(util.ThingAdded, asThing(device))
-	}
+	bus.Publish(util.ThingAdded, asThing(device))
+
 }
 
 func (manager *AddonManager) HandleDeviceRemoved(device *addon.Device) {
@@ -235,23 +234,22 @@ func (manager *AddonManager) handleSetPropertyValue(deviceId, propName string, s
 	adapter.setPropertyValue(property, setValue)
 }
 
-func (manager *AddonManager) handleGetDevices(devs []*addon.Device) {
+func (manager *AddonManager) handleGetDevices(devs *[]*addon.Device) {
 	for _, d := range manager.devices {
-		devs = append(devs, d)
-		devs = append(devs, d)
+		*devs = append(*devs, d)
 	}
 }
-func (manager *AddonManager) handleGetThings(ts []*thing.Thing) {
+
+func (manager *AddonManager) handleGetThings(ts *[]*thing.Thing) {
 	for _, d := range manager.devices {
 		var t = asThing(d)
-		ts = append(ts, t)
+		*ts = append(*ts, t)
 	}
 }
 
 func (manager *AddonManager) getAdapterByDeviceId(deviceId string) *AdapterProxy {
-	device, err := manager.findDevice(deviceId)
-	if err != nil {
-		log.Error(err.Error())
+	device := manager.getDevice(deviceId)
+	if device == nil {
 		return nil
 	}
 	adapter, err1 := manager.findAdapter(device.AdapterId)
@@ -262,15 +260,12 @@ func (manager *AddonManager) getAdapterByDeviceId(deviceId string) *AdapterProxy
 	return adapter
 }
 
-func (manager *AddonManager) findDevice(deviceId string) (*addon.Device, error) {
-	if deviceId == "" {
-		return nil, fmt.Errorf("devices id none")
-	}
+func (manager *AddonManager) getDevice(deviceId string) *addon.Device {
 	d, ok := manager.devices[deviceId]
 	if !ok {
-		return nil, fmt.Errorf("addon manager can not found devices(id:%s)", deviceId)
+		return nil
 	}
-	return d, nil
+	return d
 }
 
 func (manager *AddonManager) Start() {

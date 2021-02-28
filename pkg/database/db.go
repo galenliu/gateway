@@ -193,6 +193,7 @@ func CreateThing(id, description string) error {
 	return nil
 }
 
+
 func GetThings() map[string]string {
 	var things map[string]string = make(map[string]string)
 	rows, err := database.Query("SELECT id, description FROM things")

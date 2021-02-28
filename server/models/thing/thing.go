@@ -8,7 +8,6 @@ import (
 	json "github.com/json-iterator/go"
 )
 
-
 type Thing struct {
 	ID          string   `json:"id"`
 	AtContext   string   `json:"@context,omitempty"`
@@ -141,6 +140,11 @@ func (t *Thing) IsConnected() bool {
 	return t.Connected
 }
 
+func (t *Thing) RemoveAction(a *Action) bool {
+	_, ok := t.Actions[a.Name]
+	return ok
+}
+
 func (t *Thing) SetThingProperty(propertyName string, value interface{}) (interface{}, error) {
 	prop, err := t.findProperty(propertyName)
 	if err != nil {
@@ -156,10 +160,7 @@ func (t *Thing) SetThingProperty(propertyName string, value interface{}) (interf
 	return value, setErr
 }
 
-func (t *Thing) Remove()error {
-	return database.RemoveThing(t.ID)
-}
-
+//thing save to database must do this:
 func (t *Thing) GetDescription() string {
 	s, err := json.MarshalToString(t)
 	if err != nil {

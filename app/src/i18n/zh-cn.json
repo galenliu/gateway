@@ -24,5 +24,9 @@
   "Save" : "保存",
   "Light": "灯光",
   "OnOffSwitch": "开关设备",
-  "Custom": "自定义"
+  "Custom": "自定义",
+
+  "AddNewThings": "添加新设备",
+  "Open": "打开",
+  "Close": "关闭"
 }

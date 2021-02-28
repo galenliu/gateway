@@ -12,31 +12,26 @@ const (
 	ActionPending = "pending"
 )
 
-var actionId uint = 0
-
 type Actions struct {
 	things *Things
-	List map[uint]*thing.Action
+	List   map[string]*thing.Action
 }
 
 func NewActions() *Actions {
-
 	return &Actions{
-		List: make(map[uint]*thing.Action),
+		List: make(map[string]*thing.Action),
 	}
 }
 
-func (actions *Actions) AddAction(action *thing.Action) {
-	action.ID = actionId
-	actions.List[action.ID] = action
+func (actions *Actions) Add(action *thing.Action) {
 
+	actions.List[action.ID] = action
 	if action.ThingID != "" {
 		t := actions.things.GetThing(action.ThingID)
 		if t == nil {
 			action.Error = "can not find thing"
 			return
 		}
-
 	}
 
 	switch action.Name {
@@ -59,19 +54,33 @@ func (actions *Actions) AddAction(action *thing.Action) {
 
 }
 
-func (actions *Actions) RemoveAction(actionId uint) error {
+func (actions *Actions) Remove(actionId string) error {
 	action, ok := actions.List[actionId]
 	if !ok {
 		return fmt.Errorf("Invaild actions id: %v ", actionId)
 	}
 	if action.Status == "pending" {
+		if action.ThingID != "" {
+			if t := actions.things.GetThing(action.ThingID); t != nil {
+				if !t.RemoveAction(action) {
+					return fmt.Errorf(fmt.Sprintf("Invaild action name : %s", action.Name))
+				}
+			}
+		}
 
+	} else {
+		switch action.Name {
+		case ActionPair:
+			plugin.CancelAddNewThing()
+			break
+		case ActionUnpair:
+			plugin.CancelRemoveThing(action.Input["id"].(string))
+			break
+		default:
+			return fmt.Errorf("Invaild action name:" + action.Name)
+		}
 	}
+	action.UpdateStatus("deleted")
 	delete(actions.List, actionId)
 	return nil
-}
-
-func generateId() uint {
-	actionId = actionId + 1
-	return actionId
 }

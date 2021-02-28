@@ -1,6 +1,10 @@
 package bus
 
-import "github.com/asaskevich/EventBus"
+import (
+	"fmt"
+	"gateway/pkg/log"
+	"github.com/asaskevich/EventBus"
+)
 
 var bus EventBus.Bus
 
@@ -22,14 +26,20 @@ func Unsubscribe(topic string, fn interface{}) {
 	_ = bus.Unsubscribe(topic, fn)
 }
 
-func Publish(topic string,args ...interface{}) {
+func Publish(topic string, args ...interface{}) {
+	log.Info("publish topic:"+topic)
 	if bus == nil {
 		initBus()
 	}
-	bus.Publish(topic,args ...)
+	log.Info(fmt.Sprintf(topic+" has callback%v",bus.HasCallback(topic)))
+	if !bus.HasCallback(topic) {
+		return
+	}
+	bus.Publish(topic, args...)
 }
 
-func HasCallBack(topic string)bool{
+
+func HasCallBack(topic string) bool {
 	return bus.HasCallback(topic)
 }
 
@@ -44,9 +54,5 @@ func SubscribeAsync(topic string, fn interface{}) {
 	if bus == nil {
 		initBus()
 	}
-	_ = bus.SubscribeAsync(topic, fn,false)
+	_ = bus.SubscribeAsync(topic, fn, false)
 }
-
-
-
-

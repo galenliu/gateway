@@ -3,13 +3,13 @@ package controllers
 import (
 	"fmt"
 	"gateway/pkg/log"
+	"gateway/plugin"
 	"gateway/server/models"
 	"gateway/server/models/thing"
 	"github.com/gin-gonic/gin"
 	json "github.com/json-iterator/go"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 )
 
 type ActionsController struct {
@@ -51,31 +51,37 @@ func (controller *ActionsController) HandleActions(c *gin.Context) {
 		input = v.Input
 	}
 
-
 	if thingId != "" {
 		action = thing.NewThingAction(thingId, actionName, input)
 	} else {
 		action = thing.NewAction(actionName, input)
 	}
-	controller.Actions.AddAction(action)
+	controller.Actions.Add(action)
 
-	var actionDesc []byte
+	var actionDesc string
 	actionDesc, err = action.GetDescription()
 	if err != nil {
 		c.String(http.StatusBadGateway, err.Error())
 		return
 	}
-	c.String(http.StatusOK, string(actionDesc))
+	c.String(http.StatusOK, actionDesc)
 }
 
 func (controller *ActionsController) HandleDeleteAction(c *gin.Context) {
 	log.Debug(fmt.Sprintf("Handler: %s %s", c.Request.Method, c.Request.URL.String()))
 	actionId := c.Param("actionId")
-	id, err := strconv.Atoi(actionId)
-	if err != nil {
-		c.String(http.StatusBadRequest, fmt.Sprintf("actions id  must int,err:%v", err.Error()))
+	actionName := c.Param("actionName")
+	thingId := c.Param("thingId")
+
+	if thingId != "" {
+		err := plugin.RemoveAction(thingId, actionId, actionName)
+		if err != nil {
+			log.Error(fmt.Sprintf("Removing acotion actionId: %s faild,err: %v", actionId, err))
+			c.String(400, err.Error())
+			return
+		}
 	}
-	err = controller.Actions.RemoveAction(uint(id))
+	err := controller.Actions.Remove(actionId)
 	if err != nil {
 		c.String(http.StatusBadRequest, err.Error())
 	}
