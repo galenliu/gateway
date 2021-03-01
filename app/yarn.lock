@@ -677,7 +677,7 @@ html-parse-stringify2@2.0.1:
   dependencies:
     void-elements "^2.0.1"
 
-http-proxy-middleware@^1.0.3, http-proxy-middleware@^1.0.6:
+http-proxy-middleware@^1.0.6:
   version "1.0.6"
   resolved "https://registry.npm.taobao.org/http-proxy-middleware/download/http-proxy-middleware-1.0.6.tgz?cache=0&sync_timestamp=1602445480546&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fhttp-proxy-middleware%2Fdownload%2Fhttp-proxy-middleware-1.0.6.tgz#0618557722f450375d3796d701a8ac5407b3b94e"
   integrity sha1-BhhVdyL0UDddN5bXAaisVAezuU4=
@@ -903,11 +903,6 @@ koa-proxy@^1.0.0-alpha.3:
     request "^2.88.0"
     request-promise-native "^1.0.5"
 
-koa2-connect@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.npm.taobao.org/koa2-connect/download/koa2-connect-1.0.2.tgz#cf196d70a4e6a055f717522768d26cdfc5396f7b"
-  integrity sha1-zxltcKTmoFX3F1InaNJs38U5b3s=
-
 lodash@^4.17.19, lodash@^4.17.20:
   version "4.17.21"
   resolved "https://registry.npm.taobao.org/lodash/download/lodash-4.17.21.tgz?cache=0&sync_timestamp=1613835817439&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Flodash%2Fdownload%2Flodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
@@ -1120,6 +1115,11 @@ react-transition-group@^4.4.0:
     dom-helpers "^5.0.1"
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
+
+react-use-websocket@^2.5.0:
+  version "2.5.0"
+  resolved "https://registry.npm.taobao.org/react-use-websocket/download/react-use-websocket-2.5.0.tgz#20c6657802369a280c4921840a0529c2fd0cfe6f"
+  integrity sha1-IMZleAI2migMSSGECgUpwv0M/m8=
 
 react@^17.0.1:
   version "17.0.1"
@@ -1343,14 +1343,6 @@ verror@1.10.0:
     assert-plus "^1.0.0"
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
-
-vite-plugin-proxy@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.npm.taobao.org/vite-plugin-proxy/download/vite-plugin-proxy-0.5.0.tgz#6d5f79a8e05fabff5c1d499b5110d36500477ba9"
-  integrity sha1-bV95qOBfq/9cHUmbURDTZQBHe6k=
-  dependencies:
-    http-proxy-middleware "^1.0.3"
-    koa2-connect "^1.0.2"
 
 vite@^2.0.1:
   version "2.0.3"

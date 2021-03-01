@@ -12,26 +12,27 @@ func initBus() {
 	bus = EventBus.New()
 }
 
-func Subscribe(topic string, fn interface{}) {
+func Subscribe(topic string, fn interface{})error {
 	if bus == nil {
 		initBus()
 	}
-	_ = bus.Subscribe(topic, fn)
+	return bus.Subscribe(topic, fn)
 }
 
-func Unsubscribe(topic string, fn interface{}) {
+
+func Unsubscribe(topic string, fn interface{})error {
 	if bus == nil {
 		initBus()
 	}
-	_ = bus.Unsubscribe(topic, fn)
+	return bus.Unsubscribe(topic, fn)
 }
 
 func Publish(topic string, args ...interface{}) {
-	log.Info("publish topic:"+topic)
+	log.Info("publish topic: "+topic)
 	if bus == nil {
 		initBus()
 	}
-	log.Info(fmt.Sprintf(topic+" has callback%v",bus.HasCallback(topic)))
+	log.Info(fmt.Sprintf(topic+" has callback %v",bus.HasCallback(topic)))
 	if !bus.HasCallback(topic) {
 		return
 	}
@@ -50,9 +51,17 @@ func SubscribeOnce(topic string, fn interface{}) {
 	_ = bus.SubscribeOnce(topic, fn)
 }
 
-func SubscribeAsync(topic string, fn interface{}) {
+func SubscribeAsync(topic string, fn interface{})error {
 	if bus == nil {
 		initBus()
 	}
-	_ = bus.SubscribeAsync(topic, fn, false)
+	return bus.SubscribeAsync(topic, fn, false)
+}
+
+
+func WaitAsync() {
+	if bus == nil {
+		initBus()
+	}
+	 bus.WaitAsync()
 }

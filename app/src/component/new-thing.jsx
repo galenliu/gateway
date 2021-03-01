@@ -41,7 +41,7 @@ export default function NewThing(props) {
 
     return <>
         <Card classes={classes.newThingCard}>
-            <ThingIcon type={thing.selectedCapability}/>
+
             <Typography variant="h6">
 
             </Typography>

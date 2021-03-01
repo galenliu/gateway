@@ -23,36 +23,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9f4f53eb-6f7f-48b5-82a2-b5196c9afd72" name="默认的" comment="">
-      <change afterPath="$PROJECT_DIR$/app/src/component/new-thing.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gateway.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gateway.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/component/newThingCard.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/component/thingIcon.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/thingIcon.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/i18n/en-us.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/i18n/en-us.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/i18n/zh-cn.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/i18n/zh-cn.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/js/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/js/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/component/new-thing.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/new-thing.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/component/thing.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/thing.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/page/addThings.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/page/addThings.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/page/home.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/page/home.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/vite.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/vite.config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core.go" beforeDir="false" afterPath="$PROJECT_DIR$/core.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/app/yarn.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/bus/bus.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/bus/bus.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/bus/constant.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/bus/constant.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/database/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/database/db.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/util/constant.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/util/constant.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/adapter_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/adapter_proxy.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/api.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/manager_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/manager_proxy.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/controllers/actions_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/actions_controller.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/controllers/new_things_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/new_things_controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/controllers/things_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/things_controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/models/actions.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/models/actions.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/models/thing/action.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/models/thing/action.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/models/thing/thing.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/models/thing/thing.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/models/things.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/models/things.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/router.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -136,7 +116,7 @@
       <recent name="$PROJECT_DIR$/app/models/thing" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.dev">
+  <component name="RunManager" selected="Go 构建.gateway">
     <configuration name="gateway" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true">
       <module name="gateway" />
       <working_directory value="$PROJECT_DIR$" />
@@ -161,8 +141,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.dev" />
         <item itemvalue="Go 构建.gateway" />
+        <item itemvalue="npm.dev" />
       </list>
     </recent_temporary>
   </component>
@@ -231,6 +211,11 @@
           <url>file://$PROJECT_DIR$/server/controllers/addon_controller.go</url>
           <line>57</line>
           <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/server/controllers/new_things_controller.go</url>
+          <line>86</line>
+          <option name="timeStamp" value="83" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

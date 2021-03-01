@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useRef, useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import Dialog from '@material-ui/core/Dialog';
 import AppBar from '@material-ui/core/AppBar';
@@ -10,9 +10,6 @@ import Slide from '@material-ui/core/Slide';
 import {HomeContext} from "./home"
 import API from "../js/api";
 import {useTranslation} from "react-i18next";
-import Grid from "@material-ui/core/Grid";
-import NewThing from "../component/new-thing";
-import * as url from "url";
 
 const useStyles = makeStyles((theme) => ({
     appBar: {
@@ -30,81 +27,109 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 export default function NewThingsDialog(props) {
 
-    let url
-
+    const classes = useStyles();
     const {t, i18n} = useTranslation();
 
-    const classes = useStyles();
+    const ws = useRef(null)
+
     const {open, setNewThingsClose, setNewThingsOpen} = useContext(HomeContext)
     const [availableThings, setAvailableThings] = useState({})
+    const [actionUrl, setActionUrl] = useState()
+    const [message, setMessage] = useState('');
+    const [readyState, setReadyState] = useState('正在链接中');
 
+    const webSocketInit = useCallback(() => {
+        const stateArr = [
+            '正在链接中',
+            '已经链接并且可以通讯',
+            '连接正在关闭',
+            '连接已关闭或者没有链接成功',
+        ];
 
-    useEffect(
-        () => {
-            if (open) {
-                requestPairing()
-            } else {
-                cancelPairing()
-            }
-            return () => cancelPairing(url)
-
-        }, [open]
-    )
-
-
-    function requestPairing() {
-        console.log("start pairing")
+        console.log("start requestPairing......")
         let proto = 'ws://';
         if (window.location.protocol === 'https:') {
             proto = 'wss://';
         }
         let host = window.location.host
         const path = proto + host + "/new_things"
-        let socket = new WebSocket(path)
 
-        socket.onmessage = (e) => {
-            console.log("e.data:",e.data)
-            try {
-                const thingObj = JSON.parse(e.data)
-                if (thingObj !== null) {
-                    const things = availableThings
-                    if (!availableThings.hasOwnProperty(thingObj.id)) {
-                        things[thingObj.id] = thingObj
-                        setAvailableThings({...things})
-                        console.log("availableThings:", availableThings)
-                    }
-                }
+        ws.current = new WebSocket(path);
+        if (!ws.current || ws.current.readyState === 3) {
 
-            } catch (e) {
-                console.log(e)
-            }
+            ws.current.onopen = _e =>
+                setReadyState(stateArr[ws.current?.readyState ?? 0]);
+            ws.current.onclose = _e =>
+                setReadyState(stateArr[ws.current?.readyState ?? 0]);
+            ws.current.onerror = e =>
+                setReadyState(stateArr[ws.current?.readyState ?? 0]);
+            ws.current.onmessage = e => {
+                setMessage(e.data);
+            };
         }
-        socket.onerror = (err) => {
-            console.log("websocket err:", err)
-            cancelPairing()
-        }
+    }, [ws]);
 
+
+    console.log("addThings websocket starting ...,open:", open)
+
+    function requestPairing() {
+        webSocketInit();
         API.startPairing(5000).then((action) => {
-            url = action.href
+            setActionUrl(action.href)
             setTimeout(() => {
-                cancelPairing(url)
-                socket.close()
+                cancelPairing()
             }, 5000)
         }).catch((err) => {
-            console.log(err)
-            cancelPairing()
+            console.log("startPairing err:", err)
         })
     }
 
-    function cancelPairing(url) {
-        API.cancelPairing(url).catch((err) => {
-            console.log(err)
-        })
+    useEffect(
+        () => {
+            try {
+                console.log("message:", message)
+                // if (lastMessage !== null) {
+                //     const things = availableThings
+                //     if (!availableThings.hasOwnProperty(lastJsonMessage.id)) {
+                //         things[lastJsonMessage.id] = lastJsonMessage
+                //         setAvailableThings({...things})
+                //         console.log("availableThings:", availableThings)
+                //     }
+                // }
+
+            } catch (e) {
+                cancelPairing()
+                console.log("message err:", e)
+            }
+
+        }, [message]
+    )
+
+
+    function cancelPairing() {
+
+        console.log("cancel pairing....")
+        ws.current?.close();
+        if (actionUrl !== undefined) {
+            API.cancelPairing(actionUrl).catch((err) => {
+                console.log("cancelParing err:", err)
+            })
+        }
+
     }
 
-    function close(){
-        cancelPairing()
-    }
+
+    useEffect(
+        () => {
+            if (open) {
+                console.log("....................")
+                requestPairing()
+            }
+            if (!open) {
+                cancelPairing()
+            }
+        }, [open]
+    )
 
     function saveRequest(id, option) {
         if (availableThings.hasOwnProperty(id)) {
@@ -117,15 +142,16 @@ export default function NewThingsDialog(props) {
         }
     }
 
+
     function RenderAvailableThings() {
         let list = []
         for (let thingId in availableThings) {
             if (availableThings.hasOwnProperty(thingId)) {
                 let thing = availableThings[thingId]
-                const newThing = <NewThing key={thing.id} thing={thing}
-                                           onSave={saveRequest}
-                />
-                list.push(newThing)
+                // const newThing = <NewThing key={thing.id} thing={thing}
+                //                            onSave={saveRequest}
+                // />
+                list.push(thing)
             }
         }
         return list
@@ -133,22 +159,33 @@ export default function NewThingsDialog(props) {
 
 
     return (
-        <div>
-            <Dialog fullScreen open={open} onClose={setNewThingsOpen} TransitionComponent={Transition}>
-                <AppBar className={classes.appBar}>
-                    <Toolbar>
-                        <Typography variant="h6" className={classes.title}>
-                            {t("AddNewThings")}
-                        </Typography>
-                        <IconButton autoFocus color="inherit" onClick={()=>{setNewThingsClose()}} aria-label="close">
-                            <CloseIcon/>
-                        </IconButton>
-                    </Toolbar>
-                </AppBar>
-                <Grid color="red">
-                    {RenderAvailableThings()}
-                </Grid>
-            </Dialog>
+        <div>{open &&
+        <Dialog fullScreen open={open} onClose={setNewThingsOpen} TransitionComponent={Transition}>
+            <AppBar className={classes.appBar}>
+                <Toolbar>
+                    <Typography variant="h6" className={classes.title}>
+                        {t("AddNewThings")}......{readyState}
+                    </Typography>
+                    <IconButton autoFocus color="inherit" onClick={() => {
+                        {
+                            setNewThingsClose()
+                            cancelPairing()
+                        }
+                    }} aria-label="close">
+                        <CloseIcon/>
+                    </IconButton>
+                </Toolbar>
+            </AppBar>
+
+
+            {open && RenderAvailableThings()}
+            {/*<ul>*/}
+            {/*    {messageHistory.current*/}
+            {/*        .map((message, idx) => <span key={idx}>{message.data}</span>)}*/}
+            {/*</ul>*/}
+            {/*{RenderAvailableThings()}*/}
+
+        </Dialog>}
         </div>
     );
 }

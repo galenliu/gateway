@@ -47,15 +47,15 @@ export default function Thing(props) {
     const [state, setState] = useState()
     const [open, setOpen] = useState(false)
 
-    const [thing,setThing] = useState()
+    const [thing, setThing] = useState()
 
     const thingRef = useRef()
 
-    const updateIcon=(icon)=> {
+    const updateIcon = (icon) => {
         setIcon(icon)
     }
 
-    const updateState=(state)=> {
+    const updateState = (state) => {
         setState(state)
     }
 
@@ -74,20 +74,18 @@ export default function Thing(props) {
         if (data.hasOwnProperty("selectedCapability")) {
             let selectedCapability = data["selectedCapability"]
             if (selectedCapability === "Light") {
-                thing = <Light updataIcon={updateIcon} ref={thingRef}  updataState ={updateState}/>
+                thing = <Light updataIcon={updateIcon} ref={thingRef} updataState={updateState}/>
             }
         }
         return thing
     }
 
     useEffect(() => {
-        console.log("11111",InitThing())
+        console.log("11111", InitThing())
         setThing(InitThing())
-        console.log("thing---------:",thing)
+        console.log("thing---------:", thing)
 
-    },[])
-
-
+    }, [])
 
 
     const {handleSendMessage} = useContext(HomeContext)
@@ -115,20 +113,21 @@ export default function Thing(props) {
         console.log("on Click")
     }
 
-    return <><ThingsContext.Provider value={{setPropertyValue}}>
-        <Grid item xs={4} sm={2} id="thing-card">
-            <Card elevation={10} className={classes.thingCard} onClick={onClick} onDoubleClick={handleOpen}>
-                {icon}
-                {state}
-                <Modal open={open} onClose={handleClose}
-                       className={classes.modal}
-                       aria-labelledby="simple-modal-title"
-                       aria-describedby="simple-modal-description">
-                  <h1>sdfasdf</h1>
-                </Modal>
-            </Card>
-        </Grid>
-    </ThingsContext.Provider>
+    return <>
+        <ThingsContext.Provider value={{setPropertyValue}}>
+            <Grid item xs={4} sm={2} id="thing-card">
+                <Card elevation={10} className={classes.thingCard} onClick={onClick} onDoubleClick={handleOpen}>
+                    {icon}
+                    {state}
+                    <Modal open={open} onClose={handleClose}
+                           className={classes.modal}
+                           aria-labelledby="simple-modal-title"
+                           aria-describedby="simple-modal-description">
+                        <h1>sdfasdf</h1>
+                    </Modal>
+                </Card>
+            </Grid>
+        </ThingsContext.Provider>
     </>
 
 }

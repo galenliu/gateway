@@ -28,14 +28,11 @@ function Home() {
         API.getThings().then((data) => {
             console.log("data", data)
         }).catch((e) => {
-            console.log(e)
+            console.log("getThings err:",e)
         })
         console.log("things", things)
-        mock.forEach((thing) => {
-            console.log(thing)
-            thingsDispatch({messaegType: Actions.addThing, thing: thing})
-        })
-    })
+
+    },[])
 
     const handleSendMessage = useCallback((data) =>
             console.log(JSON.stringify(data)),
