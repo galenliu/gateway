@@ -7,9 +7,11 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import CloseIcon from '@material-ui/icons/Close';
 import Slide from '@material-ui/core/Slide';
-import {HomeContext} from "./home"
 import API from "../js/api";
 import {useTranslation} from "react-i18next";
+import NewThing from "../component/new-thing";
+import Grid from "@material-ui/core/Grid";
+import {AppContext} from "../App";
 
 const useStyles = makeStyles((theme) => ({
     appBar: {
@@ -32,7 +34,9 @@ export default function NewThingsDialog(props) {
 
     const ws = useRef(null)
 
-    const {open, setNewThingsClose, setNewThingsOpen} = useContext(HomeContext)
+    const {drawerOpen,setDrawerOpen, newThingsOpen,setNewThingsOpen} = useContext(AppContext)
+
+
     const [availableThings, setAvailableThings] = useState({})
     const [actionUrl, setActionUrl] = useState()
     const [message, setMessage] = useState('');
@@ -41,9 +45,9 @@ export default function NewThingsDialog(props) {
     const webSocketInit = useCallback(() => {
         const stateArr = [
             '正在链接中',
-            '已经链接并且可以通讯',
+            '正在扫描新设备',
             '连接正在关闭',
-            '连接已关闭或者没有链接成功',
+            '扫描完成',
         ];
 
         console.log("start requestPairing......")
@@ -55,18 +59,17 @@ export default function NewThingsDialog(props) {
         const path = proto + host + "/new_things"
 
         ws.current = new WebSocket(path);
-        if (!ws.current || ws.current.readyState === 3) {
+        ws.current.onopen = _e =>
+            setReadyState(stateArr[ws.current?.readyState ?? 0]);
+        ws.current.onclose = _e =>
+            setReadyState(stateArr[ws.current?.readyState ?? 0]);
+        ws.current.onerror = e =>
+            setReadyState(stateArr[ws.current?.readyState ?? 0]);
+        ws.current.onmessage = e => {
+            console.log(e)
+            setMessage(e.data);
+        };
 
-            ws.current.onopen = _e =>
-                setReadyState(stateArr[ws.current?.readyState ?? 0]);
-            ws.current.onclose = _e =>
-                setReadyState(stateArr[ws.current?.readyState ?? 0]);
-            ws.current.onerror = e =>
-                setReadyState(stateArr[ws.current?.readyState ?? 0]);
-            ws.current.onmessage = e => {
-                setMessage(e.data);
-            };
-        }
     }, [ws]);
 
 
@@ -87,16 +90,15 @@ export default function NewThingsDialog(props) {
     useEffect(
         () => {
             try {
-                console.log("message:", message)
-                // if (lastMessage !== null) {
-                //     const things = availableThings
-                //     if (!availableThings.hasOwnProperty(lastJsonMessage.id)) {
-                //         things[lastJsonMessage.id] = lastJsonMessage
-                //         setAvailableThings({...things})
-                //         console.log("availableThings:", availableThings)
-                //     }
-                // }
-
+                if (message !== undefined) {
+                    let newThing = JSON.parse(message)
+                    const things = availableThings
+                    if (!availableThings.hasOwnProperty(newThing.id)) {
+                        things[newThing.id] = newThing
+                        setAvailableThings({...things})
+                        console.log("AvailableThings update :", availableThings)
+                    }
+                }
             } catch (e) {
                 cancelPairing()
                 console.log("message err:", e)
@@ -107,7 +109,6 @@ export default function NewThingsDialog(props) {
 
 
     function cancelPairing() {
-
         console.log("cancel pairing....")
         ws.current?.close();
         if (actionUrl !== undefined) {
@@ -115,20 +116,20 @@ export default function NewThingsDialog(props) {
                 console.log("cancelParing err:", err)
             })
         }
-
     }
 
 
     useEffect(
         () => {
-            if (open) {
+            if (newThingsOpen) {
                 console.log("....................")
+                setAvailableThings([])
                 requestPairing()
             }
-            if (!open) {
+            if (!newThingsOpen) {
                 cancelPairing()
             }
-        }, [open]
+        }, [newThingsOpen]
     )
 
     function saveRequest(id, option) {
@@ -146,29 +147,28 @@ export default function NewThingsDialog(props) {
     function RenderAvailableThings() {
         let list = []
         for (let thingId in availableThings) {
-            if (availableThings.hasOwnProperty(thingId)) {
-                let thing = availableThings[thingId]
-                // const newThing = <NewThing key={thing.id} thing={thing}
-                //                            onSave={saveRequest}
-                // />
-                list.push(thing)
-            }
+            let thing = availableThings[thingId]
+            console.log("render thing :", thing)
+            const newThing = <NewThing key={thing.id} thing={thing}
+
+            />
+            list.push(newThing)
         }
         return list
     }
 
 
     return (
-        <div>{open &&
-        <Dialog fullScreen open={open} onClose={setNewThingsOpen} TransitionComponent={Transition}>
+        <div>
+        <Dialog fullScreen open={newThingsOpen} onClose={()=>setNewThingsOpen(true)} TransitionComponent={Transition}>
             <AppBar className={classes.appBar}>
                 <Toolbar>
                     <Typography variant="h6" className={classes.title}>
-                        {t("AddNewThings")}......{readyState}
+                        {t(readyState)}......
                     </Typography>
                     <IconButton autoFocus color="inherit" onClick={() => {
                         {
-                            setNewThingsClose()
+                            setNewThingsOpen(false)
                             cancelPairing()
                         }
                     }} aria-label="close">
@@ -176,16 +176,10 @@ export default function NewThingsDialog(props) {
                     </IconButton>
                 </Toolbar>
             </AppBar>
-
-
-            {open && RenderAvailableThings()}
-            {/*<ul>*/}
-            {/*    {messageHistory.current*/}
-            {/*        .map((message, idx) => <span key={idx}>{message.data}</span>)}*/}
-            {/*</ul>*/}
-            {/*{RenderAvailableThings()}*/}
-
-        </Dialog>}
+            <Grid container justify="flex-start" alignItems="center" direction="column">
+                {RenderAvailableThings()}
+            </Grid>
+        </Dialog>
         </div>
     );
 }

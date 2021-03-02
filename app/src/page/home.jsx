@@ -1,38 +1,30 @@
-import React, {useCallback, useEffect, useReducer, useState} from "react";
+import React, {useCallback, useContext, useEffect, useReducer, useState} from "react";
 import Thing from "../component/thing.jsx";
 import Grid from "@material-ui/core/Grid";
-import mock from "../mock/things.json"
 import API from "../js/api";
-import NewThingsDialog from "./addThings";
+import NewThingsDialog from "./new-things";
 
-import ThingsReducer, {Actions} from "../js/things-reducer";
+import ThingsReducer from "../js/things-reducer";
 import TopBar from "../component/topBar";
+import {AppContext} from "../App";
 
 export const HomeContext = React.createContext()
 
 function Home() {
 
     const [things, thingsDispatch] = useReducer(ThingsReducer, [])
-    const [newThingsShow, setNewThingsShow] = useState(false)
 
 
-    function handleNewThingsAddClose() {
-        setNewThingsShow(false)
-    }
-
-    function handleNewThingsAddOpen() {
-        setNewThingsShow(true)
-    }
 
     useEffect(() => {
         API.getThings().then((data) => {
             console.log("data", data)
         }).catch((e) => {
-            console.log("getThings err:",e)
+            console.log("getThings err:", e)
         })
         console.log("things", things)
 
-    },[])
+    }, [])
 
     const handleSendMessage = useCallback((data) =>
             console.log(JSON.stringify(data)),
@@ -52,20 +44,13 @@ function Home() {
 
 
     return (
+        <>
+            <TopBar/>
+            <Grid container spacing={1}>
+                {RenderThingsView()}
+            </Grid>
+            <NewThingsDialog/>  </>
 
-        <HomeContext.Provider value={{
-            open: newThingsShow,
-            setNewThingsClose: handleNewThingsAddClose,
-            setNewThingsOpen: handleNewThingsAddOpen
-        }}>
-            <>
-                <TopBar/>
-                <Grid container spacing={1}>
-                    {RenderThingsView()}
-                </Grid>
-            </>
-            <NewThingsDialog/>
-        </HomeContext.Provider>
     );
 }
 

@@ -14,7 +14,6 @@ import AddIcon from '@material-ui/icons/Add';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import {useTranslation} from 'react-i18next';
-import {HomeContext} from "../page/home.jsx";
 import clsx from "clsx";
 import {AppContext} from "../App";
 
@@ -88,12 +87,8 @@ export default function TopBar(props) {
     const {t, i18n} = useTranslation();
     const theme = useTheme();
 
-    const {open, setOpen} = useContext(AppContext)
-    const {setNewThingsOpen} = useContext(HomeContext)
+    const {drawerOpen,setDrawerOpen, newThingsOpen,setNewThingsOpen} = useContext(AppContext)
 
-    function handleNewThings() {
-
-    }
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -181,7 +176,7 @@ export default function TopBar(props) {
         <>
             <AppBar position="fixed"
                     className={clsx(classes.appBar, {
-                        [classes.appBarShift]: open,
+                        [classes.appBarShift]: drawerOpen,
                     })}>
                 <Toolbar>
                     <IconButton
@@ -189,7 +184,7 @@ export default function TopBar(props) {
                         className={classes.menuButton}
                         color="inherit"
                         aria-label="open drawer"
-                        onClick={() => setOpen()}
+                        onClick={() => setDrawerOpen(true)}
                     >
                         <MenuIcon/>
                     </IconButton>
@@ -200,7 +195,7 @@ export default function TopBar(props) {
                     <div className={classes.grow}/>
                     <div className={classes.sectionDesktop}>
                         <IconButton aria-label="show 4 new mails" color="inherit" onClick={() => {
-                            setNewThingsOpen()
+                            setNewThingsOpen(true)
                         }}>
                             <Badge badgeContent={0} color="secondary">
                                 <AddIcon/>

@@ -1,26 +1,28 @@
-const Alarm = "Alarm"
-const AirQualitySensor = "AirQualitySensor"
-const BarometricPressureSensor = "BarometricPressureSensor"
-const BinarySensor = "BinarySensor"
-const Camera = "Camera"
-const ColorControl = "ColorControl"
-const ColorSensor = "ColorSensor"
-const DoorSensor = "DoorSensor"
-const EnergyMonitor = "EnergyMonitor"
-const HumiditySensor = "HumiditySensor"
-const LeakSensor = "LeakSensor"
-const Light = "Light"
-const Lock = "Lock"
-const MotionSensor = "MotionSensor"
-const MultiLevelSensor = "MultiLevelSensor"
-const MultiLevelSwitch = "MultiLevelSwitch"
-const OnOffSwitch = "OnOffSwitch"
-const PushButton = "PushButton"
-const SmartPlug = "SmartPlug"
-const SmokeSensor = "SmokeSensor"
-const TemperatureSensor = "TemperatureSensor"
-const Thermostat = "Thermostat"
-const VideoCamera = "VideoCamera"
+export const ThingType = {
+    Alarm: "Alarm",
+    AirQualitySensor: "AirQualitySensor",
+    BarometricPressureSensor: "BarometricPressureSensor",
+    BinarySensor: "BinarySensor",
+    Camera: "Camera",
+    ColorControl: "ColorControl",
+    ColorSensor: "ColorSensor",
+    DoorSensor: "DoorSensor",
+    EnergyMonitor: "EnergyMonitor",
+    HumiditySensor: "HumiditySensor",
+    LeakSensor: "LeakSensor",
+    Light: "Light",
+    Lock: "Lock",
+    MotionSensor: "MotionSensor",
+    MultiLevelSensor: "MultiLevelSensor",
+    MultiLevelSwitch: "MultiLevelSwitch",
+    OnOffSwitch: "OnOffSwitch",
+    PushButton: "PushButton",
+    SmartPlug: "SmartPlug",
+    SmokeSensor: "SmokeSensor",
+    TemperatureSensor: "TemperatureSensor",
+    Thermostat: "Thermostat",
+    VideoCamera: "VideoCamera",
 
+}
 
 export const drawerWidth = 240;

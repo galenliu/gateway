@@ -17,6 +17,8 @@ import {useTranslation} from 'react-i18next';
 import Home from "../page/home.jsx";
 import {drawerWidth} from "../js/constant"
 import {AppContext} from "../App"
+import SettingsIcon from '@material-ui/icons/Settings';
+import {useHistory} from "react-router-dom";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -47,13 +49,20 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SideBar(props) {
 
+    let history = useHistory();
     const classes = useStyles();
 
-    const {open, setOpen, setClose} = useContext(AppContext)
+    const {drawerOpen,setDrawerOpen, newThingsOpen,setNewThingsOpen} = useContext(AppContext)
 
-    console.log("layout sidebar", open)
+    console.log("layout sidebar", drawerOpen)
     const {t, i18n} = useTranslation();
     const theme = useTheme();
+
+    function handleClick(url) {
+        setDrawerOpen(false)
+        history.push(url)
+
+    }
 
     return (
         <>
@@ -62,31 +71,39 @@ export default function SideBar(props) {
                 width="240"
                 variant="persistent"
                 anchor="left"
-                open={open}
+                open={drawerOpen}
                 classes={{
                     paper: classes.drawerPaper,
                 }}
             >
                 <div className={classes.drawerHeader}>
-                    <IconButton onClick={() => setClose()}>
+                    <IconButton onClick={() => setDrawerOpen(false)}>
                         {theme.direction === 'ltr' ? <ChevronLeftIcon/> : <ChevronRightIcon/>}
                     </IconButton>
                 </div>
                 <Divider/>
 
                 <List>
-                    <ListItem button key={"home"}>
+
+                    <ListItem button key={"home"} onClick={() => handleClick("/home")}>
                         <ListItemIcon>
                             <HomeIcon/>
                         </ListItemIcon>
                         <ListItemText primary={t('Home')}/>
                     </ListItem>
 
-                    <ListItem button key={"rules"}>
+                    <ListItem button key={"rules"} onClick={() => handleClick("/rules")}>
                         <ListItemIcon>
                             <AlarmOnIcon/>
                         </ListItemIcon>
                         <ListItemText primary={t('Rules')}/>
+                    </ListItem>
+
+                    <ListItem button key={"settings"} onClick={() => handleClick("/settings")}>
+                        <ListItemIcon>
+                            <SettingsIcon/>
+                        </ListItemIcon>
+                        <ListItemText primary={t('Settings')}/>
                     </ListItem>
 
 

@@ -13,22 +13,22 @@ import (
 )
 
 type NewThingsController struct {
-	locker                 *sync.Mutex
-	container              *models.Things
-	ws                     *websocket.Conn
-	closeChan              chan struct{}
+	locker    *sync.Mutex
+	container *models.Things
+	wss       map[*websocket.Conn]bool
+	closeChan chan struct{}
 }
 
 func NewNewThingsController(things *models.Things) *NewThingsController {
 	controller := &NewThingsController{container: models.NewThings()}
 	controller.locker = new(sync.Mutex)
+	controller.wss = make(map[*websocket.Conn]bool, 0)
 	controller.closeChan = make(chan struct{})
 	_ = bus.Subscribe(util.ThingAdded, controller.handleNewThing)
 	return controller
 }
 
 func (controller *NewThingsController) HandleGetThing(c *gin.Context) {
-
 	c.JSON(http.StatusOK, controller.container.GetThings())
 }
 
@@ -50,36 +50,30 @@ func (controller *NewThingsController) HandleWebsocket(c *gin.Context) {
 		return
 	}
 
-	log.Debug("new thing websocket...add:"+conn.RemoteAddr().String())
-	controller.ws = conn
+	log.Debug("new thing websocket...add:" + conn.RemoteAddr().String())
 
 	newThings := controller.container.GetNewThings()
 
 	for _, t := range newThings {
-		controller.handleNewThing(t)
-	}
-
-
-	for {
-		select {
-
-		case <-controller.closeChan:
+		err := conn.WriteJSON(t)
+		if err != nil {
 			return
-		default:
-			_, data, e := conn.ReadMessage()
-			controller.checkErr(e)
-			log.Debug("new thing websocket rev data:", data)
 		}
-
 	}
+	controller.wss[conn] = true
+	//go handlerPing(controller, conn)
 }
 
 func (controller *NewThingsController) handleNewThing(thing *thing.Thing) {
 	controller.locker.Lock()
 	defer controller.locker.Unlock()
-	if controller.ws != nil {
-		err := controller.ws.WriteJSON(thing)
-		controller.checkErr(err)
+	for ws, _ := range controller.wss {
+		err := ws.WriteJSON(thing)
+		if err != nil {
+			ws.PingHandler()
+			_ = ws.Close()
+			delete(controller.wss, ws)
+		}
 	}
 }
 
@@ -90,10 +84,17 @@ func (controller *NewThingsController) checkErr(err error) {
 	}
 }
 
-func (controller *NewThingsController) Close() {
-	controller.locker.Lock()
-	defer controller.locker.Unlock()
-	_ = bus.Unsubscribe(util.ThingAdded, controller.handleNewThing)
-	controller.closeChan <- struct{}{}
-	_ = controller.ws.Close()
-}
+//func handlerPing(c *NewThingsController, conn *websocket.Conn) {
+//	var pingTime = 60 * time.Second
+//	var pongTime = 180 * time.Second
+//	pingTicker := time.NewTicker(pingTime)
+//	pongTicker := time.NewTicker(pongTime)
+//	defer pingTicker.Stop()
+//	defer pongTicker.Stop()
+//	for {
+//		select {
+//		case <-pingTicker.C:
+//			_ = conn.WriteMessage(websocket.PingMessage, []byte{})
+//		}
+//	}
+//}
