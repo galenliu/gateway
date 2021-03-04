@@ -6,7 +6,7 @@ import (
 	"gateway/config"
 	"gateway/pkg/log"
 	"gateway/plugin"
-	"gateway/server"
+	"gateway/server/controllers"
 	"time"
 )
 
@@ -14,7 +14,7 @@ import (
 type HomeGateway struct {
 	Preferences   *config.Preferences
 	AddonsManager *plugin.AddonManager
-	Web           *server.WebApp
+	Web           *controllers.WebApp
 	Ctx           context.Context
 }
 

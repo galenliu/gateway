@@ -58,9 +58,9 @@ func NewAddonsManager(ctx context.Context) (*AddonManager, error) {
 	am.installAddons = make(map[string]*AddonInfo, 50)
 	am.adapters = make(map[string]*AdapterProxy, 20)
 
-	bus.Subscribe(bus.SetProperty, am.handleSetPropertyValue)
-	bus.Subscribe(bus.GetDevices, am.handleGetDevices)
-	bus.Subscribe(bus.GetThings, am.handleGetThings)
+	_ = bus.Subscribe(bus.SetProperty, am.handleSetPropertyValue)
+	_ = bus.Subscribe(bus.GetDevices, am.handleGetDevices)
+	_ = bus.Subscribe(bus.GetThings, am.handleGetThings)
 
 	var c context.Context
 	c, am.pluginCancel = context.WithCancel(am.ctx)
@@ -84,7 +84,7 @@ func (manager *AddonManager) LoadAddons() error {
 			addonId := fi.Name()
 			err = manager.loadAddon(addonId, true)
 			if err != nil {
-				log.Error(fmt.Sprintf("load add-ons: %v err:", addonId, addonId, err.Error()))
+				log.Error("Failed load add-ons id:%v, err: %v", addonId, err.Error())
 			}
 		}
 	}

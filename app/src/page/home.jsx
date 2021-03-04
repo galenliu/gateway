@@ -7,14 +7,14 @@ import NewThingsDialog from "./new-things";
 import ThingsReducer from "../js/things-reducer";
 import TopBar from "../component/topBar";
 import {AppContext} from "../App";
+import {useTranslation} from "react-i18next";
 
 export const HomeContext = React.createContext()
 
 function Home() {
 
     const [things, thingsDispatch] = useReducer(ThingsReducer, [])
-
-
+    const {t, i18n} = useTranslation();
 
     useEffect(() => {
         API.getThings().then((data) => {
@@ -45,7 +45,7 @@ function Home() {
 
     return (
         <>
-            <TopBar/>
+            <TopBar add={true} title={t("Home")}/>
             <Grid container spacing={1}>
                 {RenderThingsView()}
             </Grid>

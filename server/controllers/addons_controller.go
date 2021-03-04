@@ -1,10 +1,12 @@
 package controllers
 
 import (
+	"gateway/pkg/database"
 	"gateway/pkg/log"
 	"gateway/plugin"
 	"github.com/gin-gonic/gin"
 	json "github.com/json-iterator/go"
+	"io"
 	"io/ioutil"
 	"net/http"
 )
@@ -16,8 +18,8 @@ func NewAddonController() *AddonController {
 	return &AddonController{}
 }
 
-//  GET /plugin
-func (addon *AddonController) HandlerGetAddons(c *gin.Context) {
+//  GET /addons
+func (addon *AddonController) handlerGetAddons(c *gin.Context) {
 	data, err := plugin.GetInstallAddons()
 	if err != nil {
 		c.String(500, "")
@@ -27,7 +29,7 @@ func (addon *AddonController) HandlerGetAddons(c *gin.Context) {
 }
 
 // PUT /addon/:id
-func (addon *AddonController) HandlerSetAddon(c *gin.Context) {
+func (addon *AddonController) handlerSetAddon(c *gin.Context) {
 	addonId := c.Param("addon_id")
 	var body map[string]bool
 	data, err := ioutil.ReadAll(c.Request.Body)
@@ -48,23 +50,32 @@ func (addon *AddonController) HandlerSetAddon(c *gin.Context) {
 	c.JSON(200, body)
 }
 
-func (addon *AddonController) HandlerInstallAddon(c *gin.Context) {
+// Post /addons
+func (addon *AddonController) handlerInstallAddon(c *gin.Context) {
 
-	var data struct {
-		ID       string `json:"id"`
-		Url      string `json:"url"`
-		Checksum string `json:"checksum"`
-	}
-	b, err := ioutil.ReadAll(c.Request.Body)
-	str := string(b)
-	log.Info(str)
-	err = json.Unmarshal(b, &data)
-	if err != nil {
-		c.String(400, err.Error())
+	d, err := io.ReadAll(c.Request.Body)
+	id := json.Get(d, "id").ToString()
+	url := json.Get(d, "url").ToString()
+	checksum := json.Get(d, "checksum").ToString()
+	if id == "" || url == "" || checksum == "" || err != nil {
+		c.String(http.StatusBadRequest, "Bad Request")
 		return
 	}
-	go plugin.InstallAddonFromUrl(data.ID, data.Url, data.Checksum, true)
-	c.Status(200)
+	e := plugin.InstallAddonFromUrl(id, url, checksum, true)
+	if e != nil {
+		c.String(http.StatusInternalServerError, "install addon err:  %v", e.Error())
+		log.Error("install add-on err :", e.Error())
+		return
+	}
+	key := "addons." + id
+	setting, ee := database.GetSetting(key)
+	if ee != nil {
+		c.String(http.StatusInternalServerError, "install addon err: "+ee.Error())
+		log.Error("install add-on err : %v", ee.Error())
+		return
+	}
+	c.String(http.StatusOK, setting)
+	return
 }
 
 //GET /addon/:addonId/config

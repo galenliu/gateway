@@ -15,7 +15,7 @@ import {AppContext} from "../App";
 
 const useStyles = makeStyles((theme) => ({
     appBar: {
-        position: 'relative',
+
     },
     title: {
         marginLeft: theme.spacing(2),
@@ -34,7 +34,7 @@ export default function NewThingsDialog(props) {
 
     const ws = useRef(null)
 
-    const {drawerOpen,setDrawerOpen, newThingsOpen,setNewThingsOpen} = useContext(AppContext)
+    const {drawerOpen, setDrawerOpen, newThingsOpen, setNewThingsOpen} = useContext(AppContext)
 
 
     const [availableThings, setAvailableThings] = useState({})
@@ -132,16 +132,7 @@ export default function NewThingsDialog(props) {
         }, [newThingsOpen]
     )
 
-    function saveRequest(id, option) {
-        if (availableThings.hasOwnProperty(id)) {
-            let saveThing = {...availableThings[id], ...option}
-            console.log(saveThing)
-            API.addThing(saveThing).catch(e => {
-                console.log(e)
-            })
 
-        }
-    }
 
 
     function RenderAvailableThings() {
@@ -160,26 +151,27 @@ export default function NewThingsDialog(props) {
 
     return (
         <div>
-        <Dialog fullScreen open={newThingsOpen} onClose={()=>setNewThingsOpen(true)} TransitionComponent={Transition}>
-            <AppBar className={classes.appBar}>
-                <Toolbar>
-                    <Typography variant="h6" className={classes.title}>
-                        {t(readyState)}......
-                    </Typography>
-                    <IconButton autoFocus color="inherit" onClick={() => {
-                        {
-                            setNewThingsOpen(false)
-                            cancelPairing()
-                        }
-                    }} aria-label="close">
-                        <CloseIcon/>
-                    </IconButton>
-                </Toolbar>
-            </AppBar>
-            <Grid container justify="flex-start" alignItems="center" direction="column">
-                {RenderAvailableThings()}
-            </Grid>
-        </Dialog>
+            <Dialog fullScreen open={newThingsOpen} onClose={() => setNewThingsOpen(true)}
+                    TransitionComponent={Transition}>
+                <AppBar className={classes.appBar}>
+                    <Toolbar>
+                        <Typography variant="h6" className={classes.title}>
+                            {t(readyState)}......
+                        </Typography>
+                        <IconButton autoFocus color="inherit" onClick={() => {
+                            {
+                                setNewThingsOpen(false)
+                                cancelPairing()
+                            }
+                        }} aria-label="close">
+                            <CloseIcon/>
+                        </IconButton>
+                    </Toolbar>
+                </AppBar>
+                <Grid container justify="flex-start" alignItems="center" direction="column">
+                    {RenderAvailableThings()}
+                </Grid>
+            </Dialog>
         </div>
     );
 }

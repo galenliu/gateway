@@ -28,11 +28,11 @@ type ManifestJson struct {
 	ManifestVersion int    `json:"manifest_version"`
 	Version         string `json:"version"`
 	Options         struct {
-		Default interface{} `json:"default"`
-		Schema  struct {
-			Type       string      `json:"type"`
-			Required   []string    `json:"required"`
-			Properties interface{} `json:"properties"`
+		Default interface{} `json:"default,omitempty"`
+		Schema  *struct {
+			Type       string      `json:"type,omitempty"`
+			Required   []string    `json:"required,omitempty"`
+			Properties interface{} `json:"properties,omitempty"`
 		} `json:"schema,,omitempty"`
 	} `json:"options,omitempty"`
 	GatewaySpecificSettings struct {
@@ -46,25 +46,7 @@ type ManifestJson struct {
 	Enable bool `json:"-"`
 }
 
-//type Schema struct {
-//	Type       string                `json:"type,omitempty"`
-//	Required   []string              `json:"required,omitempty"`
-//	Properties map[string]Properties `json:"properties,omitempty"`
-//}
-//type Properties struct {
-//	Title   string   `json:"title"`
-//	Type    string   `json:"type"`
-//	Default string   `json:"default,omitempty"`
-//	Items   Schema   `json:"items,omitempty"`
-//	Enum    []string `json:"enum,omitempty"`
-//}
-//
-//type WebThings struct {
-//	Exec             string `json:"exec"`
-//	PrimaryType      string `json:"primary_type"`
-//	StrictMaxVersion string `json:"strict_max_version"`
-//	StrictMinVersion string `json:"strict_min_version"`
-//}
+
 
 //author: "bewee"
 //description: "Tuya Smart Life IoT devices support"
@@ -124,7 +106,7 @@ func GetAddonInfoFromDB(id string) (*AddonInfo, error) {
 	return &a, nil
 }
 
-func loadManifest(destPath ,packetId string) (*AddonInfo, error) {
+func loadManifest(destPath, packetId string) (*AddonInfo, error) {
 
 	//load manifest.json\
 	f, err := ioutil.ReadFile(path.Join(destPath, FileName))
@@ -161,10 +143,13 @@ func loadManifest(destPath ,packetId string) (*AddonInfo, error) {
 		License:     manifest.License,
 		HomepageUrl: manifest.HomepageUrl,
 		Version:     manifest.Version,
-		Schema:      manifest.Options.Schema,
+
 		Exec:        manifest.GatewaySpecificSettings.WebThings.Exec,
 		Enabled:     true,
 		PrimaryType: manifest.GatewaySpecificSettings.WebThings.PrimaryType,
+	}
+	if manifest.Options.Schema != nil {
+		addonInfo.Schema = manifest.Options.Schema
 	}
 	return &addonInfo, nil
 }
@@ -172,19 +157,12 @@ func loadManifest(destPath ,packetId string) (*AddonInfo, error) {
 func asThing(device *addon.Device) *thing.Thing {
 
 	t := thing.Thing{
-		ID:          device.ID,
-		AtContext:   device.AtContext,
-		AtType:      device.AtType,
-		Title:       device.Title,
-		Description: device.Description,
-		BaseHref:    fmt.Sprintf("/thing/%s", device.ID),
-		Pin: struct {
-			Required bool        `json:"required"`
-			Pattern  interface{} `json:"pattern"`
-		}{
-			Required: device.Pin.Required,
-			Pattern:  device.Pin.Pattern,
-		},
+		ID:                  device.ID,
+		AtContext:           device.AtContext,
+		AtType:              device.AtType,
+		Title:               device.Title,
+		Description:         device.Description,
+		BaseHref:            fmt.Sprintf("/thing/%s", device.ID),
 		Href:                "",
 		CredentialsRequired: device.CredentialsRequired,
 		Properties:          nil,

@@ -29,6 +29,27 @@ export default defineConfig({
                 secure: false,
                 ws:true,
                 // rewrite: (path) => path.replace(/^\/things/, '')
+            },
+            '/settings': {
+                target: 'http://localhost:9090',
+                changeOrigin: true,
+                secure: false,
+                ws:true,
+                // rewrite: (path) => path.replace(/^\/things/, '')
+            },
+            '/settings/addonsInfo': {
+                target: 'http://localhost:9090',
+                changeOrigin: true,
+                secure: false,
+                ws:true,
+                // rewrite: (path) => path.replace(/^\/things/, '')
+            },
+            '/addons': {
+                target: 'http://localhost:9090',
+                changeOrigin: true,
+                secure: false,
+                ws:true,
+                // rewrite: (path) => path.replace(/^\/things/, '')
             }
             // with RegEx
 

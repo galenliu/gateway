@@ -11,8 +11,8 @@ type addonInfo struct {
 	Urls          []string `json:"urls"`
 	Architecture  string   `json:"architecture"`
 	Version       string   `json:"version"`
-	NodeVersion   string   `json:"node_version"`
-	PythonVersion string   `json:"python_version"`
+	NodeVersion   string   `json:"nodeVersion"`
+	PythonVersion []string   `json:"pythonVersion"`
 }
 
 type SettingsController struct {

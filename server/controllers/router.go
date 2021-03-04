@@ -1,10 +1,9 @@
-package server
+package controllers
 
 import (
 	"context"
 	"fmt"
 	"gateway/config"
-	"gateway/server/controllers"
 	"gateway/server/models"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -84,13 +83,13 @@ func CollectRoute(app *WebApp) *gin.Engine {
 
 	// root controller
 	//router.GET("/", controllers.RootHandle())
-	router.GET("/index.html", controllers.RootHandle())
+	router.GET("/index.html", RootHandle())
 
 	//Things Controller
 	thingsGroup := router.Group(models.ThingsPath)
 
 	{
-		thingsController := controllers.NewThingsControllerFunc()
+		thingsController := NewThingsControllerFunc()
 
 		//set a properties of a thing.
 		thingsGroup.PUT("/:thingId/properties/:propertyName", thingsController.HandleSetProperty)
@@ -118,17 +117,17 @@ func CollectRoute(app *WebApp) *gin.Engine {
 
 	newThingsGroup := router.Group(models.NewThingsPath)
 	{
-		newThingsController := controllers.NewNewThingsController(app.things)
+		newThingsController := NewNewThingsController(app.things)
 		newThingsGroup.GET("", newThingsController.HandleWebsocket)
 	}
 
 	//Addons Controller
 	addonGroup := router.Group(models.AddonsPath)
 	{
-		addonController := controllers.NewAddonController()
-		addonGroup.GET("/", addonController.HandlerGetAddons)
-		addonGroup.PUT("/", addonController.HandlerInstallAddon)
-		addonGroup.PUT("/:addon_id", addonController.HandlerSetAddon)
+		addonController := NewAddonController()
+		addonGroup.GET("/", addonController.handlerGetAddons)
+		addonGroup.POST("/", addonController.handlerInstallAddon)
+		addonGroup.PUT("/:addon_id", addonController.handlerSetAddon)
 		addonGroup.GET("/:addon_id/config", addonController.HandlerGetAddonConfig)
 		addonGroup.PUT("/:addon_id/config", addonController.HandlerSetAddonConfig)
 	}
@@ -136,14 +135,14 @@ func CollectRoute(app *WebApp) *gin.Engine {
 	//settings Controller
 	debugGroup := router.Group(models.SettingsPath)
 	{
-		settingsController := controllers.NewSettingController()
-		debugGroup.GET("/addons_info", settingsController.HandleGetAddonsInfo)
+		settingsController := NewSettingController()
+		debugGroup.GET("/addonsInfo", settingsController.HandleGetAddonsInfo)
 	}
 
 	//actions Controller
 	actionsGroup := router.Group(models.ActionsPath)
 	{
-		actionsController := controllers.NewActionsController()
+		actionsController := NewActionsController()
 		actionsGroup.POST("/", actionsController.HandleActions)
 		actionsGroup.DELETE("/:actionName/:actionId", actionsController.HandleDeleteAction)
 	}

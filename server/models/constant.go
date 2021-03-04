@@ -4,7 +4,7 @@ const (
 	ApiPrefix     = "/api"
 	ThingsPath    = "/things"
 	NewThingsPath = "/new_things"
-	AddonsPath    = "/plugin"
+	AddonsPath    = "/addons"
 	DebugPath     = "/debug"
 	SettingsPath  = "/settings"
 	ActionsPath   = "/actions"

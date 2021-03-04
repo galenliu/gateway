@@ -1,7 +1,6 @@
 import React, {useContext} from 'react';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
-import MailIcon from '@material-ui/icons/Mail';
 import Drawer from "@material-ui/core/Drawer";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
@@ -12,13 +11,14 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import HomeIcon from "@material-ui/icons/Home";
 import AlarmOnIcon from '@material-ui/icons/AlarmOn';
 import ListItemText from "@material-ui/core/ListItemText";
-import InboxIcon from "@material-ui/icons/MoveToInbox";
 import {useTranslation} from 'react-i18next';
 import Home from "../page/home.jsx";
-import {drawerWidth} from "../js/constant"
+import {drawerWidth, SettingsType as SettingType} from "../js/constant"
 import {AppContext} from "../App"
 import SettingsIcon from '@material-ui/icons/Settings';
 import {useHistory} from "react-router-dom";
+import {ListSubheader} from "@material-ui/core";
+import ThingIcon from "./thing-icon";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -52,7 +52,7 @@ export default function SideBar(props) {
     let history = useHistory();
     const classes = useStyles();
 
-    const {drawerOpen,setDrawerOpen, newThingsOpen,setNewThingsOpen} = useContext(AppContext)
+    const {drawerOpen, setDrawerOpen, newThingsOpen, setNewThingsOpen} = useContext(AppContext)
 
     console.log("layout sidebar", drawerOpen)
     const {t, i18n} = useTranslation();
@@ -106,19 +106,16 @@ export default function SideBar(props) {
                         <ListItemText primary={t('Settings')}/>
                     </ListItem>
 
-
-                    {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-                        <ListItem button key={text}>
-                            <ListItemIcon>{index % 2 === 0 ? <InboxIcon/> : <MailIcon/>}</ListItemIcon>
-                            <ListItemText primary={text}/>
-                        </ListItem>
-                    ))}
                 </List>
                 <Divider/>
-                <List>
-                    {['All mail', 'Trash', 'Spam'].map((text, index) => (
+                <List subheader={
+                    <ListSubheader component="div" id="nested-list-subheader">
+                        房间列表
+                    </ListSubheader>
+                }>
+                    {['客厅', '餐厅', '卧室'].map((text, index) => (
                         <ListItem button key={text}>
-                            <ListItemIcon>{index % 2 === 0 ? <InboxIcon/> : <MailIcon/>}</ListItemIcon>
+                            <ListItemIcon><ThingIcon type={SettingType.Room}/></ListItemIcon>
                             <ListItemText primary={text}/>
                         </ListItem>
                     ))}

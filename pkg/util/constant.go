@@ -59,8 +59,8 @@ const (
 	READWRITE         = "readwrite"
 	READ              = "read"
 
-	MajorVersion = 0
-	MinorVersion = 1
+	MajorVersion = 1
+	MinorVersion = 0
 	PatchVersion = 0
 
 	AddonsDir = "addons"

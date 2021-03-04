@@ -4,10 +4,10 @@ import (
 	"flag"
 	"fmt"
 	core "gateway"
-	"gateway/plugin"
-	"gateway/server"
-	"gateway/pkg/util"
 	"gateway/config"
+	"gateway/pkg/util"
+	"gateway/plugin"
+	"gateway/server/controllers"
 	"os"
 	"os/signal"
 	"syscall"
@@ -48,7 +48,7 @@ func main() {
 	gw.AddonsManager, err = plugin.NewAddonsManager(gw.Ctx)
 	CheckError(err)
 
-	gw.Web = server.NewWebAPP(server.NewDefaultWebConfig(gw.Ctx))
+	gw.Web = controllers.NewWebAPP(controllers.NewDefaultWebConfig(gw.Ctx))
 
 	//handle signal
 	signal.Notify(c, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGTERM)

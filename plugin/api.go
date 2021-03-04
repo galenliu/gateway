@@ -97,8 +97,8 @@ func GetPropertyValue(deviceId, propName string) (interface{}, error) {
 	return prop, nil
 }
 
-func InstallAddonFromUrl(id, url, checksum string, enabled bool) {
-	_ = manager.installAddonFromUrl(id, url, checksum, enabled)
+func InstallAddonFromUrl(id, url, checksum string, enabled bool) error {
+	return manager.installAddonFromUrl(id, url, checksum, enabled)
 }
 
 func AddNewThing(pairingTimeout float64) error {
@@ -142,7 +142,7 @@ func CancelRemoveThing(deviceId string) {
 		return
 	}
 	adapter := manager.getAdapter(dev.ID)
-	if adapter!=nil{
+	if adapter != nil {
 		adapter.cancelRemoveThing(dev.ID)
 	}
 }
@@ -150,7 +150,7 @@ func CancelRemoveThing(deviceId string) {
 func SetThingPin(thingId string, pin interface{}) error {
 	device := manager.getDevice(thingId)
 	if device == nil {
-		return fmt.Errorf("con not finid device:"+thingId)
+		return fmt.Errorf("con not finid device:" + thingId)
 	}
 	err := device.SetPin(pin)
 	if err != nil {

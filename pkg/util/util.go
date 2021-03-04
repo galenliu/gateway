@@ -60,15 +60,15 @@ func GetArch() string {
 	if arch == "amd64" {
 		arch = "x64"
 	}
-	return runtime.GOOS + "-" + arch
+	return  "linux"+"-" + arch
 }
 
-func GetPythonVersion() string {
-	return "3.5"
+func GetPythonVersion() []string {
+	return []string{"3.5","3,7","3.8"}
 }
 
 func GetNodeVersion() string {
-	return "1.5.2"
+	return "57"
 }
 
 func GetDefaultConfigDir() string {

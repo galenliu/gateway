@@ -86,18 +86,18 @@ func (ts *Things) HasThing(thingId string) bool {
 	return ok
 }
 
-func (ts *Things) CreateThing(id string, description []byte) error {
+func (ts *Things) CreateThing(id string, description []byte) (string,error) {
 	var th = thing.NewThing(id, description)
 	if th == nil {
-		return fmt.Errorf("thing description invaild")
+		return "",fmt.Errorf("thing description invaild")
 	}
 	th.SetConnected(true)
 	err := database.CreateThing(th.ID, th.GetDescription())
 	if err != nil {
-		return err
+		return "",err
 	}
 	ts.things[th.ID] = th
-	return nil
+	return th.GetDescription(),err
 }
 
 func (ts *Things) RemoveThing(thingId string) error {

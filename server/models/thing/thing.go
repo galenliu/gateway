@@ -15,20 +15,20 @@ type Thing struct {
 	Title       string   `json:"title"`
 	Description string   `json:"description,omitempty"`
 
-	Links    []string `json:"links"`
-	BaseHref string   `json:"baseHref"`
+	Links    []string `json:"links,omitempty"`
+	BaseHref string   `json:"baseHref,omitempty"`
 	Pin      struct {
-		Required bool        `json:"required"`
-		Pattern  interface{} `json:"pattern"`
+		Required bool        `json:"required,omitempty"`
+		Pattern  interface{} `json:"pattern,omitempty"`
 	} `json:"pin,omitempty"`
 
 	Href                string `json:"href"`
-	CredentialsRequired bool   `json:"credentialsRequired"`
+	CredentialsRequired bool   `json:"credentialsRequired,omitempty"`
 	SelectedCapability  string `json:"selectedCapability"`
 
-	Properties map[string]*Property `json:"properties"`
-	Actions    map[string]*Action   `json:"actions"`
-	Events     map[string]*Event    `json:"events"`
+	Properties map[string]*Property `json:"properties,omitempty"`
+	Actions    map[string]*Action   `json:"actions,omitempty"`
+	Events     map[string]*Event    `json:"events,omitempty"`
 
 	onConnectedFuncs       map[interface{}]func(bool)
 	onRemovedFuncs         map[interface{}]func(thing *Thing)

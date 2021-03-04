@@ -25,4 +25,16 @@ export const ThingType = {
 
 }
 
+export const AddonType = {
+    Adapter: "adapter",
+    Notifier: "notifier",
+    Extension: "extension"
+}
+
+export const SettingsType = {
+    Room: "room",
+    Notifier: "notifier",
+    Extension: "extension"
+}
+
 export const drawerWidth = 240;

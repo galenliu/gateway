@@ -107,7 +107,7 @@ const API = {
     },
 
     getAddonsInfo() {
-        return this.getJson("/settings/addons_info")
+        return this.getJson("/settings/addonsInfo")
     },
 
     getInstalledAddons() {

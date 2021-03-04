@@ -13,7 +13,7 @@
   "Experiments": "Experiments",
   "Developer": "Developer",
   "author": "by",
-  "license": "license",
+  "license": "(license)",
   "configure": "configure",
   "update": "update",
   "remove": "remove",
@@ -22,12 +22,19 @@
   "add": "Add",
   "chooseIcon" : "choose icon",
 
+  "version": "version",
+
+  "AddonsMarket": "Add-ons Market",
+
   "AddNewThings": "Add new things",
   "Open": "Open",
   "Close": "Close",
   "SelectedCapability": "selected capability",
 
   "Title": "title",
+
+  "fail": "fail",
+  "Fail": "Fail",
 
   "Alarm": "Alarm",
   "AirQualitySensor": "AirQualitySensor",

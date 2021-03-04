@@ -5,27 +5,20 @@ import (
 	"fmt"
 	"gateway/pkg/log"
 	_ "github.com/mattn/go-sqlite3"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 	"os"
 	"path"
 )
 
 const dbFileName = "database.sqlite3"
 
-
-var db *gorm.DB
 var database *sql.DB
 
-var config *Config
-
-type Config struct {
-	file string
-}
+var filePath string
 
 func InitDB(dir string) error {
 	var e error
-	database, e = sql.Open("sqlite3", path.Join(dir, dbFileName))
+	filePath = path.Join(dir, dbFileName)
+	database, e = sql.Open("sqlite3", filePath)
 	if e != nil {
 		return e
 	}
@@ -45,17 +38,7 @@ func ResetDB(dir string) {
 	}
 }
 
-func GetDB() (*gorm.DB, error) {
-	var err error
-	if db != nil {
-		return db, nil
-	}
-	db, err = gorm.Open(sqlite.Open(config.file), &gorm.Config{})
-	if err != nil {
-		return nil, err
-	}
-	return db, err
-}
+
 
 func createTable(db *sql.DB) error {
 
@@ -118,7 +101,6 @@ func createTable(db *sql.DB) error {
 	return nil
 }
 
-
 func UpdateValue(k, v string) (err error) {
 	_, err = database.Exec(`update data set value=@value where key=@key`, sql.Named("value", v), sql.Named("key", k))
 	return
@@ -126,6 +108,7 @@ func UpdateValue(k, v string) (err error) {
 
 func QueryValue(k string) (value string, err error) {
 	err = database.QueryRow("SELECT value FROM data where key = @key", sql.Named("key", k)).Scan(&value)
+	log.Info(k, value)
 	return value, err
 }
 
@@ -144,11 +127,13 @@ func DeleteValue(key string) error {
 func GetSetting(key string) (value string, err error) {
 
 	err = database.QueryRow("SELECT value FROM settings where key = @key", sql.Named("key", key), sql.Named("key", key)).Scan(&value)
+	log.Info("get setting key:%v value:%v", key, value)
 	return value, err
 }
 
 func SetSetting(key, value string) error {
 
+	log.Info("set setting key:%v value:%v", key, value)
 	_, err := GetSetting(key)
 	if err == nil {
 		_, e := database.Exec(`update settings set value=@value where key=@key`, sql.Named("value", value), sql.Named("key", key))
@@ -167,9 +152,8 @@ func SetSetting(key, value string) error {
 	if eee != nil {
 		return eee
 	}
-	fmt.Printf("insert data,id:%d , value: %s", id, value)
+	log.Debug("insert data,id:%d , value: %s", id, value)
 	return nil
-
 }
 
 func CreateThing(id, description string) error {
@@ -192,7 +176,6 @@ func CreateThing(id, description string) error {
 	fmt.Printf("insert data,id:%d , value: %s", id, description)
 	return nil
 }
-
 
 func GetThings() map[string]string {
 	var things map[string]string = make(map[string]string)

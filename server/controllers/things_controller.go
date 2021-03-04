@@ -38,17 +38,17 @@ func (tc *ThingsController) HandleCreateThing(c *gin.Context) {
 		return
 	}
 
-	//if tc.Container.HasThing(id) {
-	//	c.String(http.StatusBadRequest, "thing already added")
-	//	return
-	//}
+	if tc.Container.HasThing(id) {
+		c.String(http.StatusBadRequest, "thing already added")
+		return
+	}
 
-	err = tc.Container.CreateThing(id,data)
-	if err != nil {
+	des,err1 := tc.Container.CreateThing(id,data)
+	if err1 != nil {
 		c.String(http.StatusInternalServerError, fmt.Sprintf("create thing(%s) err: %v", err.Error()))
 		return
 	}
-	c.String(http.StatusCreated, fmt.Sprintf("create thing(%s) succeed", id))
+	c.String(http.StatusCreated, des)
 }
 
 func (tc *ThingsController) HandleDeleteThing(c *gin.Context) {

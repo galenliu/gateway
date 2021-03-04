@@ -51,7 +51,9 @@ const useStyles = makeStyles((theme) => ({
             display: 'block',
         },
     },
-
+    hide: {
+        display: 'none',
+    },
 
     inputRoot: {
         color: 'inherit',
@@ -87,7 +89,7 @@ export default function TopBar(props) {
     const {t, i18n} = useTranslation();
     const theme = useTheme();
 
-    const {drawerOpen,setDrawerOpen, newThingsOpen,setNewThingsOpen} = useContext(AppContext)
+    const {drawerOpen, setDrawerOpen, newThingsOpen, setNewThingsOpen} = useContext(AppContext)
 
 
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -181,26 +183,26 @@ export default function TopBar(props) {
                 <Toolbar>
                     <IconButton
                         edge="start"
-                        className={classes.menuButton}
                         color="inherit"
                         aria-label="open drawer"
                         onClick={() => setDrawerOpen(true)}
+                        className={clsx(classes.menuButton, drawerOpen && classes.hide)}
                     >
                         <MenuIcon/>
                     </IconButton>
                     <Typography className={classes.title} variant="h6" noWrap>
-                        Web of Things
+                        {props.title}
                     </Typography>
 
                     <div className={classes.grow}/>
                     <div className={classes.sectionDesktop}>
-                        <IconButton aria-label="show 4 new mails" color="inherit" onClick={() => {
+                        {props.add && <IconButton aria-label="show 4 new mails" color="inherit" onClick={() => {
                             setNewThingsOpen(true)
                         }}>
                             <Badge badgeContent={0} color="secondary">
                                 <AddIcon/>
                             </Badge>
-                        </IconButton>
+                        </IconButton>}
                     </div>
                     <div className={classes.sectionMobile}>
                         <IconButton

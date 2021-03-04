@@ -1,8 +1,12 @@
 import React from "react";
-
 import {SvgIcon} from "@material-ui/core";
+import ExtensionIcon from '@material-ui/icons/Extension';
+import PowerIcon from '@material-ui/icons/Power';
+import NotificationsIcon from '@material-ui/icons/Notifications';
 import "../js/constant"
-import {ThingType} from "../js/constant";
+import Icon from '@mdi/react';
+import {AddonType, SettingsType, ThingType} from "../js/constant";
+import {mdiFloorPlan} from '@mdi/js';
 
 
 export default function ThingIcon(props) {
@@ -153,7 +157,8 @@ export default function ThingIcon(props) {
             }
             case ThingType.OnOffSwitch: {
                 return <SvgIcon {...props}>
-                    <path fill="currentColor" d="M13,3H11V13H13V3M17.83,5.17L16.41,6.59C18.05,7.91 19,9.9 19,12A7,7 0 0,1 12,19C8.14,19 5,15.88 5,12C5,9.91 5.95,7.91 7.58,6.58L6.17,5.17C2.38,8.39 1.92,14.07 5.14,17.86C8.36,21.64 14.04,22.1 17.83,18.88C19.85,17.17 21,14.65 21,12C21,9.37 19.84,6.87 17.83,5.17Z" />
+                    <path fill="currentColor"
+                          d="M13,3H11V13H13V3M17.83,5.17L16.41,6.59C18.05,7.91 19,9.9 19,12A7,7 0 0,1 12,19C8.14,19 5,15.88 5,12C5,9.91 5.95,7.91 7.58,6.58L6.17,5.17C2.38,8.39 1.92,14.07 5.14,17.86C8.36,21.64 14.04,22.1 17.83,18.88C19.85,17.17 21,14.65 21,12C21,9.37 19.84,6.87 17.83,5.17Z"/>
                 </SvgIcon>
             }
             case ThingType.PushButton: {
@@ -209,6 +214,24 @@ export default function ThingIcon(props) {
                         className="st1"
                         style="fill:#ffffff;stroke-width:0.66666669"/>
                 </SvgIcon>
+            }
+
+            case AddonType.Adapter: {
+                return <PowerIcon {...props}/>
+            }
+            case AddonType.Extension: {
+                return <ExtensionIcon {...props}/>
+            }
+            case AddonType.Notifier: {
+                return <NotificationsIcon {...props}/>
+            }
+            case SettingsType.Room: {
+                return <Icon path={mdiFloorPlan}
+                             size={1}
+                             horizontal
+                             vertical
+                             rotate={90}
+                />
             }
         }
     }
