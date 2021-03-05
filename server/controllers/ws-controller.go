@@ -50,10 +50,10 @@ func HandleWebsocket(c *gin.Context, things *models.Things) {
 	controller.thingId = c.Param("thingId")
 	controller.locker = new(sync.Mutex)
 	controller.Container = things
-	bus.Subscribe(util.PropertyChanged, controller.onPropertyChanged)
-	bus.Subscribe(util.CONNECTED, controller.onConnected)
-	bus.Subscribe(util.MODIFIED, controller.onModified)
-	bus.Subscribe(util.ThingRemoved, controller.onRemoved)
+	_ = bus.Subscribe(util.PropertyChanged, controller.onPropertyChanged)
+	_ = bus.Subscribe(util.CONNECTED, controller.onConnected)
+	_ = bus.Subscribe(util.MODIFIED, controller.onModified)
+	_ = bus.Subscribe(util.ThingRemoved, controller.onRemoved)
 
 	if controller.thingId != "" {
 		t := controller.Container.GetThing(controller.thingId)

@@ -19,6 +19,9 @@
   "remove": "移除",
   "disable": "禁用",
   "enable": "启用",
+  "updating": "正在更新",
+  "on": "打开",
+  "off": "关闭",
   "add": "添加",
   "chooseIcon": "选择图标",
   "Save": "保存",
@@ -62,5 +65,6 @@
   "TemperatureSensor": "TemperatureSensor",
   "Thermostat": "Thermostat",
   "VideoCamera": "VideoCamera",
-  "Custom": "自定义"
+  "Custom": "自定义",
+  "add things": "添加配件"
 }

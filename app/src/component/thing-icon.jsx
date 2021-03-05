@@ -5,8 +5,8 @@ import PowerIcon from '@material-ui/icons/Power';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import "../js/constant"
 import Icon from '@mdi/react';
-import {AddonType, SettingsType, ThingType} from "../js/constant";
-import {mdiFloorPlan} from '@mdi/js';
+import {AddonType, SettingsType, ThingType as Things, ThingType} from "../js/constant";
+import {mdiFloorPlan, mdiLightbulb, mdiPower} from '@mdi/js';
 
 
 export default function ThingIcon(props) {
@@ -114,10 +114,12 @@ export default function ThingIcon(props) {
             }
             case ThingType.Light: {
                 console.log("props.type:", props.type)
-                return <SvgIcon {...props}>
-                    <path fill="currentColor"
-                          d="M12,6A6,6 0 0,1 18,12C18,14.22 16.79,16.16 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.21,16.16 6,14.22 6,12A6,6 0 0,1 12,6M14,21V22A1,1 0 0,1 13,23H11A1,1 0 0,1 10,22V21H14M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5M16.95,5.63L19.07,3.5L20.5,4.93L18.37,7.05L16.95,5.63Z"/>
-                </SvgIcon>
+                return <Icon {...props} path={mdiLightbulb}
+                             horizontal
+                             vertical
+                             rotate={180}
+                />
+
             }
             case ThingType.Lock: {
                 return <SvgIcon>
@@ -226,7 +228,7 @@ export default function ThingIcon(props) {
                 return <NotificationsIcon {...props}/>
             }
             case SettingsType.Room: {
-                return <Icon path={mdiFloorPlan}
+                return <Icon {...props} path={mdiFloorPlan}
                              size={1}
                              horizontal
                              vertical
@@ -241,6 +243,22 @@ export default function ThingIcon(props) {
     </div>
 }
 
+export const actionsType = {
+    powerOn: "powerOn"
+}
+
+export function ActionsIcon(props) {
+    switch (props.type) {
+        case Things.Light: {
+            return <Icon {...props} path={mdiPower}
+                         size={1}
+                         horizontal
+                         vertical
+                         rotate={180}
+            />
+        }
+    }
+}
 
 
 

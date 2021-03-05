@@ -37,4 +37,4 @@ export const SettingsType = {
     Extension: "extension"
 }
 
-export const drawerWidth = 240;
+export const drawerWidth = 200;

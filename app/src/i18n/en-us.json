@@ -59,5 +59,6 @@
   "TemperatureSensor": "TemperatureSensor",
   "Thermostat": "Thermostat",
   "VideoCamera": "VideoCamera",
-  "Custom": "Custom"
+  "Custom": "Custom",
+  "add things":"add things"
 }

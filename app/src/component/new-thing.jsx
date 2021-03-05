@@ -38,6 +38,12 @@ const useStyles = makeStyles((theme) => ({
     }
 }))
 
+const states = {
+    Save: "save",
+    Processing: "processing",
+    Saved: "saved",
+    Fail: "fail",
+}
 
 export default function NewThing(props) {
 
@@ -45,12 +51,7 @@ export default function NewThing(props) {
 
     const classes = useStyles();
     const [thing, setThing] = useState({...props["thing"], selectedCapability: props.thing["@type"][0]})
-    const states = {
-        Save: "save",
-        Processing: "processing",
-        Saved: "saved",
-        Fail: "fail",
-    }
+
 
     const [state, setState] = useState(states.Save)
 

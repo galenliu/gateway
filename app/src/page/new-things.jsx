@@ -14,9 +14,7 @@ import Grid from "@material-ui/core/Grid";
 import {AppContext} from "../App";
 
 const useStyles = makeStyles((theme) => ({
-    appBar: {
-
-    },
+    appBar: {},
     title: {
         marginLeft: theme.spacing(2),
         flex: 1,
@@ -72,9 +70,6 @@ export default function NewThingsDialog(props) {
 
     }, [ws]);
 
-
-    console.log("addThings websocket starting ...,open:", open)
-
     function requestPairing() {
         webSocketInit();
         API.startPairing(5000).then((action) => {
@@ -90,7 +85,7 @@ export default function NewThingsDialog(props) {
     useEffect(
         () => {
             try {
-                if (message !== undefined) {
+                if (message) {
                     let newThing = JSON.parse(message)
                     const things = availableThings
                     if (!availableThings.hasOwnProperty(newThing.id)) {
@@ -121,18 +116,16 @@ export default function NewThingsDialog(props) {
 
     useEffect(
         () => {
-            if (newThingsOpen) {
+            if (props.open) {
                 console.log("....................")
                 setAvailableThings([])
                 requestPairing()
             }
-            if (!newThingsOpen) {
-                cancelPairing()
+            if (!props.open) {
+
             }
-        }, [newThingsOpen]
+        }, [props.open]
     )
-
-
 
 
     function RenderAvailableThings() {
@@ -151,7 +144,7 @@ export default function NewThingsDialog(props) {
 
     return (
         <div>
-            <Dialog fullScreen open={newThingsOpen} onClose={() => setNewThingsOpen(true)}
+            <Dialog fullScreen open={props.open} onClose={() => props.show(true)}
                     TransitionComponent={Transition}>
                 <AppBar className={classes.appBar}>
                     <Toolbar>
@@ -160,7 +153,7 @@ export default function NewThingsDialog(props) {
                         </Typography>
                         <IconButton autoFocus color="inherit" onClick={() => {
                             {
-                                setNewThingsOpen(false)
+                                props.show(false)
                                 cancelPairing()
                             }
                         }} aria-label="close">

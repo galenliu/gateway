@@ -16,8 +16,8 @@ import MoreIcon from '@material-ui/icons/MoreVert';
 import {useTranslation} from 'react-i18next';
 import clsx from "clsx";
 import {AppContext} from "../App";
-
-const drawerWidth = 240;
+import {Tooltip} from "@material-ui/core";
+import {drawerWidth} from "../js/constant";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -197,10 +197,12 @@ export default function TopBar(props) {
                     <div className={classes.grow}/>
                     <div className={classes.sectionDesktop}>
                         {props.add && <IconButton aria-label="show 4 new mails" color="inherit" onClick={() => {
-                            setNewThingsOpen(true)
+                            props.show(true)
                         }}>
                             <Badge badgeContent={0} color="secondary">
-                                <AddIcon/>
+                                <Tooltip title={t("add things")} arrow>
+                                    <AddIcon/>
+                                </Tooltip>
                             </Badge>
                         </IconButton>}
                     </div>

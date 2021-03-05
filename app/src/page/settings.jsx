@@ -15,8 +15,8 @@ import Grid from "@material-ui/core/Grid";
 import AddonsDialog from "./addons";
 import Divider from "@material-ui/core/Divider";
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+import {drawerWidth} from "../js/constant";
 
-const drawerWidth = 240
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
-        marginLeft: -drawerWidth,
+        marginLeft: drawerWidth,
     },
     contentShift: {
         transition: theme.transitions.create('margin', {
@@ -49,11 +49,9 @@ const useStyles = makeStyles((theme) => ({
     },
 
     listItem: {
-        minWidth: 360,
-    },
-    list: {
-        padding: 12,
-    },
+        maxWidth: 400,
+        minWidth: 300,
+    }
 
 }))
 
@@ -64,7 +62,7 @@ export default function Settings(props) {
     const theme = useTheme();
     const {t, i18n} = useTranslation();
     const {drawerOpen, setNewThingsClose, setNewThingsOpen, newThingsOpen} = useContext(AppContext)
-    const [addonsDialogShow,setAddonsDialogShow] = useState(false)
+    const [addonsDialogShow, setAddonsDialogShow] = useState(false)
 
     return (
         <>
@@ -79,7 +77,7 @@ export default function Settings(props) {
                     <div className={classes.drawerHeader}/>
 
                     <List component="nav" aria-label="main mailbox folders" className={classes.list}>
-                        <Divider />
+                        <Divider/>
                         <ListItem button
                                   className={classes.listItem} variant="contained" elevation={111}>
                             <ListItemIcon>
@@ -88,16 +86,17 @@ export default function Settings(props) {
                             <ListItemText primary={t("Domain")}/>
                             <NavigateNextIcon/>
                         </ListItem>
-                        <Divider />
+                        <Divider/>
                         <ListItem button
-                                  className={classes.listItem} variant="contained" onClick={()=>setAddonsDialogShow(true)}>
+                                  className={classes.listItem} variant="contained"
+                                  onClick={() => setAddonsDialogShow(true)}>
                             <ListItemIcon>
                                 <ExtensionIcon/>
                             </ListItemIcon>
                             <ListItemText primary={t("Addons")}/>
                             <NavigateNextIcon/>
                         </ListItem>
-                        <Divider />
+                        <Divider/>
                         <ListItem button
                                   className={classes.listItem} variant="contained" elevation={111}>
                             <ListItemIcon>
@@ -106,7 +105,7 @@ export default function Settings(props) {
                             <ListItemText primary={t("Domain")}/>
                             <NavigateNextIcon/>
                         </ListItem>
-                        <Divider />
+                        <Divider/>
                         <ListItem button
                                   className={classes.listItem} variant="contained" elevation={111}>
                             <ListItemIcon>
@@ -115,13 +114,12 @@ export default function Settings(props) {
                             <ListItemText primary={t("Domain")}/>
                             <NavigateNextIcon/>
                         </ListItem>
-                        <Divider />
+                        <Divider/>
                     </List>
-
                 </Grid>
 
             </main>
-            {addonsDialogShow && <AddonsDialog open={addonsDialogShow} show={setAddonsDialogShow}/>}
+            <AddonsDialog open={addonsDialogShow} show={setAddonsDialogShow}/>
         </>
     )
 }

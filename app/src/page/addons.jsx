@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import Dialog from "@material-ui/core/Dialog";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -18,6 +18,8 @@ import {Button, CircularProgress, FormHelperText, Link} from "@material-ui/core"
 import Divider from "@material-ui/core/Divider";
 import StoreIcon from "@material-ui/icons/Store";
 import {versionStringCompare} from "../js/util";
+import AddIcon from "@material-ui/icons/Add";
+import {drawerWidth} from "../js/constant";
 
 
 export const useStyles = makeStyles((theme) => ({
@@ -26,7 +28,7 @@ export const useStyles = makeStyles((theme) => ({
         padding: 3,
         display: "flex",
         maxWidth: 400,
-        minWidth: 300,
+        minWidth: 240,
         margin: 5,
         justifyContent: "space-between",
         alignItems: "center",
@@ -48,7 +50,17 @@ export const useStyles = makeStyles((theme) => ({
         alignItems: "stretch",
     },
     content: {
-        marginTop: 80,
+
+        justifyContent:"flex-start", alignItems:"center", direction:"column",
+
+    },
+    drawerHeader: {
+        display: 'flex',
+        alignItems: 'center',
+        padding: theme.spacing(0, 1),
+        // necessary for content to be below app bar
+        ...theme.mixins.toolbar,
+        justifyContent: 'flex-end',
     },
     appBar: {},
     title: {
@@ -60,6 +72,11 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
+const states = {
+    Loading: "loading",
+    Empty: "empty",
+    Completed: "completed",
+}
 
 export default function AddonsDialog(props) {
 
@@ -68,8 +85,8 @@ export default function AddonsDialog(props) {
     const [fetchAddonsShow, setFetchAddonsShow] = useState(false)
     const [installedAddons, setInstalledAddons] = useState(new Map())
     const [availableAddons, setAvailableAddons] = useState(new Map())
+    const [state, setState] = useState(states.Loading)
 
-    const [open, setOpen] = useState(props.open)
 
     function fetchAvailableAddonList() {
         return new Promise(function (resolve, reject) {
@@ -154,32 +171,34 @@ export default function AddonsDialog(props) {
     }
 
     function fetchInstalledAddonsList() {
-        return API.getInstalledAddons().then(body => {
-            if (!body) {
-                return;
-            }
-
-            console.log("fetch the installed addon body :", body)
-            let list = new Map()
-            for (const s of body) {
-                console.log("fetch addon  :", s)
-                try {
-                    s.isUpdate = false
-                    list.set(s.id, s)
-                } catch (err) {
-                    console.error(`Failed to parse add-on settings: ${err}`);
+        return new Promise(function (resolve, reject) {
+            API.getInstalledAddons().then(body => {
+                if (!body) {
+                    return reject(new Error("installed empty"))
                 }
-            }
-            setInstalledAddons(list)
+                console.log("fetch the installed addon body :", body)
+                let newMap = new Map()
+                try {
+                    for (const s of body) {
+                        s.isUpdate = false
+                        newMap.set(s.id, s)
+                    }
+
+                } catch (err) {
+                    return reject(err);
+                }
+                return resolve(newMap)
+            })
         })
     }
 
-
     function renderInstalledAddonsList() {
+        console.log("installedAddons:", installedAddons)
         const list = []
         for (const [id, a] of installedAddons) {
-            const addon = <InstalledAddon key={id}
-                                          id={id}
+            console.log("installedAddons:", id, a)
+            const addon = <InstalledAddon key={a.id}
+                                          id={a.id}
                                           name={a.name}
                                           short_name={a.short_name}
                                           author={a.author}
@@ -190,7 +209,7 @@ export default function AddonsDialog(props) {
                                           version={a.version}
                                           primary_type={a.primary_type}
                                           schema={a.schema}
-                                          isUpdate = {a.isUpdate}
+                                          isUpdate={a.isUpdate}
 
             />
             list.push(addon)
@@ -199,52 +218,64 @@ export default function AddonsDialog(props) {
     }
 
     useEffect(() => {
-            if (!open) {
-                return
-            }
-            fetchInstalledAddonsList().then(() =>
-                fetchAvailableAddonList()
+        if (!props.open) {
+            setFetchAddonsShow(false)
+            setState(states.Empty)
+            setInstalledAddons(new Map())
+            setAvailableAddons(new Map())
+        } else {
+            setState(states.Loading)
+            let installed = new Map()
+            fetchInstalledAddonsList().then((installedMap) => {
+                    installed = installedMap
+                    return fetchAvailableAddonList()
+                }
             ).then((fetchAddons) => {
-                console.log("fetchAddons:", fetchAddons)
-                setAvailableAddons(fetchAddons)
+                for (const [id, addon] of fetchAddons) {
+                    if (installed.has(id)) {
+                        if (!addon.installed) {
+                            fetchAddons.get(id).installed = true
+
+                        }
+                        if (versionStringCompare(addon.version, installed.get(id).version) > 0) {
+                            console.log(versionStringCompare(addon.version, installed.get(id).version))
+                            installed.get(id).isUpdate = true
+                            installed.get(id).url = addon.url
+
+                        }
+
+                    }
+                }
+                if (fetchAddons) {
+                    console.log("update available:", fetchAddons)
+                    setAvailableAddons(fetchAddons)
+                }
+                if (installed) {
+                    console.log("update installed:", installed)
+                    setInstalledAddons(installed)
+                }
+            }, (err) => {
+                console.err(err)
+                setInstalledAddons(installed)
             }).catch((e) =>
                 console.error(e)
             )
+        }
 
-        }, [open])
+    }, [props.open])
 
     useEffect(() => {
-        let availableUpdate = false
-        let installedUpdate = false
-        let available = availableAddons
-        let installed = installedAddons
-
-        console.log("available:", available)
-        for (const [id, addon] of availableAddons) {
-            if (installedAddons.has(id)) {
-                if (!addon.installed) {
-                    available.get(id).installed = true
-                    availableUpdate = true
-                }
-                if (versionStringCompare(addon.version, installed.get(id).version) === 0) {
-                    console.log(versionStringCompare(addon.version, installed.get(id).version))
-                    installed.get(id).isUpdate = true
-                    installed.get(id).url = addon.url
-                    installedUpdate = true
-                }
-
-            }
-            if (availableUpdate) {
-                setAvailableAddons(available)
-            }
-            if (installedUpdate) {
-                setInstalledAddons(installed)
-            }
-            console.log("available:", availableAddons)
-            console.log("installed:", installedAddons)
-        }
+        console.info("update availableAddons:")
     }, [availableAddons])
 
+    useEffect(() => {
+        console.info("update installedAddons:", installedAddons)
+        if (installedAddons.size === 0) {
+            setState(states.Empty)
+        } else {
+            setState(states.Completed)
+        }
+    }, [installedAddons])
 
     return (
         <div>
@@ -267,12 +298,17 @@ export default function AddonsDialog(props) {
                         </IconButton>
                     </Toolbar>
                 </AppBar>
-                <Grid container justify="flex-start" alignItems="center" direction="column">
-                    {renderInstalledAddonsList()}
+
+                <Grid className={classes.content} container justify="flex-start" alignItems="center" direction="column">
+                    <div className={classes.drawerHeader}/>
+                    {state === states.Loading && <CircularProgress disableShrink/>}
+                    {state === states.Completed && renderInstalledAddonsList()}
+                    {state === states.Empty && <AddIcon/>}
+
                 </Grid>
             </Dialog>
-            {fetchAddonsShow && <AddAddonsDialog installedAddons={installedAddons} availableAddons={availableAddons}
-                                                 open={fetchAddonsShow} show={setFetchAddonsShow}/>}
+            <AddAddonsDialog installedAddons={installedAddons} availableAddons={availableAddons}
+                             open={fetchAddonsShow} show={setFetchAddonsShow}/>
         </div>
     )
 
@@ -289,7 +325,6 @@ export function AddAddonsDialog(props) {
         if (!availableAddons) {
             return
         }
-        console.log("addon:", availableAddons)
         const list = []
         for (const [id, addon] of availableAddons) {
             if (availableAddons.has(id)) {
@@ -313,11 +348,6 @@ export function AddAddonsDialog(props) {
         return list
     }
 
-    useEffect(() => {
-        if (props.open) {
-
-        }
-    }, [props.open])
 
     return (
         <Dialog fullScreen className={classes.root} open={props.open} onClose={() => props.show(false)}
@@ -333,6 +363,7 @@ export function AddAddonsDialog(props) {
                     </IconButton>
                 </Toolbar>
             </AppBar>
+            <div className={classes.drawerHeader}/>
             <Grid className={classes.content} container justify="flex-start" alignItems="center" direction="column">
                 {renderAvailableAddons()}
             </Grid>
@@ -340,7 +371,6 @@ export function AddAddonsDialog(props) {
     )
 
 }
-
 
 function InstalledAddon(props) {
 
@@ -424,7 +454,7 @@ function NewAddon(props) {
 
     return (
         <>
-            <Card className={classes.addonCard} elevation={5}>
+            <Card className={classes.addonCard} elevation={10}>
                 <Addon {...props} />
 
                 <div className={classes.sideContent}>
@@ -485,26 +515,36 @@ export function Addon(props) {
             <Typography variant="subtitle1">
                 {addon.id}
             </Typography>
-            <div style={{display: "flex", "flex-direction": "row"}}>
+            <div style={{
+                display: "flex",
+                "flexDirection": "row",
+                "justifyContent": "flex-start",
+                "alignItems": "center"
+            }}>
                 <FormHelperText>{t("version")}: </FormHelperText>
-                <Typography variant="h9">
+                <Typography variant="body1">
                     {addon.version}
                 </Typography>
             </div>
-            <div style={{display: "flex", "flex-direction": "row"}}>
+            <div style={{
+                display: "flex",
+                "flexDirection": "row",
+                "justifyContent": "flex-start",
+                "alignItems": "center"
+            }}>
                 <FormHelperText>{t("author")}: </FormHelperText>
-                <Typography variant="h9">
-                    <Link href={addon.homepage_url}>
-                        {addon.author}
-                    </Link>
-                </Typography>
+
+                <Link href={addon.homepage_url}>
+                    {addon.author}
+                </Link>
+
             </div>
-            <div style={{display: "flex", "flex-direction": "row"}}>
-                <Typography variant="h9">
-                    <Link href={addon.license_url}>
-                        {t("license")}
-                    </Link>
-                </Typography>
+            <div style={{display: "flex", "flexDirection": "row"}}>
+
+                <Link href={addon.license_url}>
+                    {t("license")}
+                </Link>
+
             </div>
 
         </div>
