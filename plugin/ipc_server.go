@@ -88,7 +88,7 @@ func (server *IpcServer) Serve() {
 	err := http.ListenAndServe(server.addr, nil)
 	log.Info(fmt.Sprintf("ipc server listening addr: %s", server.addr))
 	if err != nil {
-		log.Error("ipc server fail,err: ", err.Error())
+		log.Error("ipc server fail,err: %s", err.Error())
 	}
 
 }

@@ -114,11 +114,13 @@ export default function Thing(props) {
     }
 
     return (
-        <> <ThingPanel open={open} show={setOpen} {...thing}/>
+        <>
+
             <Grid item className={classes.root} onDoubleClick={() => {
                 console.log("doubleClick")
                 setOpen(true)
             }}>
+
                 <Card elevation={10} className={classes.thingCard}>
                     <div className={classes.cardTop}>
                         <ThingIcon state={state} color={"#fb8c00"} type={thing.selectedCapability} size={2}/>

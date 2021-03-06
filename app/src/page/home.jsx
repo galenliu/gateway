@@ -17,9 +17,8 @@ import useWebSocket, {ReadyState} from "react-use-websocket";
 
 const useStyles = makeStyles((theme) => ({
     containerGrid: {
-        marginTop: 80,
         alignItems: "flex-start",
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
 
         // background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
         flexGrow: 1,
@@ -37,6 +36,7 @@ const useStyles = makeStyles((theme) => ({
         }),
         marginLeft: 0,
     },
+
     drawerHeader: {
         display: 'flex',
         alignItems: 'center',
@@ -55,7 +55,7 @@ const states = {
     disconnected: "disconnected",
 }
 
-function Home() {
+function Home(props) {
 
     const classes = useStyles()
     const {drawerOpen} = useContext(AppContext)
@@ -112,11 +112,11 @@ function Home() {
 
     const [state, setState] = useState()
 
-    useEffect(()=>{
-        if(connectionStatus === 'Open' && state === states.completed){
-        setState(states.connected)
-    }
-    },[connectionStatus])
+    useEffect(() => {
+        if (connectionStatus === 'Open' && state === states.completed) {
+            setState(states.connected)
+        }
+    }, [connectionStatus])
 
 
     useEffect(() => {
@@ -174,13 +174,15 @@ function Home() {
     return (
         <>
             <TopBar add={true} show={setAddThingShow} title={t("Home")}/>
+            <div className={classes.drawerHeader}/>
+            {state === states.fetching && <CircularProgress disableShrink/>}
             <Grid
                 className={clsx(classes.containerGrid, {
                     [classes.contentShift]: !drawerOpen,
                 })}
-                container spacing={3}>
-                <div className={classes.drawerHeader}/>
-                {state === states.fetching && <CircularProgress disableShrink/>}
+                container spacing={2}>
+
+
                 {things && renderThings()}
             </Grid>
             <NewThingsDialog open={addThingShow} show={setAddThingShow}/>  </>
