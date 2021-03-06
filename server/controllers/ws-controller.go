@@ -3,8 +3,8 @@ package controllers
 import (
 	"addon"
 	"fmt"
+	"gateway/log"
 	"gateway/pkg/bus"
-	"gateway/pkg/log"
 	"gateway/pkg/util"
 	"gateway/plugin"
 	"gateway/server/models"
@@ -21,13 +21,17 @@ type ThingsWebsocketController struct {
 	Container          *models.Things
 	ws                 *websocket.Conn
 	locker             *sync.Mutex
+	done               chan struct{}
 	subscriptionThings []*thing.Thing
 }
 
-func NewThingsWebsocketController() *ThingsWebsocketController {
-	handler := &ThingsWebsocketController{}
-
-	return handler
+func NewThingsWebsocketController(ts *models.Things, conn *websocket.Conn, thingId string) *ThingsWebsocketController {
+	controller := &ThingsWebsocketController{}
+	controller.locker = new(sync.Mutex)
+	controller.Container = ts
+	controller.ws = conn
+	controller.done = make(chan struct{})
+	return controller
 }
 
 var wsUpgrade = websocket.Upgrader{
@@ -45,15 +49,13 @@ func HandleWebsocket(c *gin.Context, things *models.Things) {
 		c.String(http.StatusBadGateway, err.Error())
 		return
 	}
-	controller := NewThingsWebsocketController()
-	controller.ws = conn
-	controller.thingId = c.Param("thingId")
-	controller.locker = new(sync.Mutex)
-	controller.Container = things
-	_ = bus.Subscribe(util.PropertyChanged, controller.onPropertyChanged)
-	_ = bus.Subscribe(util.CONNECTED, controller.onConnected)
-	_ = bus.Subscribe(util.MODIFIED, controller.onModified)
-	_ = bus.Subscribe(util.ThingRemoved, controller.onRemoved)
+	controller := NewThingsWebsocketController(things, conn, c.Param("thingId"))
+
+	go controller.handleWebsocket()
+
+}
+
+func (controller *ThingsWebsocketController) handleWebsocket() {
 
 	if controller.thingId != "" {
 		t := controller.Container.GetThing(controller.thingId)
@@ -83,23 +85,31 @@ func HandleWebsocket(c *gin.Context, things *models.Things) {
 			controller.addThing(t)
 		}
 	}
-	go controller.handleWebsocket()
 
-}
-
-func (controller *ThingsWebsocketController) handleWebsocket() {
+	_ = bus.Subscribe(util.PropertyChanged, controller.onPropertyChanged)
+	_ = bus.Subscribe(util.CONNECTED, controller.onConnected)
+	_ = bus.Subscribe(util.MODIFIED, controller.onModified)
+	_ = bus.Subscribe(util.ThingRemoved, controller.onRemoved)
 	for {
-		_, data, readErr := controller.ws.ReadMessage()
-		if data == nil {
-			break
-		}
-		if readErr != nil {
-			log.Info("websocket disconnected", readErr.Error())
+		select {
+		case <-controller.done:
 			controller.close()
 			return
+		default:
+			_, data, readErr := controller.ws.ReadMessage()
+			if readErr != nil {
+				log.Info("websocket disconnected", readErr.Error())
+				controller.done <- struct{}{}
+				return
+			}
+			if data != nil {
+				go controller.handleMessage(data)
+			}
+
 		}
-		go controller.handleMessage(data)
+
 	}
+
 }
 
 func (controller *ThingsWebsocketController) handleMessage(data []byte) {
@@ -131,9 +141,9 @@ func (controller *ThingsWebsocketController) handleMessage(data []byte) {
 	}
 
 	// get devices form addon
-	device, err := plugin.FindDevice(id)
+	device := plugin.GetDevice(id)
 
-	if err != nil {
+	if device == nil {
 		controller.sendMessage(struct {
 			MessageType string      `json:"messageType"`
 			Data        interface{} `json:"data"`
@@ -151,7 +161,6 @@ func (controller *ThingsWebsocketController) handleMessage(data []byte) {
 				Request: json.Get(data),
 			},
 		})
-
 		return
 	}
 
@@ -162,7 +171,7 @@ func (controller *ThingsWebsocketController) handleMessage(data []byte) {
 		var propertyMap map[string]interface{}
 		json.Get(data, "data").ToVal(&propertyMap)
 		for propName, value := range propertyMap {
-			setErr := plugin.SetProperValue(device.ID, propName, value)
+			setErr := plugin.SetPropertyValue(device.ID, propName, value)
 			if setErr != nil {
 				controller.sendMessage(struct {
 					MessageType string      `json:"messageType"`
@@ -213,7 +222,6 @@ func (controller *ThingsWebsocketController) handleMessage(data []byte) {
 func (controller *ThingsWebsocketController) addThing(thing *thing.Thing) {
 
 	controller.subscriptionThings = append(controller.subscriptionThings, thing)
-
 	for propName, _ := range thing.Properties {
 		value, err := plugin.GetPropertyValue(thing.ID, propName)
 		if err != nil {
@@ -327,17 +335,7 @@ func (controller *ThingsWebsocketController) sendMessage(message interface{}) {
 
 func (controller *ThingsWebsocketController) onError(err error) {
 	log.Info("websocket err:", err.Error())
-	controller.close()
-}
-
-func (controller *ThingsWebsocketController) close() {
-	controller.locker.Lock()
-	defer controller.locker.Unlock()
-	bus.Unsubscribe(util.PropertyChanged, controller.onPropertyChanged)
-	bus.Unsubscribe(util.CONNECTED, controller.onConnected)
-	bus.Unsubscribe(util.MODIFIED, controller.onModified)
-	bus.Unsubscribe(util.ThingRemoved, controller.onRemoved)
-	_ = controller.ws.Close()
+	controller.done <- struct{}{}
 }
 
 func (controller *ThingsWebsocketController) getThing(id string) *thing.Thing {
@@ -347,4 +345,15 @@ func (controller *ThingsWebsocketController) getThing(id string) *thing.Thing {
 		}
 	}
 	return nil
+}
+
+func (controller *ThingsWebsocketController) close() {
+	controller.locker.Lock()
+	defer controller.locker.Unlock()
+	_ = bus.Unsubscribe(util.PropertyChanged, controller.onPropertyChanged)
+	_ = bus.Unsubscribe(util.CONNECTED, controller.onConnected)
+	_ = bus.Unsubscribe(util.MODIFIED, controller.onModified)
+	_ = bus.Unsubscribe(util.ThingRemoved, controller.onRemoved)
+	_ = controller.ws.Close()
+	return
 }

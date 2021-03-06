@@ -5,6 +5,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import ThingIcon, {ActionsIcon} from "./thing-icon";
 import Typography from "@material-ui/core/Typography";
 import {useTranslation} from "react-i18next";
+import {ThingPanel} from "./thing-panel";
 
 // function rand() {
 //     return Math.round(Math.random() * 20) - 10;
@@ -67,6 +68,7 @@ export default function Thing(props) {
 
     const classes = useStyles()
     const {t, i18n} = useTranslation();
+    const [open, setOpen] = useState(false)
 
     const [thing, setThing] = useState(props)
     const [state, setState] = useState()
@@ -112,21 +114,25 @@ export default function Thing(props) {
     }
 
     return (
-        <Grid item className={classes.root}>
-            <Card elevation={10} className={classes.thingCard}>
-                <div className={classes.cardTop}>
-                    <ThingIcon state={state} color={"#fb8c00"} type={thing.selectedCapability} size={2}/>
-                    <ActionsIcon state={state} type={thing.selectedCapability} size={2}/>
-                </div>
-                <div className={classes.cardBot}>
-                    <Typography variant={"body1"} >
-                        {thing.title}
-                    </Typography>
-                    <Typography {...stateTextStyle()} t={2}>
-                        {t(state)}
-                    </Typography>
-                </div>
-            </Card>
-
-        </Grid>)
+        <> <ThingPanel open={open} show={setOpen} {...thing}/>
+            <Grid item className={classes.root} onDoubleClick={() => {
+                console.log("doubleClick")
+                setOpen(true)
+            }}>
+                <Card elevation={10} className={classes.thingCard}>
+                    <div className={classes.cardTop}>
+                        <ThingIcon state={state} color={"#fb8c00"} type={thing.selectedCapability} size={2}/>
+                        <ActionsIcon state={state} type={thing.selectedCapability} size={2}/>
+                    </div>
+                    <div className={classes.cardBot}>
+                        <Typography variant={"body1"}>
+                            {thing.title}
+                        </Typography>
+                        <Typography {...stateTextStyle()} t={2}>
+                            {t(state)}
+                        </Typography>
+                    </div>
+                </Card>
+            </Grid>
+        </>)
 }

@@ -1,7 +1,7 @@
 package homekit
 
 import (
-	"gateway/pkg/log"
+	"gateway/log"
 	"github.com/brutella/hc"
 	"github.com/brutella/hc/accessory"
 )
@@ -42,7 +42,3 @@ func NewHomeKitBridge(name, sn, manufacturer, model, storagePath string) {
 	})
 	t.Start()
 }
-
-
-
-

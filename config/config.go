@@ -3,8 +3,8 @@ package config
 import (
 	_ "embed"
 	"fmt"
+	"gateway/log"
 	"gateway/pkg/database"
-	"gateway/pkg/log"
 	"gateway/pkg/util"
 	json "github.com/json-iterator/go"
 	"gopkg.in/yaml.v3"

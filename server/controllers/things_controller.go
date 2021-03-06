@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"fmt"
-	"gateway/pkg/log"
+	"gateway/log"
 	"gateway/server/models"
 	thing2 "gateway/server/models/thing"
 	"github.com/gin-gonic/gin"
@@ -32,8 +32,8 @@ func (tc *ThingsController) HandleCreateThing(c *gin.Context) {
 	}
 	log.Debug("Post /thing,Body: \t\n %s", data)
 
-	id := json.Get(data,"id").ToString()
-	if len(id)<1 {
+	id := json.Get(data, "id").ToString()
+	if len(id) < 1 {
 		c.String(http.StatusBadRequest, "bad request")
 		return
 	}
@@ -43,7 +43,7 @@ func (tc *ThingsController) HandleCreateThing(c *gin.Context) {
 		return
 	}
 
-	des,err1 := tc.Container.CreateThing(id,data)
+	des, err1 := tc.Container.CreateThing(id, data)
 	if err1 != nil {
 		c.String(http.StatusInternalServerError, fmt.Sprintf("create thing(%s) err: %v", err.Error()))
 		return
@@ -61,8 +61,6 @@ func (tc *ThingsController) HandleDeleteThing(c *gin.Context) {
 	log.Info(fmt.Sprintf("Successfully deleted %v from database", thingId))
 	c.Status(http.StatusNoContent)
 }
-
-
 
 func (tc *ThingsController) HandleGetThing(c *gin.Context) {
 	if c.IsWebsocket() {
@@ -175,6 +173,3 @@ func (tc *ThingsController) HandleSetThing(c *gin.Context) {
 	}
 
 }
-
-
-

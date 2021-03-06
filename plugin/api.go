@@ -72,17 +72,17 @@ func GetThings() []*thing.Thing {
 	return ts
 }
 
-func FindDevice(deviceId string) (*addon.Device, error) {
+func GetDevice(deviceId string) *addon.Device {
 	device, ok := manager.devices[deviceId]
 	if !ok {
-		return nil, fmt.Errorf("devices(%s) not found", deviceId)
+		return nil
 	}
-	return device, nil
+	return device
 }
 
-func SetProperValue(deviceId, propName string, newValue interface{}) error {
-	manager.handleSetPropertyValue(deviceId, propName, newValue)
-	return nil
+func SetPropertyValue(deviceId, propName string, newValue interface{}) error {
+	return manager.handleSetPropertyValue(deviceId, propName, newValue)
+
 }
 
 func GetPropertyValue(deviceId, propName string) (interface{}, error) {

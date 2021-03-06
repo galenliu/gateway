@@ -23,7 +23,7 @@ func NewThings() *Things {
 		func() {
 			things = &Things{}
 			things.things = make(map[string]*thing.Thing)
-			bus.Subscribe(util.PropertyChanged, things.onPropertyChanged)
+			_ = bus.Subscribe(util.PropertyChanged, things.onPropertyChanged)
 
 		},
 	)
@@ -86,18 +86,18 @@ func (ts *Things) HasThing(thingId string) bool {
 	return ok
 }
 
-func (ts *Things) CreateThing(id string, description []byte) (string,error) {
+func (ts *Things) CreateThing(id string, description []byte) (string, error) {
 	var th = thing.NewThing(id, description)
 	if th == nil {
-		return "",fmt.Errorf("thing description invaild")
+		return "", fmt.Errorf("thing description invaild")
 	}
 	th.SetConnected(true)
 	err := database.CreateThing(th.ID, th.GetDescription())
 	if err != nil {
-		return "",err
+		return "", err
 	}
 	ts.things[th.ID] = th
-	return th.GetDescription(),err
+	return th.GetDescription(), err
 }
 
 func (ts *Things) RemoveThing(thingId string) error {
@@ -123,7 +123,7 @@ func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) 
 	if prop == nil {
 		return
 	}
-	_ = plugin.SetProperValue(thingId, propName, value)
+	_ = plugin.SetPropertyValue(thingId, propName, value)
 }
 
 func (ts *Things) onPropertyChanged(property *addon.Property) {
@@ -137,7 +137,6 @@ func (ts *Things) onPropertyChanged(property *addon.Property) {
 		}
 	}
 }
-
 
 func GetThingsFormDataBase() (list []*thing.Thing) {
 

@@ -7,8 +7,8 @@ import (
 	"context"
 	"fmt"
 	"gateway/config"
+	"gateway/log"
 	"gateway/pkg/bus"
-	"gateway/pkg/log"
 	"gateway/pkg/util"
 	"gateway/server/models/thing"
 	"io"
@@ -228,10 +228,17 @@ func (manager *AddonManager) installAddon(packageId, packagePath string, enabled
 
 }
 
-func (manager *AddonManager) handleSetPropertyValue(deviceId, propName string, setValue interface{}) {
+func (manager *AddonManager) handleSetPropertyValue(deviceId, propName string, setValue interface{}) error {
 	adapter := manager.getAdapterByDeviceId(deviceId)
+	if adapter == nil {
+		return fmt.Errorf("adapter not found")
+	}
 	property := adapter.GetDevice(deviceId).GetProperty(propName)
-	adapter.setPropertyValue(property, setValue)
+	if property == nil {
+		return fmt.Errorf("device or property not found")
+	}
+	adapter.handleSetPropertyValue(property, setValue)
+	return nil
 }
 
 func (manager *AddonManager) handleGetDevices(devs *[]*addon.Device) {

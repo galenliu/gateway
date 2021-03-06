@@ -5,8 +5,8 @@ import (
 	"context"
 	"fmt"
 	"gateway/config"
+	"gateway/log"
 	"gateway/pkg/bus"
-	"gateway/pkg/log"
 	"gateway/pkg/util"
 	json "github.com/json-iterator/go"
 	"io"
@@ -19,7 +19,8 @@ import (
 const ExecNode = "{nodeLoader}"
 const ExecPython3 = "{python}"
 
-type OnConnect = func(device addon.Device,bool2 bool)
+type OnConnect = func(device addon.Device, bool2 bool)
+
 //Plugin 管理Adapters
 //处理每一个plugin的请求
 type Plugin struct {
@@ -146,7 +147,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 		device = adapter.GetDevice(deviceId)
 		property := device.GetProperty(p.Name)
 		property.Update(&p)
-		bus.Publish(util.PropertyChanged,property)
+		bus.Publish(util.PropertyChanged, property)
 		break
 
 	case DeviceActionStatusNotification:
@@ -170,7 +171,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 		device = adapter.GetDevice(deviceId)
 		var connected = json.Get(data, "data", "connected")
 		if device != nil && connected.LastError() != nil {
-			bus.Publish(util.CONNECTED,device, connected.ToBool())
+			bus.Publish(util.CONNECTED, device, connected.ToBool())
 		}
 
 	case AdapterPairingPromptNotification:
@@ -195,16 +196,14 @@ func (plugin *Plugin) getManager() *AddonManager {
 	return plugin.pluginServer.manager
 }
 
-func (plugin *Plugin)addAdapter(adapter *AdapterProxy){
+func (plugin *Plugin) addAdapter(adapter *AdapterProxy) {
 	plugin.getManager().addAdapter(adapter)
 }
 
 func (plugin *Plugin) start() {
 
-
 	command := strings.Replace(plugin.exec, "{path}", plugin.execPath, 1)
-	command = strings.Replace(command,"{nodeLoader}",config.Conf.NodeLoader,1)
-
+	command = strings.Replace(command, "{nodeLoader}", config.Conf.NodeLoader, 1)
 
 	commands := strings.Split(command, " ")
 
@@ -217,14 +216,14 @@ func (plugin *Plugin) start() {
 		}
 	}
 
-	var syncLog =func (reader io.ReadCloser) {
+	var syncLog = func(reader io.ReadCloser) {
 
 		buf := make([]byte, 1024, 1024)
 		for {
 			strNum, err := reader.Read(buf)
 			if strNum > 0 {
 				outputByte := buf[:strNum]
-				log.Info(fmt.Sprintf("plugin(%s) out: %s \t\n",plugin.pluginId,string(outputByte)))
+				log.Info(fmt.Sprintf("plugin(%s) out: %s \t\n", plugin.pluginId, string(outputByte)))
 			}
 			if err != nil {
 				//读到结尾
@@ -243,13 +242,13 @@ func (plugin *Plugin) start() {
 		cmd = exec.Command(commands[0])
 	}
 
-	stdout,_ := cmd.StdoutPipe()
+	stdout, _ := cmd.StdoutPipe()
 	stderr, _ := cmd.StderrPipe()
 	//stdOut, err := cmd.StdoutPipe()
 
 	go cmd.Start()
 
-	log.Debug(fmt.Sprintf("plugin(%s) start \t\n",plugin.pluginId))
+	log.Debug(fmt.Sprintf("plugin(%s) start \t\n", plugin.pluginId))
 	go syncLog(stdout)
 	go syncLog(stderr)
 
@@ -269,14 +268,14 @@ func (plugin *Plugin) handleConnection(c *Connection) {
 	}{
 		MessageType: PluginRegisterResponse,
 		Data: struct {
-			PluginID       string `json:"pluginId"`
-			GatewayVersion string `json:"gatewayVersion"`
+			PluginID       string              `json:"pluginId"`
+			GatewayVersion string              `json:"gatewayVersion"`
 			UserProfile    *config.UserProfile `json:"userProfile"`
 			Preferences    *config.Preferences `json:"preferences"`
 		}{
-			PluginID:    plugin.pluginId,
-			UserProfile: config.GetUserProfile(),
-			Preferences: config.GetPreferences(),
+			PluginID:       plugin.pluginId,
+			UserProfile:    config.GetUserProfile(),
+			Preferences:    config.GetPreferences(),
 			GatewayVersion: config.Conf.GatewayVersion,
 		},
 	}
@@ -285,5 +284,3 @@ func (plugin *Plugin) handleConnection(c *Connection) {
 	plugin.registered = true
 	log.Info(fmt.Sprintf("plugin: %s registered", plugin.pluginId))
 }
-
-

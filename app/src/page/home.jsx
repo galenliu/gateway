@@ -72,18 +72,7 @@ function Home() {
         sendMessage,
         lastMessage,
         readyState,
-    } = useWebSocket(socketUrl,
-        {
-            shouldReconnect: (closeEvent) => {
-                /*
-                  useWebSocket will handle unmounting for you, but this is an example of a
-                  case in which you would not want it to automatically reconnect
-                */
-                return didUnmount.current === false;
-            },
-            reconnectAttempts: 10,
-            reconnectInterval: 3000,
-        }
+    } = useWebSocket(socketUrl
     );
 
     const connectionStatus = {
@@ -153,7 +142,7 @@ function Home() {
     useEffect(() => {
 
         if (lastMessage != null) {
-            console.log("websocket rev message", lastMessage)
+            console.log("websocket rev message:", lastMessage.data)
         }
 
     }, [lastMessage])

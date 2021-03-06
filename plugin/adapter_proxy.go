@@ -4,7 +4,7 @@ import (
 	"addon"
 	"context"
 	"fmt"
-	"gateway/pkg/log"
+	"gateway/log"
 	"sync"
 
 	json "github.com/json-iterator/go"
@@ -36,13 +36,13 @@ func (adapter *AdapterProxy) PropertyChanged(property, new *addon.Property) {
 	property.Update(new)
 }
 
-func (adapter *AdapterProxy) setPropertyValue(property *addon.Property, newValue interface{}) {
+func (adapter *AdapterProxy) handleSetPropertyValue(property *addon.Property, newValue interface{}) {
 	adapter.sendMessage(DeviceSetPropertyCommand, struct {
 		AdapterId     string      `json:"adapterId"`
 		PluginId      string      `json:"pluginId"`
 		DeviceId      string      `json:"deviceId"`
 		PropertyName  string      `json:"propertyName"`
-		PropertyValue interface{} `json:"propertyValue"`
+		PropertyValue interface{} `json:"handleSetPropertyValue"`
 	}{
 		AdapterId:     adapter.ID,
 		PluginId:      adapter.pluginId,

@@ -3,7 +3,7 @@ package plugin
 import (
 	"context"
 	"fmt"
-	"gateway/pkg/log"
+	"gateway/log"
 	"github.com/gorilla/websocket"
 	"net/http"
 	"sync"
@@ -84,7 +84,7 @@ func (server *IpcServer) handle(w http.ResponseWriter, r *http.Request) {
 
 func (server *IpcServer) Serve() {
 	http.HandleFunc("/", server.handle)
-	log.Info("plugin server start on port: %s",server.addr)
+	log.Info("plugin server start on port: %s", server.addr)
 	err := http.ListenAndServe(server.addr, nil)
 	log.Info(fmt.Sprintf("ipc server listening addr: %s", server.addr))
 	if err != nil {

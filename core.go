@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"gateway/config"
-	"gateway/pkg/log"
+	"gateway/log"
 	"gateway/plugin"
 	"gateway/server/controllers"
 	"time"
@@ -26,8 +26,6 @@ func NewGateway() (gateway *HomeGateway, err error) {
 	//update the gateway preferences
 	return gateway, err
 }
-
-
 
 func (gateway *HomeGateway) Start() error {
 

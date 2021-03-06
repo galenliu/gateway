@@ -1,8 +1,8 @@
 package controllers
 
 import (
+	"gateway/log"
 	"gateway/pkg/bus"
-	"gateway/pkg/log"
 	"gateway/pkg/util"
 	"gateway/server/models"
 	"gateway/server/models/thing"

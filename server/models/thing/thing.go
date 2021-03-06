@@ -2,8 +2,8 @@ package thing
 
 import (
 	"fmt"
+	"gateway/log"
 	"gateway/pkg/database"
-	"gateway/pkg/log"
 	"github.com/gorilla/websocket"
 	json "github.com/json-iterator/go"
 )

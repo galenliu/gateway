@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"gateway/pkg/log"
+	"gateway/log"
 	_ "github.com/mattn/go-sqlite3"
 	"os"
 	"path"
@@ -37,8 +37,6 @@ func ResetDB(dir string) {
 		_ = os.Remove(dir)
 	}
 }
-
-
 
 func createTable(db *sql.DB) error {
 
