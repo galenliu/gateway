@@ -52,19 +52,6 @@ func (adapter *AdapterProxy) handleSetPropertyValue(property *addon.Property, ne
 	})
 }
 
-func (adapter *AdapterProxy) handleRemoveThing(device *addon.Device) {
-	log.Info(fmt.Sprintf("adapter delete thing ID: %v", device.ID))
-	adapter.sendMessage(AdapterRemoveDeviceRequest, struct {
-		AdapterId string `json:"adapterId"`
-		PluginId  string `json:"pluginId"`
-		DeviceId  string `json:"deviceId"`
-	}{
-		AdapterId: adapter.ID,
-		PluginId:  adapter.pluginId,
-		DeviceId:  device.ID,
-	})
-}
-
 func (adapter *AdapterProxy) pairing(timeout float64) {
 	log.Info(fmt.Sprintf("adapter: %s start pairing", adapter.ID))
 	adapter.sendMessage(AdapterStartPairingCommand, struct {
@@ -85,6 +72,19 @@ func (adapter *AdapterProxy) cancelPairing() {
 	}{
 		PluginId:  adapter.pluginId,
 		AdapterID: adapter.ID,
+	})
+}
+
+func (adapter *AdapterProxy) removeThing(device *addon.Device) {
+	log.Info(fmt.Sprintf("adapter delete thing ID: %v", device.ID))
+	adapter.sendMessage(AdapterRemoveDeviceRequest, struct {
+		AdapterId string `json:"adapterId"`
+		PluginId  string `json:"pluginId"`
+		DeviceId  string `json:"deviceId"`
+	}{
+		AdapterId: adapter.ID,
+		PluginId:  adapter.pluginId,
+		DeviceId:  device.ID,
 	})
 }
 

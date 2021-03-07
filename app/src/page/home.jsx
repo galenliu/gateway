@@ -13,13 +13,15 @@ import {drawerWidth} from "../js/constant";
 import clsx from "clsx";
 import {CircularProgress} from "@material-ui/core";
 import useWebSocket, {ReadyState} from "react-use-websocket";
-
+import AddCircleIcon from "@material-ui/icons/AddCircle";
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import {ThingPanel} from "../component/thing-panel";
 
 const useStyles = makeStyles((theme) => ({
     containerGrid: {
         alignItems: "flex-start",
-        justifyContent: 'flex-start',
-
+        height: "200",
+        minHeight: "200",
         // background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
         flexGrow: 1,
         padding: theme.spacing(3),
@@ -36,7 +38,6 @@ const useStyles = makeStyles((theme) => ({
         }),
         marginLeft: 0,
     },
-
     drawerHeader: {
         display: 'flex',
         alignItems: 'center',
@@ -55,26 +56,25 @@ const states = {
     disconnected: "disconnected",
 }
 
-function Home(props) {
+export default function Home(props) {
 
     const classes = useStyles()
     const {drawerOpen} = useContext(AppContext)
     const [addThingShow, setAddThingShow] = useState(false)
+    const [thingPanelShow, setThingPanelShow] = useState(false)
+    const [currentThing, setCurrentThing] = useState()
     const [things, dispatch] = useReducer(ThingsReducer, new Map())
     const {t, i18n} = useTranslation();
-
     const url = "ws://localhost:9090/things/"
-
     const [socketUrl, setSocketUrl] = useState(null);
     const didUnmount = useRef(false);
-
     const {
         sendMessage,
         lastMessage,
         readyState,
     } = useWebSocket(socketUrl
     );
-
+    const [state, setState] = useState()
     const connectionStatus = {
         [ReadyState.CONNECTING]: 'Connecting',
         [ReadyState.OPEN]: 'Open',
@@ -83,8 +83,10 @@ function Home(props) {
         [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
     }[readyState];
 
-    const handleSendMessage = useCallback((data) =>
-            sendMessage(JSON.stringify(data)),
+    const handleSendMessage = useCallback((data) => {
+            console.log("sendMessage:", data)
+            sendMessage(JSON.stringify(data))
+        },
         []);
 
     // resolve=> return Promise(map)
@@ -110,12 +112,14 @@ function Home(props) {
 
     }
 
-    const [state, setState] = useState()
-
     useEffect(() => {
         if (connectionStatus === 'Open' && state === states.completed) {
             setState(states.connected)
         }
+        if (connectionStatus === 'Closed') {
+            setState(states.disconnected)
+        }
+
     }, [connectionStatus])
 
 
@@ -162,32 +166,49 @@ function Home(props) {
 
 
     function renderThings() {
+
         let list = []
         for (let [id, t] of things) {
             const thing =
-                <Thing key={id} {...t}/>
+                <Thing key={id} {...t} openPanel={handleOpenThingPanel} sendMessage={handleSendMessage}/>
             list.push(thing)
         }
         return list
     }
 
+    function handleOpenThingPanel(props) {
+        setThingPanelShow(true)
+        setCurrentThing(props)
+    }
+
+    function handle(props) {
+
+    }
+
+
     return (
         <>
             <TopBar add={true} show={setAddThingShow} title={t("Home")}/>
             <div className={classes.drawerHeader}/>
-            {state === states.fetching && <CircularProgress disableShrink/>}
-            <Grid
-                className={clsx(classes.containerGrid, {
-                    [classes.contentShift]: !drawerOpen,
-                })}
-                container spacing={2}>
 
 
-                {things && renderThings()}
+            <Grid style={{"justifyContent": !state === states.fetching || things.keys > 0 ? 'flex-start' : "center"}}
+                  className={clsx(classes.containerGrid, {
+                      [classes.contentShift]: !drawerOpen,
+                  })}
+                  container spacing={2}>
+                {state === states.fetching && <CircularProgress disableShrink/>}
+                {state === states.connected && things.length === 0 && <AddCircleIcon/>}
+                {state === states.connected && things && renderThings()}
+                {state === states.disconnected &&
+                <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}><ErrorOutlineIcon/>
+                    <h4>{t("disconnect")}</h4></div>}
             </Grid>
-            <NewThingsDialog open={addThingShow} show={setAddThingShow}/>  </>
+            <NewThingsDialog open={addThingShow} show={setAddThingShow}/>
+            <ThingPanel open={thingPanelShow} show={setThingPanelShow} {...currentThing}/>
+        </>
 
-    );
+    )
 }
 
-export default Home;
+

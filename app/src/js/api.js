@@ -130,6 +130,9 @@ const API = {
     addThing(thing) {
         return this.postJson("/things", thing)
     },
+    removeThing(thingId) {
+        return this.delete(`/things/${encodeURIComponent(thingId)}`);
+    },
 
     getThings() {
         return this.getJson("/things")

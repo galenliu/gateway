@@ -85,6 +85,16 @@ func SetPropertyValue(deviceId, propName string, newValue interface{}) error {
 
 }
 
+func RemoveDevice(deviceId string) error {
+	adapter := manager.getAdapterByDeviceId(deviceId)
+	device := manager.getDevice(deviceId)
+	if adapter != nil {
+		adapter.removeThing(device)
+		return nil
+	}
+	return fmt.Errorf("can not find thing")
+}
+
 func GetPropertyValue(deviceId, propName string) (interface{}, error) {
 	device, ok := manager.devices[deviceId]
 	if !ok {

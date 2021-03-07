@@ -5,7 +5,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import ThingIcon, {ActionsIcon} from "./thing-icon";
 import Typography from "@material-ui/core/Typography";
 import {useTranslation} from "react-i18next";
-import {ThingPanel} from "./thing-panel";
+import {ThingProperties, ThingType as Things} from "../js/constant";
 
 // function rand() {
 //     return Math.round(Math.random() * 20) - 10;
@@ -79,30 +79,6 @@ export default function Thing(props) {
     }, [])
 
 
-    // const {handleSendMessage} = useContext(HomeContext)
-    //
-    //
-    // const setPropertyValue = useCallback((property) => {
-    //         console.log("set property", property)
-    //         const data = {}
-    //         console.log(data)
-    //         let message = {}
-    //         message.messageType = "setProperty"
-    //         message.id = props.thing.id
-    //         message.data = {}
-    //         message.data[property.name] = property.value
-    //         console.log("set property message:", message)
-    //         handleSendMessage(message)
-    //     }, []
-    // )
-    //
-    // const propertyValueChanged = (thingId, value) => {
-    //     console.log(thingId, value)
-    // }
-    //
-    // const onClick = (e) => {
-    //     console.log("on Click")
-    // }
     function stateTextStyle() {
         if (state === states.updating) {
             return {color: "primary", variant: "body2"}
@@ -113,6 +89,31 @@ export default function Thing(props) {
         return {color: "primary", variant: "h6"}
     }
 
+    function thingToggleClick(e) {
+        console.log("thing.properties", thing.properties)
+        console.log("thing", props)
+        if (!thing.connected) {
+            return
+        }
+        e.stopPropagation()
+        let message = {}
+        message.messageType = "setProperty"
+        message.id = thing.id
+        message.data = {}
+        if (thing.selectedCapability === Things.Light) {
+            for (const name in thing.properties) {
+                let prop = thing.properties[name]
+
+                if (prop["@type"] === ThingProperties.OnOffProperty) {
+                    console.log(prop)
+                    message.data[name] = !prop.value
+                    props.sendMessage(message)
+                }
+
+            }
+        }
+    }
+
     return (
         <>
 
@@ -121,10 +122,11 @@ export default function Thing(props) {
                 setOpen(true)
             }}>
 
-                <Card elevation={10} className={classes.thingCard}>
+                <Card elevation={10} className={classes.thingCard} onClick={() => props.openPanel(props)}>
                     <div className={classes.cardTop}>
                         <ThingIcon state={state} color={"#fb8c00"} type={thing.selectedCapability} size={2}/>
-                        <ActionsIcon state={state} type={thing.selectedCapability} size={2}/>
+                        <ActionsIcon state={state} type={thing.selectedCapability} size={2}
+                                     onClick={thingToggleClick}/>
                     </div>
                     <div className={classes.cardBot}>
                         <Typography variant={"body1"}>

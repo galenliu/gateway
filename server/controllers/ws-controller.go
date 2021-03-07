@@ -60,7 +60,7 @@ func (controller *ThingsWebsocketController) handleWebsocket() {
 	if controller.thingId != "" {
 		t := controller.Container.GetThing(controller.thingId)
 		if t == nil {
-			log.Info(fmt.Sprintf("THing(%s) not found", controller.thingId))
+			log.Info(fmt.Sprintf("Thing(%s) not found", controller.thingId))
 			controller.sendMessage(struct {
 				messageType string
 				data        interface{}
@@ -73,7 +73,7 @@ func (controller *ThingsWebsocketController) handleWebsocket() {
 				}{
 					Code:    400,
 					Status:  "404 NOT FOUND",
-					Message: fmt.Sprintf("THing(%s) not found", controller.thingId),
+					Message: fmt.Sprintf("Thing(%s) not found", controller.thingId),
 				},
 			})
 			controller.close()
@@ -98,7 +98,7 @@ func (controller *ThingsWebsocketController) handleWebsocket() {
 		default:
 			_, data, readErr := controller.ws.ReadMessage()
 			if readErr != nil {
-				log.Info("websocket disconnected", readErr.Error())
+				log.Info("websocket disconnected err: %s", readErr.Error())
 				controller.done <- struct{}{}
 				return
 			}
@@ -334,7 +334,7 @@ func (controller *ThingsWebsocketController) sendMessage(message interface{}) {
 }
 
 func (controller *ThingsWebsocketController) onError(err error) {
-	log.Info("websocket err:", err.Error())
+	log.Info("websocket err: %s", err.Error())
 	controller.done <- struct{}{}
 }
 

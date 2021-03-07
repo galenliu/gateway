@@ -66,5 +66,7 @@
   "Thermostat": "Thermostat",
   "VideoCamera": "VideoCamera",
   "Custom": "自定义",
-  "add things": "添加配件"
+  "add things": "添加配件",
+  "disconnect": "失去连接",
+  "Remove the accessories": "Remove the accessories"
 }

@@ -20,22 +20,16 @@
   "disable": "disable",
   "enable": "enable",
   "add": "Add",
-  "chooseIcon" : "choose icon",
-
+  "chooseIcon": "choose icon",
   "version": "version",
-
   "AddonsMarket": "Add-ons Market",
-
   "AddNewThings": "Add new things",
   "Open": "Open",
   "Close": "Close",
   "SelectedCapability": "selected capability",
-
   "Title": "title",
-
   "fail": "fail",
   "Fail": "Fail",
-
   "Alarm": "Alarm",
   "AirQualitySensor": "AirQualitySensor",
   "BarometricPressureSensor": "BarometricPressureSensor",
@@ -60,5 +54,5 @@
   "Thermostat": "Thermostat",
   "VideoCamera": "VideoCamera",
   "Custom": "Custom",
-  "add things":"add things"
+  "add things": "add things"
 }

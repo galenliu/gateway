@@ -24,7 +24,6 @@ func NewThings() *Things {
 			things = &Things{}
 			things.things = make(map[string]*thing.Thing)
 			_ = bus.Subscribe(util.PropertyChanged, things.onPropertyChanged)
-
 		},
 	)
 	return things
@@ -79,11 +78,6 @@ func (ts *Things) GetNewThings() []*thing.Thing {
 		}
 	}
 	return things
-}
-
-func (ts *Things) HasThing(thingId string) bool {
-	_, ok := ts.things[thingId]
-	return ok
 }
 
 func (ts *Things) CreateThing(id string, description []byte) (string, error) {

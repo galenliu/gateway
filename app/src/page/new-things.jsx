@@ -19,6 +19,14 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: theme.spacing(2),
         flex: 1,
     },
+    drawerHeader: {
+        display: 'flex',
+        alignItems: 'center',
+        padding: theme.spacing(0, 1),
+        // necessary for content to be below app bar
+        ...theme.mixins.toolbar,
+        justifyContent: 'flex-end',
+    },
 }));
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -161,6 +169,7 @@ export default function NewThingsDialog(props) {
                         </IconButton>
                     </Toolbar>
                 </AppBar>
+                <div className={classes.drawerHeader}/>
                 <Grid container justify="flex-start" alignItems="center" direction="column">
                     {RenderAvailableThings()}
                 </Grid>

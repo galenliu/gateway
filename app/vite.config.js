@@ -13,42 +13,42 @@ export default defineConfig({
                 target: 'http://localhost:9090',
                 changeOrigin: true,
                 secure: false,
-                ws:true,
-               // rewrite: (path) => path.replace(/^\/things/, '')
+                ws: true,
+                // rewrite: (path) => path.replace(/^\/things/, '')
             },
             '/new_things': {
                 target: 'ws://localhost:9090',
                 changeOrigin: false,
                 secure: false,
-                ws:true,
+                ws: true,
                 // rewrite: (path) => path.replace(/^\/things/, '')
             },
             '/actions': {
                 target: 'http://localhost:9090',
                 changeOrigin: true,
                 secure: false,
-                ws:true,
+                ws: true,
                 // rewrite: (path) => path.replace(/^\/things/, '')
             },
             '/settings': {
                 target: 'http://localhost:9090',
                 changeOrigin: true,
                 secure: false,
-                ws:true,
+                ws: true,
                 // rewrite: (path) => path.replace(/^\/things/, '')
             },
             '/settings/addonsInfo': {
                 target: 'http://localhost:9090',
                 changeOrigin: true,
                 secure: false,
-                ws:true,
+                ws: true,
                 // rewrite: (path) => path.replace(/^\/things/, '')
             },
             '/addons': {
                 target: 'http://localhost:9090',
                 changeOrigin: true,
                 secure: false,
-                ws:true,
+                ws: true,
                 // rewrite: (path) => path.replace(/^\/things/, '')
             }
             // with RegEx

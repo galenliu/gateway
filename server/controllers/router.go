@@ -95,7 +95,7 @@ func CollectRoute(app *WebApp) *gin.Engine {
 		thingsGroup.PUT("/:thingId/properties/:propertyName", thingsController.HandleSetProperty)
 
 		//Handle creating a new thing.
-		thingsGroup.POST("/", thingsController.HandleCreateThing)
+		thingsGroup.POST("/", thingsController.handleCreateThing)
 
 		thingsGroup.GET("/", thingsController.HandleGetThings)
 		thingsGroup.GET("/:thingId", thingsController.HandleGetThing)
@@ -112,7 +112,7 @@ func CollectRoute(app *WebApp) *gin.Engine {
 		thingsGroup.PATCH("/", thingsController.HandlePatchThings)
 		thingsGroup.PATCH("/:thingId", thingsController.HandlePatchThing)
 
-		thingsGroup.DELETE("/:thingId", thingsController.HandleDeleteThing)
+		thingsGroup.DELETE("/:thingId", thingsController.handleDeleteThing)
 	}
 
 	newThingsGroup := router.Group(models.NewThingsPath)

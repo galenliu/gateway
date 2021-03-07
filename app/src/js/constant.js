@@ -25,6 +25,10 @@ export const ThingType = {
 
 }
 
+export const ThingProperties = {
+    OnOffProperty: "OnOffProperty",
+}
+
 export const AddonType = {
     Adapter: "adapter",
     Notifier: "notifier",

@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"gateway/log"
+	"gateway/plugin"
 	"gateway/server/models"
 	thing2 "gateway/server/models/thing"
 	"github.com/gin-gonic/gin"
@@ -23,7 +24,7 @@ func NewThingsControllerFunc() *ThingsController {
 }
 
 // POST /things
-func (tc *ThingsController) HandleCreateThing(c *gin.Context) {
+func (tc *ThingsController) handleCreateThing(c *gin.Context) {
 
 	data, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
@@ -38,21 +39,23 @@ func (tc *ThingsController) HandleCreateThing(c *gin.Context) {
 		return
 	}
 
-	if tc.Container.HasThing(id) {
+	t := tc.Container.GetThing(id)
+	if t != nil {
 		c.String(http.StatusBadRequest, "thing already added")
 		return
 	}
 
 	des, err1 := tc.Container.CreateThing(id, data)
 	if err1 != nil {
-		c.String(http.StatusInternalServerError, fmt.Sprintf("create thing(%s) err: %v", err.Error()))
+		c.String(http.StatusInternalServerError, fmt.Sprintf("create thing(%s) err: %v", id, err.Error()))
 		return
 	}
 	c.String(http.StatusCreated, des)
 }
 
-func (tc *ThingsController) HandleDeleteThing(c *gin.Context) {
+func (tc *ThingsController) handleDeleteThing(c *gin.Context) {
 	thingId := c.Param("thingId")
+	_ = plugin.RemoveDevice(thingId)
 	err := tc.Container.RemoveThing(thingId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, fmt.Sprintf("Failed to remove thing thingId: %v ,err: %v", thingId, err))
