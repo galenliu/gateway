@@ -84,7 +84,7 @@ export default function Home(props) {
     }[readyState];
 
     const handleSendMessage = useCallback((data) => {
-            console.log("sendMessage:", data)
+            console.log("websocket sendMessage:", data)
             sendMessage(JSON.stringify(data))
         },
         []);
@@ -122,7 +122,6 @@ export default function Home(props) {
 
     }, [connectionStatus])
 
-
     useEffect(() => {
 
         setState(states.fetching)
@@ -141,7 +140,6 @@ export default function Home(props) {
             didUnmount.current = true;
         };
     }, [])
-
 
     useEffect(() => {
 
@@ -164,7 +162,6 @@ export default function Home(props) {
         }
     }, [state])
 
-
     function renderThings() {
 
         let list = []
@@ -180,11 +177,6 @@ export default function Home(props) {
         setThingPanelShow(true)
         setCurrentThing(props)
     }
-
-    function handle(props) {
-
-    }
-
 
     return (
         <>

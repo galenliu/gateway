@@ -1,3 +1,8 @@
+// @Title  things_controllers
+// @Description  app router
+// @Author  liuguilin
+// @Update  liuguilin
+
 package controllers
 
 import (
@@ -53,6 +58,7 @@ func (tc *ThingsController) handleCreateThing(c *gin.Context) {
 	c.String(http.StatusCreated, des)
 }
 
+// DELETE /things/:thingId
 func (tc *ThingsController) handleDeleteThing(c *gin.Context) {
 	thingId := c.Param("thingId")
 	_ = plugin.RemoveDevice(thingId)
@@ -65,7 +71,8 @@ func (tc *ThingsController) handleDeleteThing(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-func (tc *ThingsController) HandleGetThing(c *gin.Context) {
+//GET /things/:thingId
+func (tc *ThingsController) handleGetThing(c *gin.Context) {
 	if c.IsWebsocket() {
 		HandleWebsocket(c, tc.Container)
 		return
@@ -84,29 +91,31 @@ func (tc *ThingsController) HandleGetThing(c *gin.Context) {
 	c.JSON(http.StatusOK, t)
 }
 
-func (tc *ThingsController) HandleGetThings(c *gin.Context) {
+//GET /things
+func (tc *ThingsController) handleGetThings(c *gin.Context) {
 	if c.IsWebsocket() {
 		HandleWebsocket(c, tc.Container)
 		return
 	}
-	ts := tc.Container.GetThings()
+	ts := tc.Container.GetListThings()
 	c.JSON(http.StatusOK, ts)
 }
 
-//patch /
-func (tc *ThingsController) HandlePatchThings(c *gin.Context) {
+//patch things
+func (tc *ThingsController) handlePatchThings(c *gin.Context) {
 	log.Info("container controller handle patch container")
 
 }
 
-//patch /:thingId
-func (tc *ThingsController) HandlePatchThing(c *gin.Context) {
+//PATCH /things/:thingId
+func (tc *ThingsController) handlePatchThing(c *gin.Context) {
 	log.Info("container controller handle patch thing")
 
 }
 
-func (tc *ThingsController) HandleSetProperty(c *gin.Context) {
-	//PUT /:thing/properties/:propertyName
+//PUT /:thing/properties/:propertyName
+func (tc *ThingsController) handleSetProperty(c *gin.Context) {
+
 	thingId := c.Param("thingId")
 	propName := c.Param("propertyName")
 
@@ -117,20 +126,26 @@ func (tc *ThingsController) HandleSetProperty(c *gin.Context) {
 
 	data, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
-		c.String(http.StatusBadRequest, "invalid value")
+		c.String(http.StatusBadRequest, "invalid params")
 		return
 	}
 	value := json.Get(data, propName).GetInterface()
 
-	tc.Container.SetThingProperty(thingId, propName, value)
-
+	prop, e := tc.Container.SetThingProperty(thingId, propName, value)
+	if e != nil {
+		log.Error("Failed set thing(%s) property:(%s) value:(%v),err:(%s)", thingId, propName, value, e.Error())
+		c.JSON(http.StatusInternalServerError, struct {
+			Value interface{} `json:"value"`
+		}{Value: value})
+		return
+	}
 	c.JSON(http.StatusOK, struct {
 		Value interface{} `json:"value"`
-	}{Value: value})
+	}{Value: prop.Value})
 	return
 }
 
-func (tc *ThingsController) HandleGetProperty(c *gin.Context) {
+func (tc *ThingsController) handleGetProperty(c *gin.Context) {
 	thingId := c.Param("thing_id")
 	propName := c.Param("property_name")
 	property := tc.Container.FindThingProperty(thingId, propName)
@@ -142,7 +157,7 @@ func (tc *ThingsController) HandleGetProperty(c *gin.Context) {
 	c.JSON(http.StatusOK, data)
 }
 
-func (tc *ThingsController) HandleGetProperties(c *gin.Context) {
+func (tc *ThingsController) handleGetProperties(c *gin.Context) {
 	thingId := c.Param("thing_id")
 	//thing := tc.Container.GetThing(thingId)
 	var props = make(map[string]interface{})
@@ -153,7 +168,7 @@ func (tc *ThingsController) HandleGetProperties(c *gin.Context) {
 	c.JSON(http.StatusOK, props)
 }
 
-func (tc *ThingsController) HandleSetThing(c *gin.Context) {
+func (tc *ThingsController) handleSetThing(c *gin.Context) {
 	thingId := c.Param("thingId")
 	thing := tc.Container.GetThing(thingId)
 	if thing == nil {

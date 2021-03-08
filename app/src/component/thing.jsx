@@ -6,6 +6,7 @@ import ThingIcon, {ActionsIcon} from "./thing-icon";
 import Typography from "@material-ui/core/Typography";
 import {useTranslation} from "react-i18next";
 import {ThingProperties, ThingType as Things} from "../js/constant";
+import API from "../js/api";
 
 // function rand() {
 //     return Math.round(Math.random() * 20) - 10;
@@ -78,7 +79,6 @@ export default function Thing(props) {
 
     }, [])
 
-
     function stateTextStyle() {
         if (state === states.updating) {
             return {color: "primary", variant: "body2"}
@@ -89,34 +89,36 @@ export default function Thing(props) {
         return {color: "primary", variant: "h6"}
     }
 
+    function handlerSetProperty(propName, value) {
+        API.setThingPropertyValue(thing.id, propName, value).then(r => {
+        }).then((res) => {
+            console.log("set property res:", res)
+        }).catch((e) => {
+            console.log(e)
+        })
+    }
+
     function thingToggleClick(e) {
-        console.log("thing.properties", thing.properties)
-        console.log("thing", props)
-        if (!thing.connected) {
-            return
-        }
         e.stopPropagation()
-        let message = {}
-        message.messageType = "setProperty"
-        message.id = thing.id
-        message.data = {}
+        // if (!thing.connected) {
+        //     return
+        // }
         if (thing.selectedCapability === Things.Light) {
             for (const name in thing.properties) {
-                let prop = thing.properties[name]
-
-                if (prop["@type"] === ThingProperties.OnOffProperty) {
-                    console.log(prop)
-                    message.data[name] = !prop.value
-                    props.sendMessage(message)
+                if (!thing.properties.hasOwnProperty(name)) {
+                    return;
                 }
-
+                let prop = thing.properties[name]
+                if (prop["@type"] === ThingProperties.OnOffProperty) {
+                    handlerSetProperty(name, !thing.value)
+                    setThing({...thing, value: !thing.value})
+                }
             }
         }
     }
 
     return (
         <>
-
             <Grid item className={classes.root} onDoubleClick={() => {
                 console.log("doubleClick")
                 setOpen(true)
@@ -125,7 +127,7 @@ export default function Thing(props) {
                 <Card elevation={10} className={classes.thingCard} onClick={() => props.openPanel(props)}>
                     <div className={classes.cardTop}>
                         <ThingIcon state={state} color={"#fb8c00"} type={thing.selectedCapability} size={2}/>
-                        <ActionsIcon state={state} type={thing.selectedCapability} size={2}
+                        <ActionsIcon cursor={"pointer"} state={state} type={thing.selectedCapability} size={2}
                                      onClick={thingToggleClick}/>
                     </div>
                     <div className={classes.cardBot}>

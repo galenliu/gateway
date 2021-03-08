@@ -31,4 +31,4 @@ require (
 
 )
 
-replace addon v1.0.0 => ../addon
+replace addon v1.0.0 => ./gateway-addon

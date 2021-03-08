@@ -25,5 +25,5 @@ func (s *HCServiceProxy) NewHCService(typ string) {
 }
 
 func (s *HCServiceProxy) OnBoolValueChanged(value bool) {
-	plugin.SetPropertyValue(s.DeviceID, "", value)
+	_, _ = plugin.SetProperty(s.DeviceID, "", value)
 }

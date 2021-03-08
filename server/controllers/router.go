@@ -92,25 +92,25 @@ func CollectRoute(app *WebApp) *gin.Engine {
 		thingsController := NewThingsControllerFunc()
 
 		//set a properties of a thing.
-		thingsGroup.PUT("/:thingId/properties/:propertyName", thingsController.HandleSetProperty)
+		thingsGroup.PUT("/:thingId/properties/:propertyName", thingsController.handleSetProperty)
 
 		//Handle creating a new thing.
 		thingsGroup.POST("/", thingsController.handleCreateThing)
 
-		thingsGroup.GET("/", thingsController.HandleGetThings)
-		thingsGroup.GET("/:thingId", thingsController.HandleGetThing)
+		thingsGroup.GET("/", thingsController.handleGetThings)
+		thingsGroup.GET("/:thingId", thingsController.handleGetThing)
 
 		//get the properties of a thing
-		thingsGroup.GET("/:thingId/properties", thingsController.HandleGetProperties)
+		thingsGroup.GET("/:thingId/properties", thingsController.handleGetProperties)
 
 		//get a properties of a thing
-		thingsGroup.GET("/:thingId/properties/:propertyName", thingsController.HandleGetProperty)
+		thingsGroup.GET("/:thingId/properties/:propertyName", thingsController.handleGetProperty)
 
 		// Modify a ThingInfo.
-		thingsGroup.PUT("/:thingId", thingsController.HandleSetThing)
+		thingsGroup.PUT("/:thingId", thingsController.handleSetThing)
 
-		thingsGroup.PATCH("/", thingsController.HandlePatchThings)
-		thingsGroup.PATCH("/:thingId", thingsController.HandlePatchThing)
+		thingsGroup.PATCH("/", thingsController.handlePatchThings)
+		thingsGroup.PATCH("/:thingId", thingsController.handlePatchThing)
 
 		thingsGroup.DELETE("/:thingId", thingsController.handleDeleteThing)
 	}
@@ -136,7 +136,7 @@ func CollectRoute(app *WebApp) *gin.Engine {
 	debugGroup := router.Group(models.SettingsPath)
 	{
 		settingsController := NewSettingController()
-		debugGroup.GET("/addonsInfo", settingsController.HandleGetAddonsInfo)
+		debugGroup.GET("/addonsInfo", settingsController.handleGetAddonsInfo)
 	}
 
 	//actions Controller

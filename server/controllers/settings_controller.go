@@ -12,7 +12,7 @@ type addonInfo struct {
 	Architecture  string   `json:"architecture"`
 	Version       string   `json:"version"`
 	NodeVersion   string   `json:"nodeVersion"`
-	PythonVersion []string   `json:"pythonVersion"`
+	PythonVersion []string `json:"pythonVersion"`
 }
 
 type SettingsController struct {
@@ -22,7 +22,7 @@ func NewSettingController() *SettingsController {
 	return &SettingsController{}
 }
 
-func (settings *SettingsController) HandleGetAddonsInfo(g *gin.Context) {
+func (settings *SettingsController) handleGetAddonsInfo(g *gin.Context) {
 	var addonInfo = addonInfo{
 		Urls:          config.GetAddonListUrls(),
 		Architecture:  util.GetArch(),

@@ -18,9 +18,10 @@ import (
 	"path"
 	"strings"
 	"sync"
+	"time"
 )
 
-var manager *AddonManager
+var instance *AddonManager
 
 type ThingAdded func(*thing.Thing)
 type ThingRemoved func(*thing.Thing)
@@ -48,7 +49,7 @@ type AddonManager struct {
 
 func NewAddonsManager(ctx context.Context) (*AddonManager, error) {
 	am := &AddonManager{}
-	manager = am
+	instance = am
 	am.ctx = ctx
 	am.AddonsDir = config.Conf.AddonsDir
 	am.DataDir = config.Conf.DataDir
@@ -58,7 +59,7 @@ func NewAddonsManager(ctx context.Context) (*AddonManager, error) {
 	am.installAddons = make(map[string]*AddonInfo, 50)
 	am.adapters = make(map[string]*AdapterProxy, 20)
 
-	_ = bus.Subscribe(bus.SetProperty, am.handleSetPropertyValue)
+	_ = bus.Subscribe(bus.SetProperty, am.handleSetProperty)
 	_ = bus.Subscribe(bus.GetDevices, am.handleGetDevices)
 	_ = bus.Subscribe(bus.GetThings, am.handleGetThings)
 
@@ -173,9 +174,9 @@ func (manager *AddonManager) findAdapter(adapterId string) (*AdapterProxy, error
 func (manager *AddonManager) installAddonFromUrl(id, url, checksum string, enabled bool) error {
 
 	destPath := path.Join(os.TempDir(), id+".tar.gz")
-	log.Info(fmt.Sprintf("fetching add-on %s as %s", url, destPath))
+	log.Info("fetching add-on %s as %s", url, destPath)
 	resp, err := http.Get(url)
-	if err != nil || resp.StatusCode != 200 {
+	if err != nil {
 		return fmt.Errorf(fmt.Sprintf("Download addon err,pakage id:%s err:%s", id, err.Error()))
 	}
 	defer resp.Body.Close()
@@ -228,17 +229,33 @@ func (manager *AddonManager) installAddon(packageId, packagePath string, enabled
 
 }
 
-func (manager *AddonManager) handleSetPropertyValue(deviceId, propName string, setValue interface{}) error {
+func (manager *AddonManager) handleSetProperty(deviceId, propName string, setValue interface{}) (*addon.Property, error) {
 	adapter := manager.getAdapterByDeviceId(deviceId)
 	if adapter == nil {
-		return fmt.Errorf("adapter not found")
+		return nil, fmt.Errorf("adapter not found")
 	}
 	property := adapter.GetDevice(deviceId).GetProperty(propName)
 	if property == nil {
-		return fmt.Errorf("device or property not found")
+		return nil, fmt.Errorf("device or property not found")
+	}
+
+	ctx, cancelFunc := context.WithTimeout(context.Background(), 1*time.Second)
+
+	var p *addon.Property
+	changedFunc := func(prop *addon.Property) {
+		if prop.DeviceId == deviceId && prop.Name == propName {
+			cancelFunc()
+			p = prop
+		}
 	}
 	adapter.handleSetPropertyValue(property, setValue)
-	return nil
+	_ = bus.Subscribe(util.PropertyChanged, changedFunc)
+	<-ctx.Done()
+	_ = bus.Unsubscribe(util.PropertyChanged, changedFunc)
+	if p == nil {
+		return property, fmt.Errorf("set property timeout")
+	}
+	return p, nil
 }
 
 func (manager *AddonManager) handleGetDevices(devs *[]*addon.Device) {

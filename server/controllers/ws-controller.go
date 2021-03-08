@@ -171,7 +171,7 @@ func (controller *ThingsWebsocketController) handleMessage(data []byte) {
 		var propertyMap map[string]interface{}
 		json.Get(data, "data").ToVal(&propertyMap)
 		for propName, value := range propertyMap {
-			setErr := plugin.SetPropertyValue(device.ID, propName, value)
+			prop, setErr := plugin.SetProperty(device.ID, propName, value)
 			if setErr != nil {
 				controller.sendMessage(struct {
 					MessageType string      `json:"messageType"`
@@ -191,6 +191,27 @@ func (controller *ThingsWebsocketController) handleMessage(data []byte) {
 					},
 				})
 			} else {
+				controller.sendMessage(struct {
+					MessageType string      `json:"messageType"`
+					Data        interface{} `json:"data"`
+				}{
+					MessageType: thing.Error,
+					Data: struct {
+						Code    int         `json:"code"`
+						Status  string      `json:"status"`
+						Message interface{} `json:"message"`
+						Request interface{} `json:"request"`
+					}{
+						Code:   http.StatusOK,
+						Status: "200 OK",
+						Message: struct {
+							Value interface{} `json:"value"`
+						}{
+							Value: prop.Value,
+						},
+						Request: json.Get(data),
+					},
+				})
 
 			}
 		}

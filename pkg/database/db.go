@@ -176,7 +176,7 @@ func CreateThing(id, description string) error {
 }
 
 func GetThings() map[string]string {
-	var things map[string]string = make(map[string]string)
+	var things = make(map[string]string)
 	rows, err := database.Query("SELECT id, description FROM things")
 	if err != nil {
 		return nil

@@ -30,14 +30,14 @@ package models
 //	if devices == nil {
 //		return nil
 //	}
-//	var things = make([]*thing.Thing, 100)
+//	var instance = make([]*thing.Thing, 100)
 //	for _, dev := range devices {
 //		if dev != nil {
 //			var thing = toThing(dev)
-//			things = append(things, thing)
+//			instance = append(instance, thing)
 //		}
 //	}
-//	return things
+//	return instance
 //}
 //
 //func toThingProperty(p *addon.Property, deviceId string) *thing.Property {
@@ -53,7 +53,7 @@ package models
 //		Minimum:     p.Minimum,
 //		Maximum:     p.Maximum,
 //		Value:       p.Value,
-//		Href:        fmt.Sprintf("/things/%s/properties/%s", deviceId, p.Name),
+//		Href:        fmt.Sprintf("/instance/%s/properties/%s", deviceId, p.Name),
 //	}
 //	return prop
 //}

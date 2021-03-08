@@ -138,8 +138,10 @@ const API = {
         return this.getJson("/things")
     },
 
-    setThingPropertyValue(url, data) {
-        return this.putJson(url, data)
+    setThingPropertyValue(thingId, propName, value) {
+        let data = {}
+        data[propName] = value
+        return this.putJson(`/things/${thingId}/properties/${propName}`, data)
     },
 
 

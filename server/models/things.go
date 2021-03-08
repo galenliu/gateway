@@ -12,7 +12,7 @@ import (
 )
 
 var once sync.Once
-var things *Things
+var instance *Things
 
 type Things struct {
 	things map[string]*thing.Thing
@@ -21,12 +21,14 @@ type Things struct {
 func NewThings() *Things {
 	once.Do(
 		func() {
-			things = &Things{}
-			things.things = make(map[string]*thing.Thing)
-			_ = bus.Subscribe(util.PropertyChanged, things.onPropertyChanged)
+			instance = &Things{}
+			instance.things = make(map[string]*thing.Thing)
+			instance.GetThings()
+			_ = bus.Subscribe(util.PropertyChanged, instance.onPropertyChanged)
+
 		},
 	)
-	return things
+	return instance
 }
 
 func (ts *Things) GetThing(id string) *thing.Thing {
@@ -49,19 +51,26 @@ func (ts *Things) FindThingProperty(thingId string, propertyName string) *thing.
 	return nil
 }
 
-//if models things is null,read new things from the database
-func (ts *Things) GetThings() []*thing.Thing {
-	var list []*thing.Thing
+//if models instance is null,read new instance from the database
+func (ts *Things) GetThings() map[string]*thing.Thing {
 	if len(ts.things) > 0 {
-		for _, t := range ts.things {
-			list = append(list, t)
-			return list
-		}
+		return ts.things
 	}
-	return GetThingsFormDataBase()
+	for _, t := range GetThingsFormDataBase() {
+		ts.things[t.ID] = t
+	}
+	return ts.things
 }
 
-//get things with out database
+func (ts *Things) GetListThings() (lt []*thing.Thing) {
+	for key, t := range ts.GetThings() {
+		t.ID = key
+		lt = append(lt, t)
+	}
+	return
+}
+
+//get instance with out database
 func (ts *Things) GetNewThings() []*thing.Thing {
 	var connectedThings []*thing.Thing
 	//connectedThings = new([]*thing.Thing)
@@ -96,11 +105,11 @@ func (ts *Things) CreateThing(id string, description []byte) (string, error) {
 
 func (ts *Things) RemoveThing(thingId string) error {
 	//TODO: Delete Thing from database
-	t := ts.GetThing(thingId)
-	if t == nil {
-		return fmt.Errorf("thing not found")
-	}
-	err := database.RemoveThing(t.ID)
+	//t := ts.GetThing(thingId)
+	//if t == nil {
+	//	return fmt.Errorf("thing not found")
+	//}
+	err := database.RemoveThing(thingId)
 	if err != nil {
 		return err
 	}
@@ -108,16 +117,16 @@ func (ts *Things) RemoveThing(thingId string) error {
 	return nil
 }
 
-func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) {
+func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) (*addon.Property, error) {
 	var th = ts.GetThing(thingId)
 	if th == nil {
-		return
+		return nil, fmt.Errorf("thing can not found")
 	}
 	prop := th.GetProperty(propName)
 	if prop == nil {
-		return
+		return nil, fmt.Errorf("property can not found")
 	}
-	_ = plugin.SetPropertyValue(thingId, propName, value)
+	return plugin.SetProperty(thingId, propName, value)
 }
 
 func (ts *Things) onPropertyChanged(property *addon.Property) {
@@ -141,6 +150,7 @@ func GetThingsFormDataBase() (list []*thing.Thing) {
 	for id, des := range ts {
 		t := thing.NewThing(id, []byte(des))
 		if t != nil {
+			t.Connected = false
 			list = append(list, t)
 		}
 	}

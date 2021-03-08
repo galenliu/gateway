@@ -4,62 +4,108 @@ import (
 	"fmt"
 	"gateway/log"
 	"github.com/asaskevich/EventBus"
+	"sync"
 )
 
-var bus EventBus.Bus
+var instance EventBus.Bus
+var once sync.Once
 
 func initBus() {
-	bus = EventBus.New()
+	once.Do(
+		func() {
+			instance = EventBus.New()
+		},
+	)
+
 }
 
 func Subscribe(topic string, fn interface{}) error {
 
-	if bus == nil {
+	if instance == nil {
 		initBus()
 	}
-	return bus.Subscribe(topic, fn)
+	return instance.Subscribe(topic, fn)
 }
 
 func Unsubscribe(topic string, fn interface{}) error {
-	if bus == nil {
+	if instance == nil {
 		initBus()
 	}
-	return bus.Unsubscribe(topic, fn)
+	return instance.Unsubscribe(topic, fn)
 }
 
 func Publish(topic string, args ...interface{}) {
 	log.Info("publish topic: " + topic)
-	if bus == nil {
+	if instance == nil {
 		initBus()
 	}
-	log.Info(fmt.Sprintf(topic+" has callback %v", bus.HasCallback(topic)))
-	if !bus.HasCallback(topic) {
+	log.Info(fmt.Sprintf(topic+" has callback %v", instance.HasCallback(topic)))
+	if !instance.HasCallback(topic) {
 		return
 	}
-	bus.Publish(topic, args...)
+	instance.Publish(topic, args...)
 }
 
 func HasCallBack(topic string) bool {
-	return bus.HasCallback(topic)
+	return instance.HasCallback(topic)
 }
 
-func SubscribeOnce(topic string, fn interface{}) {
-	if bus == nil {
+func SubscribeOnce(topic string, fn interface{}) error {
+	if instance == nil {
 		initBus()
 	}
-	_ = bus.SubscribeOnce(topic, fn)
+	return instance.SubscribeOnce(topic, fn)
 }
 
 func SubscribeAsync(topic string, fn interface{}) error {
-	if bus == nil {
+	if instance == nil {
 		initBus()
 	}
-	return bus.SubscribeAsync(topic, fn, false)
+	return instance.SubscribeAsync(topic, fn, false)
 }
 
 func WaitAsync() {
-	if bus == nil {
+	if instance == nil {
 		initBus()
 	}
-	bus.WaitAsync()
+	instance.WaitAsync()
 }
+
+//type OnPropertyChangeFunc = func(property *addon.Property)
+//
+//func SubscribePropertyChanged(thingId, propName string, fn OnPropertyChangeFunc) error {
+//	topic := fmt.Sprintf("%s.%s.%s", util.PropertyChanged, thingId, propName)
+//	if instance == nil {
+//		initBus()
+//	}
+//	return instance.Subscribe(topic, fn)
+//}
+//
+//func SubscribeOncePropertyChanged(thingId, propName string, fn OnPropertyChangeFunc) error {
+//	topic := fmt.Sprintf("%s.%s.%s", util.PropertyChanged, thingId, propName)
+//
+//	if instance == nil {
+//		initBus()
+//	}
+//	return instance.SubscribeOnce(topic, fn)
+//}
+//
+//func UnsubscribePropertyChanged(thingId, propName string, fn OnPropertyChangeFunc) error {
+//	topic := fmt.Sprintf("%s.%s.%s", util.PropertyChanged, thingId, propName)
+//	if instance == nil {
+//		initBus()
+//	}
+//	return instance.Unsubscribe(topic, fn)
+//}
+//
+//func PublishPropertyChanged(prop *addon.Property) {
+//	topic := fmt.Sprintf("%s.%s.%s", util.PropertyChanged, prop.DeviceId, prop.Name)
+//	if instance == nil {
+//		initBus()
+//	}
+//	log.Info(fmt.Sprintf(topic+" has callback %v", instance.HasCallback(topic)))
+//	if !instance.HasCallback(topic) {
+//		return
+//	}
+//	instance.Publish(topic, prop)
+//}

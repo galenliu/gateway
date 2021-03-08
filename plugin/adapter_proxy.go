@@ -42,7 +42,7 @@ func (adapter *AdapterProxy) handleSetPropertyValue(property *addon.Property, ne
 		PluginId      string      `json:"pluginId"`
 		DeviceId      string      `json:"deviceId"`
 		PropertyName  string      `json:"propertyName"`
-		PropertyValue interface{} `json:"handleSetPropertyValue"`
+		PropertyValue interface{} `json:"propertyValue"`
 	}{
 		AdapterId:     adapter.ID,
 		PluginId:      adapter.pluginId,
@@ -103,11 +103,6 @@ func (adapter *AdapterProxy) cancelRemoveThing(deviceId string) {
 
 func (adapter *AdapterProxy) getManager() *AddonManager {
 	return adapter.plugin.pluginServer.manager
-}
-
-type tag struct {
-	AdapterId string
-	PluginId  string
 }
 
 func (adapter *AdapterProxy) sendMessage(messageType int, msg interface{}) {

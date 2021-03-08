@@ -19,7 +19,6 @@ import Divider from "@material-ui/core/Divider";
 import StoreIcon from "@material-ui/icons/Store";
 import {versionStringCompare} from "../js/util";
 import AddIcon from "@material-ui/icons/Add";
-import {drawerWidth} from "../js/constant";
 
 
 export const useStyles = makeStyles((theme) => ({
@@ -51,7 +50,7 @@ export const useStyles = makeStyles((theme) => ({
     },
     content: {
 
-        justifyContent:"flex-start", alignItems:"center", direction:"column",
+        justifyContent: "flex-start", alignItems: "center", direction: "column",
 
     },
     drawerHeader: {
@@ -173,7 +172,8 @@ export default function AddonsDialog(props) {
     function fetchInstalledAddonsList() {
         return new Promise(function (resolve, reject) {
             API.getInstalledAddons().then(body => {
-                if (!body) {
+                if (body === null) {
+                    console.log(body)
                     return reject(new Error("installed empty"))
                 }
                 console.log("fetch the installed addon body :", body)
@@ -225,40 +225,48 @@ export default function AddonsDialog(props) {
             setAvailableAddons(new Map())
         } else {
             setState(states.Loading)
+
             let installed = new Map()
             fetchInstalledAddonsList().then((installedMap) => {
                     installed = installedMap
                     return fetchAvailableAddonList()
+                }, (e) => {
+                    setState(states.Empty)
+                    return fetchAvailableAddonList()
                 }
             ).then((fetchAddons) => {
                 for (const [id, addon] of fetchAddons) {
-                    if (installed.has(id)) {
-                        if (!addon.installed) {
-                            fetchAddons.get(id).installed = true
+                    if (installed !== null) {
+                        if (installed.has(id)) {
+                            if (!addon.installed) {
+                                fetchAddons.get(id).installed = true
+
+                            }
+                            if (versionStringCompare(addon.version, installed.get(id).version) > 0) {
+                                console.log(versionStringCompare(addon.version, installed.get(id).version))
+                                installed.get(id).isUpdate = true
+                                installed.get(id).url = addon.url
+
+                            }
 
                         }
-                        if (versionStringCompare(addon.version, installed.get(id).version) > 0) {
-                            console.log(versionStringCompare(addon.version, installed.get(id).version))
-                            installed.get(id).isUpdate = true
-                            installed.get(id).url = addon.url
-
-                        }
-
                     }
                 }
                 if (fetchAddons) {
                     console.log("update available:", fetchAddons)
                     setAvailableAddons(fetchAddons)
                 }
-                if (installed) {
+                if (installed !== null) {
                     console.log("update installed:", installed)
                     setInstalledAddons(installed)
+                    setState(states.Completed)
                 }
             }, (err) => {
-                console.err(err)
+                console.log(err)
+                setState(states.Completed)
                 setInstalledAddons(installed)
             }).catch((e) =>
-                console.error(e)
+                console.log(e)
             )
         }
 
@@ -303,7 +311,12 @@ export default function AddonsDialog(props) {
                     <div className={classes.drawerHeader}/>
                     {state === states.Loading && <CircularProgress disableShrink/>}
                     {state === states.Completed && renderInstalledAddonsList()}
-                    {state === states.Empty && <AddIcon/>}
+                    {state === states.Empty &&
+                    <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}><AddIcon cursor={"pointer"}
+                        onClick={() => setFetchAddonsShow(true)} style={{fontSize: 50}}/><Typography variant="h6"
+                                                                                                     className={classes.title}>
+                        {t("Click Added")}
+                    </Typography></div>}
 
                 </Grid>
             </Dialog>
