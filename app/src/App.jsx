@@ -5,15 +5,19 @@ import "./i18n"
 import {HashRouter as Router, Route, Switch} from 'react-router-dom'
 import Home from "./page/home";
 import Settings from "./page/settings";
-import { createMuiTheme, makeStyles, ThemeProvider } from '@material-ui/core/styles';
-import {orange} from "@material-ui/core/colors";
+import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 
 export const AppContext = React.createContext()
 const theme = createMuiTheme({
-    status: {
-
-    },
+    status: {},
 });
+
+
+export const ORIGIN = window.location.origin
+export const HOST = window.location.host
+export const LANGUAGE = 'en-US'
+export const TIMEZONE = 'UTC'
+export const UNITS = {}
 
 
 export default function App() {

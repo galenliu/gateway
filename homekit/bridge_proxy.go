@@ -1,7 +1,7 @@
 package homekit
 
 import (
-	"gateway/log"
+	"gateway/pkg/log"
 	"github.com/brutella/hc"
 	"github.com/brutella/hc/accessory"
 )

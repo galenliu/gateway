@@ -12,7 +12,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import DialogContent from '@material-ui/core/DialogContent';
 
-import ThingIcon from "./thing-icon";
+import Icons from "./icons";
 import Grid from "@material-ui/core/Grid";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -163,8 +163,8 @@ export function DetailsPanel(props) {
                 <ListItem button
                           className={classes.listItem} variant="contained" elevation={111}>
                     <ListItemIcon>
-                        <ThingIcon  {...props} color={"#fb8c00"} type={props.selectedCapability}
-                                    size={1}/>
+                        <Icons  {...props} color={"#fb8c00"} type={props.selectedCapability}
+                                size={1}/>
                     </ListItemIcon>
                     <ListItemText primary={t("Domain")}/>
                     <NavigateNextIcon/>

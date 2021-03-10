@@ -3,7 +3,7 @@ package plugin
 import (
 	"context"
 	"fmt"
-	"gateway/log"
+	"gateway/pkg/log"
 	"github.com/gorilla/websocket"
 	"net/http"
 	"sync"

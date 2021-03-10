@@ -18,7 +18,7 @@ import {AppContext} from "../App"
 import SettingsIcon from '@material-ui/icons/Settings';
 import {useHistory} from "react-router-dom";
 import {ListSubheader} from "@material-ui/core";
-import ThingIcon from "./thing-icon";
+import Icons from "./icons";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -115,7 +115,7 @@ export default function SideBar(props) {
                 }>
                     {['客厅', '餐厅', '卧室'].map((text, index) => (
                         <ListItem button key={text}>
-                            <ListItemIcon><ThingIcon type={SettingType.Room}/></ListItemIcon>
+                            <ListItemIcon><Icons type={SettingType.Room}/></ListItemIcon>
                             <ListItemText primary={text}/>
                         </ListItem>
                     ))}

@@ -7,7 +7,7 @@ package controllers
 
 import (
 	"fmt"
-	"gateway/log"
+	"gateway/pkg/log"
 	"gateway/plugin"
 	"gateway/server/models"
 	thing2 "gateway/server/models/thing"
@@ -74,7 +74,7 @@ func (tc *ThingsController) handleDeleteThing(c *gin.Context) {
 //GET /things/:thingId
 func (tc *ThingsController) handleGetThing(c *gin.Context) {
 	if c.IsWebsocket() {
-		HandleWebsocket(c, tc.Container)
+		handleWebsocket(c, tc.Container)
 		return
 	}
 
@@ -94,7 +94,7 @@ func (tc *ThingsController) handleGetThing(c *gin.Context) {
 //GET /things
 func (tc *ThingsController) handleGetThings(c *gin.Context) {
 	if c.IsWebsocket() {
-		HandleWebsocket(c, tc.Container)
+		handleWebsocket(c, tc.Container)
 		return
 	}
 	ts := tc.Container.GetListThings()

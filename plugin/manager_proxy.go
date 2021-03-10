@@ -7,8 +7,8 @@ import (
 	"context"
 	"fmt"
 	"gateway/config"
-	"gateway/log"
 	"gateway/pkg/bus"
+	"gateway/pkg/log"
 	"gateway/pkg/util"
 	"gateway/server/models/thing"
 	"io"
@@ -123,13 +123,13 @@ func (manager *AddonManager) unloadAddon(packageId string) {
 
 func (manager *AddonManager) HandleDeviceAdded(device *addon.Device) {
 	manager.devices[device.ID] = device
-	bus.Publish(util.ThingAdded, asThing(device))
+	bus.Publish(util.ThingAdded, asWebThing(device))
 
 }
 
 func (manager *AddonManager) HandleDeviceRemoved(device *addon.Device) {
 	delete(manager.devices, device.ID)
-	bus.Publish(util.ThingRemoved, asThing(device))
+	bus.Publish(util.ThingRemoved, asWebThing(device))
 }
 
 func (manager *AddonManager) actionNotify(action *addon.Action) {
@@ -239,7 +239,7 @@ func (manager *AddonManager) handleSetProperty(deviceId, propName string, setVal
 		return nil, fmt.Errorf("device or property not found")
 	}
 
-	ctx, cancelFunc := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second)
 
 	var p *addon.Property
 	changedFunc := func(prop *addon.Property) {
@@ -266,7 +266,7 @@ func (manager *AddonManager) handleGetDevices(devs *[]*addon.Device) {
 
 func (manager *AddonManager) handleGetThings(ts *[]*thing.Thing) {
 	for _, d := range manager.devices {
-		var t = asThing(d)
+		var t = asWebThing(d)
 		*ts = append(*ts, t)
 	}
 }

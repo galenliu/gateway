@@ -25,6 +25,14 @@ export const ThingType = {
 
 }
 
+module.exports.CONNECTED = 'connected';
+module.exports.DELETE_THING = 'deleteThing';
+module.exports.DELETE_THINGS = 'deleteThings';
+module.exports.EVENT_OCCURRED = 'eventOccurred';
+module.exports.PROPERTY_STATUS = 'propertyStatus';
+module.exports.REFRESH_THINGS = 'refreshThings';
+
+
 export const ThingProperties = {
     OnOffProperty: "OnOffProperty",
 }

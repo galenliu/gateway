@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"gateway/log"
 	"gateway/pkg/database"
+	"gateway/pkg/log"
 	"gateway/plugin"
 	"github.com/gin-gonic/gin"
 	json "github.com/json-iterator/go"

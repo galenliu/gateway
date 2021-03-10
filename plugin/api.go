@@ -66,7 +66,7 @@ func GetDevices() []*addon.Device {
 func GetThings() []*thing.Thing {
 	var ts []*thing.Thing
 	for _, d := range instance.devices {
-		var t = asThing(d)
+		var t = asWebThing(d)
 		ts = append(ts, t)
 	}
 	return ts

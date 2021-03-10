@@ -9,7 +9,7 @@ import {AddonType, SettingsType, ThingType as Things, ThingType} from "../js/con
 import {mdiFloorPlan, mdiLightbulb, mdiPower} from '@mdi/js';
 
 
-export default function ThingIcon(props) {
+export default function Icons(props) {
 
 
     function Layout() {

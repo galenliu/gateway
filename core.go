@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"gateway/config"
-	"gateway/log"
+	"gateway/pkg/log"
 	"gateway/plugin"
 	"gateway/server/controllers"
 	"time"

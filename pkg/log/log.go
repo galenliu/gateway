@@ -8,7 +8,7 @@ import (
 	"path"
 )
 
-var Logger *zap.Logger
+var instance *zap.Logger
 
 func InitLogger(logDir string, debug bool, logRotateDays int) {
 	// 设置一些基本日志格式
@@ -58,20 +58,20 @@ func InitLogger(logDir string, debug bool, logRotateDays int) {
 	development := zap.Development()
 
 	// 构造日志
-	Logger = zap.New(core, caller, development, zap.AddCallerSkip(1))
+	instance = zap.New(core, caller, development, zap.AddCallerSkip(1))
 
 	Debug("logger init succeed")
 
 }
 
 func Debug(format string, v ...interface{}) {
-	Logger.Sugar().Debugf(format, v...)
+	instance.Sugar().Debugf(format, v...)
 }
 
 func Info(format string, v ...interface{}) {
-	Logger.Sugar().Infof(format, v...)
+	instance.Sugar().Infof(format, v...)
 }
 
 func Error(format string, v ...interface{}) {
-	Logger.Sugar().Errorf(format, v...)
+	instance.Sugar().Errorf(format, v...)
 }

@@ -13,7 +13,7 @@ import API from "../js/api";
 import ExtensionIcon from "@material-ui/icons/Extension";
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import Card from "@material-ui/core/Card";
-import ThingIcon from "../component/thing-icon";
+import Icons from "../component/icons";
 import {Button, CircularProgress, FormHelperText, Link} from "@material-ui/core";
 import Divider from "@material-ui/core/Divider";
 import StoreIcon from "@material-ui/icons/Store";
@@ -518,7 +518,7 @@ export function Addon(props) {
     const {t, i18n} = useTranslation();
     const addon = props
     return <>
-        <ThingIcon style={{fontSize: 80}} color={"primary"} type={addon.primary_type}/>
+        <Icons style={{fontSize: 80}} color={"primary"} type={addon.primary_type}/>
         <div className={classes.cardContent}>
             <FormHelperText>{t("name")}: </FormHelperText>
             <Typography variant="h5">

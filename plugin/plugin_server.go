@@ -5,7 +5,7 @@ import (
 	"context"
 	"fmt"
 	"gateway/config"
-	"gateway/log"
+	"gateway/pkg/log"
 	json "github.com/json-iterator/go"
 	"go.uber.org/zap"
 	"strconv"

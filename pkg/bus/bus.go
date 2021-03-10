@@ -2,7 +2,7 @@ package bus
 
 import (
 	"fmt"
-	"gateway/log"
+	"gateway/pkg/log"
 	"github.com/asaskevich/EventBus"
 	"sync"
 )

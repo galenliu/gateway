@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import Card from "@material-ui/core/Card";
 import {makeStyles} from "@material-ui/core/styles";
-import ThingIcon from "./thing-icon";
+import Icons from "./icons";
 import {Button, CircularProgress, FormControl, FormHelperText, MenuItem, Select, TextField} from "@material-ui/core";
 import {useTranslation} from "react-i18next";
 import Divider from "@material-ui/core/Divider";
@@ -101,8 +101,8 @@ export default function NewThing(props) {
 
     return <>
         <Card className={classes.newThingCard} elevation={5}>
-            <ThingIcon className={classes.icon} style={{fontSize: 80}} color={"primary"}
-                       type={thing.selectedCapability}/>
+            <Icons className={classes.icon} style={{fontSize: 80}} color={"primary"}
+                   type={thing.selectedCapability}/>
             <div className={classes.content}>
                 <TextField  disabled={state === states.Saved || state === states.Fail} id="standard-basic" label={t("Title")} defaultValue={thing.title}
                            onChange={handleTitleChange}/>

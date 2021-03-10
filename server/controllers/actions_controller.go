@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"fmt"
-	"gateway/log"
+	"gateway/pkg/log"
 	"gateway/plugin"
 	"gateway/server/models"
 	"gateway/server/models/thing"

@@ -2,25 +2,11 @@ import React, {useEffect, useState} from "react";
 import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
 import {makeStyles} from "@material-ui/core/styles";
-import ThingIcon, {ActionsIcon} from "./thing-icon";
+import Icons, {ActionsIcon} from "./icons";
 import Typography from "@material-ui/core/Typography";
 import {useTranslation} from "react-i18next";
 import {ThingProperties, ThingType as Things} from "../js/constant";
 import API from "../js/api";
-
-// function rand() {
-//     return Math.round(Math.random() * 20) - 10;
-// }
-//
-// function getModalStyle() {
-//     const top = 50 + rand();
-//     const left = 50 + rand();
-//     return {
-//         top: `${top}%`,
-//         left: `${left}%`,
-//         transform: `translate(-${top}%, -${left}%)`,
-//     };
-// }
 
 const useStyles = makeStyles((theme) => ({
     thingCard: {
@@ -90,9 +76,9 @@ export default function Thing(props) {
     }
 
     function handlerSetProperty(propName, value) {
-        API.setThingPropertyValue(thing.id, propName, value).then(r => {
+        API(thing.id, propName, value).then(r => {
         }).then((res) => {
-            console.log("set property res:", res)
+            console.log("set property res:", res.data)
         }).catch((e) => {
             console.log(e)
         })
@@ -126,7 +112,7 @@ export default function Thing(props) {
 
                 <Card elevation={10} className={classes.thingCard} onClick={() => props.openPanel(props)}>
                     <div className={classes.cardTop}>
-                        <ThingIcon state={state} color={"#fb8c00"} type={thing.selectedCapability} size={2}/>
+                        <Icons state={state} color={"#fb8c00"} type={thing.selectedCapability} size={2}/>
                         <ActionsIcon cursor={"pointer"} state={state} type={thing.selectedCapability} size={2}
                                      onClick={thingToggleClick}/>
                     </div>

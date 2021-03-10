@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"gateway/log"
+	"gateway/pkg/log"
 	_ "github.com/mattn/go-sqlite3"
 	"os"
 	"path"
@@ -11,23 +11,23 @@ import (
 
 const dbFileName = "database.sqlite3"
 
-var database *sql.DB
+var instance *sql.DB
 
 var filePath string
 
 func InitDB(dir string) error {
 	var e error
 	filePath = path.Join(dir, dbFileName)
-	database, e = sql.Open("sqlite3", filePath)
+	instance, e = sql.Open("sqlite3", filePath)
 	if e != nil {
 		return e
 	}
-	ee := createTable(database)
+	ee := createTable(instance)
 	if ee != nil {
 		return ee
 	}
 
-	log.Debug("database init succeed")
+	log.Debug("instance init succeed")
 	return nil
 }
 
@@ -100,18 +100,18 @@ func createTable(db *sql.DB) error {
 }
 
 func UpdateValue(k, v string) (err error) {
-	_, err = database.Exec(`update data set value=@value where key=@key`, sql.Named("value", v), sql.Named("key", k))
+	_, err = instance.Exec(`update data set value=@value where key=@key`, sql.Named("value", v), sql.Named("key", k))
 	return
 }
 
 func QueryValue(k string) (value string, err error) {
-	err = database.QueryRow("SELECT value FROM data where key = @key", sql.Named("key", k)).Scan(&value)
+	err = instance.QueryRow("SELECT value FROM data where key = @key", sql.Named("key", k)).Scan(&value)
 	log.Info(k, value)
 	return value, err
 }
 
 func DeleteValue(key string) error {
-	stmt, err := database.Prepare(`delete from data where key = ?`)
+	stmt, err := instance.Prepare(`delete from data where key = ?`)
 	if err != nil {
 		return err
 	}
@@ -124,7 +124,7 @@ func DeleteValue(key string) error {
 
 func GetSetting(key string) (value string, err error) {
 
-	err = database.QueryRow("SELECT value FROM settings where key = @key", sql.Named("key", key), sql.Named("key", key)).Scan(&value)
+	err = instance.QueryRow("SELECT value FROM settings where key = @key", sql.Named("key", key), sql.Named("key", key)).Scan(&value)
 	log.Info("get setting key:%v value:%v", key, value)
 	return value, err
 }
@@ -134,10 +134,10 @@ func SetSetting(key, value string) error {
 	log.Info("set setting key:%v value:%v", key, value)
 	_, err := GetSetting(key)
 	if err == nil {
-		_, e := database.Exec(`update settings set value=@value where key=@key`, sql.Named("value", value), sql.Named("key", key))
+		_, e := instance.Exec(`update settings set value=@value where key=@key`, sql.Named("value", value), sql.Named("key", key))
 		return e
 	}
-	stmt, err := database.Prepare("INSERT INTO settings(key, value) values(?,?)")
+	stmt, err := instance.Prepare("INSERT INTO settings(key, value) values(?,?)")
 	if err != nil {
 		return err
 	}
@@ -158,7 +158,7 @@ func CreateThing(id, description string) error {
 	if id == "" && description == "" {
 		return fmt.Errorf("description is emtry")
 	}
-	stmt, err := database.Prepare("INSERT INTO things(id, description) values(?,?)")
+	stmt, err := instance.Prepare("INSERT INTO things(id, description) values(?,?)")
 	if err != nil {
 		return err
 	}
@@ -177,7 +177,7 @@ func CreateThing(id, description string) error {
 
 func GetThings() map[string]string {
 	var things = make(map[string]string)
-	rows, err := database.Query("SELECT id, description FROM things")
+	rows, err := instance.Query("SELECT id, description FROM things")
 	if err != nil {
 		return nil
 	}
@@ -193,7 +193,7 @@ func GetThings() map[string]string {
 }
 
 func RemoveThing(id string) error {
-	stmt, err := database.Prepare(`delete from things where id = ?`)
+	stmt, err := instance.Prepare(`delete from things where id = ?`)
 	if err != nil {
 		return err
 	}
@@ -207,6 +207,6 @@ func RemoveThing(id string) error {
 }
 
 func UpdateThing(id string, description string) (err error) {
-	_, err = database.Exec(`update things set id=@id where description=@description`, sql.Named("id", id), sql.Named("description", description))
+	_, err = instance.Exec(`update things set id=@id where description=@description`, sql.Named("id", id), sql.Named("description", description))
 	return
 }

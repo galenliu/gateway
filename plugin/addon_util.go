@@ -4,6 +4,7 @@ import (
 	"addon"
 	"fmt"
 	"gateway/pkg/database"
+	"gateway/pkg/util"
 	"gateway/server/models/thing"
 	json "github.com/json-iterator/go"
 	"io/ioutil"
@@ -45,19 +46,6 @@ type ManifestJson struct {
 	} `json:"gateway_specific_settings"`
 	Enable bool `json:"-"`
 }
-
-
-
-//author: "bewee"
-//description: "Tuya Smart Life IoT devices support"
-//enabled: true
-//exec: "{nodeLoader} {path}"
-//homepage_url: "https://github.com/bewee/tuya-adapter"
-//id: "tuya-adapter"
-//name: "Tuya Smart Life"
-//primary_type: "adapter"
-//schema: {type: "object", required: ["devices", "timeout", "log"], properties: {,…}}
-//version: "0.2.4"
 
 type AddonInfo struct {
 	ID          string      `json:"id"`
@@ -154,43 +142,51 @@ func loadManifest(destPath, packetId string) (*AddonInfo, error) {
 	return &addonInfo, nil
 }
 
-func asThing(device *addon.Device) *thing.Thing {
+func asWebThing(device *addon.Device) *thing.Thing {
 
 	t := thing.Thing{
-		ID:                  device.ID,
-		AtContext:           device.AtContext,
-		AtType:              device.AtType,
-		Title:               device.Title,
-		Description:         device.Description,
-		BaseHref:            fmt.Sprintf("/thing/%s", device.ID),
-		Href:                "",
-		CredentialsRequired: device.CredentialsRequired,
-		Properties:          nil,
-		Actions:             nil,
-		Events:              nil,
+		ID:          fmt.Sprintf("/things/%s", device.ID),
+		AtContext:   device.AtContext,
+		AtType:      device.AtType,
+		Title:       device.Title,
+		Description: device.Description,
+		Properties:  nil,
+		Actions:     nil,
+		Events:      nil,
+
 		Connected:           false,
+		CredentialsRequired: device.CredentialsRequired,
 	}
 
 	t.Properties = make(map[string]*thing.Property)
+	if len(device.Properties) > 0 {
 
-	for _, prop := range device.Properties {
-		t.Properties[prop.Name] = &thing.Property{
-			Name:        prop.Name,
-			AtType:      prop.AtType,
-			Type:        prop.Type,
-			Title:       prop.Title,
-			Description: prop.Description,
-			Unit:        prop.Unit,
-			ReadOnly:    false,
-			Visible:     prop.Visible,
-			Minimum:     prop.Minimum,
-			Maximum:     prop.Maximum,
-			Value:       prop.Value,
-			Enum:        prop.Enum,
-			Links:       nil,
-			Href:        fmt.Sprintf("/thing/%s/properties/%s", device.ID, prop.Name),
-			ThingId:     t.ID,
+		f := util.NewForm("rel", "properties", "href", fmt.Sprintf("/things/%s/properties/", t.ID))
+		t.Forms = append(t.Forms, f)
+
+		for _, prop := range device.Properties {
+			var thingProperty *thing.Property
+			thingProperty = &thing.Property{
+				Name:        prop.Name,
+				AtType:      prop.AtType,
+				Type:        prop.Type,
+				Title:       prop.Title,
+				Description: prop.Description,
+				Unit:        prop.Unit,
+				ReadOnly:    prop.ReadOnly,
+				Visible:     prop.Visible,
+				Minimum:     prop.Minimum,
+				Maximum:     prop.Maximum,
+				Value:       prop.Value,
+				Enum:        prop.Enum,
+				ThingId:     t.ID,
+			}
+			thingProperty.Forms = append(thingProperty.Forms, util.NewForm("href", fmt.Sprintf("/things/%s/properties/%s", t.ID, prop.Name)))
+			t.Properties[thingProperty.Name] = thingProperty
 		}
+
 	}
+	t.Forms = append(t.Forms, util.NewForm("rel", "alternate", "mediaType", "text/html", "href", fmt.Sprintf("/things/%s", device.ID)))
+	t.Forms = append(t.Forms, util.NewForm("rel", "alternate", "href", fmt.Sprintf("/things/%s/", t.ID)))
 	return &t
 }

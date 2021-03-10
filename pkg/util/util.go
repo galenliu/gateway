@@ -22,7 +22,7 @@ func EnsureDir(baseDir string, dirs ...string) error {
 	for _, dir := range dirs {
 		_, err := ioutil.ReadDir(dir)
 		if os.IsNotExist(err) {
-			e := os.MkdirAll(dir, os.ModePerm);
+			e := os.MkdirAll(dir, os.ModePerm)
 			if e != nil {
 				return e
 			}
@@ -60,11 +60,11 @@ func GetArch() string {
 	if arch == "amd64" {
 		arch = "x64"
 	}
-	return  "linux"+"-" + arch
+	return "linux" + "-" + arch
 }
 
 func GetPythonVersion() []string {
-	return []string{"3.5","3,7","3.8"}
+	return []string{"3.5", "3,7", "3.8"}
 }
 
 func GetNodeVersion() string {
@@ -75,4 +75,17 @@ func GetDefaultConfigDir() string {
 	dir, _ := os.UserHomeDir()
 	dirPath := path.Join(dir, ConfDirName)
 	return dirPath
+}
+
+type Form map[string]string
+
+func NewForm(args ...string) Form {
+	m := make(map[string]string, 0)
+	for i, _ := range args {
+		if i%2 == 0 {
+			continue
+		}
+		m[args[i]] = args[i-1]
+	}
+	return m
 }

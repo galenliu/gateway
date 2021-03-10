@@ -4,7 +4,7 @@ import (
 	"addon"
 	"context"
 	"fmt"
-	"gateway/log"
+	"gateway/pkg/log"
 	"sync"
 
 	json "github.com/json-iterator/go"
