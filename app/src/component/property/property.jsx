@@ -1,5 +1,5 @@
 import {useContext} from "react";
-import {ThingsContext} from "../../page/home.jsx";
+import {ThingsContext} from "../../views/Things.jsx";
 
 
 

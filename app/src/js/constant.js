@@ -25,12 +25,15 @@ export const ThingType = {
 
 }
 
-module.exports.CONNECTED = 'connected';
-module.exports.DELETE_THING = 'deleteThing';
-module.exports.DELETE_THINGS = 'deleteThings';
-module.exports.EVENT_OCCURRED = 'eventOccurred';
-module.exports.PROPERTY_STATUS = 'propertyStatus';
-module.exports.REFRESH_THINGS = 'refreshThings';
+export const Constants = {
+    CONNECTED: 'connected',
+    DELETE_THING: 'deleteThing',
+    DELETE_THINGS: 'deleteThings',
+    EVENT_OCCURRED: 'eventOccurred',
+    PROPERTY_STATUS: 'propertyStatus',
+    REFRESH_THINGS: 'refreshThings',
+
+}
 
 
 export const ThingProperties = {
@@ -50,3 +53,4 @@ export const SettingsType = {
 }
 
 export const drawerWidth = 200;
+export default Constants;

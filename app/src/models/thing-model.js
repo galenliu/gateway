@@ -5,13 +5,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
 'use strict';
 
-import {ORIGIN} from "../../App"
-
-const API = require('../api');
-const Model = require('./model');
-const Constants = require('../constants');
+import API from "../js/api";
+import Model from "./model";
+import Constants from "../js/constant";
+import Core from "../core"
 
 
 class ThingModel extends Model {
@@ -25,7 +25,8 @@ class ThingModel extends Model {
 
         this.initWebSocket(ws);
 
-        this.updateEvents();
+        this.updateEvents().then(r => {
+        });
 
         return this;
     }
@@ -33,20 +34,14 @@ class ThingModel extends Model {
     updateFromDescription(description) {
         this.title = description.title;
 
-        // Parse base URL of Thing
-        if (description.href) {
-            this.href = new URL(description.href, ORIGIN);
-            this.id = decodeURIComponent(this.href.pathname.split('/').pop());
-        }
-
         // Parse events URL
-        for (const link of description.forms) {
-            switch (link.rel) {
+        for (const form of description.forms) {
+            switch (form.rel) {
                 case 'events':
-                    this.eventsHref = new URL(link.href, ORIGIN);
+                    this.eventsHref = new URL(form.href, Core.ORIGIN);
                     break;
                 case 'properties':
-                    this.propertiesHref = new URL(link.href, ORIGIN);
+                    this.propertiesHref = new URL(form.href, Core.ORIGIN);
                     break;
                 default:
                     break;
@@ -101,7 +96,7 @@ class ThingModel extends Model {
 
         // After the websocket is open, add subscriptions for all events.
         this.ws.addEventListener('open', () => {
-            if (Object.keys(this.eventDescriptions).length == 0) {
+            if (Object.keys(this.eventDescriptions).length === 0) {
                 return;
             }
             const msg = {
@@ -122,13 +117,16 @@ class ThingModel extends Model {
             }
             switch (message.messageType) {
                 case 'propertyStatus':
-                    this.onPropertyStatus(message.data);
+                    this.onPropertyStatus(message.data).then(r => {
+                    });
                     break;
                 case 'event':
-                    this.onEvent(message.data);
+                    this.onEvent(message.data).then(r => {
+                    });
                     break;
                 case 'connected':
-                    this.onConnected(message.data);
+                    this.onConnected(message.data).then(r => {
+                    });
                     break;
                 case 'error':
                     // status 404 means that the Thing already removed.
@@ -313,4 +311,4 @@ class ThingModel extends Model {
     }
 }
 
-module.exports = ThingModel;
+export default ThingModel;

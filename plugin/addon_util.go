@@ -187,6 +187,6 @@ func asWebThing(device *addon.Device) *thing.Thing {
 
 	}
 	t.Forms = append(t.Forms, util.NewForm("rel", "alternate", "mediaType", "text/html", "href", fmt.Sprintf("/things/%s", device.ID)))
-	t.Forms = append(t.Forms, util.NewForm("rel", "alternate", "href", fmt.Sprintf("/things/%s/", t.ID)))
+	t.Forms = append(t.Forms, util.NewForm("rel", "alternate", "href", fmt.Sprintf("/things/%s/", device.ID)))
 	return &t
 }

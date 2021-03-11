@@ -1,6 +1,6 @@
 import React, {useContext} from "react";
 import Switch from '@material-ui/core/Switch';
-import {ThingsContext} from "../../page/home.jsx";
+import {ThingsContext} from "../../views/Things.jsx";
 
 const OnOffProperty = (props) => {
 

@@ -12,7 +12,7 @@ import HomeIcon from "@material-ui/icons/Home";
 import AlarmOnIcon from '@material-ui/icons/AlarmOn';
 import ListItemText from "@material-ui/core/ListItemText";
 import {useTranslation} from 'react-i18next';
-import Home from "../page/home.jsx";
+import Things from "../views/Things.jsx";
 import {drawerWidth, SettingsType as SettingType} from "../js/constant"
 import {AppContext} from "../App"
 import SettingsIcon from '@material-ui/icons/Settings';
@@ -89,7 +89,7 @@ export default function SideBar(props) {
                         <ListItemIcon>
                             <HomeIcon/>
                         </ListItemIcon>
-                        <ListItemText primary={t('Home')}/>
+                        <ListItemText primary={t('Things')}/>
                     </ListItem>
 
                     <ListItem button key={"rules"} onClick={() => handleClick("/rules")}>

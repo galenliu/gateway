@@ -12,7 +12,7 @@ import {CssBaseline, useTheme} from "@material-ui/core";
 import clsx from "clsx";
 import {AppContext} from "../App";
 import Grid from "@material-ui/core/Grid";
-import AddonsDialog from "./addons";
+import AddonsDialog from "./Addons";
 import Divider from "@material-ui/core/Divider";
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import {drawerWidth} from "../js/constant";

@@ -2,7 +2,7 @@ import React, {useCallback, useContext, useEffect, useReducer, useRef, useState}
 import Thing from "../component/thing.jsx";
 import Grid from "@material-ui/core/Grid";
 import API from "../js/api";
-import NewThingsDialog from "./new-things";
+import NewThingsDialog from "./AddThing";
 
 import ThingsReducer, {Actions} from "../js/things-reducer";
 import TopBar from "../component/topBar";
@@ -16,6 +16,7 @@ import useWebSocket, {ReadyState} from "react-use-websocket";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import {ThingPanel} from "../component/thing-panel";
+import Core from "../core";
 
 const useStyles = makeStyles((theme) => ({
     containerGrid: {
@@ -56,7 +57,11 @@ const states = {
     disconnected: "disconnected",
 }
 
-export default function Home(props) {
+export const ThingsScreen={
+
+}
+
+export default function Things(props) {
 
     const classes = useStyles()
     const {drawerOpen} = useContext(AppContext)
@@ -180,7 +185,7 @@ export default function Home(props) {
 
     return (
         <>
-            <TopBar add={true} show={setAddThingShow} title={t("Home")}/>
+            <TopBar add={true} show={setAddThingShow} title={t("Things")}/>
             <div className={classes.drawerHeader}/>
 
 

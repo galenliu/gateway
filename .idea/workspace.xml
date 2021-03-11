@@ -22,50 +22,32 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9f4f53eb-6f7f-48b5-82a2-b5196c9afd72" name="默认的" comment="0309">
-      <change afterPath="$PROJECT_DIR$/app/src/component/models/gateway-model.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/component/models/model.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/component/models/reopening-web-socket.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/component/models/thing-model.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/component/thing-model.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/profile/config/database.sqlite3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/profile/logger/log.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/profile/logger/web.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" />
+    <list default="true" id="9f4f53eb-6f7f-48b5-82a2-b5196c9afd72" name="默认的" comment="0310">
+      <change afterPath="$PROJECT_DIR$/app/src/core.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/App.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/component/new-thing.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/new-thing.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/component/models/gateway-model.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/models/gateway-model.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/component/models/model.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/models/model.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/component/models/reopening-web-socket.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/models/reopening-web-socket.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/component/models/thing-model.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/models/thing-model.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/component/property/brightness.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/property/brightness.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/component/property/on-off.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/property/on-off.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/component/property/property.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/property/property.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/component/sideBar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/sideBar.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/component/thing-icon.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/icons.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/component/thing-panel.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/thing-panel.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/component/thing.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/thing.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/component/topBar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/topBar.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/js/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/js/api.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/js/constant.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/js/constant.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/page/addons.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/page/addons.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core.go" beforeDir="false" afterPath="$PROJECT_DIR$/core.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-addon" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-addon" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-addon/adapter.go" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-addon/adapter.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-addon/device.go" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-addon/device.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/homekit/bridge_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/homekit/bridge_proxy.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/log/log.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/log/log.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/bus/bus.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/bus/bus.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/database/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/database/db.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/page/addons.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/Addons.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/page/home.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/Things.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/page/new-things.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/AddThing.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/page/settings.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/Settings.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/vite.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/vite.config.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/util/util.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/util/util.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/adapter_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/adapter_proxy.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/plugin/addon_util.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/addon_util.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/api.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/ipc_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/ipc_server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/manager_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/manager_proxy.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/plugin.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/plugin.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/plugin_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/plugin_server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/controllers/actions_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/actions_controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/controllers/addons_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/addons_controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/controllers/new_things_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/new_things_controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/controllers/things_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/things_controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/controllers/ws-controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/ws-controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/models/thing/property.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/models/thing/property.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/models/thing/thing.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/models/thing/thing.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/router.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,7 +102,7 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/src/component" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -145,11 +127,11 @@
       <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\app" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\app\src" />
       <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\pkg" />
       <recent name="C:\Users\刘桂林\Desktop\web-things\gateway" />
       <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\server\controllers" />
       <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\app\src\component" />
-      <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\app\src" />
     </key>
   </component>
   <component name="RunManager" selected="Go 构建.gateway">
@@ -234,7 +216,8 @@
     <MESSAGE value="0307" />
     <MESSAGE value="0308" />
     <MESSAGE value="0309" />
-    <option name="LAST_COMMIT_MESSAGE" value="0309" />
+    <MESSAGE value="0310" />
+    <option name="LAST_COMMIT_MESSAGE" value="0310" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>

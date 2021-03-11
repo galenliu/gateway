@@ -651,4 +651,4 @@ const API = {
 // Elevate this to the window level.
 window.API = API;
 
-module.exports = API;
+export default API;

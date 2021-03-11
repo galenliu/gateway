@@ -14,7 +14,7 @@ export default defineConfig({
                 changeOrigin: true,
                 secure: false,
                 ws: true,
-                // rewrite: (path) => path.replace(/^\/things/, '')
+               // rewrite: (path) => path.replace(/^\//, '')
             },
             '/new_things': {
                 target: 'ws://localhost:9090',

@@ -6,7 +6,7 @@ import Icons, {ActionsIcon} from "./icons";
 import Typography from "@material-ui/core/Typography";
 import {useTranslation} from "react-i18next";
 import {ThingProperties, ThingType as Things} from "../js/constant";
-import API from "../js/api";
+import API from "../js/api"
 
 const useStyles = makeStyles((theme) => ({
     thingCard: {

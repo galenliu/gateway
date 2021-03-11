@@ -1,6 +1,6 @@
 import React, {useContext} from "react";
 import Slider from '@material-ui/core/Slider';
-import {ThingsContext} from "../../page/home.jsx";
+import {ThingsContext} from "../../views/Things.jsx";
 
 
 const BrightnessProperty = (props) => {

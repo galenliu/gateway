@@ -229,7 +229,7 @@ export default function TopBar(props) {
             {/*    })}*/}
             {/*>*/}
             {/*    <div className={classes.drawerHeader}/>*/}
-            {/*    <Home/>*/}
+            {/*    <Things/>*/}
             {/*</main>*/}
 
 

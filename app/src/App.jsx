@@ -1,11 +1,13 @@
 import './App.css';
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import SideBar from "./component/sideBar";
 import "./i18n"
 import {HashRouter as Router, Route, Switch} from 'react-router-dom'
-import Home from "./page/home";
-import Settings from "./page/settings";
+import Things from "./views/Things";
+import Settings from "./views/Settings";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
+import Core from "./core";
+
 
 export const AppContext = React.createContext()
 const theme = createMuiTheme({
@@ -13,14 +15,11 @@ const theme = createMuiTheme({
 });
 
 
-export const ORIGIN = window.location.origin
-export const HOST = window.location.host
-export const LANGUAGE = 'en-US'
-export const TIMEZONE = 'UTC'
-export const UNITS = {}
-
-
 export default function App() {
+
+    useEffect(() => {
+        Core.init()
+    }, [])
 
     const [drawerOpen, setDrawerOpen] = useState(false)
     const [newThingsOpen, setNewThingsOpen] = useState(false)
@@ -37,7 +36,7 @@ export default function App() {
                     <Switch>
                         <Route exact path="/things">
                             <SideBar/>
-                            <Home/>
+                            <Things/>
                         </Route>
                         <Route exact path="/settings">
                             <SideBar/>
@@ -45,7 +44,7 @@ export default function App() {
                         </Route>
                         <Route path="/">
                             <SideBar/>
-                            <Home/>
+                            <Things/>
                         </Route>
 
                     </Switch>

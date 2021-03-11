@@ -85,7 +85,7 @@ func NewForm(args ...string) Form {
 		if i%2 == 0 {
 			continue
 		}
-		m[args[i]] = args[i-1]
+		m[args[i-1]] = args[i]
 	}
 	return m
 }
