@@ -2,15 +2,15 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"gateway/config"
+	"gateway/server"
 	"gateway/server/models"
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"io"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/filesystem"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/websocket/v2"
 	"net/http"
-	"os"
-	"path"
 	"strconv"
 )
 
@@ -24,135 +24,124 @@ type Config struct {
 	Ctx         context.Context
 }
 
-type WebApp struct {
-	*gin.Engine
+type Web struct {
+	*fiber.App
 	config Config
 	ctx    context.Context
 	things *models.Things
 }
 
-func NewWebAPP(conf Config) *WebApp {
-	app := WebApp{}
-	app.things = models.NewThings()
-	app.config = conf
-	app.Engine = CollectRoute(&app)
-	return &app
+func NewWebAPP(conf Config) *Web {
+	web := Web{}
+	web.things = models.NewThings()
+	web.config = conf
+	web.App = CollectRoute(conf)
+	return &web
 }
 
-func CollectRoute(app *WebApp) *gin.Engine {
+func CollectRoute(conf Config) *fiber.App {
 
-	//init thingsController
+	//init
+	var app = fiber.New()
+	app.Use(recover.New())
 
-	//thingsCtr := controllers.NewThingsControllerFunc()
-	var router = gin.Default()
+	app.Use("/", filesystem.New(filesystem.Config{
+		Root: http.FS(server.File),
+	}))
 
-	gin.SetMode(gin.DebugMode)
-
-	//解决跨域问题 仅测试
-	if gin.Mode() == gin.DebugMode {
-		router.Use(cors.Default())
-	}
-
-	//日志写入文件
-	f, _ := os.Create(path.Join(app.config.LogDir, "web.log"))
-	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
-
-	//html template
-	//router.LoadHTMLGlob(path.Join(conf.TemplateDir,"index.html"))
-	//router.Static("/_assets",conf.StaticDir)
-	//router.StaticFS("/_assets",http.Dir(path.Join(conf.StaticDir,"_assets")))
-	//router.Static("/server",conf.StaticDir)
-
-	router.POST("/upload", func(c *gin.Context) {
-		// 单文件
-		// Multipart form
-		form, _ := c.MultipartForm()
-		files := form.File["upload[]"]
-
-		for _, file := range files {
-			// Upload the file to specific dst.
-			_ = c.SaveUploadedFile(file, app.config.UploadDir)
-		}
-		c.String(http.StatusOK, fmt.Sprintf("%d files uploaded!", len(files)))
-	})
+	//logger
+	app.Use(logger.New())
 
 	//ping controller
-	router.GET("/ping", func(c *gin.Context) {
-		c.Status(http.StatusNoContent)
+	app.Get("/ping", func(c *fiber.Ctx) error {
+		return c.SendStatus(http.StatusNoContent)
 	})
 
-	// root controller
-	//router.GET("/", controllers.RootHandle())
-	router.GET("/index.html", RootHandle())
+	//root handler
+	app.Use(rootHandler)
+
+	//app.Get("/", controllers.RootHandle())
+	app.Static("/index.htm", "")
 
 	//Things Controller
-	thingsGroup := router.Group(models.ThingsPath)
-
 	{
+		thingsGroup := app.Group(models.ThingsPath)
 		thingsController := NewThingsControllerFunc()
 
 		//set a properties of a thing.
-		thingsGroup.PUT("/:thingId/properties/:propertyName", thingsController.handleSetProperty)
+		thingsGroup.Put("/:thingId/properties/*", thingsController.handleSetProperty)
 
 		//Handle creating a new thing.
-		thingsGroup.POST("/", thingsController.handleCreateThing)
+		thingsGroup.Post("/", thingsController.handleCreateThing)
 
-		thingsGroup.GET("/:thingId", thingsController.handleGetThing)
+		thingsGroup.Get("/:thingId", thingsController.handleGetThing)
+		thingsGroup.Get("/", thingsController.handleGetThings)
 
-		//get the properties of a thing
-		thingsGroup.GET("/:thingId/properties", thingsController.handleGetProperties)
+		thingsGroup.Get("/:thingId", websocket.New(handleWebsocket))
+		thingsGroup.Get("/", websocket.New(handleWebsocket))
 
-		//get a properties of a thing
-		thingsGroup.GET("/:thingId/properties/:propertyName", thingsController.handleGetProperty)
+		//Get the properties of a thing
+		thingsGroup.Get("/:thingId/properties", thingsController.handleGetProperties)
+
+		//Get a properties of a thing
+		thingsGroup.Get("/:thingId/properties/*", thingsController.handleGetProperty)
 
 		// Modify a ThingInfo.
-		thingsGroup.PUT("/:thingId", thingsController.handleSetThing)
+		thingsGroup.Put("/:thingId", thingsController.handleSetThing)
 
-		thingsGroup.PATCH("/", thingsController.handlePatchThings)
-		thingsGroup.PATCH("/:thingId", thingsController.handlePatchThing)
+		thingsGroup.Patch("/", thingsController.handlePatchThings)
+		thingsGroup.Patch("/:thingId", thingsController.handlePatchThing)
 
-		thingsGroup.DELETE("/:thingId", thingsController.handleDeleteThing)
-		thingsGroup.GET("/", thingsController.handleGetThings)
+		thingsGroup.Delete("/:thingId", thingsController.handleDeleteThing)
+
 	}
 
-	newThingsGroup := router.Group(models.NewThingsPath)
+	//NewThing Controller
 	{
-		newThingsController := NewNewThingsController(app.things)
-		newThingsGroup.GET("", newThingsController.HandleWebsocket)
+		newThingsGroup := app.Group(models.NewThingsPath)
+		newThingsGroup.Use("/", func(c *fiber.Ctx) error {
+			if websocket.IsWebSocketUpgrade(c) {
+				c.Locals("websocket", true)
+				return c.Next()
+			}
+			return fiber.ErrUpgradeRequired
+		})
+
+		newThingsGroup.Get("/", websocket.New(handleNewThingsWebsocket))
 	}
 
 	//Addons Controller
-	addonGroup := router.Group(models.AddonsPath)
 	{
+		addonGroup := app.Group(models.AddonsPath)
 		addonController := NewAddonController()
-		addonGroup.GET("/", addonController.handlerGetAddons)
-		addonGroup.POST("/", addonController.handlerInstallAddon)
-		addonGroup.PUT("/:addon_id", addonController.handlerSetAddon)
-		addonGroup.GET("/:addon_id/config", addonController.HandlerGetAddonConfig)
-		addonGroup.PUT("/:addon_id/config", addonController.HandlerSetAddonConfig)
+		addonGroup.Get("/", addonController.handlerGetAddons)
+		addonGroup.Post("/", addonController.handlerInstallAddon)
+		addonGroup.Put("/:addonId", addonController.handlerSetAddon)
+		addonGroup.Get("/:addonId/config", addonController.handlerGetAddonConfig)
 	}
 
 	//settings Controller
-	debugGroup := router.Group(models.SettingsPath)
 	{
+		debugGroup := app.Group(models.SettingsPath)
 		settingsController := NewSettingController()
-		debugGroup.GET("/addonsInfo", settingsController.handleGetAddonsInfo)
+		debugGroup.Get("/addonsInfo", settingsController.handleGetAddonsInfo)
 	}
 
 	//actions Controller
-	actionsGroup := router.Group(models.ActionsPath)
+
 	{
+		actionsGroup := app.Group(models.ActionsPath)
 		actionsController := NewActionsController()
-		actionsGroup.POST("/", actionsController.HandleActions)
-		actionsGroup.DELETE("/:actionName/:actionId", actionsController.HandleDeleteAction)
+		actionsGroup.Post("/", actionsController.handleActions)
+		actionsGroup.Delete("/:actionName/:actionId", actionsController.handleDeleteAction)
 	}
 
-	return router
+	return app
 }
 
-func (app *WebApp) Start() error {
-	httpPort := ":" + strconv.Itoa(app.config.HttpPort)
-	err := app.Run(httpPort)
+func (web *Web) Start() error {
+	httpPort := ":" + strconv.Itoa(web.config.HttpPort)
+	err := web.Listen(httpPort)
 	if err != nil {
 		return err
 	}

@@ -80,8 +80,8 @@ func GetDevice(deviceId string) *addon.Device {
 	return device
 }
 
-func SetProperty(deviceId, propName string, newValue interface{}) (*addon.Property, error) {
-	return instance.handleSetProperty(deviceId, propName, newValue)
+func SetProperty(deviceId, propName string, newValue interface{}, ctx context.Context) (*addon.Property, error) {
+	return instance.handleSetProperty(deviceId, propName, newValue, ctx)
 
 }
 

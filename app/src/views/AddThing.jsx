@@ -11,7 +11,7 @@ import API from "../js/api";
 import {useTranslation} from "react-i18next";
 import NewThing from "../component/new-thing";
 import Grid from "@material-ui/core/Grid";
-import {AppContext} from "../App";
+import {AppContext} from "../Router";
 
 const useStyles = makeStyles((theme) => ({
     appBar: {},

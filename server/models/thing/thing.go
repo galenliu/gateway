@@ -9,13 +9,13 @@ import (
 )
 
 type Thing struct {
-	AtContext   []string `json:"@context,omitempty"`
+	AtContext   []string `json:"@context"`
 	Title       string   `json:"title"`
 	ID          string   `json:"id"`
 	AtType      []string `json:"@type"`
 	Description string   `json:"description,omitempty"`
 
-	Properties map[string]*Property `json:"properties,omitempty"`
+	Properties map[string]*Property `json:"properties"`
 	Actions    map[string]*Action   `json:"actions,omitempty"`
 	Events     map[string]*Event    `json:"events,omitempty"`
 	Forms      []util.Form          `json:"forms,omitempty"`

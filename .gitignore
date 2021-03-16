@@ -1,0 +1,10 @@
+/app/node_modules/
+.idea/
+.vscode/
+
+/server/static/*.html
+/server/static/*.js
+!/server/static/*.go
+
+
+

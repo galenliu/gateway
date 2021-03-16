@@ -1,22 +1,18 @@
-import React, {useCallback, useContext, useEffect, useReducer, useRef, useState} from "react";
-import Thing from "../component/thing.jsx";
+import React, {useContext, useEffect, useState} from "react";
 import Grid from "@material-ui/core/Grid";
-import API from "../js/api";
-import NewThingsDialog from "./AddThing";
-
-import ThingsReducer, {Actions} from "../js/things-reducer";
+import {ErrorOutlined} from "@material-ui/icons";
 import TopBar from "../component/topBar";
 import {useTranslation} from "react-i18next";
 import {makeStyles} from "@material-ui/core/styles";
-import {AppContext} from "../App";
-import {drawerWidth} from "../js/constant";
+import {AppContext} from "../Router";
+import Constants, {drawerWidth} from "../js/constant";
 import clsx from "clsx";
 import {CircularProgress} from "@material-ui/core";
-import useWebSocket, {ReadyState} from "react-use-websocket";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
-import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import App from "../App";
 import {ThingPanel} from "../component/thing-panel";
-import Core from "../core";
+import NewThingsDialog from "./AddThing";
+import Thing from "../component/thing";
+
 
 const useStyles = makeStyles((theme) => ({
     containerGrid: {
@@ -51,158 +47,71 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const states = {
-    fetching: "fetching",
-    completed: "completed",
+    pending: "pending",
     connected: "connected",
     disconnected: "disconnected",
 }
 
-export const ThingsScreen={
-
-}
 
 export default function Things(props) {
-
     const classes = useStyles()
+    const [things, setThings] = useState(props.things)
     const {drawerOpen} = useContext(AppContext)
     const [addThingShow, setAddThingShow] = useState(false)
     const [thingPanelShow, setThingPanelShow] = useState(false)
-    const [currentThing, setCurrentThing] = useState()
-    const [things, dispatch] = useReducer(ThingsReducer, new Map())
+    const [currentThingId, setCurrentThingId] = useState(null)
+    //const [things, dispatch] = useReducer(ThingsReducer, new Map())
+    const [state, setState] = useState(states.connected)
     const {t, i18n} = useTranslation();
-    const url = "ws://localhost:9090/things/"
-    const [socketUrl, setSocketUrl] = useState(null);
-    const didUnmount = useRef(false);
-    const {
-        sendMessage,
-        lastMessage,
-        readyState,
-    } = useWebSocket(socketUrl
-    );
-    const [state, setState] = useState()
-    const connectionStatus = {
-        [ReadyState.CONNECTING]: 'Connecting',
-        [ReadyState.OPEN]: 'Open',
-        [ReadyState.CLOSING]: 'Closing',
-        [ReadyState.CLOSED]: 'Closed',
-        [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
-    }[readyState];
-
-    const handleSendMessage = useCallback((data) => {
-            console.log("websocket sendMessage:", data)
-            sendMessage(JSON.stringify(data))
-        },
-        []);
-
-    // resolve=> return Promise(map)
-    function fetchThings() {
-        return new Promise(
-            function (resolve, reject) {
-                API.getThings().then((data) => {
-                    if (!data) {
-                        reject(new Error("fetch things empty"))
-                    }
-                    let map = new Map()
-                    for (const t of data) {
-                        map.set(t.id, t)
-                    }
-                    if (map) {
-                        return resolve(map)
-                    }
-                }).catch((e) => {
-                    reject(e)
-                })
-            }
-        )
-
-    }
 
     useEffect(() => {
-        if (connectionStatus === 'Open' && state === states.completed) {
-            setState(states.connected)
+        const refreshThings = (things) => {
+            console.log("=================", things)
+            setThings(things)
         }
-        if (connectionStatus === 'Closed') {
-            setState(states.disconnected)
-        }
-
-    }, [connectionStatus])
-
-    useEffect(() => {
-
-        setState(states.fetching)
-        fetchThings().then((mapThings) => {
-            console.log("mapThings:", mapThings)
-            if (mapThings) {
-                dispatch({type: Actions.initial, initialState: mapThings})
-            }
-            setState(states.completed)
-        }).catch((e) => {
-                console.log(e, "------------------------------------------")
-                setState(states.disconnected)
-            }
-        )
+        App.gatewayModel.subscribe(Constants.REFRESH_THINGS, refreshThings)
         return () => {
-            didUnmount.current = true;
-        };
+            App.gatewayModel.unsubscribe(Constants.REFRESH_THINGS, refreshThings)
+        }
     }, [])
 
-    useEffect(() => {
-
-        if (lastMessage != null) {
-            console.log("websocket rev message:", lastMessage.data)
-        }
-
-    }, [lastMessage])
-
-    useEffect(() => {
-        if (state === states.completed) {
-            try {
-                setSocketUrl(url)
-            } catch (e) {
-                console.error(e, "++++++++++++++++++++++++")
-            }
-        }
-        if (state === states.disconnected) {
-            setSocketUrl("")
-        }
-    }, [state])
-
     function renderThings() {
-
-        let list = []
-        for (let [id, t] of things) {
-            const thing =
-                <Thing key={id} {...t} openPanel={handleOpenThingPanel} sendMessage={handleSendMessage}/>
-            list.push(thing)
+        if (things === undefined) {
+            return
         }
-        return list
+        let thingList = []
+        for (const [key, value] of things) {
+            console.log("props:", props)
+            let model = App.gatewayModel.thingModels.get(key)
+            let thing = <Thing key={key} description={value} model={model} open={openPanel}/>
+            thingList.push(thing)
+            console.log(thing)
+        }
+        return thingList
     }
 
-    function handleOpenThingPanel(props) {
+    function openPanel(thingId) {
+        setCurrentThingId(thingId)
         setThingPanelShow(true)
-        setCurrentThing(props)
     }
 
     return (
         <>
             <TopBar add={true} show={setAddThingShow} title={t("Things")}/>
             <div className={classes.drawerHeader}/>
-
-
-            <Grid style={{"justifyContent": !state === states.fetching || things.keys > 0 ? 'flex-start' : "center"}}
+            <Grid style={{"justifyContent": !state === states.pending ? 'flex-start' : "center"}}
                   className={clsx(classes.containerGrid, {
                       [classes.contentShift]: !drawerOpen,
                   })}
                   container spacing={2}>
-                {state === states.fetching && <CircularProgress disableShrink/>}
-                {state === states.connected && things.length === 0 && <AddCircleIcon/>}
-                {state === states.connected && things && renderThings()}
+                {state === states.pending && <CircularProgress disableShrink/>}
+                {state === states.connected && renderThings()}
                 {state === states.disconnected &&
-                <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}><ErrorOutlineIcon/>
+                <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}><ErrorOutlined/>
                     <h4>{t("disconnect")}</h4></div>}
             </Grid>
             <NewThingsDialog open={addThingShow} show={setAddThingShow}/>
-            <ThingPanel open={thingPanelShow} show={setThingPanelShow} {...currentThing}/>
+            {currentThingId !== null && <ThingPanel open={thingPanelShow} show={setThingPanelShow} thingId={currentThingId}/>}
         </>
 
     )

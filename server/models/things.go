@@ -2,6 +2,7 @@ package models
 
 import (
 	"addon"
+	"context"
 	"fmt"
 	"gateway/pkg/bus"
 	"gateway/pkg/database"
@@ -32,7 +33,7 @@ func NewThings() *Things {
 }
 
 func (ts *Things) GetThing(id string) *thing.Thing {
-	t, ok := ts.things[id]
+	t, ok := ts.things["/things/"+id]
 	if !ok {
 		return nil
 	}
@@ -109,7 +110,7 @@ func (ts *Things) RemoveThing(thingId string) error {
 	//if t == nil {
 	//	return fmt.Errorf("thing not found")
 	//}
-	err := database.RemoveThing(thingId)
+	err := database.RemoveThing("/things/"+thingId)
 	if err != nil {
 		return err
 	}
@@ -117,16 +118,16 @@ func (ts *Things) RemoveThing(thingId string) error {
 	return nil
 }
 
-func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) (*addon.Property, error) {
+func (ts *Things) SetThingProperty(thingId, propName string, value interface{},ctx context.Context) (*addon.Property, error) {
 	var th = ts.GetThing(thingId)
 	if th == nil {
 		return nil, fmt.Errorf("thing can not found")
 	}
 	prop := th.GetProperty(propName)
 	if prop == nil {
-		return nil, fmt.Errorf("property can not found")
+		return nil, fmt.Errorf("propertyName not found")
 	}
-	return plugin.SetProperty(thingId, propName, value)
+	return plugin.SetProperty(thingId, propName, value,ctx)
 }
 
 func (ts *Things) onPropertyChanged(property *addon.Property) {

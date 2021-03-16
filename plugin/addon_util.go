@@ -161,7 +161,7 @@ func asWebThing(device *addon.Device) *thing.Thing {
 	t.Properties = make(map[string]*thing.Property)
 	if len(device.Properties) > 0 {
 
-		f := util.NewForm("rel", "properties", "href", fmt.Sprintf("/things/%s/properties/", t.ID))
+		f := util.NewForm("rel", "properties", "href", fmt.Sprintf("%s/properties", t.ID))
 		t.Forms = append(t.Forms, f)
 
 		for _, prop := range device.Properties {
@@ -181,7 +181,7 @@ func asWebThing(device *addon.Device) *thing.Thing {
 				Enum:        prop.Enum,
 				ThingId:     t.ID,
 			}
-			thingProperty.Forms = append(thingProperty.Forms, util.NewForm("href", fmt.Sprintf("/things/%s/properties/%s", t.ID, prop.Name)))
+			thingProperty.Forms = append(thingProperty.Forms, util.NewForm("href", fmt.Sprintf("%s/properties/%s", t.ID, prop.Name)))
 			t.Properties[thingProperty.Name] = thingProperty
 		}
 

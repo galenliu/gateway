@@ -11,7 +11,7 @@
 import API from "../js/api";
 import Model from "./model";
 import Constants from "../js/constant";
-import Core from "../core"
+import App from "../App"
 
 
 class ThingModel extends Model {
@@ -24,24 +24,22 @@ class ThingModel extends Model {
         this.updateFromDescription(description);
 
         this.initWebSocket(ws);
-
-        this.updateEvents().then(r => {
-        });
-
+        this.updateEvents()
         return this;
     }
 
     updateFromDescription(description) {
         this.title = description.title;
-
+        this.id = decodeURIComponent(description.id.split('/').pop());
+        this.href = new URL(description.id, App.ORIGIN);
         // Parse events URL
         for (const form of description.forms) {
             switch (form.rel) {
                 case 'events':
-                    this.eventsHref = new URL(form.href, Core.ORIGIN);
+                    this.eventsHref = new URL(form.href, App.ORIGIN);
                     break;
                 case 'properties':
-                    this.propertiesHref = new URL(form.href, Core.ORIGIN);
+                    this.propertiesHref = new URL(form.href, App.ORIGIN);
                     break;
                 default:
                     break;
@@ -176,7 +174,6 @@ class ThingModel extends Model {
         if (!this.propertyDescriptions.hasOwnProperty(name)) {
             return Promise.reject(`Unavailable property name ${name}`);
         }
-
         switch (this.propertyDescriptions[name].type) {
             case 'number':
                 value = parseFloat(value);
@@ -188,12 +185,8 @@ class ThingModel extends Model {
                 value = Boolean(value);
                 break;
         }
-
         const property = this.propertyDescriptions[name];
-        const payload = {
-            [name]: value,
-        };
-
+        ;
         let href;
         for (const form of property.forms) {
             if (!form.rel || form.rel === 'property') {
@@ -201,9 +194,9 @@ class ThingModel extends Model {
                 break;
             }
         }
-
-        return API.putJson(href, payload).then((json) => {
-            this.onPropertyStatus(json).then(r => (console.log(r)));
+        return API.putJson(href, value).then((json) => {
+            console.log("json", json)
+            this.onPropertyStatus(json)
         }).catch((error) => {
             console.error(error);
             throw new Error(`Error trying to set ${name}`);
@@ -236,7 +229,7 @@ class ThingModel extends Model {
         }
 
         getPropertiesPromise.then((properties) => {
-            this.onPropertyStatus(properties).then(r => console.log(r));
+            this.onPropertyStatus(properties)
         }).catch((error) => {
             console.error(`Error fetching ${this.title} status: ${error}`);
         });
@@ -247,6 +240,8 @@ class ThingModel extends Model {
      * @param {Object} data Property data
      */
     onPropertyStatus(data) {
+
+
         const updatedProperties = {};
         for (const prop in data) {
             if (!this.propertyDescriptions.hasOwnProperty(prop)) {
@@ -261,6 +256,7 @@ class ThingModel extends Model {
             this.properties[prop] = value;
             updatedProperties[prop] = value;
         }
+        console.log("updatedProperties:", updatedProperties)
         return this.handleEvent(Constants.PROPERTY_STATUS, updatedProperties);
     }
 

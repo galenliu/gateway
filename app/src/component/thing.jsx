@@ -5,8 +5,8 @@ import {makeStyles} from "@material-ui/core/styles";
 import Icons, {ActionsIcon} from "./icons";
 import Typography from "@material-ui/core/Typography";
 import {useTranslation} from "react-i18next";
-import {ThingProperties, ThingType as Things} from "../js/constant";
-import API from "../js/api"
+import Constants, {ThingProperties, ThingType as Things} from "../js/constant";
+import App from "../App";
 
 const useStyles = makeStyles((theme) => ({
     thingCard: {
@@ -56,13 +56,28 @@ export default function Thing(props) {
     const classes = useStyles()
     const {t, i18n} = useTranslation();
     const [open, setOpen] = useState(false)
-
-    const [thing, setThing] = useState(props)
+    const [description, setDescription] = useState(props.description)
+    const [model, setModel] = useState(props.model)
     const [state, setState] = useState()
 
     useEffect(() => {
-        setState(states.updating)
+        function refreshThing(prop) {
+            let newModel = model
+            for (const name in prop) {
+                if (newModel.propertyDescriptions.hasOwnProperty(name)) {
+                    console.log("new value", prop)
+                    newModel.propertyDescriptions[name]["value"] = prop[name]
+                }
+                setModel(newModel)
+            }
+        }
 
+        let thingModel = App.gatewayModel.thingModels.get(decodeURIComponent(description.id.split('/').pop()))
+        thingModel.subscribe(Constants.PROPERTY_STATUS, refreshThing)
+        setState(states.updating)
+        return () => {
+            thingModel.unsubscribe(Constants.PROPERTY_STATUS, refreshThing)
+        }
     }, [])
 
     function stateTextStyle() {
@@ -75,29 +90,30 @@ export default function Thing(props) {
         return {color: "primary", variant: "h6"}
     }
 
-    function handlerSetProperty(propName, value) {
-        API(thing.id, propName, value).then(r => {
-        }).then((res) => {
-            console.log("set property res:", res.data)
-        }).catch((e) => {
-            console.log(e)
-        })
-    }
 
-    function thingToggleClick(e) {
+    function handleToggleClick(e) {
         e.stopPropagation()
-        // if (!thing.connected) {
-        //     return
-        // }
-        if (thing.selectedCapability === Things.Light) {
-            for (const name in thing.properties) {
-                if (!thing.properties.hasOwnProperty(name)) {
-                    return;
-                }
-                let prop = thing.properties[name]
+        if (description.selectedCapability === Things.Light) {
+            for (const name in model.propertyDescriptions) {
+
+                let prop = model.propertyDescriptions[name]
                 if (prop["@type"] === ThingProperties.OnOffProperty) {
-                    handlerSetProperty(name, !thing.value)
-                    setThing({...thing, value: !thing.value})
+                    let value = prop.value
+                    let newValue
+                    switch (prop.type) {
+                        case 'number':
+                            value = parseFloat(value);
+                            break;
+                        case 'integer':
+                            value = parseInt(value);
+                            break;
+                        case 'boolean':
+                            value = Boolean(value);
+                            newValue = !value
+                            break;
+                    }
+                    console.log("toggle:", newValue)
+                    model.setProperty(name, newValue)
                 }
             }
         }
@@ -105,20 +121,16 @@ export default function Thing(props) {
 
     return (
         <>
-            <Grid item className={classes.root} onDoubleClick={() => {
-                console.log("doubleClick")
-                setOpen(true)
-            }}>
-
-                <Card elevation={10} className={classes.thingCard} onClick={() => props.openPanel(props)}>
+            <Grid item className={classes.root}>
+                <Card elevation={10} className={classes.thingCard} onClick={() => props.open(description.id)}>
                     <div className={classes.cardTop}>
-                        <Icons state={state} color={"#fb8c00"} type={thing.selectedCapability} size={2}/>
-                        <ActionsIcon cursor={"pointer"} state={state} type={thing.selectedCapability} size={2}
-                                     onClick={thingToggleClick}/>
+                        <Icons state={state} color={"#fb8c00"} type={description.selectedCapability} size={2}/>
+                        <ActionsIcon cursor={"pointer"} state={state} type={description.selectedCapability} size={2}
+                                     onClick={handleToggleClick}/>
                     </div>
                     <div className={classes.cardBot}>
                         <Typography variant={"body1"}>
-                            {thing.title}
+                            {description.title}
                         </Typography>
                         <Typography {...stateTextStyle()} t={2}>
                             {t(state)}

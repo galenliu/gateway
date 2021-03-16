@@ -14,7 +14,7 @@ import (
 type HomeGateway struct {
 	Preferences   *config.Preferences
 	AddonsManager *plugin.AddonManager
-	Web           *controllers.WebApp
+	Web           *controllers.Web
 	Ctx           context.Context
 }
 

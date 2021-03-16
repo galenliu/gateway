@@ -20,6 +20,7 @@
         <method importPath="os/exec" receiver="*Cmd" name="Start" />
         <method importPath="gateway/server" receiver="*WebApp" name="Start" />
         <method importPath="database/sql" receiver="*DB" name="Close" />
+        <method importPath="gateway/server/controllers" receiver="*Web" name="Start" />
       </methods>
     </inspection_tool>
   </profile>

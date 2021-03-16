@@ -1,12 +1,12 @@
 import './App.css';
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import SideBar from "./component/sideBar";
 import "./i18n"
-import {HashRouter as Router, Route, Switch} from 'react-router-dom'
+import {HashRouter as AppRouter, Route, Switch} from 'react-router-dom'
 import Things from "./views/Things";
 import Settings from "./views/Settings";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
-import Core from "./core";
+import App from "./App";
 
 
 export const AppContext = React.createContext()
@@ -14,12 +14,9 @@ const theme = createMuiTheme({
     status: {},
 });
 
+App.init()
 
-export default function App() {
-
-    useEffect(() => {
-        Core.init()
-    }, [])
+export default function Router() {
 
     const [drawerOpen, setDrawerOpen] = useState(false)
     const [newThingsOpen, setNewThingsOpen] = useState(false)
@@ -32,11 +29,11 @@ export default function App() {
                 newThingsOpen: newThingsOpen,
                 setNewThingsOpen: setNewThingsOpen,
             }}>
-                <Router>
+                <AppRouter>
                     <Switch>
                         <Route exact path="/things">
                             <SideBar/>
-                            <Things/>
+                            <Things models={App.gatewayModel.thingModels} things={App.gatewayModel.things}/>
                         </Route>
                         <Route exact path="/settings">
                             <SideBar/>
@@ -48,7 +45,7 @@ export default function App() {
                         </Route>
 
                     </Switch>
-                </Router>
+                </AppRouter>
             </AppContext.Provider>
         </ThemeProvider>
     );

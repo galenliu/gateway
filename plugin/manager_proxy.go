@@ -11,6 +11,7 @@ import (
 	"gateway/pkg/log"
 	"gateway/pkg/util"
 	"gateway/server/models/thing"
+	"github.com/xiam/to"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -18,7 +19,6 @@ import (
 	"path"
 	"strings"
 	"sync"
-	"time"
 )
 
 var instance *AddonManager
@@ -229,33 +229,48 @@ func (manager *AddonManager) installAddon(packageId, packagePath string, enabled
 
 }
 
-func (manager *AddonManager) handleSetProperty(deviceId, propName string, setValue interface{}) (*addon.Property, error) {
+func (manager *AddonManager) handleSetProperty(deviceId, propName string, setValue interface{}, ctx context.Context) (*addon.Property, error) {
 	adapter := manager.getAdapterByDeviceId(deviceId)
 	if adapter == nil {
 		return nil, fmt.Errorf("adapter not found")
 	}
 	property := adapter.GetDevice(deviceId).GetProperty(propName)
+
+	var newValue interface{}
+	if property.Type == addon.TypeBoolean {
+		newValue = to.Bool(setValue)
+	}
+	if property.Type == addon.TypeInteger || property.Type == addon.TypeNumber {
+		newValue = to.Float64(setValue)
+	}
+	if property.Type == addon.TypeString {
+		newValue = to.String(setValue)
+	}
+
 	if property == nil {
 		return nil, fmt.Errorf("device or property not found")
 	}
 
-	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second)
-
-	var p *addon.Property
+	var propChan = make(chan *addon.Property)
 	changedFunc := func(prop *addon.Property) {
 		if prop.DeviceId == deviceId && prop.Name == propName {
-			cancelFunc()
-			p = prop
+			propChan <- prop
 		}
 	}
-	adapter.handleSetPropertyValue(property, setValue)
+	adapter.handleSetPropertyValue(property, newValue)
 	_ = bus.Subscribe(util.PropertyChanged, changedFunc)
-	<-ctx.Done()
-	_ = bus.Unsubscribe(util.PropertyChanged, changedFunc)
-	if p == nil {
-		return property, fmt.Errorf("set property timeout")
+	defer func() {
+		_ = bus.Unsubscribe(util.PropertyChanged, changedFunc)
+	}()
+	for {
+		select {
+		case <-ctx.Done():
+			return nil, fmt.Errorf("time out")
+		case prop := <-propChan:
+			return prop, nil
+		}
 	}
-	return p, nil
+
 }
 
 func (manager *AddonManager) handleGetDevices(devs *[]*addon.Device) {

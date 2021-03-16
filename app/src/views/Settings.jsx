@@ -10,7 +10,7 @@ import ExtensionIcon from '@material-ui/icons/Extension';
 import TopBar from "../component/topBar";
 import {CssBaseline, useTheme} from "@material-ui/core";
 import clsx from "clsx";
-import {AppContext} from "../App";
+import {AppContext} from "../Router";
 import Grid from "@material-ui/core/Grid";
 import AddonsDialog from "./Addons";
 import Divider from "@material-ui/core/Divider";

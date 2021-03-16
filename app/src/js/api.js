@@ -39,12 +39,11 @@ const API = {
             method: 'GET',
             headers: this.headers(),
         };
-
         return fetch(url, opts).then((res) => {
             if (!res.ok) {
+
                 throw new Error(res.status);
             }
-
             return res.json();
         });
     },
@@ -104,7 +103,7 @@ const API = {
             method: 'DELETE',
             headers: this.headers(),
         };
-
+       console.log("url:",url)
         return fetch(url, opts).then((res) => {
             if (!res.ok) {
                 throw new Error(res.status);

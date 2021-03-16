@@ -27,6 +27,7 @@ class GatewayModel extends Model {
     }
 
     addQueue(job) {
+
         this.queue = this.queue.then(job)
             .catch((e) => {
                 console.error(e);
@@ -51,6 +52,7 @@ class GatewayModel extends Model {
     }
 
     setThing(thingId, description) {
+        console.log("setThing thingId: \t\n", thingId, "description:\t\n", description)
         if (this.thingModels.has(thingId)) {
             const thingModel = this.thingModels.get(thingId);
             thingModel.updateFromDescription(description);
@@ -61,12 +63,12 @@ class GatewayModel extends Model {
                 this.handleRemove.bind(this)
             );
             if (this.connectedThings.has(thingId)) {
-                thingModel.onConnected(this.connectedThings.get(thingId)).then(r => {
-                });
+                thingModel.onConnected(this.connectedThings.get(thingId))
             }
             this.thingModels.set(thingId, thingModel);
         }
         this.things.set(thingId, description);
+        console.log(" gateway things:", this.things, "\t\nmodels:", this.thingModels)
     }
 
     getThing(thingId) {
@@ -87,12 +89,6 @@ class GatewayModel extends Model {
         });
     }
 
-
-    /**
-     * Remove the thing.
-     *
-     * @param {string} thingId - Id of the thing
-     */
     removeThing(thingId) {
         if (!this.thingModels.has(thingId)) {
             return Promise.reject(`No Thing id:${thingId}`);
@@ -106,12 +102,6 @@ class GatewayModel extends Model {
         });
     }
 
-    /**
-     * Update the thing.
-     *
-     * @param {string} thingId - Id of the thing
-     * @param {object} updates - contents of update
-     */
     updateThing(thingId, updates) {
         if (!this.thingModels.has(thingId)) {
             return Promise.reject(`No Thing id:${thingId}`);
@@ -122,8 +112,7 @@ class GatewayModel extends Model {
             }
             const thingModel = this.thingModels.get(thingId);
             return thingModel.updateThing(updates).then(() => {
-                this.refreshThing(thingId).then(r => {
-                });
+                this.refreshThing(thingId)
             });
         });
     }
@@ -143,7 +132,7 @@ class GatewayModel extends Model {
     }
 
     connectWebSocket() {
-        const thingsHref = `${window.location.origin}/things/`;
+        const thingsHref = `${window.location.origin}/things`;
         const wsHref = thingsHref.replace(/^http/, 'ws');
         this.ws = new ReopeningWebSocket(wsHref);
         this.ws.addEventListener('open', this.refreshThings.bind(this));
@@ -158,10 +147,12 @@ class GatewayModel extends Model {
                 this.connectedThings.set(message.id, message.data);
                 break;
             case 'thingAdded':
-                this.refreshThings().then(r => {});
+                this.refreshThings().then(r => {
+                });
                 break;
             case 'thingModified':
-                this.refreshThing(message.id).then(r =>{} );
+                this.refreshThing(message.id).then(r => {
+                });
                 break;
             default:
                 break;
@@ -169,8 +160,9 @@ class GatewayModel extends Model {
     }
 
     refreshThings() {
-        return this.addQueue(() => {
+       return  this.addQueue(() => {
             return API.getThings().then((things) => {
+                console.log("things:-------------------", things)
                 const fetchedIds = new Set();
                 things.forEach((description) => {
                     const thingId = decodeURIComponent(description.id.split('/').pop());
@@ -181,10 +173,9 @@ class GatewayModel extends Model {
                 const removedIds = Array.from(this.thingModels.keys()).filter((id) => {
                     return !fetchedIds.has(id);
                 });
-
                 removedIds.forEach((thingId) => this.handleRemove(thingId, true));
 
-                return this.handleEvent(Constants.REFRESH_THINGS, this.things);
+              return  this.handleEvent(Constants.REFRESH_THINGS, this.things);
             }).catch((e) => {
                 console.error(`Get things failed ${e}`);
             });

@@ -6,52 +6,39 @@ import (
 	"gateway/pkg/util"
 	"gateway/server/models"
 	"gateway/server/models/thing"
-	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
-	"net/http"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/websocket/v2"
 	"sync"
 )
 
 type NewThingsController struct {
 	locker    *sync.Mutex
 	container *models.Things
-	wss       map[*websocket.Conn]bool
+	ws        *websocket.Conn
 	closeChan chan struct{}
 }
 
-func NewNewThingsController(things *models.Things) *NewThingsController {
+func NewNewThingsController() *NewThingsController {
 	controller := &NewThingsController{container: models.NewThings()}
 	controller.locker = new(sync.Mutex)
-	controller.wss = make(map[*websocket.Conn]bool, 0)
 	controller.closeChan = make(chan struct{})
+	controller.container = models.NewThings()
 	_ = bus.Subscribe(util.ThingAdded, controller.handleNewThing)
 	return controller
 }
 
-func (controller *NewThingsController) HandleGetThing(c *gin.Context) {
-	c.JSON(http.StatusOK, controller.container.GetThings())
+func (controller *NewThingsController) HandleGetThing(c *fiber.Ctx) error {
+	return c.JSON(controller.container.GetThings())
 }
 
-var upGrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
-
-func (controller *NewThingsController) HandleWebsocket(c *gin.Context) {
-
-	if !c.IsWebsocket() {
-		c.Next()
-	}
-
-	conn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
-	if err != nil {
-		c.String(http.StatusBadGateway, err.Error())
+func handleNewThingsWebsocket(conn *websocket.Conn) {
+	if !conn.Locals("websocket").(bool) {
 		return
 	}
+	controller := NewNewThingsController()
+	controller.ws = conn
 
 	log.Debug("new thing websocket...add:" + conn.RemoteAddr().String())
-
 	newThings := controller.container.GetNewThings()
 
 	for _, t := range newThings {
@@ -60,41 +47,31 @@ func (controller *NewThingsController) HandleWebsocket(c *gin.Context) {
 			return
 		}
 	}
-	controller.wss[conn] = true
-	//go handlerPing(controller, conn)
+	for {
+		select {
+		case <-controller.closeChan:
+			controller.close()
+			return
+		}
+
+	}
 }
 
 func (controller *NewThingsController) handleNewThing(thing *thing.Thing) {
 	controller.locker.Lock()
 	defer controller.locker.Unlock()
-	for ws, _ := range controller.wss {
-		err := ws.WriteJSON(thing)
-		if err != nil {
-			ws.PingHandler()
-			_ = ws.Close()
-			delete(controller.wss, ws)
-		}
-	}
+	err := controller.ws.WriteJSON(thing)
+	controller.checkErr(err)
 }
 
 func (controller *NewThingsController) checkErr(err error) {
 	if err != nil {
 		log.Error(err.Error())
+		controller.closeChan <- struct{}{}
 		return
 	}
 }
 
-//func handlerPing(c *NewThingsController, conn *websocket.Conn) {
-//	var pingTime = 60 * time.Second
-//	var pongTime = 180 * time.Second
-//	pingTicker := time.NewTicker(pingTime)
-//	pongTicker := time.NewTicker(pongTime)
-//	defer pingTicker.Stop()
-//	defer pongTicker.Stop()
-//	for {
-//		select {
-//		case <-pingTicker.C:
-//			_ = conn.WriteMessage(websocket.PingMessage, []byte{})
-//		}
-//	}
-//}
+func (controller *NewThingsController) close() {
+	_ = controller.ws.Close()
+}

@@ -15,7 +15,7 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import {useTranslation} from 'react-i18next';
 import clsx from "clsx";
-import {AppContext} from "../App";
+import {AppContext} from "../Router";
 import {Tooltip} from "@material-ui/core";
 import {drawerWidth} from "../js/constant";
 

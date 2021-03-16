@@ -3,8 +3,8 @@ package controllers
 import (
 	"gateway/config"
 	"gateway/pkg/util"
-	"github.com/gin-gonic/gin"
-	"net/http"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type addonInfo struct {
@@ -22,7 +22,7 @@ func NewSettingController() *SettingsController {
 	return &SettingsController{}
 }
 
-func (settings *SettingsController) handleGetAddonsInfo(g *gin.Context) {
+func (settings *SettingsController) handleGetAddonsInfo(c *fiber.Ctx) error {
 	var addonInfo = addonInfo{
 		Urls:          config.GetAddonListUrls(),
 		Architecture:  util.GetArch(),
@@ -30,11 +30,5 @@ func (settings *SettingsController) handleGetAddonsInfo(g *gin.Context) {
 		NodeVersion:   util.GetNodeVersion(),
 		PythonVersion: util.GetPythonVersion(),
 	}
-	//data, err := json.Marshal(addonInfo)
-	//if err != nil {
-	//	log.Error("marshal err", zap.Error(err))
-	//	g.String(http.StatusInternalServerError, "marshal err")
-	//	return
-	//}
-	g.JSON(http.StatusOK, addonInfo)
+	return c.JSON(addonInfo)
 }

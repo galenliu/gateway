@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"addon"
+	"context"
 	"fmt"
 	"gateway/pkg/bus"
 	"gateway/pkg/log"
@@ -9,11 +10,11 @@ import (
 	"gateway/plugin"
 	"gateway/server/models"
 	"gateway/server/models/thing"
-	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
+	"github.com/gofiber/websocket/v2"
 	json "github.com/json-iterator/go"
 	"net/http"
 	"sync"
+	"time"
 )
 
 type ThingsWebsocketHandler struct {
@@ -25,38 +26,22 @@ type ThingsWebsocketHandler struct {
 	subscriptionThings []*thing.Thing
 }
 
-func NewThingsWebsocketController(ts *models.Things, conn *websocket.Conn, thingId string) *ThingsWebsocketHandler {
+func NewThingsWebsocketController() *ThingsWebsocketHandler {
 	controller := &ThingsWebsocketHandler{}
 	controller.locker = new(sync.Mutex)
-	controller.Container = ts
-	controller.ws = conn
+	controller.Container = models.NewThings()
 	controller.done = make(chan struct{})
 	return controller
 }
 
-var wsUpgrade = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
+func handleWebsocket(c *websocket.Conn) {
 
-func handleWebsocket(c *gin.Context, things *models.Things) {
-
-	//  websocket upgrade
-	log.Info("websocket connection host: %v", c.Request.Host)
-	conn, err := wsUpgrade.Upgrade(c.Writer, c.Request, nil)
-	if err != nil {
-		c.String(http.StatusBadGateway, err.Error())
+	if !c.Locals("websocket").(bool) {
 		return
 	}
-	websocketHandler := NewThingsWebsocketController(things, conn, c.Param("thingId"))
-
-	go websocketHandler.handleWebsocket()
-
-}
-
-func (controller *ThingsWebsocketHandler) handleWebsocket() {
-
+	controller := NewThingsWebsocketController()
+	controller.ws = c
+	controller.thingId = c.Params("thingId")
 	if controller.thingId != "" {
 		t := controller.Container.GetThing(controller.thingId)
 		if t == nil {
@@ -147,8 +132,10 @@ func (controller *ThingsWebsocketHandler) handleMessage(data []byte) {
 	case models.SetProperty:
 		var propertyMap map[string]interface{}
 		json.Get(data, "data").ToVal(&propertyMap)
+		ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second)
+		defer cancelFunc()
 		for propName, value := range propertyMap {
-			prop, setErr := plugin.SetProperty(device.ID, propName, value)
+			prop, setErr := plugin.SetProperty(device.ID, propName, value, ctx)
 			if setErr != nil {
 				controller.sendMessage(struct {
 					MessageType string      `json:"messageType"`

@@ -6,15 +6,18 @@
 package controllers
 
 import (
+	"context"
 	"fmt"
 	"gateway/pkg/log"
 	"gateway/plugin"
 	"gateway/server/models"
-	thing2 "gateway/server/models/thing"
-	"github.com/gin-gonic/gin"
+	model "gateway/server/models/thing"
+	"github.com/gofiber/fiber/v2"
+	"time"
+
+	"github.com/gofiber/websocket/v2"
 	json "github.com/json-iterator/go"
 	"go.uber.org/zap"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -29,165 +32,150 @@ func NewThingsControllerFunc() *ThingsController {
 }
 
 // POST /things
-func (tc *ThingsController) handleCreateThing(c *gin.Context) {
+func (tc *ThingsController) handleCreateThing(c *fiber.Ctx) error {
 
-	data, err := ioutil.ReadAll(c.Request.Body)
-	if err != nil {
-		c.String(http.StatusBadRequest, "bad request")
-		return
-	}
-	log.Debug("Post /thing,Body: \t\n %s", data)
+	log.Debug("Post /thing,Body: \t\n %s", c.Body())
 
-	id := json.Get(data, "id").ToString()
+	id := json.Get(c.Body(), "id").ToString()
 	if len(id) < 1 {
-		c.String(http.StatusBadRequest, "bad request")
-		return
+		return fiber.NewError(http.StatusBadRequest, "bad request")
+
 	}
 
 	t := tc.Container.GetThing(id)
 	if t != nil {
-		c.String(http.StatusBadRequest, "thing already added")
-		return
+		return fiber.NewError(http.StatusBadRequest, "thing already added")
 	}
 
-	des, err1 := tc.Container.CreateThing(id, data)
-	if err1 != nil {
-		c.String(http.StatusInternalServerError, fmt.Sprintf("create thing(%s) err: %v", id, err.Error()))
-		return
+	des, e := tc.Container.CreateThing(id, c.Body())
+	if e != nil {
+		return fiber.NewError(http.StatusInternalServerError, fmt.Sprintf("create thing(%s) err: %v", id, e.Error()))
+
 	}
-	c.String(http.StatusCreated, des)
+	return c.SendString(des)
 }
 
 // DELETE /things/:thingId
-func (tc *ThingsController) handleDeleteThing(c *gin.Context) {
-	thingId := c.Param("thingId")
+func (tc *ThingsController) handleDeleteThing(c *fiber.Ctx) error {
+	thingId := c.Params("thingId")
 	_ = plugin.RemoveDevice(thingId)
 	err := tc.Container.RemoveThing(thingId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, fmt.Sprintf("Failed to remove thing thingId: %v ,err: %v", thingId, err))
-		return
+		return fiber.NewError(http.StatusInternalServerError, err.Error())
 	}
 	log.Info(fmt.Sprintf("Successfully deleted %v from database", thingId))
-	c.Status(http.StatusNoContent)
+	return c.SendStatus(http.StatusNoContent)
 }
 
 //GET /things/:thingId
-func (tc *ThingsController) handleGetThing(c *gin.Context) {
-	if c.IsWebsocket() {
-		handleWebsocket(c, tc.Container)
-		return
+func (tc *ThingsController) handleGetThing(c *fiber.Ctx) error {
+	if websocket.IsWebSocketUpgrade(c) {
+		c.Locals("websocket", true)
+		return c.Next()
 	}
 
-	thingId := c.Param("thingId")
+	thingId := c.Params("thingId")
 	if thingId == "" {
-		c.String(http.StatusBadRequest, "thing id invalid")
-		return
+		return fiber.NewError(http.StatusBadRequest, "thing id invalid")
+
 	}
 	t := tc.Container.GetThing(thingId)
 	if t == nil {
-		c.String(http.StatusBadRequest, "thing not found")
-		return
+		return fiber.NewError(http.StatusBadRequest, "thing not found")
+
 	}
-	c.JSON(http.StatusOK, t)
+	return c.Status(fiber.StatusOK).JSON(t)
 }
 
 //GET /things
-func (tc *ThingsController) handleGetThings(c *gin.Context) {
-	if c.IsWebsocket() {
-		handleWebsocket(c, tc.Container)
-		return
+func (tc *ThingsController) handleGetThings(c *fiber.Ctx) error {
+	if websocket.IsWebSocketUpgrade(c) {
+		c.Locals("websocket", true)
+		return c.Next()
 	}
+	log.Debug("GET things")
 	ts := tc.Container.GetListThings()
-	c.JSON(http.StatusOK, ts)
+	data, err := json.MarshalIndent(ts, "", "  ")
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+	return c.Status(fiber.StatusOK).SendString(string(data))
 }
 
 //patch things
-func (tc *ThingsController) handlePatchThings(c *gin.Context) {
+func (tc *ThingsController) handlePatchThings(c *fiber.Ctx) error {
 	log.Info("container controller handle patch container")
-
+	return nil
 }
 
 //PATCH /things/:thingId
-func (tc *ThingsController) handlePatchThing(c *gin.Context) {
+func (tc *ThingsController) handlePatchThing(c *fiber.Ctx) error {
 	log.Info("container controller handle patch thing")
-
+	return nil
 }
 
 //PUT /:thing/properties/:propertyName
-func (tc *ThingsController) handleSetProperty(c *gin.Context) {
+func (tc *ThingsController) handleSetProperty(c *fiber.Ctx) error {
 
-	thingId := c.Param("thingId")
-	propName := c.Param("propertyName")
+	thingId := c.Params("thingId")
+	propName := c.Params("*")
 
 	if thingId == "" || propName == "" {
-		c.String(http.StatusBadRequest, "invalid params")
-		return
+		return fiber.NewError(fiber.StatusBadRequest, "invalid params")
 	}
 
-	data, err := ioutil.ReadAll(c.Request.Body)
-	if err != nil {
-		c.String(http.StatusBadRequest, "invalid params")
-		return
-	}
-	value := json.Get(data, propName).GetInterface()
+	value := c.Body()
 
-	prop, e := tc.Container.SetThingProperty(thingId, propName, value)
+	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second)
+	defer cancelFunc()
+
+	prop, e := tc.Container.SetThingProperty(thingId, propName, value, ctx)
 	if e != nil {
 		log.Error("Failed set thing(%s) property:(%s) value:(%v),err:(%s)", thingId, propName, value, e.Error())
-		c.JSON(http.StatusInternalServerError, struct {
-			Value interface{} `json:"value"`
-		}{Value: value})
-		return
+		return fiber.NewError(fiber.StatusGatewayTimeout, e.Error())
 	}
-	c.JSON(http.StatusOK, struct {
-		Value interface{} `json:"value"`
-	}{Value: prop.Value})
-	return
+	data := map[string]interface{}{propName: prop.Value}
+	return c.Status(fiber.StatusOK).JSON(data)
 }
 
-func (tc *ThingsController) handleGetProperty(c *gin.Context) {
-	thingId := c.Param("thing_id")
-	propName := c.Param("property_name")
+func (tc *ThingsController) handleGetProperty(c *fiber.Ctx) error {
+	thingId := c.Params("thingId")
+	propName := c.Params("*")
 	property := tc.Container.FindThingProperty(thingId, propName)
 	if property == nil {
-		c.String(http.StatusBadRequest, "property no found")
-		return
+		return fiber.NewError(fiber.StatusBadRequest, "property no found")
+
 	}
 	data := map[string]interface{}{propName: property.Value}
-	c.JSON(http.StatusOK, data)
+	return c.JSON(data)
 }
 
-func (tc *ThingsController) handleGetProperties(c *gin.Context) {
-	thingId := c.Param("thing_id")
+func (tc *ThingsController) handleGetProperties(c *fiber.Ctx) error {
+	thingId := c.Params("thing_id")
 	//thing := tc.Container.GetThing(thingId)
 	var props = make(map[string]interface{})
 	//for propName, _ := range thing.Properties {
 	//	props[propName] = tc.Container.Manager.GetProperty(thingId, propName)
 	//}
 	log.Info("container handler:GetProperties", zap.String("thingId", thingId), zap.String("method", "PUT"))
-	c.JSON(http.StatusOK, props)
+	return c.JSON(props)
 }
 
-func (tc *ThingsController) handleSetThing(c *gin.Context) {
-	thingId := c.Param("thingId")
+func (tc *ThingsController) handleSetThing(c *fiber.Ctx) error {
+	thingId := c.Params("thingId")
 	thing := tc.Container.GetThing(thingId)
 	if thing == nil {
-		c.String(http.StatusBadRequest, "thing not found")
-		return
+		return fiber.NewError(http.StatusBadRequest, "thing not found")
+
 	}
-	req, err := ioutil.ReadAll(c.Request.Body)
+	var rThing model.Thing
+	err := json.Unmarshal(c.Body(), &rThing)
 	if err != nil {
-		c.String(http.StatusBadRequest, "Read body err")
-		return
-	}
-	var rThing thing2.Thing
-	err = json.Unmarshal(req, &rThing)
-	if err != nil {
-		c.String(http.StatusBadRequest, "Unmarshal err")
-		return
+		return fiber.NewError(http.StatusBadRequest, "Unmarshal body err")
+
 	}
 	if rThing.Title != "" {
 		thing.SetTitle(rThing.Title)
 	}
-
+	return nil
 }

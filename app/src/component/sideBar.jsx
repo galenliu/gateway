@@ -14,7 +14,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import {useTranslation} from 'react-i18next';
 import Things from "../views/Things.jsx";
 import {drawerWidth, SettingsType as SettingType} from "../js/constant"
-import {AppContext} from "../App"
+import {AppContext} from "../Router"
 import SettingsIcon from '@material-ui/icons/Settings';
 import {useHistory} from "react-router-dom";
 import {ListSubheader} from "@material-ui/core";

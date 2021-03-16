@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback, useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import Dialog from '@material-ui/core/Dialog';
 import IconButton from '@material-ui/core/IconButton';
@@ -16,13 +16,12 @@ import Icons from "./icons";
 import Grid from "@material-ui/core/Grid";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-import StoreIcon from "@material-ui/icons/Store";
 import Divider from "@material-ui/core/Divider";
 import DomainIcon from "@material-ui/icons/Domain";
 import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import ExtensionIcon from "@material-ui/icons/Extension";
 import Slide from '@material-ui/core/Slide';
-import API from "../js/api";
+import App from "../App";
 
 
 const styles = (theme) => ({
@@ -46,10 +45,8 @@ const useStyles = makeStyles((theme) => ({
     list: {
         display: "flex",
         width: '100%',
-
         flexDirection: "column",
         backgroundColor: theme.palette.background.paper,
-
     },
     content: {
         flexDirection: "column",
@@ -97,20 +94,28 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 export function ThingPanel(props) {
-
     const {t, i18n} = useTranslation();
     const classes = useStyles();
+    const [description, setDescription] = useState(App.gatewayModel.things.get(decodeURIComponent(props.thingId.split('/').pop())))
+    const [model, setModel] = useState(App.gatewayModel.thingModels.get(decodeURIComponent(props.thingId.split('/').pop())))
+
+    const removeThing = useCallback(() => {
+            console.log("remove thing", model)
+            model.removeThing()
+            props.show(false)
+        }
+    )
 
     return (
-
         <Dialog fullScreen className={classes.root} open={props.open} onClose={() => props.show(false)}
                 TransitionComponent={Transition}>
 
             <AppBar className={classes.appBar}>
                 <Toolbar>
-                    <StoreIcon/>
+                    <Icons prop color={"#fb8c00"} type={description.selectedCapability}
+                           size={2}/>
                     <Typography variant="h6" className={classes.title}>
-                        {props.title}
+                        {description.title}
                     </Typography>
                     <IconButton autoFocus color="inherit" onClick={() => props.show(false)} aria-label="close">
                         <CloseIcon/>
@@ -120,7 +125,7 @@ export function ThingPanel(props) {
             <DialogContent>
                 <div className={classes.drawerHeader}/>
                 <Grid className={classes.content} container>
-                    <DetailsPanel {...props} />
+                    <DetailsPanel description={description} model={model} remove={removeThing}/>
                 </Grid>
             </DialogContent>
         </Dialog>
@@ -146,25 +151,16 @@ export function DetailsPanel(props) {
     const {t, i18n} = useTranslation();
     const theme = useTheme();
 
-    function remove() {
-        API.removeThing(props.id).then((data) => {
-            console.log(data)
-        }).catch((e) => {
-            console.log(e)
-        })
-        props.show(false)
-    }
 
     return (
         <>
             <List subheader={<ListSubheader>Settings</ListSubheader>} className={classes.list}>
-
                 <Divider/>
                 <ListItem button
                           className={classes.listItem} variant="contained" elevation={111}>
                     <ListItemIcon>
-                        <Icons  {...props} color={"#fb8c00"} type={props.selectedCapability}
-                                size={1}/>
+                        <Icons prop color={"#fb8c00"} type={props.description.selectedCapability}
+                               size={1}/>
                     </ListItemIcon>
                     <ListItemText primary={t("Domain")}/>
                     <NavigateNextIcon/>
@@ -199,7 +195,7 @@ export function DetailsPanel(props) {
                         />
                     </ListItemSecondaryAction>
                 </ListItem>
-                <ListItem color={"red"} button onClick={() => remove()}>
+                <ListItem color={"red"} button onClick={() => props.remove()}>
                     {t("remove the accessories")}
                 </ListItem>
             </List>
