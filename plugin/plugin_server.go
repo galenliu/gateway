@@ -2,34 +2,30 @@ package plugin
 
 //	plugin server
 import (
-	"context"
 	"fmt"
 	"gateway/config"
 	"gateway/pkg/log"
 	json "github.com/json-iterator/go"
-	"go.uber.org/zap"
 	"strconv"
 	"sync"
 )
 
 type PluginsServer struct {
-	Plugins map[string]*Plugin
-	locker  *sync.Mutex
-	manager *AddonManager
-	ipc     *IpcServer
-	ctx     context.Context
-	verbose bool
-	logger  **zap.Logger
+	Plugins   map[string]*Plugin
+	locker    *sync.Mutex
+	manager   *AddonManager
+	ipc       *IpcServer
+	closeChan chan struct{}
+	verbose   bool
 }
 
-func NewPluginServer(manager *AddonManager, _ctx context.Context) *PluginsServer {
+func NewPluginServer(manager *AddonManager) *PluginsServer {
 	server := &PluginsServer{}
-	server.ctx = _ctx
+	server.closeChan = make(chan struct{})
 	server.Plugins = make(map[string]*Plugin, 30)
 	server.locker = new(sync.Mutex)
 	server.manager = manager
-	ctx, _ := context.WithCancel(server.ctx)
-	server.ipc = NewIpcServer(ctx, ":"+strconv.Itoa(config.Conf.Ports["ipc"]))
+	server.ipc = NewIpcServer(":" + strconv.Itoa(config.Conf.Ports["ipc"]))
 	return server
 }
 
@@ -113,18 +109,19 @@ func (s *PluginsServer) Start() {
 		select {
 		case conn := <-s.ipc.wsChan:
 			go s.readConnectionLoop(conn)
-		case <-s.ctx.Done():
-			log.Debug("connection close")
-			s.Stop()
+		case <-s.closeChan:
+			log.Debug("plugin server closed")
+			return
 		}
 	}
 }
 
 //if server stop, also need to stop all of package
 func (s *PluginsServer) Stop() {
-	close(s.ipc.wsChan)
-	for _, v := range s.Plugins {
-		v.Stop()
+	s.ipc.close()
+	s.closeChan <- struct{}{}
+	for _, p := range s.Plugins {
+		p.Stop()
 	}
 }
 

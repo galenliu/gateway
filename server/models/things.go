@@ -110,15 +110,16 @@ func (ts *Things) RemoveThing(thingId string) error {
 	//if t == nil {
 	//	return fmt.Errorf("thing not found")
 	//}
-	err := database.RemoveThing("/things/"+thingId)
+	id := "/things/" + thingId
+	err := database.RemoveThing(id)
 	if err != nil {
 		return err
 	}
-	delete(ts.things, thingId)
+	delete(ts.things, id)
 	return nil
 }
 
-func (ts *Things) SetThingProperty(thingId, propName string, value interface{},ctx context.Context) (*addon.Property, error) {
+func (ts *Things) SetThingProperty(thingId, propName string, value interface{}, ctx context.Context) (*addon.Property, error) {
 	var th = ts.GetThing(thingId)
 	if th == nil {
 		return nil, fmt.Errorf("thing can not found")
@@ -127,7 +128,7 @@ func (ts *Things) SetThingProperty(thingId, propName string, value interface{},c
 	if prop == nil {
 		return nil, fmt.Errorf("propertyName not found")
 	}
-	return plugin.SetProperty(thingId, propName, value,ctx)
+	return plugin.SetProperty(thingId, propName, value, ctx)
 }
 
 func (ts *Things) onPropertyChanged(property *addon.Property) {

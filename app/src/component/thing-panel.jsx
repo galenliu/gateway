@@ -7,7 +7,16 @@ import Typography from '@material-ui/core/Typography';
 import {useTranslation} from "react-i18next";
 import ListItem from '@material-ui/core/ListItem';
 import List from "@material-ui/core/List";
-import {ListItemSecondaryAction, ListSubheader, Switch, useTheme} from "@material-ui/core";
+import {
+    Button, FormControl,
+    InputLabel,
+    ListItemSecondaryAction,
+    ListSubheader, MenuItem,
+    Select,
+    Switch,
+    TextField,
+    useTheme
+} from "@material-ui/core";
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -21,6 +30,7 @@ import DomainIcon from "@material-ui/icons/Domain";
 import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import ExtensionIcon from "@material-ui/icons/Extension";
 import Slide from '@material-ui/core/Slide';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import App from "../App";
 
 
@@ -79,6 +89,8 @@ const useStyles = makeStyles((theme) => ({
     },
 
     listItem: {
+        marginTop: 5,
+        marginBottom: 5,
         maxWidth: 400,
         minWidth: 300,
     },
@@ -150,20 +162,26 @@ export function DetailsPanel(props) {
     const classes = useStyles();
     const {t, i18n} = useTranslation();
     const theme = useTheme();
+    const [title, setTitle] = useState(props.description.title)
 
+    function update() {
+
+    }
 
     return (
         <>
             <List subheader={<ListSubheader>Settings</ListSubheader>} className={classes.list}>
                 <Divider/>
-                <ListItem button
-                          className={classes.listItem} variant="contained" elevation={111}>
+                <ListItem
+                    className={classes.listItem} variant="contained" elevation={111}>
                     <ListItemIcon>
                         <Icons prop color={"#fb8c00"} type={props.description.selectedCapability}
                                size={1}/>
                     </ListItemIcon>
-                    <ListItemText primary={t("Domain")}/>
-                    <NavigateNextIcon/>
+                    <TextField defaultValue={props.description.title}
+                               onChange={(e) => setTitle(e.target.value)}/>
+                    {title !== props.description.title &&
+                    <CheckCircleIcon cursor={"pointer"}/>}
                 </ListItem>
                 <Divider/>
                 <ListItem button
@@ -181,13 +199,23 @@ export function DetailsPanel(props) {
                     <ListItemIcon>
                         <DomainIcon/>
                     </ListItemIcon>
-                    <ListItemText primary={t("Domain")}/>
-                    <NavigateNextIcon/>
+                    <FormControl className={classes.formControl} style={{width: "100%"}}>
+                        <InputLabel id="demo-simple-select-label">{t("Room")}</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                        >
+                            <MenuItem value={10}>客厅</MenuItem>
+                            <MenuItem value={20}>卧室</MenuItem>
+                            <MenuItem value={30}>厨房</MenuItem>
+                        </Select>
+                    </FormControl>
+
                 </ListItem>
                 <Divider/>
 
                 <ListItem>
-                    <ListItemText id="switch-list-label-wifi" primary="Wi-Fi"/>
+                    <ListItemText id="switch-list-label-wifi" primary={t("On")}/>
                     <ListItemSecondaryAction>
                         <Switch
                             edge="end"
@@ -195,9 +223,13 @@ export function DetailsPanel(props) {
                         />
                     </ListItemSecondaryAction>
                 </ListItem>
+                <Divider/>
                 <ListItem color={"red"} button onClick={() => props.remove()}>
-                    {t("remove the accessories")}
+                    <Button variant="contained" color="secondary" style={{width: "100%"}}>
+                        {t("remove the accessories")}
+                    </Button>
                 </ListItem>
+                <Divider/>
             </List>
 
         </>

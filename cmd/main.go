@@ -6,8 +6,6 @@ import (
 	core "gateway"
 	"gateway/config"
 	"gateway/pkg/util"
-	"gateway/plugin"
-	"gateway/server/controllers"
 	"os"
 	"os/signal"
 	"syscall"
@@ -44,11 +42,6 @@ func main() {
 	//create core instance
 	gw, err := core.NewGateway()
 	CheckError(err)
-
-	gw.AddonsManager, err = plugin.NewAddonsManager(gw.Ctx)
-	CheckError(err)
-
-	gw.Web = controllers.NewWebAPP(controllers.NewDefaultWebConfig(gw.Ctx))
 
 	//handle signal
 	signal.Notify(c, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGTERM)

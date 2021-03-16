@@ -1,7 +1,6 @@
 package plugin
 
 import (
-	"context"
 	"fmt"
 	"gateway/pkg/log"
 	"github.com/gorilla/websocket"
@@ -22,16 +21,14 @@ var upgrade = websocket.Upgrader{
 type IpcServer struct {
 	addr   string
 	path   string
-	ctx    context.Context
 	wsChan chan *Connection
 	locker *sync.Mutex
 }
 
-func NewIpcServer(_ctx context.Context, _addr string) *IpcServer {
+func NewIpcServer(_addr string) *IpcServer {
 	ipc := &IpcServer{
 		addr:   _addr,
-		ctx:    _ctx,
-		wsChan: make(chan *Connection),
+		wsChan: make(chan *Connection, 2),
 	}
 	return ipc
 }
@@ -90,5 +87,8 @@ func (server *IpcServer) Serve() {
 	if err != nil {
 		log.Error("ipc server fail,err: %s", err.Error())
 	}
+}
 
+func (server *IpcServer) close() {
+	close(server.wsChan)
 }

@@ -1,7 +1,6 @@
 package gateway
 
 import (
-	"context"
 	"fmt"
 	"gateway/config"
 	"gateway/pkg/log"
@@ -15,14 +14,15 @@ type HomeGateway struct {
 	Preferences   *config.Preferences
 	AddonsManager *plugin.AddonManager
 	Web           *controllers.Web
-	Ctx           context.Context
+	closeChan     chan struct{}
 }
 
 func NewGateway() (gateway *HomeGateway, err error) {
 
 	gateway = &HomeGateway{}
-	gateway.Ctx = context.Background()
-
+	gateway.AddonsManager = plugin.NewAddonsManager()
+	gateway.Web = controllers.NewWebAPP(controllers.NewDefaultWebConfig())
+	gateway.closeChan = make(chan struct{})
 	//update the gateway preferences
 	return gateway, err
 }
@@ -34,8 +34,8 @@ func (gateway *HomeGateway) Start() error {
 	go gateway.AddonsManager.Start()
 	for {
 		select {
-		case <-gateway.Ctx.Done():
-			return fmt.Errorf("application exit")
+		case <-gateway.closeChan:
+			return fmt.Errorf("gateway exit")
 		default:
 			time.Sleep(2 * time.Second)
 		}
@@ -43,5 +43,7 @@ func (gateway *HomeGateway) Start() error {
 }
 
 func (gateway *HomeGateway) Close() {
-	gateway.Ctx.Done()
+	gateway.closeChan <- struct{}{}
+	gateway.AddonsManager.Close()
+	log.Error(gateway.Web.Close().Error())
 }

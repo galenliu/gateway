@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"context"
 	"gateway/config"
 	"gateway/server"
 	"gateway/server/models"
@@ -21,13 +20,14 @@ type Config struct {
 	TemplateDir string
 	UploadDir   string
 	LogDir      string
-	Ctx         context.Context
 }
+
+var instance *Web
 
 type Web struct {
 	*fiber.App
 	config Config
-	ctx    context.Context
+
 	things *models.Things
 }
 
@@ -36,6 +36,7 @@ func NewWebAPP(conf Config) *Web {
 	web.things = models.NewThings()
 	web.config = conf
 	web.App = CollectRoute(conf)
+	instance = &web
 	return &web
 }
 
@@ -148,7 +149,11 @@ func (web *Web) Start() error {
 	return nil
 }
 
-func NewDefaultWebConfig(ctx context.Context) Config {
+func (web *Web) Close() error {
+	return web.App.Shutdown()
+}
+
+func NewDefaultWebConfig() Config {
 	conf := Config{
 		HttpPort:    config.Conf.Ports["http"],
 		HttpsPort:   config.Conf.Ports["https"],
@@ -156,7 +161,6 @@ func NewDefaultWebConfig(ctx context.Context) Config {
 		TemplateDir: "./dist",
 		UploadDir:   config.Conf.UploadDir,
 		LogDir:      config.Conf.LogDir,
-		Ctx:         ctx,
 	}
 	return conf
 }

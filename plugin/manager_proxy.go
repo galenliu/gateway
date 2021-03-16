@@ -28,7 +28,6 @@ type ThingRemoved func(*thing.Thing)
 type PropertyChanged func(property addon.Property)
 
 type AddonManager struct {
-	addon.AddonManager
 	configPath   string
 	pluginServer *PluginsServer
 
@@ -43,18 +42,19 @@ type AddonManager struct {
 
 	AddonsDir string
 	DataDir   string
-	ctx       context.Context
 	locker    *sync.Mutex
+	running   bool
 }
 
-func NewAddonsManager(ctx context.Context) (*AddonManager, error) {
+func NewAddonsManager() *AddonManager {
 	am := &AddonManager{}
 	instance = am
-	am.ctx = ctx
+
 	am.AddonsDir = config.Conf.AddonsDir
 	am.DataDir = config.Conf.DataDir
 
 	am.isPairing = false
+	am.running = false
 	am.devices = make(map[string]*addon.Device, 50)
 	am.installAddons = make(map[string]*AddonInfo, 50)
 	am.adapters = make(map[string]*AdapterProxy, 20)
@@ -63,15 +63,13 @@ func NewAddonsManager(ctx context.Context) (*AddonManager, error) {
 	_ = bus.Subscribe(bus.GetDevices, am.handleGetDevices)
 	_ = bus.Subscribe(bus.GetThings, am.handleGetThings)
 
-	var c context.Context
-	c, am.pluginCancel = context.WithCancel(am.ctx)
-	am.pluginServer = NewPluginServer(am, c)
+	am.pluginServer = NewPluginServer(am)
 	am.locker = new(sync.Mutex)
 	err := am.LoadAddons()
 	if err != nil {
-		return nil, err
+		log.Error(err.Error())
 	}
-	return am, nil
+	return am
 }
 
 func (manager *AddonManager) LoadAddons() error {
@@ -309,10 +307,10 @@ func (manager *AddonManager) getDevice(deviceId string) *addon.Device {
 
 func (manager *AddonManager) Start() {
 	go manager.pluginServer.Start()
-	manager.AddonManager.Start()
+	manager.running = true
 }
 
-func (manager *AddonManager) Stop() {
+func (manager *AddonManager) Close() {
 	manager.pluginServer.Stop()
-	manager.AddonManager.Stop()
+	manager.running = false
 }

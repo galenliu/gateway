@@ -43,7 +43,6 @@ func NewPlugin(s *PluginsServer, pluginId string) (plugin *Plugin) {
 	plugin.pluginServer = s
 	plugin.execPath = path.Join(plugin.getManager().AddonsDir, pluginId)
 	plugin.ctx = context.Background()
-
 	return
 }
 
