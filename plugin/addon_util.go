@@ -18,48 +18,55 @@ func GetAddonKey(id string) string {
 	return fmt.Sprintf("addons.%s", id)
 }
 
+type Options struct {
+	Default interface{} `json:"default,omitempty"`
+	Schema  struct {
+		Type       string      `json:"type,omitempty"`
+		Required   []string    `json:"required,omitempty"`
+		Properties interface{} `json:"properties,omitempty"`
+	} `json:"schema,,omitempty"`
+}
+
 type ManifestJson struct {
-	ID              string `json:"id"`
-	Name            string `json:"name"`
-	ShortName       string `json:"short_name,omitempty"`
-	Author          string `json:"author"`
-	Description     string `json:"description,omitempty"`
-	License         string `json:"license"`
-	HomepageUrl     string `json:"homepage_url,omitempty"`
-	ManifestVersion int    `json:"manifest_version"`
-	Version         string `json:"version"`
-	Options         struct {
-		Default interface{} `json:"default,omitempty"`
-		Schema  *struct {
-			Type       string      `json:"type,omitempty"`
-			Required   []string    `json:"required,omitempty"`
-			Properties interface{} `json:"properties,omitempty"`
-		} `json:"schema,,omitempty"`
-	} `json:"options,omitempty"`
+	ID                      string  `json:"id"`
+	Name                    string  `json:"name"`
+	ShortName               string  `json:"short_name,omitempty"`
+	Author                  string  `json:"author"`
+	Description             string  `json:"description,omitempty"`
+	License                 string  `json:"license"`
+	HomepageUrl             string  `json:"homepage_url,omitempty"`
+	ManifestVersion         int     `json:"manifest_version"`
+	Version                 string  `json:"version"`
+	ContentScripts          string  `json:"content_Scripts"`
+	WSebAccessibleResources string  `json:"web_accessible_resources"`
+	Options                 Options `json:"options"`
 	GatewaySpecificSettings struct {
 		WebThings struct {
 			Exec             string `json:"exec"`
 			PrimaryType      string `json:"primary_type"`
 			StrictMaxVersion string `json:"strict_max_version"`
 			StrictMinVersion string `json:"strict_min_version"`
+			Enable           bool   `json:"enable"`
 		} `json:"webthings"`
 	} `json:"gateway_specific_settings"`
-	Enable bool `json:"-"`
+	Enable bool `json:"enable"`
 }
 
 type AddonInfo struct {
-	ID          string      `json:"id"`
-	Name        string      `json:"name"`
-	ShortName   string      `json:"short_name"`
-	Author      string      `json:"author"`
-	Description string      `json:"description"`
-	License     string      `json:"license"`
-	HomepageUrl string      `json:"homepage_url"`
-	Version     string      `json:"version"`
-	Schema      interface{} `json:"schema,omitempty"`
-	Exec        string      `json:"exec"`
-	Enabled     bool        `json:"enabled"`
-	PrimaryType string      `json:"primary_type"`
+	ID                      string      `json:"id"`
+	Name                    string      `json:"name"`
+	ShortName               string      `json:"short_name"`
+	Author                  string      `json:"author"`
+	Description             string      `json:"description"`
+	License                 string      `json:"license"`
+	HomepageUrl             string      `json:"homepage_url"`
+	Version                 string      `json:"version"`
+	Schema                  interface{} `json:"schema,omitempty"`
+	Exec                    string      `json:"exec"`
+	Enabled                 bool        `json:"enabled"`
+	PrimaryType             string      `json:"primary_type"`
+	ContentScripts          string      `json:"content_scripts"`
+	WSebAccessibleResources string      `json:"web_accessible_resources"`
 }
 
 func (addonInfo *AddonInfo) UpdateFromDB() error {
@@ -94,52 +101,57 @@ func GetAddonInfoFromDB(id string) (*AddonInfo, error) {
 	return &a, nil
 }
 
-func loadManifest(destPath, packetId string) (*AddonInfo, error) {
+func loadManifest(destPath, packetId string) (*AddonInfo, *Options, error) {
 
 	//load manifest.json\
 	f, err := ioutil.ReadFile(path.Join(destPath, FileName))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	var manifest ManifestJson
 	err = json.Unmarshal(f, &manifest)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	//First verify manifest version
 	if manifest.ManifestVersion != ManifestVersion {
 		err = fmt.Errorf("the manifest version(%v) for addon :%v does not match version",
 			manifest.ManifestVersion, ManifestVersion)
-		return nil, err
+		return nil, nil, err
 	}
 
 	//verify that id in packet matches packetId
 	if manifest.ID != packetId {
 		err = fmt.Errorf("ID:%s from the manfest file,doesn't match ID for packetId: %s ",
 			manifest.ID, packetId)
-		return nil, err
+		return nil, nil, err
 	}
+
+	//var min = manifest.GatewaySpecificSettings.WebThings.StrictMinVersion
+	//var max = manifest.GatewaySpecificSettings.WebThings.StrictMinVersion
+
 	//TODO :checksum every file.
 	//TODO: Verify that manifest filed schema
 	addonInfo := AddonInfo{
-		ID:          manifest.ID,
-		Name:        manifest.Name,
-		ShortName:   manifest.ShortName,
-		Author:      manifest.Author,
-		Description: manifest.Description,
-		License:     manifest.License,
-		HomepageUrl: manifest.HomepageUrl,
-		Version:     manifest.Version,
-
-		Exec:        manifest.GatewaySpecificSettings.WebThings.Exec,
-		Enabled:     true,
-		PrimaryType: manifest.GatewaySpecificSettings.WebThings.PrimaryType,
+		ID:                      manifest.ID,
+		Name:                    manifest.Name,
+		ShortName:               manifest.ShortName,
+		Author:                  manifest.Author,
+		Description:             manifest.Description,
+		License:                 manifest.License,
+		HomepageUrl:             manifest.HomepageUrl,
+		Version:                 manifest.Version,
+		ContentScripts:          manifest.ContentScripts,
+		WSebAccessibleResources: manifest.WSebAccessibleResources,
+		Exec:                    manifest.GatewaySpecificSettings.WebThings.Exec,
+		Enabled:                 false,
+		PrimaryType:             manifest.GatewaySpecificSettings.WebThings.PrimaryType,
 	}
-	if manifest.Options.Schema != nil {
-		addonInfo.Schema = manifest.Options.Schema
+	if manifest.GatewaySpecificSettings.WebThings.Enable {
+		addonInfo.Enabled = true
 	}
-	return &addonInfo, nil
+	return &addonInfo, &manifest.Options, nil
 }
 
 func asWebThing(device *addon.Device) *thing.Thing {

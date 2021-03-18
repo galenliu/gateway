@@ -4,8 +4,12 @@ import (
 	"addon"
 	"context"
 	"fmt"
+	"gateway/pkg/database"
+	"gateway/pkg/log"
+	"gateway/pkg/util"
 	"gateway/server/models/thing"
 	json "github.com/json-iterator/go"
+	"path"
 	"time"
 )
 
@@ -32,7 +36,7 @@ func EnableAddon(addonId string) error {
 	}
 
 	err := addonInfo.UpdateAddonInfoToDB(true)
-	err = instance.loadAddon(addonId, true)
+	err = instance.loadAddon(addonId)
 	if err != nil {
 		return err
 	}
@@ -50,7 +54,10 @@ func DisableAddon(addonId string) error {
 	if err != nil {
 		return err
 	}
-	instance.unloadAddon(addonId)
+	err = instance.unloadAddon(addonId)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -171,5 +178,42 @@ func SetThingPin(thingId string, pin interface{}) error {
 
 func RemoveAction(thingId, actionId, actionName string) error {
 	//TODO
+	return nil
+}
+
+func UnloadAddon(addonId string) error {
+	return instance.unloadAddon(addonId)
+}
+func LoadAddon(addonId string) error {
+	return instance.loadAddon(addonId)
+}
+
+func AddonEnabled(addonId string) bool {
+	a, ok := instance.installAddons[addonId]
+	if !ok {
+		return false
+	}
+	return a.Enabled
+}
+
+func UninstallAddon(addonId string, disable bool) error {
+	var key = "addons." + addonId
+	err := instance.unloadAddon(addonId)
+	if err != nil {
+		return err
+	}
+	util.RemoveDir(path.Join(instance.DataDir, addonId))
+	util.RemoveDir(path.Join(instance.AddonsDir, addonId))
+
+	if disable {
+		config, err := database.GetSetting(key)
+		if err != nil {
+			log.Error(err.Error())
+		}
+		var addonInfo AddonInfo
+		err = json.UnmarshalFromString(config, &addonInfo)
+		_ = addonInfo.UpdateAddonInfoToDB(false)
+	}
+	delete(instance.installAddons, addonId)
 	return nil
 }

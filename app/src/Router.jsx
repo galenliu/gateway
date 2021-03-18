@@ -1,4 +1,3 @@
-import './App.css';
 import React, {useState} from "react";
 import SideBar from "./component/sideBar";
 import "./i18n"
@@ -17,7 +16,6 @@ const theme = createMuiTheme({
 App.init()
 
 export default function Router() {
-
     const [drawerOpen, setDrawerOpen] = useState(false)
     const [newThingsOpen, setNewThingsOpen] = useState(false)
 
@@ -28,12 +26,13 @@ export default function Router() {
                 setDrawerOpen: setDrawerOpen,
                 newThingsOpen: newThingsOpen,
                 setNewThingsOpen: setNewThingsOpen,
+                ts: App.gatewayModel.things,
             }}>
                 <AppRouter>
                     <Switch>
                         <Route exact path="/things">
                             <SideBar/>
-                            <Things models={App.gatewayModel.thingModels} things={App.gatewayModel.things}/>
+                            <Things things={App.gatewayModel.things}/>
                         </Route>
                         <Route exact path="/settings">
                             <SideBar/>

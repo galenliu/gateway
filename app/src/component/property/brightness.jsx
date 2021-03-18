@@ -1,17 +1,15 @@
-import React, {useContext} from "react";
+import React from "react";
 import Slider from '@material-ui/core/Slider';
-import {ThingsContext} from "../../views/Things.jsx";
 
 
 const BrightnessProperty = (props) => {
 
-    const [state, setState] = React.useState(props.data)
-    const {setPropertyValue} = useContext(ThingsContext)
+    const [state, setState] = React.useState(props.value)
+
 
     const handleChange = (event, newValue) => {
-        if (state.value !== newValue){
+        if (state.value !== newValue) {
             setState({...state, value: newValue})
-            setPropertyValue(state)
         }
     };
 

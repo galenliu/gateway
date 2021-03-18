@@ -27,7 +27,6 @@ var instance *Web
 type Web struct {
 	*fiber.App
 	config Config
-
 	things *models.Things
 }
 
@@ -111,26 +110,24 @@ func CollectRoute(conf Config) *fiber.App {
 		newThingsGroup.Get("/", websocket.New(handleNewThingsWebsocket))
 	}
 
-	//Addons Controller
-	{
+	{ //Addons Controller
 		addonGroup := app.Group(models.AddonsPath)
 		addonController := NewAddonController()
 		addonGroup.Get("/", addonController.handlerGetAddons)
 		addonGroup.Post("/", addonController.handlerInstallAddon)
 		addonGroup.Put("/:addonId", addonController.handlerSetAddon)
+		addonGroup.Patch("/:addonId", addonController.handlerUpdateAddon)
 		addonGroup.Get("/:addonId/config", addonController.handlerGetAddonConfig)
+		addonGroup.Put("/:addonId/config", addonController.handlerSetAddonConfig)
 	}
 
-	//settings Controller
-	{
+	{ //settings Controller
 		debugGroup := app.Group(models.SettingsPath)
 		settingsController := NewSettingController()
 		debugGroup.Get("/addonsInfo", settingsController.handleGetAddonsInfo)
 	}
 
-	//actions Controller
-
-	{
+	{ //actions Controller
 		actionsGroup := app.Group(models.ActionsPath)
 		actionsController := NewActionsController()
 		actionsGroup.Post("/", actionsController.handleActions)

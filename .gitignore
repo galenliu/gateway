@@ -6,5 +6,9 @@
 /server/static/*.js
 !/server/static/*.go
 
+/cmd/miot*
+/miot/
+
+
 
 

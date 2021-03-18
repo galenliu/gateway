@@ -52,7 +52,7 @@ class GatewayModel extends Model {
     }
 
     setThing(thingId, description) {
-        console.log("setThing thingId: \t\n", thingId, "description:\t\n", description)
+        console.log("setThing thingId: \t\n", thingId, " \t\n description:\t\n", description)
         if (this.thingModels.has(thingId)) {
             const thingModel = this.thingModels.get(thingId);
             thingModel.updateFromDescription(description);
@@ -68,7 +68,7 @@ class GatewayModel extends Model {
             this.thingModels.set(thingId, thingModel);
         }
         this.things.set(thingId, description);
-        console.log(" gateway things:", this.things, "\t\nmodels:", this.thingModels)
+        console.log(" gateway things:\t\n", this.things, "\t\nmodels:\t\n", this.thingModels)
     }
 
     getThing(thingId) {
@@ -160,9 +160,8 @@ class GatewayModel extends Model {
     }
 
     refreshThings() {
-       return  this.addQueue(() => {
+        return this.addQueue(() => {
             return API.getThings().then((things) => {
-                console.log("things:-------------------", things)
                 const fetchedIds = new Set();
                 things.forEach((description) => {
                     const thingId = decodeURIComponent(description.id.split('/').pop());
@@ -175,7 +174,7 @@ class GatewayModel extends Model {
                 });
                 removedIds.forEach((thingId) => this.handleRemove(thingId, true));
 
-              return  this.handleEvent(Constants.REFRESH_THINGS, this.things);
+                return this.handleEvent(Constants.REFRESH_THINGS, this.things);
             }).catch((e) => {
                 console.error(`Get things failed ${e}`);
             });

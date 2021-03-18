@@ -9,9 +9,9 @@ import Constants, {drawerWidth} from "../js/constant";
 import clsx from "clsx";
 import {CircularProgress} from "@material-ui/core";
 import App from "../App";
-import {ThingPanel} from "../component/thing-panel";
 import NewThingsDialog from "./AddThing";
 import Thing from "../component/thing";
+import {ThingPanel} from "../component/thing-panel";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -55,8 +55,8 @@ const states = {
 
 export default function Things(props) {
     const classes = useStyles()
-    const [things, setThings] = useState(props.things)
     const {drawerOpen} = useContext(AppContext)
+    const [things, setThings] = useState()
     const [addThingShow, setAddThingShow] = useState(false)
     const [thingPanelShow, setThingPanelShow] = useState(false)
     const [currentThingId, setCurrentThingId] = useState(null)
@@ -64,16 +64,18 @@ export default function Things(props) {
     const [state, setState] = useState(states.connected)
     const {t, i18n} = useTranslation();
 
+
     useEffect(() => {
         const refreshThings = (things) => {
-            console.log("=================", things)
             setThings(things)
         }
         App.gatewayModel.subscribe(Constants.REFRESH_THINGS, refreshThings)
+        App.showThings()
         return () => {
             App.gatewayModel.unsubscribe(Constants.REFRESH_THINGS, refreshThings)
         }
-    }, [])
+
+    }, [props])
 
     function renderThings() {
         if (things === undefined) {
@@ -81,9 +83,7 @@ export default function Things(props) {
         }
         let thingList = []
         for (const [key, value] of things) {
-            console.log("props:", props)
-            let model = App.gatewayModel.thingModels.get(key)
-            let thing = <Thing key={key} description={value} model={model} open={openPanel}/>
+            let thing = <Thing key={key} thingId={key} description={value} open={openPanel}/>
             thingList.push(thing)
             console.log(thing)
         }
@@ -92,8 +92,15 @@ export default function Things(props) {
 
     function openPanel(thingId) {
         setCurrentThingId(thingId)
-        setThingPanelShow(true)
     }
+
+    function renderThingPanel() {
+        return <ThingPanel open={thingPanelShow} show={setThingPanelShow} thingId={currentThingId}/>
+    }
+
+    useEffect(() => {
+        setThingPanelShow(true)
+    }, [currentThingId])
 
     return (
         <>
@@ -111,7 +118,8 @@ export default function Things(props) {
                     <h4>{t("disconnect")}</h4></div>}
             </Grid>
             <NewThingsDialog open={addThingShow} show={setAddThingShow}/>
-            {currentThingId !== null && <ThingPanel open={thingPanelShow} show={setThingPanelShow} thingId={currentThingId}/>}
+            {currentThingId !== null && thingPanelShow && renderThingPanel()}
+            }
         </>
 
     )

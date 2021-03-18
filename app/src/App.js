@@ -15,6 +15,7 @@ const App = {
     },
 
     showThings: function () {
+        App.gatewayModel.refreshThings()
     },
 
     // initWebSocket() {

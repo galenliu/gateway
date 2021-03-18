@@ -30,6 +30,7 @@ func NewIpcServer(_addr string) *IpcServer {
 		addr:   _addr,
 		wsChan: make(chan *Connection, 2),
 	}
+	go ipc.Serve()
 	return ipc
 }
 

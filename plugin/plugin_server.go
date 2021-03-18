@@ -79,7 +79,6 @@ func (s *PluginsServer) loadPlugin(addonPath, id, exec string) {
 	plugin.exec = exec
 	plugin.execPath = addonPath
 	go plugin.start()
-
 }
 
 func (s *PluginsServer) uninstallPlugin(packageId string) {

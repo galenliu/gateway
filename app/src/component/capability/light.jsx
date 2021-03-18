@@ -14,34 +14,34 @@ const Light = (props) => {
 
     function LightOffIcon() {
         return (
-            <SvgIcon style={{fontSize: 40, color: yellow[900]}} >
+            <SvgIcon style={{fontSize: 40, color: yellow[900]}}>
                 <path fill="currentColor"
                       d="M12,2A7,7 0 0,0 5,9C5,11.38 6.19,13.47 8,14.74V17A1,1 0 0,0 9,18H15A1,1 0 0,0 16,17V14.74C17.81,13.47 19,11.38 19,9A7,7 0 0,0 12,2M9,21A1,1 0 0,0 10,22H14A1,1 0 0,0 15,21V20H9V21Z"/>
             </SvgIcon>
         );
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         update(props.thing)
         props.updataState(<h1>打开</h1>)
         props.updataIcon(LightOnIcon())
-    },[])
+    }, [])
 
-    function update(thing){
+    function update(thing) {
         props.updataState(<h1>打开</h1>)
-        if(thing){
-            if(thing.value){
-                if(thing.value == true){
+        if (thing) {
+            if (thing.value) {
+                if (thing.value == true) {
                     props.updataIcon(LightOnIcon())
                 }
-                if(thing.value == false){
+                if (thing.value == false) {
                     props.updataIcon(LightOffIcon())
                 }
             }
         }
     }
 
-    return(
+    return (
         <>
             <h1> 亮度
             </h1>

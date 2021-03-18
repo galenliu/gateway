@@ -125,7 +125,6 @@ func DeleteValue(key string) error {
 func GetSetting(key string) (value string, err error) {
 
 	err = instance.QueryRow("SELECT value FROM settings where key = @key", sql.Named("key", key), sql.Named("key", key)).Scan(&value)
-	log.Info("get setting key:%v value:%v", key, value)
 	return value, err
 }
 

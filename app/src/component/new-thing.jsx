@@ -2,12 +2,14 @@ import React, {useState} from "react";
 import Card from "@material-ui/core/Card";
 import {makeStyles} from "@material-ui/core/styles";
 import Icons from "./icons";
-import {Button, CircularProgress, FormControl, FormHelperText, MenuItem, Select, TextField} from "@material-ui/core";
+import {Button, CircularProgress, MenuItem, Select} from "@material-ui/core";
+import FormControl from "@material-ui/core/FormControl"
+import TextField from "@material-ui/core/TextField"
+import FormHelperText from "@material-ui/core/FormHelperText"
 import {useTranslation} from "react-i18next";
 import Divider from "@material-ui/core/Divider";
 import API from "../js/api";
 import Typography from "@material-ui/core/Typography";
-
 
 
 const useStyles = makeStyles((theme) => ({
@@ -104,7 +106,8 @@ export default function NewThing(props) {
             <Icons className={classes.icon} style={{fontSize: 80}} color={"primary"}
                    type={thing.selectedCapability}/>
             <div className={classes.content}>
-                <TextField  disabled={state === states.Saved || state === states.Fail} id="standard-basic" label={t("Title")} defaultValue={thing.title}
+                <TextField disabled={state === states.Saved || state === states.Fail} id="standard-basic"
+                           label={t("Title")} defaultValue={thing.title}
                            onChange={handleTitleChange}/>
                 <FormControl className={classes.formControl}>
                     <FormHelperText>{t("SelectedCapability")}</FormHelperText>

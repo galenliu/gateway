@@ -7,6 +7,7 @@
   "Network": "网络",
   "Users": "用户",
   "Addons": "附加组件",
+  "Add-on Configure": "附加组件配置",
   "Localization": "本地化",
   "Updates": "更新",
   "Authorizations": "授权",
@@ -69,5 +70,7 @@
   "add things": "添加配件",
   "disconnect": "失去连接",
   "remove the accessories": "移除配件",
-  "Room": "房间"
+  "accessories removed": "配件已移除",
+  "Room": "房间",
+  "Ok": "好的"
 }

@@ -1,6 +1,5 @@
 import useWebSocket, {ReadyState} from "react-use-websocket";
-import {useCallback, useEffect, useMemo, useRef, useState} from "react";
-
+import {useMemo, useRef, useState} from "react";
 
 
 export const useThingsWebsocket = (props) => {

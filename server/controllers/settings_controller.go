@@ -30,5 +30,5 @@ func (settings *SettingsController) handleGetAddonsInfo(c *fiber.Ctx) error {
 		NodeVersion:   util.GetNodeVersion(),
 		PythonVersion: util.GetPythonVersion(),
 	}
-	return c.JSON(addonInfo)
+	return c.Status(fiber.StatusOK).JSON(addonInfo)
 }

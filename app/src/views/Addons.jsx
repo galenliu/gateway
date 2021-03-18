@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import Dialog from "@material-ui/core/Dialog";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -19,6 +19,7 @@ import Divider from "@material-ui/core/Divider";
 import StoreIcon from "@material-ui/icons/Store";
 import {versionStringCompare} from "../js/util";
 import AddIcon from "@material-ui/icons/Add";
+import FormatListBulletedIcon from '@material-ui/icons/FormatListBulleted';
 
 
 export const useStyles = makeStyles((theme) => ({
@@ -82,9 +83,12 @@ export default function AddonsDialog(props) {
     const classes = useStyles();
     const {t, i18n} = useTranslation();
     const [fetchAddonsShow, setFetchAddonsShow] = useState(false)
+    const [addonConfigShow, setAddonConfigShow] = useState(false)
+
     const [installedAddons, setInstalledAddons] = useState(new Map())
     const [availableAddons, setAvailableAddons] = useState(new Map())
     const [state, setState] = useState(states.Loading)
+    const [addonConfigId, setAddonConfigId] = useState()
 
 
     function fetchAvailableAddonList() {
@@ -192,6 +196,11 @@ export default function AddonsDialog(props) {
         })
     }
 
+    function configAddon(id) {
+        setAddonConfigId(id)
+        setAddonConfigShow(true)
+    }
+
     function renderInstalledAddonsList() {
         console.log("installedAddons:", installedAddons)
         const list = []
@@ -210,6 +219,7 @@ export default function AddonsDialog(props) {
                                           primary_type={a.primary_type}
                                           schema={a.schema}
                                           isUpdate={a.isUpdate}
+                                          config={configAddon}
 
             />
             list.push(addon)
@@ -217,73 +227,56 @@ export default function AddonsDialog(props) {
         return list
     }
 
+    const load = useCallback(() => {
+        fetchInstalledAddonsList().then((installedAddons) => {
+            setInstalledAddons(installedAddons)
+            setState(states.Completed)
+            return fetchAvailableAddonList()
+        }).catch((e) => {
+            console.log(e)
+            return fetchAvailableAddonList()
+        }).then((fetchAddons) => {
+            const installed = installedAddons
+            for (const [id, addon] of fetchAddons) {
+                if (installed !== null) {
+                    if (installed.has(id)) {
+                        if (!addon.installed) {
+                            fetchAddons.get(id).installed = true
+                        }
+                        if (versionStringCompare(addon.version, installed.get(id).version) > 0) {
+                            console.log(versionStringCompare(addon.version, installed.get(id).version))
+                            installed.get(id).isUpdate = true
+                            installed.get(id).url = addon.url
+
+                        }
+
+                    }
+                }
+            }
+            if (installed.size !== 0) {
+                setInstalledAddons(installed)
+            }
+            if (fetchAddons.size !== 0) {
+                setAvailableAddons(fetchAddons)
+            }
+
+        }).catch((e) => {
+            console.log(e)
+        })
+
+    })
+
+    //首先获取已安装的 addon
     useEffect(() => {
         if (!props.open) {
             setFetchAddonsShow(false)
-            setState(states.Empty)
-            setInstalledAddons(new Map())
-            setAvailableAddons(new Map())
+            setAddonConfigShow(false)
         } else {
             setState(states.Loading)
-
-            let installed = new Map()
-            fetchInstalledAddonsList().then((installedMap) => {
-                    installed = installedMap
-                    return fetchAvailableAddonList()
-                }, (e) => {
-                    setState(states.Empty)
-                    return fetchAvailableAddonList()
-                }
-            ).then((fetchAddons) => {
-                for (const [id, addon] of fetchAddons) {
-                    if (installed !== null) {
-                        if (installed.has(id)) {
-                            if (!addon.installed) {
-                                fetchAddons.get(id).installed = true
-
-                            }
-                            if (versionStringCompare(addon.version, installed.get(id).version) > 0) {
-                                console.log(versionStringCompare(addon.version, installed.get(id).version))
-                                installed.get(id).isUpdate = true
-                                installed.get(id).url = addon.url
-
-                            }
-
-                        }
-                    }
-                }
-                if (fetchAddons) {
-                    console.log("update available:", fetchAddons)
-                    setAvailableAddons(fetchAddons)
-                }
-                if (installed !== null) {
-                    console.log("update installed:", installed)
-                    setInstalledAddons(installed)
-                    setState(states.Completed)
-                }
-            }, (err) => {
-                console.log(err)
-                setState(states.Completed)
-                setInstalledAddons(installed)
-            }).catch((e) =>
-                console.log(e)
-            )
+            load()
         }
-
     }, [props.open])
 
-    useEffect(() => {
-        console.info("update availableAddons:")
-    }, [availableAddons])
-
-    useEffect(() => {
-        console.info("update installedAddons:", installedAddons)
-        if (installedAddons.size === 0) {
-            setState(states.Empty)
-        } else {
-            setState(states.Completed)
-        }
-    }, [installedAddons])
 
     return (
         <div>
@@ -307,12 +300,14 @@ export default function AddonsDialog(props) {
                     </Toolbar>
                 </AppBar>
 
-                <Grid className={classes.content} container justify="flex-start" alignItems="center" direction="column">
+                <Grid className={classes.content} container justify="flex-start" alignItems="center"
+                      direction="column">
                     <div className={classes.drawerHeader}/>
                     {state === states.Loading && <CircularProgress disableShrink/>}
-                    {state === states.Completed && renderInstalledAddonsList()}
+                    {renderInstalledAddonsList()}
                     {state === states.Empty &&
-                    <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}><AddIcon cursor={"pointer"}
+                    <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}><AddIcon
+                        cursor={"pointer"}
                         onClick={() => setFetchAddonsShow(true)} style={{fontSize: 50}}/><Typography variant="h6"
                                                                                                      className={classes.title}>
                         {t("Click Added")}
@@ -321,7 +316,10 @@ export default function AddonsDialog(props) {
                 </Grid>
             </Dialog>
             <AddAddonsDialog installedAddons={installedAddons} availableAddons={availableAddons}
-                             open={fetchAddonsShow} show={setFetchAddonsShow}/>
+                             reload={load} open={fetchAddonsShow} show={setFetchAddonsShow}/>
+
+            <AddonConfigDialog open={addonConfigShow} show={setAddonConfigShow} addonId={addonConfigId}
+            />
         </div>
     )
 
@@ -363,7 +361,10 @@ export function AddAddonsDialog(props) {
 
 
     return (
-        <Dialog fullScreen className={classes.root} open={props.open} onClose={() => props.show(false)}
+        <Dialog fullScreen className={classes.root} open={props.open} onClose={() => {
+            props.show(false);
+            props.reload()
+        }}
                 TransitionComponent={Transition}>
             <AppBar className={classes.appBar}>
                 <Toolbar>
@@ -371,7 +372,10 @@ export function AddAddonsDialog(props) {
                     <Typography variant="h6" className={classes.title}>
                         {t("AddonsMarket")}
                     </Typography>
-                    <IconButton autoFocus color="inherit" onClick={() => props.show(false)} aria-label="close">
+                    <IconButton autoFocus color="inherit" onClick={() => {
+                        props.show(false);
+                        props.reload()
+                    }} aria-label="close">
                         <CloseIcon/>
                     </IconButton>
                 </Toolbar>
@@ -390,33 +394,31 @@ function InstalledAddon(props) {
     const classes = useStyles();
     const {t, i18n} = useTranslation();
 
-    const [addon, setAddon] = useState(props)
 
     return (
         <>
             <Card className={classes.addonCard} elevation={5}>
-
                 <Addon {...props}/>
                 <div className={classes.sideContent}>
-                    {!addon.enabled && <Button style={{margin: 3}}
+                    {!props.enabled && <Button style={{margin: 3}}
                                                variant="contained"
                                                color="primary">
                         {t("enable")}
                     </Button>}
 
-                    {addon.enabled && <Button style={{margin: 3}}
+                    {props.enabled && <Button style={{margin: 3}}
                                               variant="contained"
                                               color="primary">
                         {t("disable")}
                     </Button>}
 
-                    {addon.isUpdate && <Button style={{margin: 3}}
+                    {props.isUpdate && <Button style={{margin: 3}}
                                                variant="contained"
                                                color="primary">
                         {t("update")}
                     </Button>}
 
-                    <Button style={{margin: 3}}
+                    <Button onClick={() => props.config(props.id)} style={{margin: 3}}
                             variant="contained"
                             color="primary">
                         {t("configure")}
@@ -513,7 +515,6 @@ function NewAddon(props) {
 }
 
 export function Addon(props) {
-
     const classes = useStyles();
     const {t, i18n} = useTranslation();
     const addon = props
@@ -563,4 +564,55 @@ export function Addon(props) {
         </div>
     </>
 
+}
+
+
+export function AddonConfigDialog(props) {
+
+    const classes = useStyles();
+    const {t, i18n} = useTranslation();
+    const [config, setConfig] = useState()
+
+    function fetchAddonConfig() {
+        API.getAddonConfig(props.addonId).then((config) => {
+            setConfig(config)
+            console.log("config------", config)
+        })
+    }
+
+    function renderAddonConfig() {
+
+    }
+
+    useEffect(() => {
+        if (props.open) {
+            fetchAddonConfig()
+        }
+
+    }, [props.open])
+
+    return (
+        <Dialog fullScreen className={classes.root} open={props.open} onClose={() => {
+            props.show(false);
+        }}
+                TransitionComponent={Transition}>
+            <AppBar className={classes.appBar}>
+                <Toolbar>
+                    <FormatListBulletedIcon/>
+                    <Typography variant="h6" className={classes.title}>
+                        {t("Add-on Configure")}
+                    </Typography>
+                    <IconButton autoFocus color="inherit" onClick={() => {
+                        props.show(false);
+                    }} aria-label="close">
+                        <CloseIcon/>
+                    </IconButton>
+                </Toolbar>
+            </AppBar>
+            <div className={classes.drawerHeader}/>
+            <Grid className={classes.content} container justify="flex-start" alignItems="center" direction="column">
+
+            </Grid>
+        </Dialog>
+    )
 }

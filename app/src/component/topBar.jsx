@@ -16,7 +16,7 @@ import MoreIcon from '@material-ui/icons/MoreVert';
 import {useTranslation} from 'react-i18next';
 import clsx from "clsx";
 import {AppContext} from "../Router";
-import {Tooltip} from "@material-ui/core";
+import Tooltip from "@material-ui/core/Tooltip";
 import {drawerWidth} from "../js/constant";
 
 const useStyles = makeStyles((theme) => ({

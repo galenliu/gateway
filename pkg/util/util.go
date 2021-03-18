@@ -3,6 +3,7 @@ package util
 import (
 	"crypto/sha256"
 	"fmt"
+	"gateway/pkg/log"
 	"io"
 	"io/ioutil"
 	"os"
@@ -29,6 +30,20 @@ func EnsureDir(baseDir string, dirs ...string) error {
 		}
 	}
 	return nil
+}
+
+func RemoveDir(dir string) {
+	ff, err := os.Stat(dir)
+	if err != nil {
+		log.Error(err.Error())
+	} else {
+		if ff.IsDir() {
+			err := os.RemoveAll(dir)
+			if err != nil {
+				log.Error(err.Error())
+			}
+		}
+	}
 }
 
 func CheckSum(file string, checksum string) bool {

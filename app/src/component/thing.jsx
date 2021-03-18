@@ -56,23 +56,15 @@ export default function Thing(props) {
     const classes = useStyles()
     const {t, i18n} = useTranslation();
     const [open, setOpen] = useState(false)
-    const [description, setDescription] = useState(props.description)
-    const [model, setModel] = useState(props.model)
+    const [description, setDescription] = useState(App.gatewayModel.things.get(props.thingId))
     const [state, setState] = useState()
 
     useEffect(() => {
-        function refreshThing(prop) {
-            let newModel = model
-            for (const name in prop) {
-                if (newModel.propertyDescriptions.hasOwnProperty(name)) {
-                    console.log("new value", prop)
-                    newModel.propertyDescriptions[name]["value"] = prop[name]
-                }
-                setModel(newModel)
-            }
+        function refreshThing(properties) {
+
         }
 
-        let thingModel = App.gatewayModel.thingModels.get(decodeURIComponent(description.id.split('/').pop()))
+        let thingModel = App.gatewayModel.thingModels.get(props.thingId)
         thingModel.subscribe(Constants.PROPERTY_STATUS, refreshThing)
         setState(states.updating)
         return () => {
@@ -113,7 +105,6 @@ export default function Thing(props) {
                             break;
                     }
                     console.log("toggle:", newValue)
-                    model.setProperty(name, newValue)
                 }
             }
         }
@@ -122,7 +113,7 @@ export default function Thing(props) {
     return (
         <>
             <Grid item className={classes.root}>
-                <Card elevation={10} className={classes.thingCard} onClick={() => props.open(description.id)}>
+                <Card elevation={10} className={classes.thingCard} onClick={() => props.open(props.thingId)}>
                     <div className={classes.cardTop}>
                         <Icons state={state} color={"#fb8c00"} type={description.selectedCapability} size={2}/>
                         <ActionsIcon cursor={"pointer"} state={state} type={description.selectedCapability} size={2}
