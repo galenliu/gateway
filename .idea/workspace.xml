@@ -23,6 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9f4f53eb-6f7f-48b5-82a2-b5196c9afd72" name="默认的" comment="0318">
+      <change afterPath="$PROJECT_DIR$/app/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/.idea/app.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/.idea/vcs.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/app/src/App.jsx" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/app/src/component/capability/light.jsx" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/app/src/component/icons.jsx" afterDir="false" />
@@ -50,46 +56,10 @@
       <change afterPath="$PROJECT_DIR$/app/src/views/Addons.jsx" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/app/src/views/Settings.jsx" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/app/src/views/Things.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/App.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/Router.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/component/capability/light.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/component/icons.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/component/new-thing.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/component/property/brightness.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/component/property/on-off.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/component/property/property.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/component/sideBar.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/component/thing-panel.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/component/thing.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/component/topBar.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/i18n/en-us.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/i18n/index.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/i18n/zh-cn.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/index.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/js/api.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/js/constant.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/js/things-reducer.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/js/util.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/js/websocket.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/main.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/mock/room.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/mock/things.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/models/gateway-model.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/models/model.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/models/reopening-web-socket.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/models/thing-model.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/views/AddThing.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/views/Addons.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/views/Settings.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/src/views/Things.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/vite.config.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app1/yarn.lock" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/gateway.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gateway.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app" beforeDir="false" afterPath="$PROJECT_DIR$/app" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/app/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/public/index.html" afterDir="false" />
@@ -102,12 +72,6 @@
       <change beforePath="$PROJECT_DIR$/app/src/reportWebVitals.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/reportWebVitals.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/setupTests.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/setupTests.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/app/yarn.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/miot/actions/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/adapter_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/adapter_proxy.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/addon_manager.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/addon_manager.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/addon_util.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/addon_util.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/plugin.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/plugin.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/controllers/addons_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/addons_controller.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -128,7 +92,7 @@
   </component>
   <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../../Program Files/Go" />
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/app" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitSEFilterConfiguration">
     <file-type-list>
@@ -162,7 +126,7 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../virtual-adapter" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />

@@ -10,6 +10,7 @@
       <excludeFolder url="file://$MODULE_DIR$/addon" />
       <excludeFolder url="file://$MODULE_DIR$/profile" />
       <excludeFolder url="file://$MODULE_DIR$/.idea/dataSources" />
+      <excludeFolder url="file://$MODULE_DIR$/server/static" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
