@@ -54,14 +54,14 @@ func (addon *AddonController) handlerInstallAddon(c *fiber.Ctx) error {
 	}
 	e := plugin.InstallAddonFromUrl(id, url, checksum, true)
 	if e != nil {
-		log.Error("install add-on err :%s", e.Error())
-		return fiber.NewError(http.StatusInternalServerError, "install addon err:", e.Error())
+		log.Error(e.Error())
+		return fiber.NewError(http.StatusInternalServerError, e.Error())
 	}
 	key := "addons." + id
 	setting, ee := database.GetSetting(key)
 	if ee != nil {
 		log.Error("install add-on err : %s", ee.Error())
-		return fiber.NewError(http.StatusInternalServerError, "install addon err:", ee.Error())
+		return fiber.NewError(http.StatusInternalServerError, ee.Error())
 	}
 	return c.Status(fiber.StatusOK).SendString(setting)
 
@@ -79,13 +79,13 @@ func (addon *AddonController) handlerUpdateAddon(c *fiber.Ctx) error {
 	e := plugin.InstallAddonFromUrl(id, url, checksum, true)
 	if e != nil {
 		log.Error("install add-on err :%s", e.Error())
-		return fiber.NewError(http.StatusInternalServerError, "install addon err:", e.Error())
+		return fiber.NewError(http.StatusInternalServerError, e.Error())
 	}
 	key := "addons." + id
 	setting, ee := database.GetSetting(key)
 	if ee != nil {
-		log.Error("install add-on err : %s", ee.Error())
-		return fiber.NewError(http.StatusInternalServerError, "install addon err:", ee.Error())
+		log.Error(ee.Error())
+		return fiber.NewError(http.StatusInternalServerError, ee.Error())
 	}
 	return c.Status(fiber.StatusOK).SendString(setting)
 
@@ -109,9 +109,10 @@ func (addon *AddonController) handlerGetAddonConfig(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).SendString(config)
 }
 
+//Put /:addonId/config
 func (addon *AddonController) handlerSetAddonConfig(c *fiber.Ctx) error {
 	var addonId = c.Params("addonId")
-	var key = "addons." + addonId
+	var key = "addons.config." + addonId
 	config := json.Get(c.Body(), "config").ToString()
 	if config == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "config empty")

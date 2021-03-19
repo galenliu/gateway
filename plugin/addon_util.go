@@ -18,28 +18,28 @@ func GetAddonKey(id string) string {
 	return fmt.Sprintf("addons.%s", id)
 }
 
-type Options struct {
-	Default interface{} `json:"default,omitempty"`
-	Schema  struct {
-		Type       string      `json:"type,omitempty"`
-		Required   []string    `json:"required,omitempty"`
-		Properties interface{} `json:"properties,omitempty"`
-	} `json:"schema,,omitempty"`
+type Schema struct {
+	Type       string      `json:"type,omitempty"`
+	Required   []string    `json:"required,omitempty"`
+	Properties interface{} `json:"properties,omitempty"`
 }
 
 type ManifestJson struct {
-	ID                      string  `json:"id"`
-	Name                    string  `json:"name"`
-	ShortName               string  `json:"short_name,omitempty"`
-	Author                  string  `json:"author"`
-	Description             string  `json:"description,omitempty"`
-	License                 string  `json:"license"`
-	HomepageUrl             string  `json:"homepage_url,omitempty"`
-	ManifestVersion         int     `json:"manifest_version"`
-	Version                 string  `json:"version"`
-	ContentScripts          string  `json:"content_Scripts"`
-	WSebAccessibleResources string  `json:"web_accessible_resources"`
-	Options                 Options `json:"options"`
+	ID                      string `json:"id"`
+	Name                    string `json:"name"`
+	ShortName               string `json:"short_name,omitempty"`
+	Author                  string `json:"author"`
+	Description             string `json:"description,omitempty"`
+	License                 string `json:"license"`
+	HomepageUrl             string `json:"homepage_url,omitempty"`
+	ManifestVersion         int    `json:"manifest_version"`
+	Version                 string `json:"version"`
+	ContentScripts          string `json:"content_Scripts"`
+	WSebAccessibleResources string `json:"web_accessible_resources"`
+	Options                 struct {
+		Default interface{} `json:"default"`
+		Schema  Schema      `json:"schema"`
+	}
 	GatewaySpecificSettings struct {
 		WebThings struct {
 			Exec             string `json:"exec"`
@@ -53,23 +53,27 @@ type ManifestJson struct {
 }
 
 type AddonInfo struct {
-	ID                      string      `json:"id"`
-	Name                    string      `json:"name"`
-	ShortName               string      `json:"short_name"`
-	Author                  string      `json:"author"`
-	Description             string      `json:"description"`
-	License                 string      `json:"license"`
-	HomepageUrl             string      `json:"homepage_url"`
-	Version                 string      `json:"version"`
-	Schema                  interface{} `json:"schema,omitempty"`
-	Exec                    string      `json:"exec"`
-	Enabled                 bool        `json:"enabled"`
-	PrimaryType             string      `json:"primary_type"`
-	ContentScripts          string      `json:"content_scripts"`
-	WSebAccessibleResources string      `json:"web_accessible_resources"`
+	ID                      string `json:"id"`
+	Name                    string `json:"name"`
+	ShortName               string `json:"short_name"`
+	Author                  string `json:"author"`
+	Description             string `json:"description"`
+	License                 string `json:"license"`
+	HomepageUrl             string `json:"homepage_url"`
+	Version                 string `json:"version"`
+	Schema                  Schema `json:"schema,omitempty"`
+	Exec                    string `json:"exec"`
+	Enabled                 bool   `json:"enabled"`
+	PrimaryType             string `json:"primary_type"`
+	ContentScripts          string `json:"content_scripts"`
+	WSebAccessibleResources string `json:"web_accessible_resources"`
 }
 
 func (addonInfo *AddonInfo) UpdateFromDB() error {
+	savedAddonInfo := GetAddonInfoFromDB(addonInfo.ID)
+	if savedAddonInfo != nil {
+		addonInfo.Enabled = savedAddonInfo.Enabled
+	}
 
 	d, err := json.MarshalToString(addonInfo)
 	if err != nil {
@@ -88,20 +92,20 @@ func (addonInfo *AddonInfo) UpdateAddonInfoToDB(enable bool) error {
 	return database.SetSetting(GetAddonKey(addonInfo.ID), s)
 }
 
-func GetAddonInfoFromDB(id string) (*AddonInfo, error) {
+func GetAddonInfoFromDB(id string) *AddonInfo {
 	value, err := database.GetSetting(GetAddonKey(id))
 	if err != nil {
-		return nil, err
+		return nil
 	}
 	var a AddonInfo
 	err = json.UnmarshalFromString(value, a)
 	if err != nil {
-		return nil, err
+		return nil
 	}
-	return &a, nil
+	return &a
 }
 
-func loadManifest(destPath, packetId string) (*AddonInfo, *Options, error) {
+func loadManifest(destPath, packetId string) (*AddonInfo, *interface{}, error) {
 
 	//load manifest.json\
 	f, err := ioutil.ReadFile(path.Join(destPath, FileName))
@@ -146,12 +150,13 @@ func loadManifest(destPath, packetId string) (*AddonInfo, *Options, error) {
 		WSebAccessibleResources: manifest.WSebAccessibleResources,
 		Exec:                    manifest.GatewaySpecificSettings.WebThings.Exec,
 		Enabled:                 false,
+		Schema:                  manifest.Options.Schema,
 		PrimaryType:             manifest.GatewaySpecificSettings.WebThings.PrimaryType,
 	}
 	if manifest.GatewaySpecificSettings.WebThings.Enable {
 		addonInfo.Enabled = true
 	}
-	return &addonInfo, &manifest.Options, nil
+	return &addonInfo, &manifest.Options.Default, nil
 }
 
 func asWebThing(device *addon.Device) *thing.Thing {

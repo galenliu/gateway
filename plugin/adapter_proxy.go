@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"gateway/pkg/log"
 	"sync"
-
-	json "github.com/json-iterator/go"
 )
 
 type pairingFunc func(ctx context.Context, cancelFunc func())
@@ -37,85 +35,46 @@ func (adapter *AdapterProxy) PropertyChanged(property, new *addon.Property) {
 }
 
 func (adapter *AdapterProxy) handleSetPropertyValue(property *addon.Property, newValue interface{}) {
-	adapter.sendMessage(DeviceSetPropertyCommand, struct {
-		AdapterId     string      `json:"adapterId"`
-		PluginId      string      `json:"pluginId"`
-		DeviceId      string      `json:"deviceId"`
-		PropertyName  string      `json:"propertyName"`
-		PropertyValue interface{} `json:"propertyValue"`
-	}{
-		AdapterId:     adapter.ID,
-		PluginId:      adapter.pluginId,
-		DeviceId:      property.DeviceId,
-		PropertyName:  property.Name,
-		PropertyValue: newValue,
-	})
+	data := make(map[string]interface{})
+	data["deviceId"] = property.DeviceId
+	data["propertyName"] = property.Name
+	data["propertyValue"] = newValue
+	adapter.send(AdapterCancelPairingCommand, data)
 }
 
 func (adapter *AdapterProxy) pairing(timeout float64) {
 	log.Info(fmt.Sprintf("adapter: %s start pairing", adapter.ID))
-	adapter.sendMessage(AdapterStartPairingCommand, struct {
-		PluginId  string  `json:"pluginId"`
-		AdapterID string  `json:"adapterId"`
-		Timeout   float64 `json:"timeout"`
-	}{
-		PluginId:  adapter.pluginId,
-		AdapterID: adapter.ID,
-		Timeout:   timeout})
+	data := make(map[string]interface{})
+	data["timeout"] = timeout
+	adapter.send(AdapterCancelPairingCommand, data)
 }
 
 func (adapter *AdapterProxy) cancelPairing() {
 	log.Info(fmt.Sprintf("adapter: %s start pairing", adapter.ID))
-	adapter.sendMessage(AdapterCancelPairingCommand, struct {
-		PluginId  string `json:"pluginId"`
-		AdapterID string `json:"adapterId"`
-	}{
-		PluginId:  adapter.pluginId,
-		AdapterID: adapter.ID,
-	})
+	data := make(map[string]interface{})
+	adapter.send(AdapterCancelPairingCommand, data)
 }
 
 func (adapter *AdapterProxy) removeThing(device *addon.Device) {
 	log.Info(fmt.Sprintf("adapter delete thing ID: %v", device.ID))
-	adapter.sendMessage(AdapterRemoveDeviceRequest, struct {
-		AdapterId string `json:"adapterId"`
-		PluginId  string `json:"pluginId"`
-		DeviceId  string `json:"deviceId"`
-	}{
-		AdapterId: adapter.ID,
-		PluginId:  adapter.pluginId,
-		DeviceId:  device.ID,
-	})
+	data := make(map[string]interface{})
+	data["deviceId"] = device.ID
+	adapter.send(AdapterRemoveDeviceRequest, data)
+
 }
 
 func (adapter *AdapterProxy) cancelRemoveThing(deviceId string) {
 	log.Info(fmt.Sprintf("adapter: %s start pairing", adapter.ID))
-	adapter.sendMessage(AdapterCancelRemoveDeviceCommand, struct {
-		PluginId  string `json:"pluginId"`
-		AdapterID string `json:"adapterId"`
-		DeviceId  string `json:"deviceId"`
-	}{
-		PluginId:  adapter.pluginId,
-		AdapterID: adapter.ID,
-		DeviceId:  deviceId,
-	})
+	data := make(map[string]interface{})
+	data["deviceId"] = deviceId
+	adapter.send(AdapterCancelRemoveDeviceCommand, data)
 }
 
 func (adapter *AdapterProxy) getManager() *AddonManager {
 	return adapter.plugin.pluginServer.manager
 }
 
-func (adapter *AdapterProxy) sendMessage(messageType int, msg interface{}) {
-	message := struct {
-		MessageType int         `json:"messageType"`
-		Data        interface{} `json:"data"`
-	}{
-		MessageType: messageType,
-		Data:        msg,
-	}
-	bt, err := json.MarshalIndent(message, "", " ")
-	if err != nil {
-		return
-	}
-	adapter.plugin.sendData(bt)
+func (adapter *AdapterProxy) send(messageType int, data map[string]interface{}) {
+	data["adapterId"] = adapter.ID
+	adapter.plugin.send(messageType, data)
 }

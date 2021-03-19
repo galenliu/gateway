@@ -1,8 +1,8 @@
+// 处理plugin的消息，完成plugin生命周期状态管理
 package plugin
 
 import (
 	"addon"
-	"context"
 	"fmt"
 	"gateway/config"
 	"gateway/pkg/bus"
@@ -32,17 +32,15 @@ type Plugin struct {
 	registered   bool
 	conn         *Connection
 	pluginServer *PluginsServer
-	ctx          context.Context
-	cancelFunc   context.CancelFunc
 }
 
 func NewPlugin(s *PluginsServer, pluginId string) (plugin *Plugin) {
 	plugin = &Plugin{}
 	plugin.locker = new(sync.Mutex)
 	plugin.pluginId = pluginId
+	plugin.registered = false
 	plugin.pluginServer = s
 	plugin.execPath = path.Join(plugin.getManager().AddonsDir, pluginId)
-	plugin.ctx = context.Background()
 	return
 }
 
@@ -50,6 +48,11 @@ func NewPlugin(s *PluginsServer, pluginId string) (plugin *Plugin) {
 func (plugin *Plugin) handleMessage(data []byte) {
 
 	var messageType = json.Get(data, "messageType").ToInt()
+	//如果为0，则消息不合法(如：缺少 messageType字段)
+	if messageType == 0 {
+		log.Info("messageType err")
+		return
+	}
 	var adapterId = json.Get(data, "data", "adapterId").ToString()
 	// plugin handler
 	switch messageType {
@@ -58,8 +61,6 @@ func (plugin *Plugin) handleMessage(data []byte) {
 	case DeviceRemoveActionResponse:
 		break
 	case OutletNotifyResponse:
-		break
-	case DeviceSetPinRequest:
 		break
 
 	case AdapterUnloadResponse:
@@ -95,16 +96,17 @@ func (plugin *Plugin) handleMessage(data []byte) {
 		break
 	}
 
-	var device *addon.Device
-	var err error
-	var adapter *AdapterProxy
-
-	adapter, err = plugin.getManager().findAdapter(adapterId)
-	if err != nil {
-		log.Error(err.Error())
+	adapterX := plugin.getManager().getAdapter(adapterId)
+	if adapterX == nil {
+		log.Error("adapter not found")
 		return
 	}
+
 	deviceId := json.Get(data, "data", "deviceId").ToString()
+	device, ok := adapterX.Devices[deviceId]
+	if !ok {
+		log.Info("device cannot found:", deviceId)
+	}
 
 	switch messageType {
 	case AdapterUnloadResponse:
@@ -127,23 +129,35 @@ func (plugin *Plugin) handleMessage(data []byte) {
 			return
 
 		}
-		adapter.HandleDeviceAdded(&newDevice)
+		adapterX.HandleDeviceAdded(&newDevice)
 		break
 
 	case AdapterRemoveDeviceResponse:
-		device, err = adapter.FindDevice(deviceId)
-		adapter.HandleDeviceRemoved(device)
+		adapterX.HandleDeviceRemoved(device)
 
 	case OutletAddedNotification:
 		break
 	case OutletRemovedNotification:
 		break
 
+	case DeviceSetPinResponse:
+		s := json.Get(data, "pin").ToString()
+		var pin addon.PIN
+		err := json.UnmarshalFromString(s, &pin)
+		if err != nil {
+			log.Info("pin error")
+			return
+		}
+		ee := device.SetPin(pin)
+		if ee != nil {
+			log.Info(ee.Error())
+		}
+
 	case DevicePropertyChangedNotification:
 		var p addon.Property
 		json.Get(data, "data", "property").ToVal(&p)
 		p.DeviceId = deviceId
-		device = adapter.GetDevice(deviceId)
+
 		property := device.GetProperty(p.Name)
 		property.Update(&p)
 		bus.Publish(util.PropertyChanged, property)
@@ -152,22 +166,13 @@ func (plugin *Plugin) handleMessage(data []byte) {
 	case DeviceActionStatusNotification:
 		var action addon.Action
 		json.Get(data, "data", "action").ToVal(&action)
-		device = adapter.GetDevice(deviceId)
-		if device != nil && &action != nil {
-			adapter.getManager().actionNotify(&action)
-		}
 		break
 
 	case DeviceEventNotification:
 		var event addon.Event
 		json.Get(data, "data", "event").ToVal(&event)
-		device = adapter.GetDevice(deviceId)
-		if device != nil && &event != nil {
-			adapter.getManager().eventNotify(&event)
-		}
 
 	case DeviceConnectedStateNotification:
-		device = adapter.GetDevice(deviceId)
 		var connected = json.Get(data, "data", "connected")
 		if device != nil && connected.LastError() != nil {
 			bus.Publish(util.CONNECTED, device, connected.ToBool())
@@ -187,10 +192,6 @@ func (plugin *Plugin) handleMessage(data []byte) {
 	}
 }
 
-func (plugin *Plugin) sendData(data []byte) {
-	plugin.conn.send(data)
-}
-
 func (plugin *Plugin) getManager() *AddonManager {
 	return plugin.pluginServer.manager
 }
@@ -203,6 +204,11 @@ func (plugin *Plugin) start() {
 
 	command := strings.Replace(plugin.exec, "{path}", plugin.execPath, 1)
 	command = strings.Replace(command, "{nodeLoader}", config.Conf.NodeLoader, 1)
+
+	if !strings.HasPrefix(command, "python") {
+		log.Error("Now only support plugin with python lang")
+		return
+	}
 
 	commands := strings.Split(command, " ")
 
@@ -255,31 +261,35 @@ func (plugin *Plugin) start() {
 
 func (plugin *Plugin) Stop() {
 	//TODO Send stop nf
-	//plugin.sendData(12,"")
-	plugin.cancelFunc()
+	data := make(map[string]interface{})
+	plugin.send(PluginUnloadResponse, data)
 }
 
+//当一个plugin建立连接后，则回复网关数据。
 func (plugin *Plugin) handleConnection(c *Connection) {
 	plugin.conn = c
-	m := struct {
+	data := make(map[string]interface{})
+	data["gatewayVersion"] = config.Conf.GatewayVersion
+	data["userProfile"] = config.GetUserProfile()
+	data["preferences"] = config.GetPreferences()
+	plugin.send(PluginRegisterResponse, data)
+	plugin.registered = true
+	log.Info(fmt.Sprintf("plugin: %s registered", plugin.pluginId))
+}
+
+func (plugin *Plugin) send(mt int, data map[string]interface{}) {
+	data["pluginId"] = plugin.pluginId
+	message := struct {
 		MessageType int         `json:"messageType"`
 		Data        interface{} `json:"data"`
 	}{
-		MessageType: PluginRegisterResponse,
-		Data: struct {
-			PluginID       string              `json:"pluginId"`
-			GatewayVersion string              `json:"gatewayVersion"`
-			UserProfile    *config.UserProfile `json:"userProfile"`
-			Preferences    *config.Preferences `json:"preferences"`
-		}{
-			PluginID:       plugin.pluginId,
-			UserProfile:    config.GetUserProfile(),
-			Preferences:    config.GetPreferences(),
-			GatewayVersion: config.Conf.GatewayVersion,
-		},
+		MessageType: mt,
+		Data:        data,
 	}
-	data, _ := json.MarshalIndent(m, "", " ")
-	plugin.sendData(data)
-	plugin.registered = true
-	log.Info(fmt.Sprintf("plugin: %s registered", plugin.pluginId))
+	bt, err := json.MarshalIndent(message, "", "  ")
+	if err != nil {
+		log.Error(err.Error())
+		return
+	}
+	plugin.conn.send(bt)
 }
