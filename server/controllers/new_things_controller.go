@@ -11,16 +11,18 @@ import (
 )
 
 type NewThingsController struct {
-	locker    *sync.Mutex
-	container *models.Things
-	ws        *websocket.Conn
-	closeChan chan struct{}
+	locker     *sync.Mutex
+	container  *models.Things
+	ws         *websocket.Conn
+	foundThing chan *thing.Thing
+	closeChan  chan struct{}
 }
 
 func NewNewThingsController(ws *websocket.Conn) *NewThingsController {
 	controller := &NewThingsController{}
 	controller.locker = new(sync.Mutex)
 	controller.closeChan = make(chan struct{})
+	controller.foundThing = make(chan *thing.Thing)
 	controller.container = models.NewThings()
 	controller.ws = ws
 	return controller
@@ -47,25 +49,18 @@ func (controller *NewThingsController) handlerConnection() {
 		case <-controller.closeChan:
 			log.Info("new things websocket disconnection")
 			return
-		default:
-			_, message, err := controller.ws.ReadMessage()
+		case t := <-controller.foundThing:
+			err := controller.ws.WriteJSON(t)
 			if err != nil {
-				log.Error("read:", err)
-				return
+				controller.closeChan <- struct{}{}
 			}
-			log.Info("recv: %s", message)
 		}
 
 	}
 }
 
 func (controller *NewThingsController) handleNewThing(thing *thing.Thing) {
-	controller.locker.Lock()
-	defer controller.locker.Unlock()
-	err := controller.ws.WriteJSON(thing)
-	if err != nil {
-		controller.closeChan <- struct{}{}
-	}
+	controller.foundThing <- thing
 }
 
 func handleNewThingsWebsocket(conn *websocket.Conn) {
