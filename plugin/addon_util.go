@@ -149,11 +149,11 @@ func loadManifest(destPath, packetId string) (*AddonInfo, *interface{}, error) {
 		ContentScripts:          manifest.ContentScripts,
 		WSebAccessibleResources: manifest.WSebAccessibleResources,
 		Exec:                    manifest.GatewaySpecificSettings.WebThings.Exec,
-		Enabled:                 false,
+		Enabled:                 true,
 		Schema:                  manifest.Options.Schema,
 		PrimaryType:             manifest.GatewaySpecificSettings.WebThings.PrimaryType,
 	}
-	if manifest.GatewaySpecificSettings.WebThings.Enable {
+	if !manifest.GatewaySpecificSettings.WebThings.Enable {
 		addonInfo.Enabled = true
 	}
 	return &addonInfo, &manifest.Options.Default, nil

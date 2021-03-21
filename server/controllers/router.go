@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"gateway/config"
+	"gateway/pkg/log"
 	"gateway/server"
 	"gateway/server/models"
 	"github.com/gofiber/fiber/v2"
@@ -107,7 +108,9 @@ func CollectRoute(conf Config) *fiber.App {
 			return fiber.ErrUpgradeRequired
 		})
 
-		newThingsGroup.Get("/", websocket.New(handleNewThingsWebsocket))
+		newThingsGroup.Get("/", websocket.New(func(conn *websocket.Conn) {
+			handleNewThingsWebsocket(conn)
+		}))
 	}
 
 	{ //Addons Controller
@@ -141,6 +144,7 @@ func (web *Web) Start() error {
 	httpPort := ":" + strconv.Itoa(web.config.HttpPort)
 	err := web.Listen(httpPort)
 	if err != nil {
+		log.Error("web err:%s", err.Error())
 		return err
 	}
 	return nil

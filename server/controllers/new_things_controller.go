@@ -6,7 +6,6 @@ import (
 	"gateway/pkg/util"
 	"gateway/server/models"
 	"gateway/server/models/thing"
-	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
 	"sync"
 )
@@ -18,40 +17,43 @@ type NewThingsController struct {
 	closeChan chan struct{}
 }
 
-func NewNewThingsController() *NewThingsController {
-	controller := &NewThingsController{container: models.NewThings()}
+func NewNewThingsController(ws *websocket.Conn) *NewThingsController {
+	controller := &NewThingsController{}
 	controller.locker = new(sync.Mutex)
 	controller.closeChan = make(chan struct{})
 	controller.container = models.NewThings()
-	_ = bus.Subscribe(util.ThingAdded, controller.handleNewThing)
+	controller.ws = ws
 	return controller
 }
 
-func (controller *NewThingsController) HandleGetThing(c *fiber.Ctx) error {
-	return c.JSON(controller.container.GetThings())
-}
+func (controller *NewThingsController) handlerConnection() {
 
-func handleNewThingsWebsocket(conn *websocket.Conn) {
-	if !conn.Locals("websocket").(bool) {
-		return
-	}
-	controller := NewNewThingsController()
-	controller.ws = conn
-
-	log.Debug("new thing websocket...add:" + conn.RemoteAddr().String())
 	newThings := controller.container.GetNewThings()
-
 	for _, t := range newThings {
-		err := conn.WriteJSON(t)
+		err := controller.ws.WriteJSON(t)
 		if err != nil {
+			log.Error("web socket err: %s", err.Error())
 			return
 		}
 	}
+	_ = bus.Subscribe(util.ThingAdded, controller.handleNewThing)
+	defer func() {
+		controller.ws.Close()
+		_ = bus.Unsubscribe(util.ThingAdded, controller.handleNewThing)
+	}()
+
 	for {
 		select {
 		case <-controller.closeChan:
-			controller.close()
+			log.Info("new things websocket disconnection")
 			return
+		default:
+			_, message, err := controller.ws.ReadMessage()
+			if err != nil {
+				log.Error("read:", err)
+				return
+			}
+			log.Info("recv: %s", message)
 		}
 
 	}
@@ -61,17 +63,16 @@ func (controller *NewThingsController) handleNewThing(thing *thing.Thing) {
 	controller.locker.Lock()
 	defer controller.locker.Unlock()
 	err := controller.ws.WriteJSON(thing)
-	controller.checkErr(err)
-}
-
-func (controller *NewThingsController) checkErr(err error) {
 	if err != nil {
-		log.Error(err.Error())
 		controller.closeChan <- struct{}{}
-		return
 	}
 }
 
-func (controller *NewThingsController) close() {
-	_ = controller.ws.Close()
+func handleNewThingsWebsocket(conn *websocket.Conn) {
+	if !conn.Locals("websocket").(bool) {
+		return
+	}
+	controller := NewNewThingsController(conn)
+	controller.handlerConnection()
+
 }

@@ -2,11 +2,8 @@ package plugin
 
 //	plugin server
 import (
-	"fmt"
-	"gateway/config"
 	"gateway/pkg/log"
 	json "github.com/json-iterator/go"
-	"strconv"
 	"sync"
 )
 
@@ -25,21 +22,21 @@ func NewPluginServer(manager *AddonManager) *PluginsServer {
 	server.Plugins = make(map[string]*Plugin, 30)
 	server.locker = new(sync.Mutex)
 	server.manager = manager
-	server.ipc = NewIpcServer(":" + strconv.Itoa(config.Conf.Ports["ipc"]))
+	server.ipc = NewIpcServer()
 	return server
 }
 
 func (s *PluginsServer) messageHandler(data []byte, c *Connection) {
 
-	log.Debug(fmt.Sprintf("plugin rev message: \t\n %s", string(data)))
-
 	//如果是注册请求的话，调用registerPlugin处理注册
 	var m = json.Get(data, "messageType")
+
 	if err := m.LastError(); err != nil {
 		log.Info("messageType err")
 		return
 	}
 	messageType := m.ToInt()
+	log.Debug("Rev %s: \t\n %s", MessageTypeToString(messageType), string(data))
 
 	if messageType == PluginRegisterRequest {
 		s.registerHandler(data, c)
@@ -47,38 +44,31 @@ func (s *PluginsServer) messageHandler(data []byte, c *Connection) {
 		//获取Plugin，并且把消息交由对应的Plugin处理
 		pluginId := json.Get(data, "data", "pluginId").ToString()
 		plugin := s.registerPlugin(pluginId)
-		go plugin.handleMessage(data)
+		go plugin.handleConnection(c, data)
 	}
 }
 
 func (s *PluginsServer) registerHandler(data []byte, c *Connection) {
 	pluginId := json.Get(data, "data", "pluginId").ToString()
 	plugin := s.registerPlugin(pluginId)
-	plugin.handleConnection(c)
+	plugin.registerAndHandleConnection(c)
 }
 
 //此处开启新协程，传入一个新的websocket连接,把读到的消息给MessageHandler
-func (s *PluginsServer) readConnectionLoop(c *Connection) {
-	for {
-		if !c.connected {
-			log.Info("lost connection")
-			return
-		}
-		d, err := c.ReadMessage()
-		if err != nil {
-			log.Info("read connection err:", err.Error())
-			c.connected = false
-			continue
-		}
-		s.messageHandler(d, c)
+func (s *PluginsServer) handlerConnection(c *Connection) {
+	d, err := c.readMessage()
+	if err != nil {
+		log.Info("plugin connection err:", err.Error())
+		return
 	}
+	s.messageHandler(d, c)
 }
 
 func (s *PluginsServer) loadPlugin(addonPath, id, exec string) {
 	plugin := s.registerPlugin(id)
 	plugin.exec = exec
 	plugin.execPath = addonPath
-	go plugin.start()
+	go plugin.execute()
 }
 
 func (s *PluginsServer) uninstallPlugin(packageId string) {
@@ -87,7 +77,7 @@ func (s *PluginsServer) uninstallPlugin(packageId string) {
 		log.Error("plugin not exist")
 		return
 	}
-	plugin.Stop()
+	plugin.unload()
 	delete(s.Plugins, packageId)
 
 }
@@ -106,8 +96,9 @@ func (s *PluginsServer) Start() {
 	go s.ipc.Serve()
 	for {
 		select {
+		//每一个连接都开一个协程处理了
 		case conn := <-s.ipc.wsChan:
-			go s.readConnectionLoop(conn)
+			go s.handlerConnection(conn)
 		case <-s.closeChan:
 			log.Debug("plugin server closed")
 			return
@@ -120,7 +111,7 @@ func (s *PluginsServer) Stop() {
 	s.ipc.close()
 	s.closeChan <- struct{}{}
 	for _, p := range s.Plugins {
-		p.Stop()
+		p.unload()
 	}
 }
 

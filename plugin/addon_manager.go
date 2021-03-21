@@ -240,7 +240,7 @@ func (manager *AddonManager) installAddon(packageId, packagePath string, enabled
 	if !manager.addonsLoaded {
 		return fmt.Errorf(`Cannot install add-on before other add-ons have been loaded.`)
 	}
-	log.Info("start install package id: %s ", packageId)
+	log.Info("execute install package id: %s ", packageId)
 	f, err := os.Open(packagePath)
 	if err != nil {
 		return err
@@ -296,6 +296,7 @@ func (manager *AddonManager) installAddon(packageId, packagePath string, enabled
 	}
 	return nil
 }
+
 func (manager *AddonManager) LoadAddons() {
 	if manager.addonsLoaded {
 		return
@@ -314,7 +315,7 @@ func (manager *AddonManager) LoadAddons() {
 			addonId := fi.Name()
 			err = manager.loadAddon(addonId)
 			if err != nil {
-				log.Error("load addon id:%s failed err:%s, err: %v", addonId, err.Error())
+				log.Error("load addon id:%s failed err:%s", addonId, err.Error())
 			}
 		}
 	}
@@ -416,6 +417,7 @@ func (manager *AddonManager) unloadAddon(packageId string) error {
 }
 
 func (manager *AddonManager) Start() {
+	manager.pluginServer.Start()
 	manager.running = true
 }
 

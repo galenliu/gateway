@@ -56,7 +56,7 @@ func (controller *ActionsController) handleActions(c *fiber.Ctx) error {
 }
 
 func (controller *ActionsController) handleDeleteAction(c *fiber.Ctx) error {
-	log.Debug(fmt.Sprintf("Handler: %s %s", c.Method, c.BaseURL()))
+
 	actionId := c.Params("actionId")
 	actionName := c.Params("actionName")
 	thingId := c.Params("thingId")

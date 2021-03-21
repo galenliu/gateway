@@ -46,11 +46,11 @@ func (adapter *AdapterProxy) pairing(timeout float64) {
 	log.Info(fmt.Sprintf("adapter: %s start pairing", adapter.ID))
 	data := make(map[string]interface{})
 	data["timeout"] = timeout
-	adapter.send(AdapterCancelPairingCommand, data)
+	adapter.send(AdapterStartPairingCommand, data)
 }
 
 func (adapter *AdapterProxy) cancelPairing() {
-	log.Info(fmt.Sprintf("adapter: %s start pairing", adapter.ID))
+	log.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.ID))
 	data := make(map[string]interface{})
 	adapter.send(AdapterCancelPairingCommand, data)
 }
@@ -64,7 +64,7 @@ func (adapter *AdapterProxy) removeThing(device *addon.Device) {
 }
 
 func (adapter *AdapterProxy) cancelRemoveThing(deviceId string) {
-	log.Info(fmt.Sprintf("adapter: %s start pairing", adapter.ID))
+	log.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.ID))
 	data := make(map[string]interface{})
 	data["deviceId"] = deviceId
 	adapter.send(AdapterCancelRemoveDeviceCommand, data)

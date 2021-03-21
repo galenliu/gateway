@@ -2,9 +2,11 @@ package plugin
 
 import (
 	"fmt"
+	"gateway/config"
 	"gateway/pkg/log"
 	"github.com/gorilla/websocket"
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -25,12 +27,11 @@ type IpcServer struct {
 	locker *sync.Mutex
 }
 
-func NewIpcServer(_addr string) *IpcServer {
+func NewIpcServer() *IpcServer {
 	ipc := &IpcServer{
-		addr:   _addr,
+		addr:   "localhost:" + strconv.Itoa(config.Conf.Ports["ipc"]),
 		wsChan: make(chan *Connection, 2),
 	}
-	go ipc.Serve()
 	return ipc
 }
 
@@ -43,14 +44,13 @@ type Connection struct {
 func (c *Connection) send(data []byte) {
 	c.locker.Lock()
 	defer c.locker.Unlock()
-	log.Debug(fmt.Sprintf("plugin send message :\t\n %s", string(data)))
 	err := c.ws.WriteMessage(websocket.BinaryMessage, data)
 	if err != nil {
 		c.connected = false
 	}
 }
 
-func (c *Connection) ReadMessage() (data []byte, err error) {
+func (c *Connection) readMessage() (data []byte, err error) {
 
 	_, data, err = c.ws.ReadMessage()
 	if err != nil {
@@ -82,7 +82,7 @@ func (server *IpcServer) handle(w http.ResponseWriter, r *http.Request) {
 
 func (server *IpcServer) Serve() {
 	http.HandleFunc("/", server.handle)
-	log.Info("plugin server start on port: %s", server.addr)
+	log.Info("plugin server execute on port: %s", server.addr)
 	err := http.ListenAndServe(server.addr, nil)
 	log.Info(fmt.Sprintf("ipc server listening addr: %s", server.addr))
 	if err != nil {

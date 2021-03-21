@@ -5,6 +5,7 @@ import (
 	"fmt"
 	core "gateway"
 	"gateway/config"
+	"gateway/pkg/log"
 	"gateway/pkg/util"
 	"os"
 	"os/signal"
@@ -46,7 +47,8 @@ func main() {
 	//handle signal
 	signal.Notify(c, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGTERM)
 	var systemCall = func() {
-		<-c
+		systemCall := <-c
+		log.Info("exited system call %v", systemCall)
 		gw.Close()
 		os.Exit(0)
 	}

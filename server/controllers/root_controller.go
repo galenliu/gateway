@@ -6,6 +6,6 @@ import (
 )
 
 func rootHandler(c *fiber.Ctx) error {
-	log.Info( "Content-Type: %s",c.Get("Content-Type"))
+	log.Info("Root Handler Path:%s", c.Path())
 	return c.Next()
 }

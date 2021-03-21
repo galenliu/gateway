@@ -45,5 +45,8 @@ func (gateway *HomeGateway) Start() error {
 func (gateway *HomeGateway) Close() {
 	gateway.closeChan <- struct{}{}
 	gateway.AddonsManager.Close()
-	log.Error(gateway.Web.Close().Error())
+	err := gateway.Web.Close()
+	if err != nil {
+		log.Error(err.Error())
+	}
 }

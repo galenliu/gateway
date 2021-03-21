@@ -52,14 +52,13 @@
       <change afterPath="$PROJECT_DIR$/app/src/models/model.js" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/app/src/models/reopening-web-socket.js" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/app/src/models/thing-model.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/setupProxy.js" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/app/src/views/AddThing.jsx" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/app/src/views/Addons.jsx" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/app/src/views/Settings.jsx" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/app/src/views/Things.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gateway.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gateway.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app" beforeDir="false" afterPath="$PROJECT_DIR$/app" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/app/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/public/index.html" afterDir="false" />
@@ -72,6 +71,22 @@
       <change beforePath="$PROJECT_DIR$/app/src/reportWebVitals.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/reportWebVitals.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/setupTests.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/setupTests.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/app/yarn.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/miot" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core.go" beforeDir="false" afterPath="$PROJECT_DIR$/core.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway-addon" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-addon" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway-addon/ipc.go" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-addon/ipc.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/adapter_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/adapter_proxy.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/addon_manager.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/addon_manager.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/addon_util.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/addon_util.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/ipc_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/ipc_server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/message_type.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/message_type.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/plugin.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/plugin.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/plugin_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/plugin_server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/actions_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/actions_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/new_things_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/new_things_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/root_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/root_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/router.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,8 +100,8 @@
         <option value="TypeScript File" />
         <option value="package.json" />
         <option value="Python Script" />
-        <option value="JavaScript File" />
         <option value="Go File" />
+        <option value="JavaScript File" />
       </list>
     </option>
   </component>
@@ -159,7 +174,7 @@
     </key>
   </component>
   <component name="RunManager" selected="Go 构建.gateway">
-    <configuration name="gateway" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <configuration name="gateway" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true">
       <module name="gateway" />
       <working_directory value="$PROJECT_DIR$" />
       <kind value="FILE" />
@@ -183,6 +198,7 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Go 构建.gateway" />
         <item itemvalue="npm.start" />
       </list>
     </recent_temporary>
@@ -255,11 +271,6 @@
           <url>file:///usr/local/go/src/runtime/panic.go</url>
           <line>1166</line>
           <option name="timeStamp" value="6" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/server/controllers/ws-controller.go</url>
-          <line>38</line>
-          <option name="timeStamp" value="8" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

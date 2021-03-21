@@ -3,6 +3,7 @@ package plugin
 
 import (
 	"addon"
+	"context"
 	"fmt"
 	"gateway/config"
 	"gateway/pkg/bus"
@@ -10,6 +11,7 @@ import (
 	"gateway/pkg/util"
 	json "github.com/json-iterator/go"
 	"io"
+	"os"
 	"os/exec"
 	"path"
 	"strings"
@@ -21,8 +23,6 @@ const ExecPython3 = "{python}"
 
 type OnConnect = func(device addon.Device, bool2 bool)
 
-//Plugin 管理Adapters
-//处理每一个plugin的请求
 type Plugin struct {
 	locker       *sync.Mutex
 	pluginId     string
@@ -31,15 +31,18 @@ type Plugin struct {
 	verbose      bool
 	registered   bool
 	conn         *Connection
+	closeChan    chan struct{}
 	pluginServer *PluginsServer
 }
 
 func NewPlugin(s *PluginsServer, pluginId string) (plugin *Plugin) {
 	plugin = &Plugin{}
 	plugin.locker = new(sync.Mutex)
+	plugin.closeChan = make(chan struct{})
 	plugin.pluginId = pluginId
 	plugin.registered = false
 	plugin.pluginServer = s
+
 	plugin.execPath = path.Join(plugin.getManager().AddonsDir, pluginId)
 	return
 }
@@ -82,7 +85,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 		adapter := NewAdapterProxy(plugin.getManager(), name, adapterId, plugin.pluginId, packageName)
 		adapter.plugin = plugin
 		plugin.pluginServer.addAdapter(adapter)
-		break
+		return
 
 	case NotifierAddedNotification:
 		break
@@ -105,7 +108,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 	deviceId := json.Get(data, "data", "deviceId").ToString()
 	device, ok := adapterX.Devices[deviceId]
 	if !ok {
-		log.Info("device cannot found:", deviceId)
+		log.Info("device cannot found: %s", deviceId)
 	}
 
 	switch messageType {
@@ -200,73 +203,112 @@ func (plugin *Plugin) addAdapter(adapter *AdapterProxy) {
 	plugin.getManager().addAdapter(adapter)
 }
 
-func (plugin *Plugin) start() {
+func (plugin *Plugin) execute() {
 
+	plugin.exec = strings.Replace(plugin.exec, "\\", string(os.PathSeparator), -1)
+	plugin.exec = strings.Replace(plugin.exec, "/", string(os.PathSeparator), -1)
 	command := strings.Replace(plugin.exec, "{path}", plugin.execPath, 1)
 	command = strings.Replace(command, "{nodeLoader}", config.Conf.NodeLoader, 1)
-
 	if !strings.HasPrefix(command, "python") {
 		log.Error("Now only support plugin with python lang")
 		return
 	}
+	ctx, cancelFunc := context.WithCancel(context.Background())
 
 	commands := strings.Split(command, " ")
 
-	var args []string
-	if len(commands) > 1 {
-		for i, arg := range commands {
-			if i != 0 {
-				args = append(args, arg)
-			}
-		}
-	}
-
 	var syncLog = func(reader io.ReadCloser) {
-
-		buf := make([]byte, 1024, 1024)
+		defer cancelFunc()
 		for {
-			strNum, err := reader.Read(buf)
-			if strNum > 0 {
-				outputByte := buf[:strNum]
-				log.Info(fmt.Sprintf("plugin(%s) out: %s \t\n", plugin.pluginId, string(outputByte)))
-			}
-			if err != nil {
-				//读到结尾
-				if err == io.EOF || strings.Contains(err.Error(), "file already closed") {
-					err = nil
+			select {
+			case <-plugin.closeChan:
+				cancelFunc()
+				return
+			default:
+				buf := make([]byte, 1024, 1024)
+				for {
+					strNum, err := reader.Read(buf)
+					if strNum > 0 {
+						outputByte := buf[:strNum]
+						log.Info(fmt.Sprintf("plugin(%s) out: %s \t\n", plugin.pluginId, string(outputByte)))
+					}
+					if err != nil {
+						//读到结尾
+						if err == io.EOF || strings.Contains(err.Error(), "file already closed") {
+							err = nil
+						}
+					}
 				}
 			}
 		}
+
 	}
 
 	//ctx, plugin.cancelFunc = context.WithCancel(plugin.ctx)
 	var cmd *exec.Cmd
+	var args = commands[1:]
 	if len(args) > 0 {
-		cmd = exec.Command(commands[0], args...)
+		cmd = exec.CommandContext(ctx, commands[0], args...)
 	} else {
-		cmd = exec.Command(commands[0])
+		cmd = exec.CommandContext(ctx, commands[0])
 	}
-
 	stdout, _ := cmd.StdoutPipe()
 	stderr, _ := cmd.StderrPipe()
 	//stdOut, err := cmd.StdoutPipe()
 
-	go cmd.Start()
+	err := cmd.Start()
+	if err != nil {
+		log.Info("plugin(%s) run err: %s", plugin.pluginId, err.Error())
+		return
+	}
 
-	log.Debug(fmt.Sprintf("plugin(%s) start \t\n", plugin.pluginId))
+	log.Debug(fmt.Sprintf("plugin(%s) execute \t\n", plugin.pluginId))
 	go syncLog(stdout)
 	go syncLog(stderr)
 
 }
 
-func (plugin *Plugin) Stop() {
+func (plugin *Plugin) unload() {
 	//TODO Send stop nf
 	data := make(map[string]interface{})
+	plugin.registered = false
 	plugin.send(PluginUnloadResponse, data)
+	_ = plugin.conn.ws.Close()
+	plugin.closeChan <- struct{}{}
+	plugin.killExec()
+}
+
+func (plugin *Plugin) killExec() {
+
 }
 
 //当一个plugin建立连接后，则回复网关数据。
-func (plugin *Plugin) handleConnection(c *Connection) {
+func (plugin *Plugin) handleConnection(c *Connection, d []byte) {
+	if d != nil {
+		plugin.handleMessage(d)
+	}
+	for {
+		select {
+		case <-plugin.closeChan:
+			return
+		default:
+			_, data, err := c.ws.ReadMessage()
+			if err != nil {
+				log.Error("plugin read err :%s", err.Error())
+				plugin.registered = false
+				return
+			}
+			plugin.handleMessage(data)
+
+		}
+	}
+}
+
+func (plugin *Plugin) registerAndHandleConnection(c *Connection) {
+	if plugin.registered == true {
+		log.Error("plugin is registered")
+		return
+	}
 	plugin.conn = c
 	data := make(map[string]interface{})
 	data["gatewayVersion"] = config.Conf.GatewayVersion
@@ -274,7 +316,8 @@ func (plugin *Plugin) handleConnection(c *Connection) {
 	data["preferences"] = config.GetPreferences()
 	plugin.send(PluginRegisterResponse, data)
 	plugin.registered = true
-	log.Info(fmt.Sprintf("plugin: %s registered", plugin.pluginId))
+	log.Info("plugin: %s registered", plugin.pluginId)
+	go plugin.handleConnection(c, nil)
 }
 
 func (plugin *Plugin) send(mt int, data map[string]interface{}) {
@@ -287,6 +330,7 @@ func (plugin *Plugin) send(mt int, data map[string]interface{}) {
 		Data:        data,
 	}
 	bt, err := json.MarshalIndent(message, "", "  ")
+	log.Debug("Send %s : \t\n %s", MessageTypeToString(mt), bt)
 	if err != nil {
 		log.Error(err.Error())
 		return
