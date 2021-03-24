@@ -22,89 +22,11 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9f4f53eb-6f7f-48b5-82a2-b5196c9afd72" name="默认的" comment="032211">
-      <change afterPath="$PROJECT_DIR$/app/src/component/constants.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/component/icon-view.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/component/property.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/js/units.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/react-app-env.d.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/utils.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/tsconfig.json" afterDir="false" />
+    <list default="true" id="9f4f53eb-6f7f-48b5-82a2-b5196c9afd72" name="默认的" comment="0324">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/App.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/component/capability/light.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/component/icons.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/icons.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/component/new-thing.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/new-thing.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/component/property/brightness.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/component/property/on-off.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/component/property/property.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/component/property.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/thing-property.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/component/thing-panel.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/thing-panel.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/component/thing.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/i18n/zh-cn.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/i18n/zh-cn.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/js/util.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/action/action.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/action/lock.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/action/unlock.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/air-quality-sensor.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/alarm.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/barometric-pressure-sensor.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/binary-sensor.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/camera.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/capabilities.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/capability/capabilities.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/color-control.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/color-sensor.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/door-sensor.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/energy-monitor.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/humidity-sensor.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/leak-sensor.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/light.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/capability/light.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/lock.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/motion-sensor.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/multi-level-sensor.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/multi-level-switch.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/on-off-switch.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/capability/on-off-switch.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/push-button.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/smart-plug.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/smoke-sensor.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/temperature-sensor.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/thermostat.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/thing-detail-layout.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/capability/thing-detail-layout.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/thing.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/capability/thing.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/video-camera.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/alarm.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/alarm.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/boolean.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/boolean.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/brightness.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/brightness.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/color-mode.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/color-mode.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/color-temperature.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/color-temperature.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/color.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/color.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/current.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/current.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/enum.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/enum.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/frequency.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/frequency.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/heating-cooling.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/heating-cooling.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/image.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/image.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/instantaneous-power-factor.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/instantaneous-power-factor.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/instantaneous-power.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/instantaneous-power.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/leak.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/leak.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/level.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/level.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/locked.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/locked.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/motion.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/motion.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/number.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/number.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/numeric-label.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/numeric-label.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/on-off.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/on-off.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/open.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/open.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/pushed.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/pushed.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/smoke.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/smoke.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/string-label.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/string-label.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/string.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/string.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/target-temperature.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/target-temperature.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/temperature.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/temperature.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/thermostat-mode.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/thermostat-mode.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/video.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/video.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/property/voltage.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/property/voltage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/views/Addons.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/Addons.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/views/Things.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/Things.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/app/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -125,7 +47,8 @@
   </component>
   <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../../Program Files/Go" />
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/app" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="GitSEFilterConfiguration">
     <file-type-list>
@@ -159,7 +82,7 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/src/schema-impl/capability" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/profile/addons/yeelight-adapter-python" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -177,18 +100,18 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\profile\addons\yeelight-adapter-python" />
+      <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\profile\addons" />
       <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\app\src\schema-impl\capability" />
       <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\app\src\js" />
       <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\app" />
-      <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\app\src" />
-      <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\profile\addons" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\profile\addons\yeelight-adapter-python\pkg" />
       <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\app\src\component" />
       <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\app\src\js" />
       <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\app\src" />
       <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\app" />
-      <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\server\static" />
     </key>
   </component>
   <component name="RunManager" selected="Go 构建.gateway">
@@ -280,7 +203,8 @@
     <MESSAGE value="0321" />
     <MESSAGE value="0322" />
     <MESSAGE value="032211" />
-    <option name="LAST_COMMIT_MESSAGE" value="032211" />
+    <MESSAGE value="0324" />
+    <option name="LAST_COMMIT_MESSAGE" value="0324" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
