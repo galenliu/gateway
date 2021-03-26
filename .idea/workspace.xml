@@ -22,10 +22,14 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9f4f53eb-6f7f-48b5-82a2-b5196c9afd72" name="默认的" comment="0324">
+    <list default="true" id="9f4f53eb-6f7f-48b5-82a2-b5196c9afd72" name="默认的" comment="03241">
+      <change afterPath="$PROJECT_DIR$/app/src/component/control-panel/light-control-panel.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/component/control-panel/master-control.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/component/property.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/thing-property.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app" beforeDir="false" afterPath="$PROJECT_DIR$/app" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/component/icons.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/icons.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/component/thing-panel.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/thing-panel.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/component/thing-property.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/thing-property.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/views/Things.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/Things.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -47,7 +51,7 @@
   </component>
   <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../../Program Files/Go" />
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/app" />
     <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="GitSEFilterConfiguration">
@@ -92,7 +96,7 @@
     <property name="nodejs_interpreter_path" value="node" />
     <property name="nodejs_package_manager_path" value="yarn" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
-    <property name="ts.external.directory.path" value="C:\Program Files\JetBrains\GoLand 2020.3.3\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
+    <property name="ts.external.directory.path" value="C:\Users\刘桂林\Desktop\web-things\gateway\app\node_modules\typescript\lib" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="ReaderModeSettings">
@@ -114,7 +118,7 @@
       <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\app" />
     </key>
   </component>
-  <component name="RunManager" selected="Go 构建.gateway">
+  <component name="RunManager" selected="npm.start">
     <configuration name="gateway" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true">
       <module name="gateway" />
       <working_directory value="$PROJECT_DIR$" />
@@ -139,8 +143,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Go 构建.gateway" />
         <item itemvalue="npm.start" />
+        <item itemvalue="Go 构建.gateway" />
       </list>
     </recent_temporary>
   </component>
@@ -204,7 +208,8 @@
     <MESSAGE value="0322" />
     <MESSAGE value="032211" />
     <MESSAGE value="0324" />
-    <option name="LAST_COMMIT_MESSAGE" value="0324" />
+    <MESSAGE value="03241" />
+    <option name="LAST_COMMIT_MESSAGE" value="03241" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
