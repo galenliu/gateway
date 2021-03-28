@@ -6,15 +6,12 @@
 package controllers
 
 import (
-	"context"
 	"fmt"
 	"gateway/pkg/log"
 	"gateway/plugin"
 	"gateway/server/models"
 	model "gateway/server/models/thing"
 	"github.com/gofiber/fiber/v2"
-	"time"
-
 	"github.com/gofiber/websocket/v2"
 	json "github.com/json-iterator/go"
 	"go.uber.org/zap"
@@ -126,15 +123,12 @@ func (tc *ThingsController) handleSetProperty(c *fiber.Ctx) error {
 
 	value := c.Body()
 
-	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second)
-	defer cancelFunc()
-
-	prop, e := tc.Container.SetThingProperty(thingId, propName, value, ctx)
+	p, e := tc.Container.SetThingProperty(thingId, propName, value)
 	if e != nil {
-		log.Error("Failed set thing(%s) property:(%s) value:(%v),err:(%s)", thingId, propName, value, e.Error())
+		log.Error("Failed set thing(%s) property:(%s) value:(%s),err:(%s)", thingId, propName, value, e.Error())
 		return fiber.NewError(fiber.StatusGatewayTimeout, e.Error())
 	}
-	data := map[string]interface{}{propName: prop.Value}
+	data := map[string]interface{}{propName: p.Value}
 	return c.Status(fiber.StatusOK).JSON(data)
 }
 

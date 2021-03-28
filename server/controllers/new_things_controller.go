@@ -44,6 +44,16 @@ func (controller *NewThingsController) handlerConnection() {
 		_ = bus.Unsubscribe(util.ThingAdded, controller.handleNewThing)
 	}()
 
+	go func() {
+		for {
+			_, _, err := controller.ws.ReadMessage()
+			if err != nil {
+				controller.closeChan <- struct{}{}
+				return
+			}
+		}
+	}()
+
 	for {
 		select {
 		case <-controller.closeChan:

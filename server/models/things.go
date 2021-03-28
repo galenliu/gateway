@@ -2,7 +2,6 @@ package models
 
 import (
 	"addon"
-	"context"
 	"fmt"
 	"gateway/pkg/bus"
 	"gateway/pkg/database"
@@ -119,7 +118,7 @@ func (ts *Things) RemoveThing(thingId string) error {
 	return nil
 }
 
-func (ts *Things) SetThingProperty(thingId, propName string, value interface{}, ctx context.Context) (*addon.Property, error) {
+func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) (*addon.Property, error) {
 	var th = ts.GetThing(thingId)
 	if th == nil {
 		return nil, fmt.Errorf("thing can not found")
@@ -128,7 +127,8 @@ func (ts *Things) SetThingProperty(thingId, propName string, value interface{}, 
 	if prop == nil {
 		return nil, fmt.Errorf("propertyName not found")
 	}
-	return plugin.SetProperty(thingId, propName, value, ctx)
+	return plugin.SetProperty(thingId, propName, value)
+
 }
 
 func (ts *Things) onPropertyChanged(property *addon.Property) {

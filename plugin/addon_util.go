@@ -171,7 +171,6 @@ func asWebThing(device *addon.Device) *thing.Thing {
 		Actions:     nil,
 		Events:      nil,
 
-		Connected:           false,
 		CredentialsRequired: device.CredentialsRequired,
 	}
 
@@ -206,4 +205,56 @@ func asWebThing(device *addon.Device) *thing.Thing {
 	t.Forms = append(t.Forms, util.NewForm("rel", "alternate", "mediaType", "text/html", "href", fmt.Sprintf("/things/%s", device.ID)))
 	t.Forms = append(t.Forms, util.NewForm("rel", "alternate", "href", fmt.Sprintf("/things/%s/", device.ID)))
 	return &t
+}
+
+func asDevice(data json.Any) (*addon.Device, error) {
+	id := data.Get("id").ToString()
+	title := data.Get("title").ToString()
+	if title == "" {
+		title = id
+	}
+
+	var atContext = make([]string, 0)
+	cs := data.Get("@context").Keys()
+	if len(cs) == 0 {
+		t := data.Get("@context").ToString()
+		if t != "" {
+			atContext = append(atContext, t)
+		}
+	}
+	for _, k := range cs {
+		atContext = append(atContext, k)
+	}
+
+	var atType = make([]string, 0)
+	data.Get("@type").ToVal(&atType)
+	if len(atType) == 0 {
+		return nil, fmt.Errorf("@type is empty")
+	}
+
+	description := data.Get("description").ToString()
+
+	properties := make(map[string]*addon.Property)
+	data.Get("properties").ToVal(&properties)
+
+	actions := make(map[string]*addon.Action)
+	data.Get("actions").ToVal(&actions)
+
+	events := make(map[string]*addon.Event)
+	data.Get("actions").ToVal(&events)
+
+	device := &addon.Device{
+		ID:                  id,
+		AtContext:           atContext,
+		Title:               title,
+		AtType:              atType,
+		Description:         description,
+		CredentialsRequired: false,
+		Properties:          properties,
+		Actions:             actions,
+		Events:              events,
+		Pin:                 addon.PIN{},
+		AdapterId:           "",
+	}
+	return device, nil
 }

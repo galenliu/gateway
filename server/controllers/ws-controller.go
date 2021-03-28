@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"addon"
-	"context"
 	"fmt"
 	"gateway/pkg/bus"
 	"gateway/pkg/log"
@@ -13,8 +12,8 @@ import (
 	"github.com/gofiber/websocket/v2"
 	json "github.com/json-iterator/go"
 	"net/http"
+	"strings"
 	"sync"
-	"time"
 )
 
 type ThingsWebsocketHandler struct {
@@ -23,11 +22,12 @@ type ThingsWebsocketHandler struct {
 	ws                 *websocket.Conn
 	locker             *sync.Mutex
 	done               chan struct{}
-	subscriptionThings []*thing.Thing
+	subscriptionThings map[string]*thing.Thing
 }
 
 func NewThingsWebsocketController() *ThingsWebsocketHandler {
 	controller := &ThingsWebsocketHandler{}
+	controller.subscriptionThings = make(map[string]*thing.Thing, 10)
 	controller.locker = new(sync.Mutex)
 	controller.Container = models.NewThings()
 	controller.done = make(chan struct{})
@@ -132,10 +132,9 @@ func (controller *ThingsWebsocketHandler) handleMessage(data []byte) {
 	case models.SetProperty:
 		var propertyMap map[string]interface{}
 		json.Get(data, "data").ToVal(&propertyMap)
-		ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second)
-		defer cancelFunc()
+
 		for propName, value := range propertyMap {
-			prop, setErr := plugin.SetProperty(device.ID, propName, value, ctx)
+			p, setErr := plugin.SetProperty(device.ID, propName, value)
 			if setErr != nil {
 				controller.sendMessage(struct {
 					MessageType string      `json:"messageType"`
@@ -171,7 +170,7 @@ func (controller *ThingsWebsocketHandler) handleMessage(data []byte) {
 						Message: struct {
 							Value interface{} `json:"value"`
 						}{
-							Value: prop.Value,
+							Value: p.Value,
 						},
 						Request: json.Get(data),
 					},
@@ -206,16 +205,18 @@ func (controller *ThingsWebsocketHandler) handleMessage(data []byte) {
 
 func (controller *ThingsWebsocketHandler) addThing(thing *thing.Thing) {
 
-	controller.subscriptionThings = append(controller.subscriptionThings, thing)
+	sl := strings.Split(thing.ID, "/")
+	id := sl[len(sl)-1]
+	controller.subscriptionThings[id] = thing
 	for propName, _ := range thing.Properties {
-		value, err := plugin.GetPropertyValue(thing.ID, propName)
+		value, err := plugin.GetPropertyValue(id, propName)
 		if err != nil {
 			controller.sendMessage(struct {
 				ID          string      `json:"id"`
 				MessageType string      `json:"messageType"`
 				Data        interface{} `json:"data"`
 			}{
-				ID:          thing.ID,
+				ID:          id,
 				MessageType: models.ERROR,
 				Data: struct {
 					Message string `json:"message"`
@@ -227,7 +228,7 @@ func (controller *ThingsWebsocketHandler) addThing(thing *thing.Thing) {
 				MessageType string      `json:"messageType"`
 				Data        interface{} `json:"data"`
 			}{
-				ID:          thing.ID,
+				ID:          id,
 				MessageType: models.PropertyStatus,
 				Data:        map[string]interface{}{propName: value},
 			})
@@ -237,7 +238,7 @@ func (controller *ThingsWebsocketHandler) addThing(thing *thing.Thing) {
 
 func (controller *ThingsWebsocketHandler) onConnected(device *addon.Device, connected bool) {
 
-	t := controller.getThing(device.ID)
+	t := controller.subscriptionThings[device.ID]
 	if t == nil {
 		return
 	}
@@ -255,7 +256,9 @@ func (controller *ThingsWebsocketHandler) onConnected(device *addon.Device, conn
 
 func (controller *ThingsWebsocketHandler) onModified(thing *thing.Thing) {
 
-	t := controller.getThing(thing.ID)
+	sl := strings.Split(thing.ID, "/")
+	id := sl[len(sl)-1]
+	t := controller.subscriptionThings[id]
 	if t == nil {
 		return
 	}
@@ -264,7 +267,7 @@ func (controller *ThingsWebsocketHandler) onModified(thing *thing.Thing) {
 		MessageType string      `json:"messageType"`
 		Data        interface{} `json:"data"`
 	}{
-		ID:          t.ID,
+		ID:          id,
 		MessageType: models.ThingModified,
 		Data: struct {
 		}{},
@@ -273,7 +276,9 @@ func (controller *ThingsWebsocketHandler) onModified(thing *thing.Thing) {
 
 func (controller *ThingsWebsocketHandler) onRemoved(thing *thing.Thing) {
 
-	t := controller.getThing(thing.ID)
+	sl := strings.Split(thing.ID, "/")
+	id := sl[len(sl)-1]
+	t := controller.subscriptionThings[id]
 	if t == nil {
 		return
 	}
@@ -282,7 +287,7 @@ func (controller *ThingsWebsocketHandler) onRemoved(thing *thing.Thing) {
 		MessageType string      `json:"messageType"`
 		Data        interface{} `json:"data"`
 	}{
-		ID:          thing.ID,
+		ID:          id,
 		MessageType: models.ThingRemoved,
 		Data: struct {
 		}{},
@@ -291,7 +296,7 @@ func (controller *ThingsWebsocketHandler) onRemoved(thing *thing.Thing) {
 
 func (controller *ThingsWebsocketHandler) onPropertyChanged(property *addon.Property) {
 
-	t := controller.getThing(property.DeviceId)
+	t := controller.subscriptionThings[property.DeviceId]
 	if t == nil {
 		return
 	}
@@ -321,15 +326,6 @@ func (controller *ThingsWebsocketHandler) sendMessage(message interface{}) {
 func (controller *ThingsWebsocketHandler) onError(err error) {
 	log.Info("websocket err: %s", err.Error())
 	controller.done <- struct{}{}
-}
-
-func (controller *ThingsWebsocketHandler) getThing(id string) *thing.Thing {
-	for _, t := range controller.subscriptionThings {
-		if t.ID == id {
-			return t
-		}
-	}
-	return nil
 }
 
 func (controller *ThingsWebsocketHandler) close() {

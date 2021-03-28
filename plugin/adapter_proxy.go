@@ -11,7 +11,7 @@ import (
 type pairingFunc func(ctx context.Context, cancelFunc func())
 
 type AdapterProxy struct {
-	*addon.Adapter
+	*Adapter
 	pluginId       string
 	plugin         *Plugin
 	looker         *sync.Mutex
@@ -23,15 +23,12 @@ type AdapterProxy struct {
 
 func NewAdapterProxy(manager *AddonManager, name, adapterId, pluginId, packageName string) *AdapterProxy {
 	proxy := &AdapterProxy{}
-	proxy.Adapter = addon.NewAdapter(manager, adapterId, name, packageName)
+	proxy.Adapter = NewAdapter(adapterId, name, packageName)
+	proxy.manager = manager
 	proxy.pluginId = pluginId
 	proxy.looker = new(sync.Mutex)
 
 	return proxy
-}
-
-func (adapter *AdapterProxy) PropertyChanged(property, new *addon.Property) {
-	property.Update(new)
 }
 
 func (adapter *AdapterProxy) handleSetPropertyValue(property *addon.Property, newValue interface{}) {
@@ -39,7 +36,7 @@ func (adapter *AdapterProxy) handleSetPropertyValue(property *addon.Property, ne
 	data["deviceId"] = property.DeviceId
 	data["propertyName"] = property.Name
 	data["propertyValue"] = newValue
-	adapter.send(AdapterCancelPairingCommand, data)
+	adapter.send(DeviceSetPropertyCommand, data)
 }
 
 func (adapter *AdapterProxy) pairing(timeout float64) {

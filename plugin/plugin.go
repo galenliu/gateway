@@ -120,23 +120,22 @@ func (plugin *Plugin) handleMessage(data []byte) {
 
 	case DeviceAddedNotification:
 		//messages.DeviceAddedNotification
-		var newDevice addon.Device
 		js := json.Get(data, "data", "device")
 		if js.LastError() != nil {
-			log.Error("new device err:", js.LastError().Error())
+			log.Error("new device err: %s", js.LastError().Error())
 			return
 		}
-		err := json.UnmarshalFromString(js.ToString(), &newDevice)
+		newDevice, err := asDevice(js)
 		if err != nil {
-			log.Error("new device err:", err.Error())
+			log.Error(err.Error())
 			return
-
 		}
-		adapterX.HandleDeviceAdded(&newDevice)
+		log.Info("new device,%v \t\n", newDevice)
+		adapterX.handleDeviceAdded(newDevice)
 		break
 
 	case AdapterRemoveDeviceResponse:
-		adapterX.HandleDeviceRemoved(device)
+		adapterX.handleDeviceRemoved(device)
 
 	case OutletAddedNotification:
 		break
@@ -157,12 +156,13 @@ func (plugin *Plugin) handleMessage(data []byte) {
 		}
 
 	case DevicePropertyChangedNotification:
-		var p addon.Property
-		json.Get(data, "data", "property").ToVal(&p)
-		p.DeviceId = deviceId
-
-		property := device.GetProperty(p.Name)
-		property.Update(&p)
+		js := json.Get(data, "data", "property")
+		propName := js.Get("name").ToString()
+		property := device.GetProperty(propName)
+		if property == nil {
+			return
+		}
+		property.Update(js)
 		bus.Publish(util.PropertyChanged, property)
 		break
 
@@ -330,7 +330,7 @@ func (plugin *Plugin) send(mt int, data map[string]interface{}) {
 		Data:        data,
 	}
 	bt, err := json.MarshalIndent(message, "", "  ")
-	log.Debug("Send %s : \t\n %s", MessageTypeToString(mt), bt)
+	log.Debug("Send-- %s : \t\n %s", MessageTypeToString(mt), bt)
 	if err != nil {
 		log.Error(err.Error())
 		return

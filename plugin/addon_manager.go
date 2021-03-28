@@ -78,13 +78,13 @@ func NewAddonsManager() *AddonManager {
 	return am
 }
 
-func (manager *AddonManager) HandleDeviceAdded(device *addon.Device) {
+func (manager *AddonManager) handleDeviceAdded(device *addon.Device) {
 	manager.devices[device.ID] = device
 	bus.Publish(util.ThingAdded, asWebThing(device))
 
 }
 
-func (manager *AddonManager) HandleDeviceRemoved(device *addon.Device) {
+func (manager *AddonManager) handleDeviceRemoved(device *addon.Device) {
 	delete(manager.devices, device.ID)
 	bus.Publish(util.ThingRemoved, asWebThing(device))
 }
@@ -127,13 +127,12 @@ func (manager *AddonManager) findAdapter(adapterId string) (*AdapterProxy, error
 	return adapter, nil
 }
 
-func (manager *AddonManager) handleSetProperty(deviceId, propName string, setValue interface{}, ctx context.Context) (*addon.Property, error) {
+func (manager *AddonManager) handleSetProperty(deviceId, propName string, setValue interface{}) error {
 	adapter := manager.getAdapterByDeviceId(deviceId)
 	if adapter == nil {
-		return nil, fmt.Errorf("adapter not found")
+		return fmt.Errorf("adapter not found")
 	}
 	property := adapter.GetDevice(deviceId).GetProperty(propName)
-
 	var newValue interface{}
 	if property.Type == addon.TypeBoolean {
 		newValue = to.Bool(setValue)
@@ -146,29 +145,11 @@ func (manager *AddonManager) handleSetProperty(deviceId, propName string, setVal
 	}
 
 	if property == nil {
-		return nil, fmt.Errorf("device or property not found")
+		return fmt.Errorf("device or property not found")
 	}
 
-	var propChan = make(chan *addon.Property)
-	changedFunc := func(prop *addon.Property) {
-		if prop.DeviceId == deviceId && prop.Name == propName {
-			propChan <- prop
-		}
-	}
-	adapter.handleSetPropertyValue(property, newValue)
-	_ = bus.Subscribe(util.PropertyChanged, changedFunc)
-	defer func() {
-		_ = bus.Unsubscribe(util.PropertyChanged, changedFunc)
-	}()
-	for {
-		select {
-		case <-ctx.Done():
-			return nil, fmt.Errorf("time out")
-		case prop := <-propChan:
-			return prop, nil
-		}
-	}
-
+	go adapter.handleSetPropertyValue(property, newValue)
+	return nil
 }
 
 func (manager *AddonManager) handleGetDevices(devs *[]*addon.Device) {
@@ -407,7 +388,7 @@ func (manager *AddonManager) unloadAddon(packageId string) error {
 	for key, adapter := range manager.adapters {
 		if adapter.PackageName == plugin.pluginId {
 			for _, dev := range adapter.Devices {
-				manager.HandleDeviceRemoved(dev)
+				adapter.handleDeviceRemoved(dev)
 			}
 			delete(manager.adapters, key)
 		}

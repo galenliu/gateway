@@ -4,6 +4,7 @@ import (
 	"addon"
 	"context"
 	"fmt"
+	"gateway/pkg/bus"
 	"gateway/pkg/database"
 	"gateway/pkg/log"
 	"gateway/pkg/util"
@@ -87,9 +88,29 @@ func GetDevice(deviceId string) *addon.Device {
 	return device
 }
 
-func SetProperty(deviceId, propName string, newValue interface{}, ctx context.Context) (*addon.Property, error) {
-	return instance.handleSetProperty(deviceId, propName, newValue, ctx)
-
+func SetProperty(deviceId, propName string, newValue interface{}) (*addon.Property, error) {
+	err := instance.handleSetProperty(deviceId, propName, newValue)
+	if err != nil {
+		return nil, err
+	}
+	closeChan := make(chan struct{})
+	propChan := make(chan *addon.Property)
+	time.AfterFunc(2*time.Second, func() {
+		closeChan <- struct{}{}
+	})
+	changed := func(property *addon.Property) {
+		propChan <- property
+	}
+	_ = bus.Subscribe(util.PropertyChanged, changed)
+	defer bus.Unsubscribe(util.PropertyChanged, changed)
+	for {
+		select {
+		case prop := <-propChan:
+			return prop, nil
+		case <-closeChan:
+			return nil, fmt.Errorf("timeout")
+		}
+	}
 }
 
 func RemoveDevice(deviceId string) error {
