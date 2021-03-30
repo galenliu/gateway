@@ -1,7 +1,7 @@
 // @Title  things_controllers
 // @Description  app router
 // @Author  liuguilin
-// @Update  liuguilin
+// @update  liuguilin
 
 package controllers
 
@@ -10,12 +10,12 @@ import (
 	"gateway/pkg/log"
 	"gateway/plugin"
 	"gateway/server/models"
-	model "gateway/server/models/thing"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
 	json "github.com/json-iterator/go"
 	"go.uber.org/zap"
 	"net/http"
+	"strings"
 )
 
 type ThingsController struct {
@@ -159,17 +159,18 @@ func (tc *ThingsController) handleSetThing(c *fiber.Ctx) error {
 	thingId := c.Params("thingId")
 	thing := tc.Container.GetThing(thingId)
 	if thing == nil {
-		return fiber.NewError(http.StatusBadRequest, "thing not found")
+		return fiber.NewError(http.StatusInternalServerError, "Failed to retrieve thing(%s)", thingId)
+	}
 
+	title := strings.Trim(json.Get(c.Body(), "title").ToString(), " ")
+	if len(title) == 0 || title == "" {
+		return fiber.NewError(http.StatusInternalServerError, "Invalid title")
 	}
-	var rThing model.Thing
-	err := json.Unmarshal(c.Body(), &rThing)
-	if err != nil {
-		return fiber.NewError(http.StatusBadRequest, "Unmarshal body err")
 
+	selectedCapability := strings.Trim(json.Get(c.Body(), "selectedCapability").ToString(), " ")
+	if selectedCapability != "" {
+		thing.SelectedCapability = selectedCapability
 	}
-	if rThing.Title != "" {
-		thing.SetTitle(rThing.Title)
-	}
-	return nil
+	t := thing.SetTitle(title)
+	return c.Status(fiber.StatusOK).SendString(t)
 }

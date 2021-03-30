@@ -2,6 +2,7 @@ package thing
 
 import (
 	"fmt"
+	"gateway/pkg/bus"
 	"gateway/pkg/database"
 	"gateway/pkg/log"
 	"gateway/pkg/util"
@@ -30,6 +31,7 @@ type Thing struct {
 	//The state  of the thing
 	SelectedCapability string `json:"selectedCapability"`
 	Connected          bool   `json:"connected"`
+	IconData           string `json:"iconData,omitempty"`
 }
 
 func NewThing(id string, description []byte) (thing *Thing) {
@@ -43,6 +45,12 @@ func NewThing(id string, description []byte) (thing *Thing) {
 		return nil
 	}
 	return &th
+}
+
+func (t *Thing) setSelectedCapability(sel string) {
+	t.SelectedCapability = sel
+	_ = t.update
+	bus.Publish(util.MODIFIED, t)
 }
 
 func (t *Thing) findProperty(propName string) (*Property, error) {
@@ -66,8 +74,11 @@ func (t *Thing) GetId() string {
 	return t.ID
 }
 
-func (t *Thing) SetTitle(title string) {
+func (t *Thing) SetTitle(title string) string {
 	t.Title = title
+	_ = t.update
+	bus.Publish(util.MODIFIED, t)
+	return t.GetDescription()
 }
 
 func (t *Thing) GetTitle() string {
@@ -105,10 +116,10 @@ func (t *Thing) GetDescription() string {
 	return s
 }
 
-func (t *Thing) Save() (err error) {
+func (t *Thing) save() (err error) {
 	return database.SetSetting(t.ID, t.GetDescription())
 }
 
-func (t *Thing) Update(thing *Thing) {
+func (t *Thing) update(thing *Thing) {
 	_ = database.UpdateThing(t.ID, thing.GetDescription())
 }

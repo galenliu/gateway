@@ -138,7 +138,7 @@ func (manager *AddonManager) handleSetProperty(deviceId, propName string, setVal
 		newValue = to.Bool(setValue)
 	}
 	if property.Type == addon.TypeInteger || property.Type == addon.TypeNumber {
-		newValue = to.Float64(setValue)
+		newValue = to.Int64(to.Bytes(setValue))
 	}
 	if property.Type == addon.TypeString {
 		newValue = to.String(setValue)

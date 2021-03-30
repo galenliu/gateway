@@ -71,6 +71,7 @@ func CollectRoute(conf Config) *fiber.App {
 
 		//set a properties of a thing.
 		thingsGroup.Put("/:thingId/properties/*", thingsController.handleSetProperty)
+		thingsGroup.Get("/:thingId/properties/*", thingsController.handleGetProperty)
 
 		//Handle creating a new thing.
 		thingsGroup.Post("/", thingsController.handleCreateThing)
@@ -83,9 +84,6 @@ func CollectRoute(conf Config) *fiber.App {
 
 		//Get the properties of a thing
 		thingsGroup.Get("/:thingId/properties", thingsController.handleGetProperties)
-
-		//Get a properties of a thing
-		thingsGroup.Get("/:thingId/properties/*", thingsController.handleGetProperty)
 
 		// Modify a ThingInfo.
 		thingsGroup.Put("/:thingId", thingsController.handleSetThing)

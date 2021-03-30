@@ -130,7 +130,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 			log.Error(err.Error())
 			return
 		}
-		log.Info("new device,%v \t\n", newDevice)
+		log.Info("new device,%s \t\n", newDevice)
 		adapterX.handleDeviceAdded(newDevice)
 		break
 

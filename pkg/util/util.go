@@ -1,11 +1,15 @@
 package util
 
 import (
+	"bytes"
 	"crypto/sha256"
+	"encoding/binary"
+	"encoding/gob"
 	"fmt"
 	"gateway/pkg/log"
 	"io"
 	"io/ioutil"
+	"math"
 	"os"
 	"path"
 	"runtime"
@@ -103,4 +107,23 @@ func NewForm(args ...string) Form {
 		m[args[i-1]] = args[i]
 	}
 	return m
+}
+
+func ByteToFloat64(bytes []byte) float64 {
+	bits := binary.LittleEndian.Uint64(bytes)
+	return math.Float64frombits(bits)
+}
+
+func GetBytes(key interface{}) []byte {
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	err := enc.Encode(key)
+	if err != nil {
+		return nil
+	}
+	return buf.Bytes()
+}
+
+func InterfaceToFloat64(data interface{}) float64 {
+	return ByteToFloat64(GetBytes(data))
 }

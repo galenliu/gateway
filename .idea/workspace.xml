@@ -22,37 +22,37 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9f4f53eb-6f7f-48b5-82a2-b5196c9afd72" name="默认的" comment="03241111">
-      <change afterPath="$PROJECT_DIR$/plugin/adapter.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+    <list default="true" id="9f4f53eb-6f7f-48b5-82a2-b5196c9afd72" name="默认的" comment="0328">
+      <change afterPath="$PROJECT_DIR$/app/src/component/control-panel/control-panel.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/js/things-screen.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app" beforeDir="false" afterPath="$PROJECT_DIR$/app" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/App.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/component/control-panel/light-control-panel.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/control-panel/light-control-panel.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/component/control-panel/master-control.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/component/icon-view.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/icon-view.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/component/icons.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/icons.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/component/new-thing.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/new-thing.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/component/thing-panel.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/thing-panel.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/component/thing-property.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/thing-property.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/i18n/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/i18n/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/i18n/zh-cn.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/i18n/zh-cn.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/js/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/js/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/js/constant.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/js/constant.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/js/units.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/js/units.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/models/gateway-model.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/models/gateway-model.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/models/thing-model.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/models/thing-model.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/capabilities.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/capability/capabilities.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/light.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/capability/light.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/on-off-switch.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/capability/on-off-switch.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/thing.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/capability/thing.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/views/AddThing.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/AddThing.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/views/Things.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/Things.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-addon/property.go" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-addon/property.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/adapter_proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/adapter_proxy.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/app/yarn.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway-addon" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-addon" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/util/util.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/util/util.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/plugin/addon_manager.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/addon_manager.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/addon_util.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/addon_util.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/api.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/plugin/plugin.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/plugin.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/controllers/new_things_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/new_things_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/router.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/controllers/things_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/things_controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/controllers/ws-controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/ws-controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/models/things.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/models/things.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/models/thing/thing.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/models/thing/thing.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -140,7 +140,7 @@
       <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\app" />
     </key>
   </component>
-  <component name="RunManager" selected="Go 构建.gateway">
+  <component name="RunManager" selected="npm.start">
     <configuration name="gateway" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true">
       <module name="gateway" />
       <working_directory value="$PROJECT_DIR$" />
@@ -165,8 +165,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Go 构建.gateway" />
         <item itemvalue="npm.start" />
+        <item itemvalue="Go 构建.gateway" />
       </list>
     </recent_temporary>
   </component>
@@ -232,7 +232,8 @@
     <MESSAGE value="0324" />
     <MESSAGE value="03241" />
     <MESSAGE value="03241111" />
-    <option name="LAST_COMMIT_MESSAGE" value="03241111" />
+    <MESSAGE value="0328" />
+    <option name="LAST_COMMIT_MESSAGE" value="0328" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
