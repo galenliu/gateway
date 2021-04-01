@@ -62,25 +62,25 @@ func DisableAddon(addonId string) error {
 	return nil
 }
 
-func GetDevices() []*addon.Device {
-	var devs []*addon.Device
-	for _, d := range instance.devices {
-		devs = append(devs, d)
-		devs = append(devs, d)
-	}
-	return devs
-}
-
 func GetThings() []*thing.Thing {
 	var ts []*thing.Thing
 	for _, d := range instance.devices {
-		var t = asWebThing(d)
-		ts = append(ts, t)
+		data, err := json.MarshalIndent(d, "", " ")
+		if err != nil {
+			log.Error("Marshal device to webThing err:", err)
+			continue
+		}
+		th, e := UnmarshalWebThing(data)
+		if e != nil {
+			log.Error("UnmarshalWebThing err:", e)
+			continue
+		}
+		ts = append(ts, th)
 	}
 	return ts
 }
 
-func GetDevice(deviceId string) *addon.Device {
+func GetDevice(deviceId string) addon.IDevice {
 	device, ok := instance.devices[deviceId]
 	if !ok {
 		return nil
@@ -88,25 +88,25 @@ func GetDevice(deviceId string) *addon.Device {
 	return device
 }
 
-func SetProperty(deviceId, propName string, newValue interface{}) (*addon.Property, error) {
+func SetProperty(deviceId, propName string, newValue interface{}) ([]byte, error) {
 	err := instance.handleSetProperty(deviceId, propName, newValue)
 	if err != nil {
 		return nil, err
 	}
 	closeChan := make(chan struct{})
-	propChan := make(chan *addon.Property)
+	propChan := make(chan []byte)
 	time.AfterFunc(2*time.Second, func() {
 		closeChan <- struct{}{}
 	})
-	changed := func(property *addon.Property) {
-		propChan <- property
+	changed := func(data []byte) {
+		propChan <- data
 	}
 	_ = bus.Subscribe(util.PropertyChanged, changed)
 	defer bus.Unsubscribe(util.PropertyChanged, changed)
 	for {
 		select {
-		case prop := <-propChan:
-			return prop, nil
+		case data := <-propChan:
+			return data, nil
 		case <-closeChan:
 			return nil, fmt.Errorf("timeout")
 		}
@@ -114,8 +114,9 @@ func SetProperty(deviceId, propName string, newValue interface{}) (*addon.Proper
 }
 
 func RemoveDevice(deviceId string) error {
-	adapter := instance.getAdapterByDeviceId(deviceId)
+
 	device := instance.getDevice(deviceId)
+	adapter := instance.getAdapter(device.GetAdapterId())
 	if adapter != nil {
 		adapter.removeThing(device)
 		return nil
@@ -126,11 +127,11 @@ func RemoveDevice(deviceId string) error {
 func GetPropertyValue(deviceId, propName string) (interface{}, error) {
 	device, ok := instance.devices[deviceId]
 	if !ok {
-		return nil, fmt.Errorf("devices(%s) not found", deviceId)
+		return nil, fmt.Errorf("deviceId (%s)invaild", deviceId)
 	}
-	prop, err := device.FindProperty(propName)
-	if err != nil {
-		return nil, err
+	prop := device.GetProperty(propName)
+	if prop == nil {
+		return nil, fmt.Errorf("propName(%s)invaild", propName)
 	}
 	return prop, nil
 }
@@ -175,13 +176,13 @@ func CancelAddNewThing() {
 }
 
 func CancelRemoveThing(deviceId string) {
-	dev := instance.getDevice(deviceId)
-	if dev == nil {
+	device := instance.getDevice(deviceId)
+	if device == nil {
 		return
 	}
-	adapter := instance.getAdapter(dev.ID)
+	adapter := instance.getAdapter(device.GetAdapterId())
 	if adapter != nil {
-		adapter.cancelRemoveThing(dev.ID)
+		adapter.cancelRemoveThing(deviceId)
 	}
 }
 

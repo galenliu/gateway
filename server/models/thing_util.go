@@ -2,14 +2,14 @@ package models
 
 //func toThing(device *addon.Device) *thing.Thing {
 //	thing := &thing.Thing{
-//		ID:                  device.ID,
+//		Id:                  device.Id,
 //		AtContext:           device.AtContext,
 //		AtType:              device.AtType,
 //		Title:               device.Title,
 //		Description:         device.Description,
 //		Links:               nil,
 //		BaseHref:            "",
-//		Href:                fmt.Sprintf("/%s", device.ID),
+//		Href:                fmt.Sprintf("/%s", device.Id),
 //		CredentialsRequired: false,
 //		SelectedCapability:  "",
 //		Properties:          nil,
@@ -18,9 +18,9 @@ package models
 //	}
 //	var tps = make(map[string]*thing.Property)
 //	for _, p := range device.Properties {
-//		tp := toThingProperty(p, thing.ID)
-//		tp.ThingId = device.ID
-//		tps[tp.Name] = tp
+//		tp := toThingProperty(p, thing.Id)
+//		tp.ThingId = device.Id
+//		tps[tp.name] = tp
 //	}
 //	thing.Properties = tps
 //	return thing
@@ -42,7 +42,7 @@ package models
 //
 //func toThingProperty(p *addon.Property, deviceId string) *thing.Property {
 //	prop := &thing.Property{
-//		Name:        p.Name,
+//		name:        p.name,
 //		AtType:      p.AtType,
 //		Type:        p.Type,
 //		Title:       p.Title,
@@ -53,7 +53,7 @@ package models
 //		Minimum:     p.Minimum,
 //		Maximum:     p.Maximum,
 //		Value:       p.Value,
-//		Href:        fmt.Sprintf("/instance/%s/properties/%s", deviceId, p.Name),
+//		Href:        fmt.Sprintf("/instance/%s/properties/%s", deviceId, p.name),
 //	}
 //	return prop
 //}

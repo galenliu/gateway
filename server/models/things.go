@@ -1,13 +1,13 @@
 package models
 
 import (
-	"addon"
 	"fmt"
 	"gateway/pkg/bus"
 	"gateway/pkg/database"
 	"gateway/pkg/util"
 	"gateway/plugin"
 	"gateway/server/models/thing"
+	json "github.com/json-iterator/go"
 	"sync"
 )
 
@@ -118,7 +118,7 @@ func (ts *Things) RemoveThing(thingId string) error {
 	return nil
 }
 
-func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) (*addon.Property, error) {
+func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) ([]byte, error) {
 	var th = ts.GetThing(thingId)
 	if th == nil {
 		return nil, fmt.Errorf("thing can not found")
@@ -131,12 +131,15 @@ func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) 
 
 }
 
-func (ts *Things) onPropertyChanged(property *addon.Property) {
+func (ts *Things) onPropertyChanged(data []byte) {
+	deviceId := json.Get(data, "deviceId").ToString()
+	name := json.Get(data, "name").ToString()
+	value := json.Get(data, "value").GetInterface()
 	for _, th := range ts.things {
-		if th.ID == property.DeviceId {
+		if th.ID == deviceId {
 			for _, prop := range th.Properties {
-				if prop.Name == property.Name {
-					prop.Value = property.Value
+				if prop.Name == name {
+					prop.Value = value
 				}
 			}
 		}

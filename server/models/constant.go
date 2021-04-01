@@ -25,4 +25,6 @@ const (
 	ThingAdded      = "thingAdded"
 	ThingModified   = "thingModified"
 	ThingRemoved    = "thingRemoved"
+
+	GetThings = "getThings"
 )

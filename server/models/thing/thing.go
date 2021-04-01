@@ -1,6 +1,7 @@
 package thing
 
 import (
+	"addon"
 	"fmt"
 	"gateway/pkg/bus"
 	"gateway/pkg/database"
@@ -22,10 +23,7 @@ type Thing struct {
 	Forms      []util.Form          `json:"forms,omitempty"`
 
 	//The configuration  of the device
-	Pin struct {
-		Required bool        `json:"required,omitempty"`
-		Pattern  interface{} `json:"pattern,omitempty"`
-	} `json:"pin,omitempty"`
+	Pin                 addon.PIN
 	CredentialsRequired bool `json:"credentialsRequired,omitempty"`
 
 	//The state  of the thing

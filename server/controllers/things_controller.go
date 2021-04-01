@@ -92,7 +92,7 @@ func (tc *ThingsController) handleGetThings(c *fiber.Ctx) error {
 	}
 	log.Debug("GET things")
 	ts := tc.Container.GetListThings()
-	data, err := json.MarshalIndent(ts, "", "  ")
+	data, err := json.MarshalIndent(ts, "", " ")
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
@@ -116,19 +116,17 @@ func (tc *ThingsController) handleSetProperty(c *fiber.Ctx) error {
 
 	thingId := c.Params("thingId")
 	propName := c.Params("*")
-
 	if thingId == "" || propName == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid params")
 	}
-
 	value := c.Body()
-
-	p, e := tc.Container.SetThingProperty(thingId, propName, value)
+	prop, e := tc.Container.SetThingProperty(thingId, propName, value)
 	if e != nil {
 		log.Error("Failed set thing(%s) property:(%s) value:(%s),err:(%s)", thingId, propName, value, e.Error())
 		return fiber.NewError(fiber.StatusGatewayTimeout, e.Error())
 	}
-	data := map[string]interface{}{propName: p.Value}
+	newValue := json.Get(prop, "value").GetInterface()
+	data := map[string]interface{}{propName: newValue}
 	return c.Status(fiber.StatusOK).JSON(data)
 }
 

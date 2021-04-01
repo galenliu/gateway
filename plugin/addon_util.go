@@ -90,6 +90,7 @@ func (addonInfo *AddonInfo) UpdateAddonInfoToDB(enable bool) error {
 		return err
 	}
 	return database.SetSetting(GetAddonKey(addonInfo.ID), s)
+
 }
 
 func GetAddonInfoFromDB(id string) *AddonInfo {
@@ -127,7 +128,7 @@ func loadManifest(destPath, packetId string) (*AddonInfo, *interface{}, error) {
 
 	//verify that id in packet matches packetId
 	if manifest.ID != packetId {
-		err = fmt.Errorf("ID:%s from the manfest file,doesn't match ID for packetId: %s ",
+		err = fmt.Errorf("Id:%s from the manfest file,doesn't match Id for packetId: %s ",
 			manifest.ID, packetId)
 		return nil, nil, err
 	}
@@ -159,102 +160,141 @@ func loadManifest(destPath, packetId string) (*AddonInfo, *interface{}, error) {
 	return &addonInfo, &manifest.Options.Default, nil
 }
 
-func asWebThing(device *addon.Device) *thing.Thing {
+func UnmarshalWebThing(data []byte) (*thing.Thing, error) {
 
-	t := thing.Thing{
-		ID:          fmt.Sprintf("/things/%s", device.ID),
-		AtContext:   device.AtContext,
-		AtType:      device.AtType,
-		Title:       device.Title,
-		Description: device.Description,
-		Properties:  nil,
-		Actions:     nil,
-		Events:      nil,
+	id := json.Get(data, "id").ToString()
+	if id == "" {
+		return nil, fmt.Errorf("id necessary")
+	}
+	title := json.Get(data, "title").ToString()
+	if title == "" {
+		title = id
+	}
+	id = fmt.Sprintf("/things/%s", id)
 
-		CredentialsRequired: device.CredentialsRequired,
+	var atContext []string
+	json.Get(data, "@context").ToVal(&atContext)
+
+	var atType []string
+	json.Get(data, "@type").ToVal(&atType)
+
+	t := &thing.Thing{
+		AtContext:           atContext,
+		Title:               title,
+		ID:                  id,
+		AtType:              atType,
+		Description:         json.Get(data, "description").ToString(),
+		Properties:          nil,
+		Actions:             nil,
+		Events:              nil,
+		Forms:               nil,
+		CredentialsRequired: json.Get(data, "credentialsRequired").ToBool(),
 	}
 
-	t.Properties = make(map[string]*thing.Property)
-	if len(device.Properties) > 0 {
-
-		f := util.NewForm("rel", "properties", "href", fmt.Sprintf("%s/properties", t.ID))
-		t.Forms = append(t.Forms, f)
-
-		for _, prop := range device.Properties {
-			var thingProperty *thing.Property
-			thingProperty = &thing.Property{
-				Name:        prop.Name,
-				AtType:      prop.AtType,
-				Type:        prop.Type,
-				Title:       prop.Title,
-				Description: prop.Description,
-				Unit:        prop.Unit,
-				ReadOnly:    prop.ReadOnly,
-				Visible:     prop.Visible,
-				Minimum:     prop.Minimum,
-				Maximum:     prop.Maximum,
-				Value:       prop.Value,
-				Enum:        prop.Enum,
+	var pin *addon.PIN
+	json.Get(data, "pin").ToVal(&pin)
+	if pin != nil {
+		t.Pin = *pin
+	}
+	var props map[string]addon.Property
+	json.Get(data, "properties").ToVal(&props)
+	if len(props) > 0 {
+		t.Properties = make(map[string]*thing.Property)
+		for n, p := range props {
+			prop := &thing.Property{
+				Name:        n,
+				AtType:      p.AtType,
+				Type:        p.Type,
+				Title:       p.Title,
+				Description: p.Description,
+				Unit:        p.Unit,
+				ReadOnly:    p.ReadOnly,
+				Visible:     p.Visible,
+				Minimum:     p.Minimum,
+				Maximum:     p.Maximum,
+				Enum:        p.Enum,
 				ThingId:     t.ID,
 			}
-			thingProperty.Forms = append(thingProperty.Forms, util.NewForm("href", fmt.Sprintf("%s/properties/%s", t.ID, prop.Name)))
-			t.Properties[thingProperty.Name] = thingProperty
+			prop.Forms = append(prop.Forms, util.NewForm("href", fmt.Sprintf("%s/properties/%s", t.ID, prop.Name)))
+			t.Properties[n] = prop
 		}
-
+		t.Forms = append(t.Forms, util.NewForm("rel", "alternate", "mediaType", "text/html", "href", fmt.Sprintf("/things/%s", id)))
+		t.Forms = append(t.Forms, util.NewForm("rel", "alternate", "href", fmt.Sprintf("/things/%s/", id)))
 	}
-	t.Forms = append(t.Forms, util.NewForm("rel", "alternate", "mediaType", "text/html", "href", fmt.Sprintf("/things/%s", device.ID)))
-	t.Forms = append(t.Forms, util.NewForm("rel", "alternate", "href", fmt.Sprintf("/things/%s/", device.ID)))
-	return &t
+	return t, nil
 }
 
-func asDevice(data json.Any) (*addon.Device, error) {
-	id := data.Get("id").ToString()
-	title := data.Get("title").ToString()
+func UnmarshalDevice(d []byte) (*addon.Device, error) {
+
+	id := json.Get(d, "id").ToString()
+	if id == "" {
+		return nil, fmt.Errorf("device id lost")
+	}
+	title := json.Get(d, "title").ToString()
 	if title == "" {
 		title = id
 	}
 
-	var atContext = make([]string, 0)
-	cs := data.Get("@context").Keys()
-	if len(cs) == 0 {
-		t := data.Get("@context").ToString()
+	atContext := json.Get(d, "@context").Keys()
+	if len(atContext) == 0 {
+		t := json.Get(d, "@context").ToString()
 		if t != "" {
 			atContext = append(atContext, t)
 		}
 	}
-	for _, k := range cs {
-		atContext = append(atContext, k)
-	}
 
-	var atType = make([]string, 0)
-	data.Get("@type").ToVal(&atType)
+	var atType []string
+	json.Get(d, `@type`).ToVal(&atType)
 	if len(atType) == 0 {
-		return nil, fmt.Errorf("@type is empty")
+		return nil, fmt.Errorf("@type lost")
 	}
 
-	description := data.Get("description").ToString()
+	var properties map[string]*addon.Property
+	json.Get(d, "properties").ToVal(&properties)
 
-	properties := make(map[string]*addon.Property)
-	data.Get("properties").ToVal(&properties)
+	var actions map[string]*addon.Action
+	json.Get(d, "actions").ToVal(&actions)
 
-	actions := make(map[string]*addon.Action)
-	data.Get("actions").ToVal(&actions)
+	var events map[string]*addon.Event
+	json.Get(d, "actions").ToVal(&events)
 
-	events := make(map[string]*addon.Event)
-	data.Get("actions").ToVal(&events)
+	var pin *addon.PIN
+	json.Get(d, "pin").ToVal(&pin)
 
 	device := &addon.Device{
 		ID:                  id,
 		AtContext:           atContext,
 		Title:               title,
 		AtType:              atType,
-		Description:         description,
-		CredentialsRequired: false,
-		Properties:          properties,
-		Actions:             actions,
-		Events:              events,
+		Description:         json.Get(d, "description").ToString(),
+		CredentialsRequired: json.Get(d, "credentialsRequired").ToBool(),
 		Pin:                 addon.PIN{},
-		AdapterId:           "",
+		AdapterId:           json.Get(d, "adapterId").ToString(),
 	}
+	if len(properties) > 0 {
+		device.Properties = make(map[string]addon.IProperty)
+		for n, p := range properties {
+			device.Properties[n] = p
+		}
+	}
+
+	if len(events) > 0 {
+		device.Events = make(map[string]*addon.Event)
+		for n, e := range events {
+			device.Events[n] = e
+		}
+	}
+
+	if len(actions) > 0 {
+		device.Actions = make(map[string]*addon.Action)
+		for n, a := range actions {
+			device.Actions[n] = a
+		}
+	}
+
+	if pin != nil {
+		device.Pin = *pin
+	}
+
 	return device, nil
 }

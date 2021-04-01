@@ -13,10 +13,10 @@ type Property struct {
 	ReadOnly bool   `json:"readOnly"`
 	Visible  bool   `json:"visible"`
 
-	Minimum interface{} `json:"minimum,omitempty"`
-	Maximum interface{} `json:"maximum,omitempty"`
-	Value   interface{} `json:"-"`
-	Enum    []string    `json:"enum,omitempty"`
+	Minimum interface{}   `json:"minimum,omitempty"`
+	Maximum interface{}   `json:"maximum,omitempty"`
+	Value   interface{}   `json:"-"`
+	Enum    []interface{} `json:"enum,omitempty"`
 
 	Forms []util.Form `json:"forms"`
 

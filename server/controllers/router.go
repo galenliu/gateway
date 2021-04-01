@@ -64,6 +64,23 @@ func CollectRoute(conf Config) *fiber.App {
 	//app.Get("/", controllers.RootHandle())
 	app.Static("/index.htm", "")
 
+	{
+		apiGroup := app.Group(models.ApiPrefix)
+		apiGroup.Use("/:thingId", func(c *fiber.Ctx) error {
+			id := c.Params("thingId")
+			c.Locals("thingId", id)
+			if websocket.IsWebSocketUpgrade(c) {
+				c.Locals("websocket", true)
+				return c.Next()
+			}
+			return fiber.ErrUpgradeRequired
+		})
+	}
+
+	app.Get(models.ApiPrefix, websocket.New(func(conn *websocket.Conn) {
+		handleApiWebsocket(conn)
+	}))
+
 	//Things Controller
 	{
 		thingsGroup := app.Group(models.ThingsPath)

@@ -115,6 +115,6 @@ func (s *PluginsServer) Stop() {
 	}
 }
 
-func (s *PluginsServer) addAdapter(adapter *AdapterProxy) {
+func (s *PluginsServer) addAdapter(adapter *Adapter) {
 	s.manager.addAdapter(adapter)
 }

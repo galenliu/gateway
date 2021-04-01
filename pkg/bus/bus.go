@@ -99,7 +99,7 @@ func WaitAsync() {
 //}
 //
 //func PublishPropertyChanged(prop *addon.Property) {
-//	topic := fmt.Sprintf("%s.%s.%s", util.PropertyChanged, prop.DeviceId, prop.Name)
+//	topic := fmt.Sprintf("%s.%s.%s", util.PropertyChanged, prop.DeviceId, prop.name)
 //	if instance == nil {
 //		initBus()
 //	}

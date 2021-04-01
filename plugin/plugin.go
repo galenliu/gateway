@@ -57,6 +57,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 		return
 	}
 	var adapterId = json.Get(data, "data", "adapterId").ToString()
+
 	// plugin handler
 	switch messageType {
 	case DeviceRequestActionResponse:
@@ -82,65 +83,69 @@ func (plugin *Plugin) handleMessage(data []byte) {
 		if packageName == "" {
 			return
 		}
-		adapter := NewAdapterProxy(plugin.getManager(), name, adapterId, plugin.pluginId, packageName)
+		adapter := NewAdapter(plugin.getManager(), name, adapterId, plugin.pluginId, packageName)
 		adapter.plugin = plugin
 		plugin.pluginServer.addAdapter(adapter)
 		return
-
-	case NotifierAddedNotification:
-		break
-	case ApiHandlerAddedNotification:
-		break
-	case ApiHandlerUnloadResponse:
-		break
-	case PluginUnloadRequest:
-		break
-	case PluginErrorNotification:
-		break
 	}
 
-	adapterX := plugin.getManager().getAdapter(adapterId)
-	if adapterX == nil {
-		log.Error("adapter not found")
+	adapter := plugin.getManager().getAdapter(adapterId)
+	if adapter == nil {
+		log.Info("(%s)adapter not found", MessageTypeToString(messageType))
 		return
 	}
 
-	deviceId := json.Get(data, "data", "deviceId").ToString()
-	device, ok := adapterX.Devices[deviceId]
-	if !ok {
-		log.Info("device cannot found: %s", deviceId)
-	}
-
 	switch messageType {
-	case AdapterUnloadResponse:
-		break
 
-	case NotifierUnloadResponse:
-		break
-
+	case NotifierAddedNotification:
+		return
+	case ApiHandlerAddedNotification:
+		return
+	case ApiHandlerUnloadResponse:
+		return
+	case PluginUnloadRequest:
+		return
+	case PluginErrorNotification:
+		return
 	case DeviceAddedNotification:
 		//messages.DeviceAddedNotification
-		js := json.Get(data, "data", "device")
-		if js.LastError() != nil {
-			log.Error("new device err: %s", js.LastError().Error())
+		data := json.Get(data, "data", "device").ToString()
+		if data == "" {
+			log.Info("marshal device err")
 			return
 		}
-		newDevice, err := asDevice(js)
+		newDevice, err := UnmarshalDevice([]byte(data))
 		if err != nil {
 			log.Error(err.Error())
 			return
 		}
-		log.Info("new device,%s \t\n", newDevice)
-		adapterX.handleDeviceAdded(newDevice)
-		break
+		newDevice.AdapterId = adapterId
+		adapter.handleDeviceAdded(newDevice)
+		return
+
+	}
+
+	deviceId := json.Get(data, "data", "deviceId").ToString()
+	device := adapter.getDevice(deviceId)
+	if device == nil {
+		log.Info("device cannot found: %s", deviceId)
+		return
+	}
+
+	switch messageType {
+	case AdapterUnloadResponse:
+		return
+
+	case NotifierUnloadResponse:
+		return
 
 	case AdapterRemoveDeviceResponse:
-		adapterX.handleDeviceRemoved(device)
+		adapter.handleDeviceRemoved(device)
 
 	case OutletAddedNotification:
-		break
+		return
 	case OutletRemovedNotification:
-		break
+		return
 
 	case DeviceSetPinResponse:
 		s := json.Get(data, "pin").ToString()
@@ -160,16 +165,21 @@ func (plugin *Plugin) handleMessage(data []byte) {
 		propName := js.Get("name").ToString()
 		property := device.GetProperty(propName)
 		if property == nil {
+			log.Info("propName err")
 			return
 		}
-		property.Update(js)
-		bus.Publish(util.PropertyChanged, property)
-		break
+		bt := []byte(js.ToString())
+		if len(bt) == 0 {
+			return
+		}
+		property.Update(bt)
+		bus.Publish(util.PropertyChanged, bt)
+		return
 
 	case DeviceActionStatusNotification:
 		var action addon.Action
 		json.Get(data, "data", "action").ToVal(&action)
-		break
+		return
 
 	case DeviceEventNotification:
 		var event addon.Event
@@ -177,20 +187,21 @@ func (plugin *Plugin) handleMessage(data []byte) {
 
 	case DeviceConnectedStateNotification:
 		var connected = json.Get(data, "data", "connected")
-		if device != nil && connected.LastError() != nil {
+		if connected.LastError() == nil {
 			bus.Publish(util.CONNECTED, device, connected.ToBool())
 		}
+		return
 
 	case AdapterPairingPromptNotification:
-		break
+		return
 
 	case AdapterUnpairingPromptNotification:
-		break
+		return
 	case MockAdapterClearStateResponse:
-		break
+		return
 
 	case MockAdapterRemoveDeviceResponse:
-		break
+		return
 
 	}
 }
@@ -199,7 +210,7 @@ func (plugin *Plugin) getManager() *AddonManager {
 	return plugin.pluginServer.manager
 }
 
-func (plugin *Plugin) addAdapter(adapter *AdapterProxy) {
+func (plugin *Plugin) addAdapter(adapter *Adapter) {
 	plugin.getManager().addAdapter(adapter)
 }
 
@@ -329,7 +340,7 @@ func (plugin *Plugin) send(mt int, data map[string]interface{}) {
 		MessageType: mt,
 		Data:        data,
 	}
-	bt, err := json.MarshalIndent(message, "", "  ")
+	bt, err := json.MarshalIndent(message, "", " ")
 	log.Debug("Send-- %s : \t\n %s", MessageTypeToString(mt), bt)
 	if err != nil {
 		log.Error(err.Error())

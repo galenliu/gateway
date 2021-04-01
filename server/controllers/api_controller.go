@@ -13,10 +13,11 @@ import (
 	json "github.com/json-iterator/go"
 	"net/http"
 	"strings"
+
 	"sync"
 )
 
-type ThingsWebsocketHandler struct {
+type ApiController struct {
 	thingId            string
 	Container          *models.Things
 	ws                 *websocket.Conn
@@ -25,7 +26,7 @@ type ThingsWebsocketHandler struct {
 	subscriptionThings map[string]*thing.Thing
 }
 
-func NewThingsWebsocketController() *ThingsWebsocketHandler {
+func NewApiController() *ThingsWebsocketHandler {
 	controller := &ThingsWebsocketHandler{}
 	controller.subscriptionThings = make(map[string]*thing.Thing, 10)
 	controller.locker = new(sync.Mutex)
@@ -34,47 +35,21 @@ func NewThingsWebsocketController() *ThingsWebsocketHandler {
 	return controller
 }
 
-func handleWebsocket(c *websocket.Conn) {
+func handleApiWebsocket(c *websocket.Conn) {
 
 	if !c.Locals("websocket").(bool) {
 		return
 	}
-	controller := NewThingsWebsocketController()
+	thingId := c.Locals("thingId").(string)
+
+	controller := NewApiController()
 	controller.ws = c
-	controller.thingId = c.Params("thingId")
-	if controller.thingId != "" {
-		t := controller.Container.GetThing(controller.thingId)
-		if t == nil {
-			log.Info("Thing(%s) not found", controller.thingId)
-			controller.sendMessage(struct {
-				messageType string
-				data        interface{}
-			}{
-				messageType: thing.Error,
-				data: struct {
-					Code    int
-					Status  string
-					Message string `json:"message"`
-				}{
-					Code:    400,
-					Status:  "404 NOT FOUND",
-					Message: fmt.Sprintf("Thing(%s) not found", controller.thingId),
-				},
-			})
-			controller.close()
-			return
-		}
-		controller.addThing(t)
-	} else {
-		for _, t := range controller.Container.GetThings() {
-			controller.addThing(t)
-		}
-	}
 
 	_ = bus.Subscribe(util.PropertyChanged, controller.onPropertyChanged)
 	_ = bus.Subscribe(util.CONNECTED, controller.onConnected)
 	_ = bus.Subscribe(util.MODIFIED, controller.onModified)
 	_ = bus.Subscribe(util.ThingRemoved, controller.onRemoved)
+
 	for {
 		select {
 		case <-controller.done:
@@ -97,34 +72,35 @@ func handleWebsocket(c *websocket.Conn) {
 
 }
 
-func (controller *ThingsWebsocketHandler) handleMessage(data []byte) {
-
-	id := json.Get(data, "id").ToString()
-	if id == "" {
-		id = controller.thingId
-	}
-	// get devices form addon
-	device := plugin.GetDevice(id)
+func (controller *ApiController) handleMessage(data []byte) {
 	messageType := json.Get(data, "messageType").ToString()
 
-	if id == "" || device == nil || messageType == "" {
+	if messageType == "" {
 		controller.sendMessage(struct {
 			MessageType string      `json:"messageType"`
 			Data        interface{} `json:"data"`
 		}{
 			MessageType: thing.Error,
 			Data: struct {
-				Code    int         `json:"code"`
-				Status  string      `json:"status"`
-				Message string      `json:"message"`
-				Request interface{} `json:"request"`
+				Code    int    `json:"code"`
+				Status  string `json:"status"`
+				Message string `json:"message"`
 			}{
 				Code:    http.StatusBadRequest,
 				Status:  "400 Bed Request",
-				Message: fmt.Sprintf("thing id(%s) not found", id),
-				Request: json.Get(data),
+				Message: fmt.Sprintf("messageType(%s) err", messageType),
 			},
 		})
+		return
+	}
+
+	switch messageType {
+	case models.GetThings:
+
+		m := make(map[string]interface{})
+		m["id"] = id
+		m["messageType"] = models.ThingModified
+		return
 		return
 	}
 
@@ -135,25 +111,29 @@ func (controller *ThingsWebsocketHandler) handleMessage(data []byte) {
 
 		for propName, value := range propertyMap {
 			p, setErr := plugin.SetProperty(device.GetID(), propName, value)
+
+			m := make(map[string]interface{})
+			m["messageType"] = thing.Error
+
 			if setErr != nil {
-				controller.sendMessage(struct {
-					MessageType string      `json:"messageType"`
-					Data        interface{} `json:"data"`
-				}{
-					MessageType: thing.Error,
-					Data: struct {
-						Code    int         `json:"code"`
-						Status  string      `json:"status"`
-						Message string      `json:"message"`
-						Request interface{} `json:"request"`
-					}{
-						Code:    http.StatusBadRequest,
-						Status:  "400 Bed Request",
-						Message: setErr.Error(),
-						Request: json.Get(data),
-					},
-				})
+				m["messageType"] = thing.Error
+				m["data"] = map[string]interface{}{
+					"code":    http.StatusBadRequest,
+					"status":  "400 Bed Request",
+					"message": setErr.Error(),
+					"request": json.Get(data),
+				}
+
 			} else {
+
+				m["messageType"] = thing.Error
+				m["data"] = map[string]interface{}{
+					"code":    http.StatusBadRequest,
+					"status":  "400 Bed Request",
+					"message": fmt.Sprintf("Unknown messageType:%s", messageType),
+					"request": json.Get(data),
+				}
+
 				controller.sendMessage(struct {
 					MessageType string      `json:"messageType"`
 					Data        interface{} `json:"data"`
@@ -179,82 +159,58 @@ func (controller *ThingsWebsocketHandler) handleMessage(data []byte) {
 			}
 		}
 		return
-
 	default:
-		controller.sendMessage(struct {
-			MessageType string `json:"messageType"`
-			Data        interface{}
-		}{
-			MessageType: thing.Error,
-			Data: struct {
-				Code    int         `json:"code"`
-				Status  string      `json:"status"`
-				Message string      `json:"message"`
-				Request interface{} `json:"request"`
-			}{
-				Code:    http.StatusBadRequest,
-				Status:  "400 Bed Request",
-				Message: fmt.Sprintf("Unknown messageType:%s", messageType),
-				Request: json.Get(data),
-			},
-		})
+		m := make(map[string]interface{})
+		m["messageType"] = thing.Error
+		m["data"] = map[string]interface{}{
+			"code":    http.StatusBadRequest,
+			"status":  "400 Bed Request",
+			"message": fmt.Sprintf("Unknown messageType:%s", messageType),
+			"request": json.Get(data),
+		}
 		return
 	}
 
 }
 
-func (controller *ThingsWebsocketHandler) addThing(thing *thing.Thing) {
+func (controller *ApiController) addThing(thing *thing.Thing) {
 
 	sl := strings.Split(thing.ID, "/")
 	id := sl[len(sl)-1]
 	controller.subscriptionThings[id] = thing
 	for propName, _ := range thing.Properties {
+		m := make(map[string]interface{})
+		m["id"] = id
+		m["messageType"] = models.ThingModified
 		value, err := plugin.GetPropertyValue(id, propName)
+
 		if err != nil {
-			controller.sendMessage(struct {
-				ID          string      `json:"id"`
-				MessageType string      `json:"messageType"`
-				Data        interface{} `json:"data"`
-			}{
-				ID:          id,
-				MessageType: models.ERROR,
-				Data: struct {
-					Message string `json:"message"`
-				}{Message: err.Error()},
-			})
+			m["messageType"] = models.ERROR
+			m["data"] = map[string]string{"message": err.Error()}
+
 		} else {
-			controller.sendMessage(struct {
-				ID          string      `json:"id"`
-				MessageType string      `json:"messageType"`
-				Data        interface{} `json:"data"`
-			}{
-				ID:          id,
-				MessageType: models.PropertyStatus,
-				Data:        map[string]interface{}{propName: value},
-			})
+			m["messageType"] = models.PropertyStatus
+			m["data"] = map[string]interface{}{propName: value}
+
 		}
+		controller.sendMessage(m)
 	}
 }
 
-func (controller *ThingsWebsocketHandler) onConnected(device *addon.Device, connected bool) {
+func (controller *ApiController) onConnected(device *addon.Device, connected bool) {
 
 	t := controller.subscriptionThings[device.ID]
 	if t == nil {
 		return
 	}
-	controller.sendMessage(struct {
-		ID          string `json:"id"`
-		MessageType string `json:"messageType"`
-		Data        bool   `json:"data"`
-	}{
-		ID:          t.ID,
-		MessageType: models.CONNECTED,
-		Data:        connected,
-	})
-
+	data := make(map[string]interface{})
+	data["id"] = t.ID
+	data["messageType"] = models.ThingModified
+	data["data"] = connected
+	controller.sendMessage(data)
 }
 
-func (controller *ThingsWebsocketHandler) onModified(thing *thing.Thing) {
+func (controller *ApiController) onModified(thing *thing.Thing) {
 
 	sl := strings.Split(thing.ID, "/")
 	id := sl[len(sl)-1]
@@ -262,19 +218,13 @@ func (controller *ThingsWebsocketHandler) onModified(thing *thing.Thing) {
 	if t == nil {
 		return
 	}
-	controller.sendMessage(struct {
-		ID          string      `json:"id"`
-		MessageType string      `json:"messageType"`
-		Data        interface{} `json:"data"`
-	}{
-		ID:          id,
-		MessageType: models.ThingModified,
-		Data: struct {
-		}{},
-	})
+	data := make(map[string]interface{})
+	data["id"] = t.ID
+	data["messageType"] = models.ThingModified
+	controller.sendMessage(data)
 }
 
-func (controller *ThingsWebsocketHandler) onRemoved(thing *thing.Thing) {
+func (controller *ApiController) onRemoved(thing *thing.Thing) {
 
 	sl := strings.Split(thing.ID, "/")
 	id := sl[len(sl)-1]
@@ -294,7 +244,7 @@ func (controller *ThingsWebsocketHandler) onRemoved(thing *thing.Thing) {
 	})
 }
 
-func (controller *ThingsWebsocketHandler) onPropertyChanged(data []byte) {
+func (controller *ApiController) onPropertyChanged(data []byte) {
 
 	deviceId := json.Get(data, "deviceId").ToString()
 	name := json.Get(data, "name").ToString()
@@ -316,7 +266,7 @@ func (controller *ThingsWebsocketHandler) onPropertyChanged(data []byte) {
 	})
 }
 
-func (controller *ThingsWebsocketHandler) sendMessage(message interface{}) {
+func (controller *ApiController) sendData(message interface{}) {
 	controller.locker.Lock()
 	defer controller.locker.Unlock()
 	data, _ := json.MarshalIndent(&message, "", " ")
@@ -327,12 +277,12 @@ func (controller *ThingsWebsocketHandler) sendMessage(message interface{}) {
 	}
 }
 
-func (controller *ThingsWebsocketHandler) onError(err error) {
+func (controller *ApiController) onError(err error) {
 	log.Info("websocket err: %s", err.Error())
 	controller.done <- struct{}{}
 }
 
-func (controller *ThingsWebsocketHandler) close() {
+func (controller *ApiController) close() {
 	controller.locker.Lock()
 	defer controller.locker.Unlock()
 	_ = bus.Unsubscribe(util.PropertyChanged, controller.onPropertyChanged)
@@ -341,4 +291,12 @@ func (controller *ThingsWebsocketHandler) close() {
 	_ = bus.Unsubscribe(util.ThingRemoved, controller.onRemoved)
 	_ = controller.ws.Close()
 	return
+}
+
+func (controller *ApiController) sendMessage(data map[string]interface{}) {
+	d, _ := json.MarshalIndent(&data, "", " ")
+	writeErr := controller.ws.WriteMessage(websocket.TextMessage, d)
+	if writeErr != nil {
+		controller.onError(writeErr)
+	}
 }

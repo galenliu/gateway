@@ -38,8 +38,8 @@ type AddonManager struct {
 	configPath   string
 	pluginServer *PluginsServer
 
-	devices       map[string]*addon.Device
-	adapters      map[string]*AdapterProxy
+	devices       map[string]addon.IDevice
+	adapters      map[string]*Adapter
 	installAddons map[string]*AddonInfo
 
 	extensions map[string]Extension
@@ -64,14 +64,10 @@ func NewAddonsManager() *AddonManager {
 	am.addonsLoaded = false
 	am.isPairing = false
 	am.running = false
-	am.devices = make(map[string]*addon.Device, 50)
+	am.devices = make(map[string]addon.IDevice, 50)
 	am.installAddons = make(map[string]*AddonInfo, 50)
-	am.adapters = make(map[string]*AdapterProxy, 20)
+	am.adapters = make(map[string]*Adapter, 20)
 	am.extensions = make(map[string]Extension)
-
-	_ = bus.Subscribe(bus.SetProperty, am.handleSetProperty)
-	_ = bus.Subscribe(bus.GetDevices, am.handleGetDevices)
-	_ = bus.Subscribe(bus.GetThings, am.handleGetThings)
 
 	am.locker = new(sync.Mutex)
 	am.LoadAddons()
@@ -79,15 +75,24 @@ func NewAddonsManager() *AddonManager {
 }
 
 func (manager *AddonManager) handleDeviceAdded(device *addon.Device) {
-	manager.devices[device.ID] = device
-	bus.Publish(util.ThingAdded, asWebThing(device))
-
+	manager.devices[device.GetID()] = device
+	//d, err := json.MarshalIndent(device, "", " ")
+	d, err := json.MarshalIndent(device, "", " ")
+	if err != nil {
+		log.Info("device marshal err: %s", err.Error())
+		return
+	}
+	th, e := UnmarshalWebThing(d)
+	if e != nil {
+		log.Info("device marshal to webThing err: %s", e.Error())
+	}
+	bus.Publish(util.ThingAdded, th)
 }
 
-func (manager *AddonManager) handleDeviceRemoved(device *addon.Device) {
-	delete(manager.devices, device.ID)
-	bus.Publish(util.ThingRemoved, asWebThing(device))
-}
+//func (manager *AddonManager) handleDeviceRemoved(device *addon.Device) {
+//	delete(manager.devices, device.id)
+//	bus.Publish(util.ThingRemoved, asWebThing(device))
+//}
 
 func (manager *AddonManager) actionNotify(action *addon.Action) {
 	bus.Publish(util.ActionStatus, action)
@@ -101,14 +106,14 @@ func (manager *AddonManager) connectedNotify(device *addon.Device, connected boo
 	bus.Publish(util.CONNECTED, connected)
 }
 
-func (manager *AddonManager) addAdapter(adapter *AdapterProxy) {
+func (manager *AddonManager) addAdapter(adapter *Adapter) {
 	manager.locker.Lock()
 	defer manager.locker.Unlock()
-	manager.adapters[adapter.ID] = adapter
-	log.Debug(fmt.Sprintf("adapter：(%s) added", adapter.ID))
+	manager.adapters[adapter.id] = adapter
+	log.Debug(fmt.Sprintf("adapter：(%s) added", adapter.id))
 }
 
-func (manager *AddonManager) getAdapter(adapterId string) *AdapterProxy {
+func (manager *AddonManager) getAdapter(adapterId string) *Adapter {
 	adapter, ok := manager.adapters[adapterId]
 	if !ok {
 		return nil
@@ -116,7 +121,7 @@ func (manager *AddonManager) getAdapter(adapterId string) *AdapterProxy {
 	return adapter
 }
 
-func (manager *AddonManager) findAdapter(adapterId string) (*AdapterProxy, error) {
+func (manager *AddonManager) findAdapter(adapterId string) (*Adapter, error) {
 	if adapterId == "" {
 		return nil, fmt.Errorf("adapter id none")
 	}
@@ -128,57 +133,32 @@ func (manager *AddonManager) findAdapter(adapterId string) (*AdapterProxy, error
 }
 
 func (manager *AddonManager) handleSetProperty(deviceId, propName string, setValue interface{}) error {
-	adapter := manager.getAdapterByDeviceId(deviceId)
-	if adapter == nil {
-		return fmt.Errorf("adapter not found")
-	}
-	property := adapter.GetDevice(deviceId).GetProperty(propName)
+	device := manager.getDevice(deviceId)
+	adapter := manager.getAdapter(device.GetAdapterId())
+	property := device.GetProperty(propName)
+
 	var newValue interface{}
-	if property.Type == addon.TypeBoolean {
+	if property.GetType() == addon.TypeBoolean {
 		newValue = to.Bool(setValue)
 	}
-	if property.Type == addon.TypeInteger || property.Type == addon.TypeNumber {
+	if property.GetType() == addon.TypeInteger || property.GetAtType() == addon.TypeNumber {
 		newValue = to.Int64(to.Bytes(setValue))
 	}
-	if property.Type == addon.TypeString {
+	if property.GetType() == addon.TypeString {
 		newValue = to.String(setValue)
 	}
-
 	if property == nil {
 		return fmt.Errorf("device or property not found")
 	}
-
-	go adapter.handleSetPropertyValue(property, newValue)
+	data := make(map[string]interface{})
+	data[addon.Did] = device.GetID()
+	data["propertyName"] = property.GetName()
+	data["propertyValue"] = newValue
+	go adapter.send(DeviceSetPropertyCommand, data)
 	return nil
 }
 
-func (manager *AddonManager) handleGetDevices(devs *[]*addon.Device) {
-	for _, d := range manager.devices {
-		*devs = append(*devs, d)
-	}
-}
-
-func (manager *AddonManager) handleGetThings(ts *[]*thing.Thing) {
-	for _, d := range manager.devices {
-		var t = asWebThing(d)
-		*ts = append(*ts, t)
-	}
-}
-
-func (manager *AddonManager) getAdapterByDeviceId(deviceId string) *AdapterProxy {
-	device := manager.getDevice(deviceId)
-	if device == nil {
-		return nil
-	}
-	adapter, err1 := manager.findAdapter(device.AdapterId)
-	if err1 != nil {
-		log.Error(err1.Error())
-		return nil
-	}
-	return adapter
-}
-
-func (manager *AddonManager) getDevice(deviceId string) *addon.Device {
+func (manager *AddonManager) getDevice(deviceId string) addon.IDevice {
 	d, ok := manager.devices[deviceId]
 	if !ok {
 		return nil
@@ -386,8 +366,8 @@ func (manager *AddonManager) unloadAddon(packageId string) error {
 	}
 
 	for key, adapter := range manager.adapters {
-		if adapter.PackageName == plugin.pluginId {
-			for _, dev := range adapter.Devices {
+		if adapter.id == plugin.pluginId {
+			for _, dev := range adapter.devices {
 				adapter.handleDeviceRemoved(dev)
 			}
 			delete(manager.adapters, key)

@@ -2,71 +2,92 @@ package plugin
 
 import (
 	"addon"
+	"context"
 	"fmt"
+	"gateway/pkg/log"
+	"sync"
 )
 
-type Manager interface {
-	handleDeviceRemoved(device *addon.Device)
-	handleDeviceAdded(device *addon.Device)
-}
+type pairingFunc func(ctx context.Context, cancelFunc func())
 
 type Adapter struct {
-	ID          string `json:"adapterId"`
-	Name        string `json:"name"`
-	PackageName string `json:"packageName"`
-	manager     Manager
-	Devices     map[string]*addon.Device
-	IsPairing   bool
+	id             string
+	name           string
+	pluginId       string
+	plugin         *Plugin
+	looker         *sync.Mutex
+	isPairing      bool
+	onPairingFunc  pairingFunc
+	devices        map[string]addon.IDevice
+	pairingContext context.Context
+	manifest       interface{}
+	packageName    string
+	manager        *AddonManager
 }
 
-func NewAdapter(adapterId, name, packageName string) *Adapter {
-	adapter := &Adapter{}
-	adapter.PackageName = packageName
-	adapter.Name = name
-	adapter.ID = adapterId
-	adapter.Devices = make(map[string]*addon.Device, 10)
-	adapter.IsPairing = false
-	return adapter
+func NewAdapter(manager *AddonManager, name, adapterId, pluginId, packageName string) *Adapter {
+	proxy := &Adapter{}
+	proxy.id = adapterId
+	proxy.name = name
+	proxy.packageName = packageName
+	proxy.pluginId = pluginId
+	proxy.devices = make(map[string]addon.IDevice)
+	proxy.looker = new(sync.Mutex)
+	proxy.manager = manager
+	return proxy
+}
+
+func (adapter *Adapter) pairing(timeout float64) {
+	log.Info(fmt.Sprintf("adapter: %s start pairing", adapter.id))
+	data := make(map[string]interface{})
+	data["timeout"] = timeout
+	adapter.send(AdapterStartPairingCommand, data)
+}
+
+func (adapter *Adapter) cancelPairing() {
+	log.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.id))
+	data := make(map[string]interface{})
+	adapter.send(AdapterCancelPairingCommand, data)
+}
+
+func (adapter *Adapter) removeThing(device addon.IDevice) {
+	log.Info(fmt.Sprintf("adapter delete thing Id: %v", device.GetID()))
+	data := make(map[string]interface{})
+	data["deviceId"] = device.GetID()
+	adapter.send(AdapterRemoveDeviceRequest, data)
+
+}
+
+func (adapter *Adapter) cancelRemoveThing(deviceId string) {
+	log.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.id))
+	data := make(map[string]interface{})
+	data["deviceId"] = deviceId
+	adapter.send(AdapterCancelRemoveDeviceCommand, data)
+}
+
+func (adapter *Adapter) getManager() *AddonManager {
+	return adapter.plugin.pluginServer.manager
+}
+
+func (adapter *Adapter) send(messageType int, data map[string]interface{}) {
+	data["adapterId"] = adapter.id
+	adapter.plugin.send(messageType, data)
+}
+
+func (adapter *Adapter) getDevice(deviceId string) addon.IDevice {
+	device, ok := adapter.devices[deviceId]
+	if ok {
+		return device
+	}
+	return nil
+}
+
+func (adapter *Adapter) handleDeviceRemoved(device addon.IDevice) {
+	delete(adapter.devices, device.GetID())
+
 }
 
 func (adapter *Adapter) handleDeviceAdded(device *addon.Device) {
-	if device == nil {
-		return
-	}
-	device.AdapterId = adapter.ID
-	adapter.Devices[device.ID] = device
+	adapter.devices[device.GetID()] = device
 	adapter.manager.handleDeviceAdded(device)
-}
-
-func (adapter *Adapter) handleDeviceRemoved(device *addon.Device) {
-	delete(adapter.Devices, device.ID)
-	adapter.manager.handleDeviceAdded(device)
-}
-
-func (adapter *Adapter) GetAdapterId() string {
-	return adapter.ID
-}
-
-func (adapter *Adapter) GetPacketName() string {
-	return adapter.PackageName
-}
-
-func (adapter *Adapter) GetManger() Manager {
-	return adapter.manager
-}
-
-func (adapter *Adapter) FindDevice(deviceId string) (*addon.Device, error) {
-	device, ok := adapter.Devices[deviceId]
-	if !ok {
-		return nil, fmt.Errorf("devices id:(%s) invaild", deviceId)
-	}
-	return device, nil
-}
-
-func (adapter *Adapter) GetDevice(deviceId string) *addon.Device {
-	device, ok := adapter.Devices[deviceId]
-	if !ok {
-		return nil
-	}
-	return device
 }
