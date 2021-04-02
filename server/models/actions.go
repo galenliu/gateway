@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gateway/plugin"
 	"gateway/server/models/thing"
+	"sync"
 )
 
 const (
@@ -12,22 +13,32 @@ const (
 	ActionPending = "pending"
 )
 
+var one sync.Once
+var instanceActions *Actions
+
 type Actions struct {
 	things *Things
 	List   map[string]*thing.Action
 }
 
 func NewActions() *Actions {
-	return &Actions{
-		List: make(map[string]*thing.Action),
-	}
+	one.Do(
+		func() {
+
+			instanceActions = &Actions{}
+			instanceActions.List = make(map[string]*thing.Action)
+
+		},
+	)
+	return instanceActions
+
 }
 
 func (actions *Actions) Add(action *thing.Action) {
 
 	actions.List[action.ID] = action
-	if action.ThingID != "" {
-		t := actions.things.GetThing(action.ThingID)
+	if action.ThingId != "" {
+		t := actions.things.GetThing(action.ThingId)
 		if t == nil {
 			action.Error = "can not find thing"
 			return
@@ -60,8 +71,8 @@ func (actions *Actions) Remove(actionId string) error {
 		return fmt.Errorf("Invaild actions id: %v ", actionId)
 	}
 	if action.Status == "pending" {
-		if action.ThingID != "" {
-			if t := actions.things.GetThing(action.ThingID); t != nil {
+		if action.ThingId != "" {
+			if t := actions.things.GetThing(action.ThingId); t != nil {
 				if !t.RemoveAction(action) {
 					return fmt.Errorf(fmt.Sprintf("Invaild action name : %s", action.Name))
 				}

@@ -42,15 +42,14 @@ func (controller *ActionsController) handleActions(c *fiber.Ctx) error {
 	if thingId != "" {
 		action = thing.NewThingAction(thingId, actionName, input)
 	} else {
-		action = thing.NewAction(actionName, input)
+		action = thing.NewAction(actionName, input, nil)
 	}
 	controller.Actions.Add(action)
 
 	var actionDesc string
-	actionDesc, err = action.GetDescription()
-	if err != nil {
-		return fiber.NewError(http.StatusBadGateway, err.Error())
-
+	actionDesc = action.GetDescription()
+	if actionDesc == "" {
+		return fiber.NewError(http.StatusBadGateway, "action GetDescription err")
 	}
 	return c.SendString(actionDesc)
 }

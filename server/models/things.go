@@ -15,7 +15,8 @@ var once sync.Once
 var instance *Things
 
 type Things struct {
-	things map[string]*thing.Thing
+	things  map[string]*thing.Thing
+	Actions *Actions
 }
 
 func NewThings() *Things {
@@ -24,6 +25,7 @@ func NewThings() *Things {
 			instance = &Things{}
 			instance.things = make(map[string]*thing.Thing)
 			instance.GetThings()
+			instance.Actions = NewActions()
 			_ = bus.Subscribe(util.PropertyChanged, instance.onPropertyChanged)
 
 		},

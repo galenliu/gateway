@@ -9,12 +9,6 @@ import (
 	"time"
 )
 
-const (
-	Created   = "created"
-	Completed = "completed"
-	Error     = "error"
-)
-
 var actionId int = 0
 
 func generateActionId() string {
@@ -31,7 +25,7 @@ type Action struct {
 	TimeRequested string                 `json:"time_requested"`
 	TimeCompleted string                 `json:"time_completed,omitempty"`
 	Error         string                 `json:"error,omitempty"`
-	ThingID       string
+	ThingId       string
 }
 
 type Input struct {
@@ -39,7 +33,7 @@ type Input struct {
 	ID      int    `json:"id,omitempty"`
 }
 
-func NewAction(name string, input map[string]interface{}) *Action {
+func NewAction(name string, input map[string]interface{}, th *Thing) *Action {
 	a := &Action{
 		ID:            generateActionId(),
 		Name:          name,
@@ -47,23 +41,26 @@ func NewAction(name string, input map[string]interface{}) *Action {
 		Status:        "created",
 		TimeRequested: time.Now().String(),
 	}
-	a.Href = fmt.Sprintf("%s/%s/%s", util.ActionsPath, name, a.ID)
+	if th != nil {
+		a.ThingId = th.ID
+		a.Href = fmt.Sprintf("%s/%s/%s/%s", th.ID, util.ActionsPath, name, a.ID)
+	}
 	return a
 }
 
 func NewThingAction(thingId, name string, input map[string]interface{}) *Action {
-	a := NewAction(name, input)
-	a.ThingID = thingId
+	a := NewAction(name, input, nil)
+	a.ThingId = thingId
 	a.Href = "/" + thingId + a.Href
 	return a
 }
 
-func (action *Action) GetDescription() (string, error) {
+func (action *Action) GetDescription() string {
 	dsc, err := json.MarshalToString(action)
 	if err != nil {
-		return "", err
+		return ""
 	}
-	return dsc, nil
+	return dsc
 }
 
 func (action *Action) UpdateStatus(newStatus string) {

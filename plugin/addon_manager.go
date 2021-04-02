@@ -95,7 +95,7 @@ func SetProperty(deviceId, propName string, newValue interface{}) ([]byte, error
 	}
 	closeChan := make(chan struct{})
 	propChan := make(chan []byte)
-	time.AfterFunc(2*time.Second, func() {
+	time.AfterFunc(1*time.Second, func() {
 		closeChan <- struct{}{}
 	})
 	changed := func(data []byte) {
@@ -133,7 +133,7 @@ func GetPropertyValue(deviceId, propName string) (interface{}, error) {
 	if prop == nil {
 		return nil, fmt.Errorf("propName(%s)invaild", propName)
 	}
-	return prop, nil
+	return prop.GetValue(), nil
 }
 
 func InstallAddonFromUrl(id, url, checksum string, enabled bool) error {
@@ -199,6 +199,11 @@ func SetThingPin(thingId string, pin interface{}) error {
 }
 
 func RemoveAction(thingId, actionId, actionName string) error {
+	//TODO
+	return nil
+}
+
+func RequestAction(thingId, actionId, actionName string, actionParams interface{}) error {
 	//TODO
 	return nil
 }

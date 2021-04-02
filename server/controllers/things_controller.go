@@ -68,6 +68,7 @@ func (tc *ThingsController) handleDeleteThing(c *fiber.Ctx) error {
 func (tc *ThingsController) handleGetThing(c *fiber.Ctx) error {
 	if websocket.IsWebSocketUpgrade(c) {
 		c.Locals("websocket", true)
+		c.Locals("thingId", c.Params("thingId"))
 		return c.Next()
 	}
 
