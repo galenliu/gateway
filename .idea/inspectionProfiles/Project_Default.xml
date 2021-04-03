@@ -31,6 +31,7 @@
         <method importPath="database/sql" receiver="*DB" name="Close" />
         <method importPath="gateway/server/controllers" receiver="*Web" name="Start" />
         <method importPath="github.com/gofiber/websocket/v2" receiver="*Conn" name="Close" />
+        <method importPath="gateway/plugin" receiver="*AddonManager" name="handleSetProperty" />
       </methods>
     </inspection_tool>
   </profile>

@@ -53,14 +53,16 @@ type AddonManager struct {
 	DataDir   string
 	locker    *sync.Mutex
 	running   bool
+	verbose   bool
 }
 
 func NewAddonsManager() *AddonManager {
 	am := &AddonManager{}
 	instance = am
 
-	am.AddonsDir = config.Conf.AddonsDir
-	am.DataDir = config.Conf.DataDir
+	am.AddonsDir = config.GetAddonsDir()
+	am.DataDir = config.GetAddonsDir()
+	am.verbose = config.IsVerbose()
 	am.addonsLoaded = false
 	am.isPairing = false
 	am.running = false
@@ -135,6 +137,9 @@ func (manager *AddonManager) findAdapter(adapterId string) (*Adapter, error) {
 func (manager *AddonManager) handleSetProperty(deviceId, propName string, setValue interface{}) error {
 	device := manager.getDevice(deviceId)
 	adapter := manager.getAdapter(device.GetAdapterId())
+	if adapter == nil {
+		return fmt.Errorf("adapter id err")
+	}
 	property := device.GetProperty(propName)
 
 	var newValue interface{}

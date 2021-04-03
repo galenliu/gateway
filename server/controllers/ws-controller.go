@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"addon"
 	"fmt"
 	"gateway/pkg/bus"
 	"gateway/pkg/log"
@@ -11,6 +10,7 @@ import (
 	"gateway/server/models/thing"
 	"github.com/gofiber/websocket/v2"
 	json "github.com/json-iterator/go"
+	"github.com/tidwall/gjson"
 	"net/http"
 	"strings"
 
@@ -38,9 +38,6 @@ func NewWsHandler() *WsHandler {
 }
 
 func handleWebsocket(c *websocket.Conn) {
-	if !c.Locals("websocket").(bool) {
-		return
-	}
 	log.Info("handler websocket....")
 	controller := NewWsHandler()
 	controller.thingId, _ = c.Locals("thingId").(string)
@@ -62,7 +59,6 @@ func (controller *WsHandler) handlerConn() {
 				"message": fmt.Sprintf("Thing(%s) not found", controller.thingId),
 			}
 			controller.sendMessage(m)
-			controller.close()
 			return
 		}
 		controller.addThing(t)
@@ -76,11 +72,23 @@ func (controller *WsHandler) handlerConn() {
 	_ = bus.Subscribe(util.CONNECTED, controller.onConnected)
 	_ = bus.Subscribe(util.MODIFIED, controller.onModified)
 	_ = bus.Subscribe(util.ThingRemoved, controller.onRemoved)
+	_ = bus.Subscribe(util.ThingAdded, controller.onThingAdded)
+
+	defer func() {
+		_ = bus.Unsubscribe(util.PropertyChanged, controller.onPropertyChanged)
+		_ = bus.Unsubscribe(util.CONNECTED, controller.onConnected)
+		_ = bus.Unsubscribe(util.MODIFIED, controller.onModified)
+		_ = bus.Unsubscribe(util.ThingRemoved, controller.onRemoved)
+		_ = bus.Unsubscribe(util.ThingAdded, controller.onThingAdded)
+		if controller.ws != nil {
+			_ = controller.ws.Close()
+		}
+
+	}()
 
 	for {
 		select {
 		case <-controller.done:
-			controller.close()
 			return
 		default:
 			_, data, readErr := controller.ws.ReadMessage()
@@ -134,7 +142,7 @@ func (controller *WsHandler) handleMessage(bytes []byte) {
 	}
 
 	switch messageType {
-	case models.SetProperty:
+	case util.SetProperty:
 		var propertyMap map[string]interface{}
 		json.Get(bytes, "data").ToVal(&propertyMap)
 		for propName, value := range propertyMap {
@@ -172,12 +180,10 @@ func (controller *WsHandler) handleMessage(bytes []byte) {
 				sendError(400, "400 Bad Request", err.Error())
 			}
 		}
-
 	default:
 		sendError(400, "400 Bed Request", fmt.Sprintf("Unknown messageType:%s", messageType))
 		return
 	}
-
 }
 
 func (controller *WsHandler) addThing(thing *thing.Thing) {
@@ -185,36 +191,47 @@ func (controller *WsHandler) addThing(thing *thing.Thing) {
 	sl := strings.Split(thing.ID, "/")
 	id := sl[len(sl)-1]
 	controller.subscriptionThings[id] = thing
+
+	m := make(map[string]interface{})
+	m["id"] = id
 	for propName, _ := range thing.Properties {
-		m := make(map[string]interface{})
-		m["id"] = id
-		m["messageType"] = models.ThingModified
 		value, err := AddonManager.GetPropertyValue(id, propName)
-
 		if err != nil {
-			m["messageType"] = models.ERROR
-			m["data"] = map[string]string{"message": err.Error()}
-
+			m["messageType"] = util.PropertyStatus
+			m["data"] = map[string]interface{}{"message": "property set err"}
+			continue
 		} else {
-			m["messageType"] = models.PropertyStatus
 			m["data"] = map[string]interface{}{propName: value}
-
 		}
 		controller.sendMessage(m)
 	}
+
+	controller.onConnected(id, thing.IsConnected())
 }
 
-func (controller *WsHandler) onConnected(device *addon.Device, connected bool) {
+func (controller *WsHandler) onThingAdded(thing *thing.Thing) {
 
-	t := controller.subscriptionThings[device.ID]
-	if t == nil {
+	sl := strings.Split(thing.ID, "/")
+	id := sl[len(sl)-1]
+	m := make(map[string]interface{})
+	m["id"] = id
+	m["messageType"] = util.ThingAdded
+	m["data"] = struct{}{}
+	controller.sendMessage(m)
+	controller.addThing(thing)
+}
+
+func (controller *WsHandler) onConnected(deviceId string, connected bool) {
+
+	_, ok := controller.subscriptionThings[deviceId]
+	if !ok {
 		return
 	}
-	data := make(map[string]interface{})
-	data["id"] = t.ID
-	data["messageType"] = models.ThingModified
-	data["data"] = connected
-	controller.sendMessage(data)
+	m := make(map[string]interface{})
+	m["id"] = deviceId
+	m["messageType"] = util.CONNECTED
+	m["data"] = connected
+	controller.sendMessage(m)
 }
 
 func (controller *WsHandler) onModified(thing *thing.Thing) {
@@ -225,10 +242,10 @@ func (controller *WsHandler) onModified(thing *thing.Thing) {
 	if t == nil {
 		return
 	}
-	data := make(map[string]interface{})
-	data["id"] = t.ID
-	data["messageType"] = models.ThingModified
-	controller.sendMessage(data)
+	m := make(map[string]interface{})
+	m["id"] = t.ID
+	m["messageType"] = util.ThingModified
+	controller.sendMessage(m)
 }
 
 func (controller *WsHandler) onActionStatus(action *thing.Action) {
@@ -270,24 +287,24 @@ func (controller *WsHandler) onRemoved(thing *thing.Thing) {
 	}
 	m := make(map[string]interface{})
 	m["id"] = id
-	m["messageType"] = models.ThingRemoved
+	m["messageType"] = util.ThingRemoved
 	m["data"] = map[string]interface{}{}
+	delete(controller.subscriptionThings, id)
 	controller.sendMessage(m)
 }
 
 func (controller *WsHandler) onPropertyChanged(data []byte) {
 
 	deviceId := json.Get(data, "deviceId").ToString()
-	name := json.Get(data, "name").ToString()
-	v := json.Get(data, "value").GetInterface()
+	name := gjson.GetBytes(data, "name").String()
+	v := gjson.GetBytes(data, "value").Value()
 	t := controller.subscriptionThings[deviceId]
 	if t == nil {
 		return
 	}
-
 	m := make(map[string]interface{})
 	m["id"] = deviceId
-	m["messageType"] = models.PropertyStatus
+	m["messageType"] = util.PropertyStatus
 	m["data"] = map[string]interface{}{
 		name: v,
 	}
@@ -308,17 +325,6 @@ func (controller *WsHandler) sendData(message interface{}) {
 func (controller *WsHandler) onError(err error) {
 	log.Info("websocket err: %s", err.Error())
 	controller.done <- struct{}{}
-}
-
-func (controller *WsHandler) close() {
-	controller.locker.Lock()
-	defer controller.locker.Unlock()
-	_ = bus.Unsubscribe(util.PropertyChanged, controller.onPropertyChanged)
-	_ = bus.Unsubscribe(util.CONNECTED, controller.onConnected)
-	_ = bus.Unsubscribe(util.MODIFIED, controller.onModified)
-	_ = bus.Unsubscribe(util.ThingRemoved, controller.onRemoved)
-	_ = controller.ws.Close()
-	return
 }
 
 func (controller *WsHandler) sendMessage(data map[string]interface{}) {

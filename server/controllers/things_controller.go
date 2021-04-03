@@ -6,14 +6,15 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
 	"gateway/pkg/log"
-	"gateway/plugin"
+	AddonManager "gateway/plugin"
 	"gateway/server/models"
 	"github.com/gofiber/fiber/v2"
+
 	"github.com/gofiber/websocket/v2"
-	json "github.com/json-iterator/go"
-	"go.uber.org/zap"
+	"github.com/tidwall/gjson"
 	"net/http"
 	"strings"
 )
@@ -33,7 +34,7 @@ func (tc *ThingsController) handleCreateThing(c *fiber.Ctx) error {
 
 	log.Debug("Post /thing,Body: \t\n %s", c.Body())
 
-	id := json.Get(c.Body(), "id").ToString()
+	id := gjson.GetBytes(c.Body(), "id").String()
 	if len(id) < 1 {
 		return fiber.NewError(http.StatusBadRequest, "bad request")
 
@@ -55,7 +56,7 @@ func (tc *ThingsController) handleCreateThing(c *fiber.Ctx) error {
 // DELETE /things/:thingId
 func (tc *ThingsController) handleDeleteThing(c *fiber.Ctx) error {
 	thingId := c.Params("thingId")
-	_ = plugin.RemoveDevice(thingId)
+	_ = AddonManager.RemoveDevice(thingId)
 	err := tc.Container.RemoveThing(thingId)
 	if err != nil {
 		return fiber.NewError(http.StatusInternalServerError, err.Error())
@@ -67,7 +68,6 @@ func (tc *ThingsController) handleDeleteThing(c *fiber.Ctx) error {
 //GET /things/:thingId
 func (tc *ThingsController) handleGetThing(c *fiber.Ctx) error {
 	if websocket.IsWebSocketUpgrade(c) {
-		c.Locals("websocket", true)
 		c.Locals("thingId", c.Params("thingId"))
 		return c.Next()
 	}
@@ -88,7 +88,6 @@ func (tc *ThingsController) handleGetThing(c *fiber.Ctx) error {
 //GET /things
 func (tc *ThingsController) handleGetThings(c *fiber.Ctx) error {
 	if websocket.IsWebSocketUpgrade(c) {
-		c.Locals("websocket", true)
 		return c.Next()
 	}
 	log.Debug("GET things")
@@ -126,32 +125,38 @@ func (tc *ThingsController) handleSetProperty(c *fiber.Ctx) error {
 		log.Error("Failed set thing(%s) property:(%s) value:(%s),err:(%s)", thingId, propName, value, e.Error())
 		return fiber.NewError(fiber.StatusGatewayTimeout, e.Error())
 	}
-	newValue := json.Get(prop, "value").GetInterface()
+	newValue := gjson.GetBytes(prop, "value").String()
 	data := map[string]interface{}{propName: newValue}
 	return c.Status(fiber.StatusOK).JSON(data)
 }
 
 func (tc *ThingsController) handleGetProperty(c *fiber.Ctx) error {
-	thingId := c.Params("thingId")
+	id := c.Params("thingId")
 	propName := c.Params("*")
-	property := tc.Container.FindThingProperty(thingId, propName)
-	if property == nil {
-		return fiber.NewError(fiber.StatusBadRequest, "property no found")
-
+	v, err := AddonManager.GetPropertyValue(id, propName)
+	var result = make(map[string]interface{})
+	if err != nil {
+		log.Info("get property err: %s", err.Error())
 	}
-	data := map[string]interface{}{propName: property.Value}
-	return c.JSON(data)
+	result[propName] = v
+	return c.Status(fiber.StatusOK).JSON(result)
 }
 
 func (tc *ThingsController) handleGetProperties(c *fiber.Ctx) error {
-	thingId := c.Params("thing_id")
-	//thing := tc.Container.GetThing(thingId)
-	var props = make(map[string]interface{})
-	//for propName, _ := range thing.Properties {
-	//	props[propName] = tc.Container.Manager.GetProperty(thingId, propName)
-	//}
-	log.Info("container handler:GetProperties", zap.String("thingId", thingId), zap.String("method", "PUT"))
-	return c.JSON(props)
+	id := c.Params("thingId")
+	th := tc.Container.GetThing(id)
+	if th == nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+	var result = make(map[string]interface{})
+	for propName, _ := range th.Properties {
+		v, err := AddonManager.GetPropertyValue(id, propName)
+		if err != nil {
+			log.Info("get property err: %s", err.Error())
+		}
+		result[propName] = v
+	}
+	return c.Status(fiber.StatusOK).JSON(result)
 }
 
 func (tc *ThingsController) handleSetThing(c *fiber.Ctx) error {
@@ -161,12 +166,12 @@ func (tc *ThingsController) handleSetThing(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusInternalServerError, "Failed to retrieve thing(%s)", thingId)
 	}
 
-	title := strings.Trim(json.Get(c.Body(), "title").ToString(), " ")
+	title := strings.Trim(gjson.GetBytes(c.Body(), "title").String(), " ")
 	if len(title) == 0 || title == "" {
 		return fiber.NewError(http.StatusInternalServerError, "Invalid title")
 	}
 
-	selectedCapability := strings.Trim(json.Get(c.Body(), "selectedCapability").ToString(), " ")
+	selectedCapability := strings.Trim(gjson.GetBytes(c.Body(), "selectedCapability").String(), " ")
 	if selectedCapability != "" {
 		thing.SelectedCapability = selectedCapability
 	}

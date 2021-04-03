@@ -89,13 +89,11 @@ func GetDevice(deviceId string) addon.IDevice {
 }
 
 func SetProperty(deviceId, propName string, newValue interface{}) ([]byte, error) {
-	err := instance.handleSetProperty(deviceId, propName, newValue)
-	if err != nil {
-		return nil, err
-	}
+
+	go instance.handleSetProperty(deviceId, propName, newValue)
 	closeChan := make(chan struct{})
 	propChan := make(chan []byte)
-	time.AfterFunc(1*time.Second, func() {
+	time.AfterFunc(3*time.Second, func() {
 		closeChan <- struct{}{}
 	})
 	changed := func(data []byte) {

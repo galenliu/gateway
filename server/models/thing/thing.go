@@ -8,6 +8,7 @@ import (
 	"gateway/pkg/log"
 	"gateway/pkg/util"
 	json "github.com/json-iterator/go"
+	"strings"
 )
 
 type Thing struct {
@@ -92,6 +93,9 @@ func (t *Thing) SetSelectedCapability(selectedCapability string) {
 }
 
 func (t *Thing) SetConnected(connected bool) {
+	sl := strings.Split(t.ID, "/")
+	id := sl[len(sl)-1]
+	bus.Publish(util.CONNECTED, id, connected)
 	t.Connected = connected
 
 }

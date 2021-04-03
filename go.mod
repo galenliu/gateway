@@ -7,6 +7,7 @@ require (
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/brutella/hc v1.2.4
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/gin-gonic/gin v1.6.3
 	github.com/gofiber/fiber/v2 v2.6.0
 	github.com/gofiber/websocket/v2 v2.0.2
 	github.com/golang/protobuf v1.4.2 // indirect
@@ -19,7 +20,8 @@ require (
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/stretchr/testify v1.6.1 // indirect
-	github.com/xiam/to v0.0.0-20200126224905-d60d31e03561 // indirect
+	github.com/tidwall/gjson v1.7.4
+	github.com/xiam/to v0.0.0-20200126224905-d60d31e03561
 	go.uber.org/zap v1.16.0
 	golang.org/x/tools v0.0.0-20191127201027-ecd32218bd7f // indirect
 	google.golang.org/protobuf v1.25.0 // indirect

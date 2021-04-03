@@ -37,8 +37,11 @@ func main() {
 	}
 
 	//init config
-	err = config.InitRuntime(proFile)
-	CheckError(err)
+	conf := config.NewConfig(proFile)
+	if conf == nil {
+		log.Info("config is bad")
+		return
+	}
 
 	//create core instance
 	gw, err := core.NewGateway()

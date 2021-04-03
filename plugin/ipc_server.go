@@ -29,7 +29,7 @@ type IpcServer struct {
 
 func NewIpcServer() *IpcServer {
 	ipc := &IpcServer{
-		addr:   "localhost:" + strconv.Itoa(config.Conf.Ports["ipc"]),
+		addr:   "localhost:" + strconv.Itoa(config.GetIpcPort()),
 		wsChan: make(chan *Connection, 2),
 	}
 	return ipc

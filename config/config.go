@@ -7,7 +7,8 @@ import (
 	"gateway/pkg/log"
 	"gateway/pkg/util"
 	json "github.com/json-iterator/go"
-	"gopkg.in/yaml.v3"
+	"sync"
+
 	"io/ioutil"
 	"os"
 	"path"
@@ -15,20 +16,20 @@ import (
 )
 
 const (
-	UnitCelsius = "celsius"
-
+	UnitCelsius    = "celsius"
 	preferencesKey = "settings.preferences"
 )
 
-var Conf *Config
+var instance *Config
 var preferences *Preferences
 var userProfile *UserProfile
+var once sync.Once
 
-//go:embed default.yaml
+//go:embed default.json
 var DefaultConfig []byte
 
 type addonManger struct {
-	ListUrls []string `yaml:"listUrls"`
+	ListUrls []string `json:"listUrls"`
 }
 
 type UserProfile struct {
@@ -76,106 +77,122 @@ func UpdateOrCreatePreferences() error {
 }
 
 type Config struct {
-	Ports map[string]int `yaml:"ports"`
+	Ports          Ports        `json:"ports"`
+	ProfileDir     string       `json:"profile_dir"`
+	GatewayVersion string       `json:"gateway_version"`
+	AddonManager   AddonManager `json:"addon_manager"`
+	Log            Log          `json:"log"`
+	Database       Database     `json:"database"`
 
-	AddonManager addonManger `yaml:"addonManager"`
+	AddonsDir    string `json:"addonDir,omitempty"`
+	LogDir       string `json:"logDir,omitempty"`
+	DataDir      string `json:"dataDir,omitempty"`
+	ConfigDir    string `json:"configDir,omitempty"`
+	MediaDir     string `json:"mediaDir,omitempty"`
+	UploadDir    string `json:"uploadDir,omitempty"`
+	Architecture string
+}
 
-	RemoveBeforeOpen bool   `yaml:"removeBeforeOpen"`
-	LogRotateDays    int    `yaml:"logRotateDays"`
-	NodeLoader       string `yaml:"nodeLoader"`
-
-	ProfileDir string `yaml:"profileDir"`
-	AddonsDir  string `yaml:"addonDir,omitempty"`
-	LogDir     string `yaml:"logDir,omitempty"`
-	DataDir    string `yaml:"dataDir,omitempty"`
-	ConfigDir  string `yaml:"configDir,omitempty"`
-	MediaDir   string `yaml:"mediaDir,omitempty"`
-	UploadDir  string `yaml:"uploadDir,omitempty"`
-
-	Architecture   string
-	GatewayVersion string `yaml:"gatewayVersion,omitempty"`
+type Ports struct {
+	HTTPS int `json:"https"`
+	HTTP  int `json:"http"`
+	Ipc   int `json:"ipc"`
+}
+type AddonManager struct {
+	NodeLoader string   `json:"node_loader"`
+	ListUrls   []string `json:"list_urls"`
+	TestAddons bool     `json:"test_addons"`
+}
+type Log struct {
+	Verbose       bool `json:"verbose"`
+	LogRotateDays int  `json:"log_rotate_days"`
+}
+type Database struct {
+	RemoveBeforeOpen bool `json:"remove_before_open"`
 }
 
 func GetAddonListUrls() []string {
-	return Conf.AddonManager.ListUrls
+	return instance.AddonManager.ListUrls
 }
 
-func InitRuntime(config string) error {
+func NewConfig(config string) *Config {
+	once.Do(func() {
+		var data []byte
+		var rtc Config
+		var err error
+		if config != "" {
+			data, err = ioutil.ReadFile(config)
+		} else {
+			data = DefaultConfig
+		}
+		err = json.Unmarshal(data, &rtc)
+		if err != nil {
+			return
+		}
+		if !path.IsAbs(rtc.ProfileDir) {
+			rtc.ProfileDir, _ = filepath.Abs(rtc.ProfileDir)
+		}
 
-	var data []byte
-	var rtc Config
-	var err error
-	if config != "" {
-		data, err = ioutil.ReadFile(config)
-	} else {
-		data = DefaultConfig
-	}
-	err = yaml.Unmarshal(data, &rtc)
-	if err != nil {
-		return err
-	}
-	if !path.IsAbs(rtc.ProfileDir) {
-		rtc.ProfileDir, _ = filepath.Abs(rtc.ProfileDir)
-	}
+		if rtc.ProfileDir == "" {
+			rtc.ProfileDir = util.GetDefaultConfigDir()
+		}
+		if rtc.AddonsDir == "" {
+			rtc.AddonsDir = rtc.ProfileDir + string(os.PathSeparator) + util.AddonsDir
+		}
+		if rtc.LogDir == "" {
+			rtc.LogDir = rtc.ProfileDir + string(os.PathSeparator) + util.LogDir
 
-	if rtc.ProfileDir == "" {
-		rtc.ProfileDir = util.GetDefaultConfigDir()
-	}
-	if rtc.AddonsDir == "" {
-		rtc.AddonsDir = rtc.ProfileDir + string(os.PathSeparator) + util.AddonsDir
-	}
-	if rtc.LogDir == "" {
-		rtc.LogDir = rtc.ProfileDir + string(os.PathSeparator) + util.LogDir
+		}
+		if rtc.DataDir == "" {
+			rtc.DataDir = rtc.ProfileDir + string(os.PathSeparator) + util.DataDir
+		}
+		if rtc.ConfigDir == "" {
+			rtc.ConfigDir = rtc.ProfileDir + string(os.PathSeparator) + util.ConfigDir
+		}
+		if rtc.MediaDir == "" {
+			rtc.MediaDir = rtc.ProfileDir + string(os.PathSeparator) + util.MediaDir
+		}
+		if rtc.UploadDir == "" {
+			rtc.UploadDir = rtc.ProfileDir + string(os.PathSeparator) + util.UploadDir
+		}
+		if rtc.GatewayVersion == "" {
+			rtc.GatewayVersion = util.Version
+		}
+		err = util.EnsureDir(rtc.ProfileDir, rtc.AddonsDir, rtc.LogDir, rtc.DataDir, rtc.ConfigDir, rtc.MediaDir, rtc.UploadDir)
+		if err != nil {
+			return
+		}
 
-	}
-	if rtc.DataDir == "" {
-		rtc.DataDir = rtc.ProfileDir + string(os.PathSeparator) + util.DataDir
-	}
-	if rtc.ConfigDir == "" {
-		rtc.ConfigDir = rtc.ProfileDir + string(os.PathSeparator) + util.ConfigDir
-	}
-	if rtc.MediaDir == "" {
-		rtc.MediaDir = rtc.ProfileDir + string(os.PathSeparator) + util.MediaDir
-	}
-	if rtc.UploadDir == "" {
-		rtc.UploadDir = rtc.ProfileDir + string(os.PathSeparator) + util.UploadDir
-	}
-	if rtc.GatewayVersion == "" {
-		rtc.GatewayVersion = util.Version
-	}
-	err = util.EnsureDir(rtc.ProfileDir, rtc.AddonsDir, rtc.LogDir, rtc.DataDir, rtc.ConfigDir, rtc.MediaDir, rtc.UploadDir)
-	if err != nil {
-		return err
-	}
+		userProfile = &UserProfile{
+			BaseDir:    rtc.ProfileDir,
+			DataDir:    rtc.DataDir,
+			AddonsDir:  rtc.AddonsDir,
+			ConfigDir:  rtc.ConfigDir,
+			UploadDir:  rtc.UploadDir,
+			MediaDir:   rtc.MediaDir,
+			LogDir:     rtc.LogDir,
+			GatewayDir: rtc.ProfileDir,
+		}
 
-	userProfile = &UserProfile{
-		BaseDir:    rtc.ProfileDir,
-		DataDir:    rtc.DataDir,
-		AddonsDir:  rtc.AddonsDir,
-		ConfigDir:  rtc.ConfigDir,
-		UploadDir:  rtc.UploadDir,
-		MediaDir:   rtc.MediaDir,
-		LogDir:     rtc.LogDir,
-		GatewayDir: rtc.ProfileDir,
-	}
+		//init logger
+		log.InitLogger(rtc.LogDir, true, rtc.Log.LogRotateDays)
 
-	//init logger
-	log.InitLogger(rtc.LogDir, true, rtc.LogRotateDays)
+		log.Info(fmt.Sprintf("gateway start path: %s", rtc.ProfileDir))
 
-	log.Info(fmt.Sprintf("gateway start path: %s", rtc.ProfileDir))
+		//init database
+		if rtc.Database.RemoveBeforeOpen {
+			database.ResetDB(rtc.ConfigDir)
+		}
+		err = database.InitDB(rtc.ConfigDir)
 
-	//init database
-	if rtc.RemoveBeforeOpen {
-		database.ResetDB(rtc.ConfigDir)
-	}
-	err = database.InitDB(rtc.ConfigDir)
-
-	if err != nil {
-		return err
-	}
-	Conf = &rtc
-	err = UpdateOrCreatePreferences()
-	return err
+		if err != nil {
+			return
+		}
+		instance = &rtc
+		err = UpdateOrCreatePreferences()
+		return
+	})
+	return instance
 }
 
 func GetUserProfile() *UserProfile {
@@ -184,4 +201,51 @@ func GetUserProfile() *UserProfile {
 
 func GetPreferences() *Preferences {
 	return preferences
+}
+
+func IsVerbose() bool {
+	return instance.Log.Verbose
+}
+
+func GetIpcPort() int {
+	return instance.Ports.Ipc
+}
+
+func GetAddonsDir() string {
+	return instance.AddonsDir
+}
+
+func GetDataDir() string {
+	return instance.DataDir
+}
+
+func GetLogDir() string {
+	return instance.LogDir
+}
+
+func GetArchitecture() string {
+	return instance.Architecture
+}
+
+func GetConfigDir() string {
+	return instance.ConfigDir
+}
+
+func GetGatewayVersion() string {
+	return instance.GatewayVersion
+}
+
+func GetProfileDir() string {
+	return instance.ProfileDir
+}
+
+func GetUploadDir() string {
+	return instance.UploadDir
+}
+func GetNodeLoader() string {
+	return instance.AddonManager.NodeLoader
+}
+
+func GetPorts() Ports {
+	return instance.Ports
 }

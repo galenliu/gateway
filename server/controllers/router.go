@@ -3,6 +3,7 @@ package controllers
 import (
 	"gateway/config"
 	"gateway/pkg/log"
+	"gateway/pkg/util"
 	"gateway/server"
 	"gateway/server/models"
 	"github.com/gofiber/fiber/v2"
@@ -66,7 +67,7 @@ func CollectRoute(conf Config) *fiber.App {
 
 	//Things Controller
 	{
-		thingsGroup := app.Group(models.ThingsPath)
+		thingsGroup := app.Group(util.ThingsPath)
 
 		thingsController := NewThingsControllerFunc()
 		//set a properties of a thing.
@@ -97,7 +98,7 @@ func CollectRoute(conf Config) *fiber.App {
 
 	//NewThing Controller
 	{
-		newThingsGroup := app.Group(models.NewThingsPath)
+		newThingsGroup := app.Group(util.NewThingsPath)
 		newThingsGroup.Use("/", func(c *fiber.Ctx) error {
 			if websocket.IsWebSocketUpgrade(c) {
 				c.Locals("websocket", true)
@@ -112,7 +113,7 @@ func CollectRoute(conf Config) *fiber.App {
 	}
 
 	{ //Addons Controller
-		addonGroup := app.Group(models.AddonsPath)
+		addonGroup := app.Group(util.AddonsPath)
 		addonController := NewAddonController()
 		addonGroup.Get("/", addonController.handlerGetAddons)
 		addonGroup.Post("/", addonController.handlerInstallAddon)
@@ -123,13 +124,13 @@ func CollectRoute(conf Config) *fiber.App {
 	}
 
 	{ //settings Controller
-		debugGroup := app.Group(models.SettingsPath)
+		debugGroup := app.Group(util.SettingsPath)
 		settingsController := NewSettingController()
 		debugGroup.Get("/addonsInfo", settingsController.handleGetAddonsInfo)
 	}
 
 	{ //actions Controller
-		actionsGroup := app.Group(models.ActionsPath)
+		actionsGroup := app.Group(util.ActionsPath)
 		actionsController := NewActionsController()
 		actionsGroup.Post("/", actionsController.handleActions)
 		actionsGroup.Delete("/:actionName/:actionId", actionsController.handleDeleteAction)
@@ -154,12 +155,12 @@ func (web *Web) Close() error {
 
 func NewDefaultWebConfig() Config {
 	conf := Config{
-		HttpPort:    config.Conf.Ports["http"],
-		HttpsPort:   config.Conf.Ports["https"],
+		HttpPort:    config.GetPorts().HTTP,
+		HttpsPort:   config.GetPorts().HTTPS,
 		StaticDir:   "./dist",
 		TemplateDir: "./dist",
-		UploadDir:   config.Conf.UploadDir,
-		LogDir:      config.Conf.LogDir,
+		UploadDir:   config.GetUploadDir(),
+		LogDir:      config.GetLogDir(),
 	}
 	return conf
 }

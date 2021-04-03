@@ -274,6 +274,7 @@ func UnmarshalDevice(d []byte) (*addon.Device, error) {
 	if len(properties) > 0 {
 		device.Properties = make(map[string]addon.IProperty)
 		for n, p := range properties {
+			p.DeviceId = id
 			device.Properties[n] = p
 		}
 	}
@@ -281,6 +282,7 @@ func UnmarshalDevice(d []byte) (*addon.Device, error) {
 	if len(events) > 0 {
 		device.Events = make(map[string]*addon.Event)
 		for n, e := range events {
+			e.DeviceId = id
 			device.Events[n] = e
 		}
 	}
@@ -288,6 +290,7 @@ func UnmarshalDevice(d []byte) (*addon.Device, error) {
 	if len(actions) > 0 {
 		device.Actions = make(map[string]*addon.Action)
 		for n, a := range actions {
+			a.DeviceId = id
 			device.Actions[n] = a
 		}
 	}

@@ -10,6 +10,7 @@ import (
 	"gateway/pkg/log"
 	"gateway/pkg/util"
 	json "github.com/json-iterator/go"
+	"github.com/tidwall/gjson"
 	"io"
 	"os"
 	"os/exec"
@@ -24,11 +25,11 @@ const ExecPython3 = "{python}"
 type OnConnect = func(device addon.Device, bool2 bool)
 
 type Plugin struct {
-	locker       *sync.Mutex
-	pluginId     string
-	exec         string
-	execPath     string
-	verbose      bool
+	locker   *sync.Mutex
+	pluginId string
+	exec     string
+	execPath string
+
 	registered   bool
 	conn         *Connection
 	closeChan    chan struct{}
@@ -50,7 +51,10 @@ func NewPlugin(s *PluginsServer, pluginId string) (plugin *Plugin) {
 //传入的data=序列化后的 Message.Data
 func (plugin *Plugin) handleMessage(data []byte) {
 
-	var messageType = json.Get(data, "messageType").ToInt()
+	var messageType = gjson.GetBytes(data, "messageType").Uint()
+	if config.IsVerbose() {
+		log.Info("Read messageType: %s \t\n Data: %s", MessageTypeToString(int(messageType)), gjson.GetBytes(data, "data").String())
+	}
 	//如果为0，则消息不合法(如：缺少 messageType字段)
 	if messageType == 0 {
 		log.Info("messageType err")
@@ -91,7 +95,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 
 	adapter := plugin.getManager().getAdapter(adapterId)
 	if adapter == nil {
-		log.Info("(%s)adapter not found", MessageTypeToString(messageType))
+		log.Info("(%s)adapter not found", MessageTypeToString(int(messageType)))
 		return
 	}
 
@@ -109,7 +113,8 @@ func (plugin *Plugin) handleMessage(data []byte) {
 		return
 	case DeviceAddedNotification:
 		//messages.DeviceAddedNotification
-		data := json.Get(data, "data", "device").ToString()
+
+		data := gjson.GetBytes(data, "data").Get("device").String()
 		if data == "" {
 			log.Info("marshal device err")
 			return
@@ -161,7 +166,9 @@ func (plugin *Plugin) handleMessage(data []byte) {
 		}
 
 	case DevicePropertyChangedNotification:
+
 		js := json.Get(data, "data", "property")
+
 		propName := js.Get("name").ToString()
 		property := device.GetProperty(propName)
 		if property == nil {
@@ -173,7 +180,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 			return
 		}
 		property.Update(bt)
-		bus.Publish(util.PropertyChanged, bt)
+		bus.Publish(util.PropertyChanged, property.GetNotifyDescription())
 		return
 
 	case DeviceActionStatusNotification:
@@ -219,7 +226,7 @@ func (plugin *Plugin) execute() {
 	plugin.exec = strings.Replace(plugin.exec, "\\", string(os.PathSeparator), -1)
 	plugin.exec = strings.Replace(plugin.exec, "/", string(os.PathSeparator), -1)
 	command := strings.Replace(plugin.exec, "{path}", plugin.execPath, 1)
-	command = strings.Replace(command, "{nodeLoader}", config.Conf.NodeLoader, 1)
+	command = strings.Replace(command, "{nodeLoader}", config.GetNodeLoader(), 1)
 	if !strings.HasPrefix(command, "python") {
 		log.Error("Now only support plugin with python lang")
 		return
@@ -322,7 +329,7 @@ func (plugin *Plugin) registerAndHandleConnection(c *Connection) {
 	}
 	plugin.conn = c
 	data := make(map[string]interface{})
-	data["gatewayVersion"] = config.Conf.GatewayVersion
+	data["gatewayVersion"] = config.GetGatewayVersion()
 	data["userProfile"] = config.GetUserProfile()
 	data["preferences"] = config.GetPreferences()
 	plugin.send(PluginRegisterResponse, data)
@@ -341,7 +348,10 @@ func (plugin *Plugin) send(mt int, data map[string]interface{}) {
 		Data:        data,
 	}
 	bt, err := json.MarshalIndent(message, "", " ")
-	log.Debug("Send-- %s : \t\n %s", MessageTypeToString(mt), bt)
+	if config.IsVerbose() {
+		log.Debug("Send-- %s : \t\n %s", MessageTypeToString(mt), bt)
+	}
+
 	if err != nil {
 		log.Error(err.Error())
 		return

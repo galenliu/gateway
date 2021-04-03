@@ -36,7 +36,7 @@ func (s *PluginsServer) messageHandler(data []byte, c *Connection) {
 		return
 	}
 	messageType := m.ToInt()
-	log.Debug("Rev %s: \t\n %s", MessageTypeToString(messageType), string(data))
+	log.Debug("%s: \t\n %s", MessageTypeToString(messageType), string(data))
 
 	if messageType == PluginRegisterRequest {
 		s.registerHandler(data, c)
