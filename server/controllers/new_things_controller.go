@@ -5,7 +5,6 @@ import (
 	"gateway/pkg/log"
 	"gateway/pkg/util"
 	"gateway/server/models"
-	"gateway/server/models/thing"
 	"github.com/gofiber/websocket/v2"
 	"sync"
 )
@@ -14,7 +13,7 @@ type NewThingsController struct {
 	locker     *sync.Mutex
 	container  *models.Things
 	ws         *websocket.Conn
-	foundThing chan *thing.Thing
+	foundThing chan *models.Thing
 	closeChan  chan struct{}
 }
 
@@ -22,7 +21,7 @@ func NewNewThingsController(ws *websocket.Conn) *NewThingsController {
 	controller := &NewThingsController{}
 	controller.locker = new(sync.Mutex)
 	controller.closeChan = make(chan struct{})
-	controller.foundThing = make(chan *thing.Thing)
+	controller.foundThing = make(chan *models.Thing)
 	controller.container = models.NewThings()
 	controller.ws = ws
 	return controller
@@ -69,7 +68,7 @@ func (controller *NewThingsController) handlerConnection() {
 	}
 }
 
-func (controller *NewThingsController) handleNewThing(thing *thing.Thing) {
+func (controller *NewThingsController) handleNewThing(thing *models.Thing) {
 	controller.foundThing <- thing
 }
 

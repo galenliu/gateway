@@ -6,8 +6,7 @@ import (
 	"gateway/pkg/database"
 	"gateway/pkg/util"
 	"gateway/plugin"
-	"gateway/server/models/thing"
-	json "github.com/json-iterator/go"
+	"github.com/tidwall/gjson"
 	"sync"
 )
 
@@ -15,7 +14,7 @@ var once sync.Once
 var instance *Things
 
 type Things struct {
-	things  map[string]*thing.Thing
+	things  map[string]*Thing
 	Actions *Actions
 }
 
@@ -23,17 +22,16 @@ func NewThings() *Things {
 	once.Do(
 		func() {
 			instance = &Things{}
-			instance.things = make(map[string]*thing.Thing)
+			instance.things = make(map[string]*Thing)
 			instance.GetThings()
 			instance.Actions = NewActions()
-			_ = bus.Subscribe(util.PropertyChanged, instance.onPropertyChanged)
-
+			_ = bus.Subscribe(util.ThingAdded, instance.handleNewThing)
 		},
 	)
 	return instance
 }
 
-func (ts *Things) GetThing(id string) *thing.Thing {
+func (ts *Things) GetThing(id string) *Thing {
 	t, ok := ts.things["/things/"+id]
 	if !ok {
 		return nil
@@ -41,7 +39,7 @@ func (ts *Things) GetThing(id string) *thing.Thing {
 	return t
 }
 
-func (ts *Things) FindThingProperty(thingId string, propertyName string) *thing.Property {
+func (ts *Things) FindThingProperty(thingId string, propertyName string) *Property {
 	th := ts.GetThing(thingId)
 	if th == nil {
 		return nil
@@ -54,7 +52,7 @@ func (ts *Things) FindThingProperty(thingId string, propertyName string) *thing.
 }
 
 //if models instance is null,read new instance from the database
-func (ts *Things) GetThings() map[string]*thing.Thing {
+func (ts *Things) GetThings() map[string]*Thing {
 	if len(ts.things) > 0 {
 		return ts.things
 	}
@@ -64,7 +62,7 @@ func (ts *Things) GetThings() map[string]*thing.Thing {
 	return ts.things
 }
 
-func (ts *Things) GetListThings() (lt []*thing.Thing) {
+func (ts *Things) GetListThings() (lt []*Thing) {
 	for key, t := range ts.GetThings() {
 		t.ID = key
 		lt = append(lt, t)
@@ -73,14 +71,14 @@ func (ts *Things) GetListThings() (lt []*thing.Thing) {
 }
 
 //get instance with out database
-func (ts *Things) GetNewThings() []*thing.Thing {
-	var connectedThings []*thing.Thing
+func (ts *Things) GetNewThings() []*Thing {
+	var connectedThings []*Thing
 	//connectedThings = new([]*thing.Thing)
 	connectedThings = plugin.GetThings()
 	//bus.Publish(bus.GetThings, &connectedThings)
 	storedThings := ts.GetThings()
-	var things []*thing.Thing
-	var newList []*thing.Thing
+	var things []*Thing
+	var newList []*Thing
 	for _, connected := range connectedThings {
 		for _, storedThing := range storedThings {
 			if connected.ID != storedThing.ID {
@@ -92,17 +90,27 @@ func (ts *Things) GetNewThings() []*thing.Thing {
 }
 
 func (ts *Things) CreateThing(id string, description []byte) (string, error) {
-	var th = thing.NewThing(id, description)
+	var th = NewThing(id, description)
 	if th == nil {
 		return "", fmt.Errorf("thing description invaild")
 	}
-	th.SetConnected(true)
 	err := database.CreateThing(th.ID, th.GetDescription())
 	if err != nil {
 		return "", err
 	}
 	ts.things[th.ID] = th
+	ts.Publish(util.ThingAdded, th)
 	return th.GetDescription(), err
+}
+
+func (ts *Things) handleNewThing(data []byte) {
+	id := gjson.GetBytes(data, "id").String()
+	t := ts.GetThing(id)
+	if t == nil {
+		return
+	}
+	t.update(NewThing(id, data))
+	t.setConnected(true)
 }
 
 func (ts *Things) RemoveThing(thingId string) error {
@@ -133,33 +141,30 @@ func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) 
 
 }
 
-func (ts *Things) onPropertyChanged(data []byte) {
-	deviceId := json.Get(data, "deviceId").ToString()
-	name := json.Get(data, "name").ToString()
-	value := json.Get(data, "value").GetInterface()
-	for _, th := range ts.things {
-		if th.ID == deviceId {
-			for _, prop := range th.Properties {
-				if prop.Name == name {
-					prop.Value = value
-				}
-			}
-		}
-	}
-}
-
-func GetThingsFormDataBase() (list []*thing.Thing) {
+func GetThingsFormDataBase() (list []*Thing) {
 
 	var ts = database.GetThings()
 	if ts == nil {
 		return nil
 	}
 	for id, des := range ts {
-		t := thing.NewThing(id, []byte(des))
+		t := NewThing(id, []byte(des))
 		if t != nil {
 			t.Connected = false
 			list = append(list, t)
 		}
 	}
 	return
+}
+
+func (ts *Things) Subscribe(typ string, f interface{}) {
+	_ = bus.Subscribe("Things."+typ, f)
+}
+
+func (ts *Things) Unsubscribe(typ string, f interface{}) {
+	_ = bus.Unsubscribe("Things."+typ, f)
+}
+
+func (ts *Things) Publish(typ string, args ...interface{}) {
+	bus.Publish("Things."+typ, args...)
 }

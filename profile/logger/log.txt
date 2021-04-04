@@ -1,0 +1,31 @@
+2021-03-29T06:13:40.436+0800	debug	log/log.go:63	logger init succeed
+2021-03-29T06:13:40.437+0800	info	config/config.go:165	gateway start path: /Users/liuguilin/Desktop/web-things/gateway/profile
+2021-03-29T06:13:40.443+0800	debug	database/db.go:30	instance init succeed
+2021-03-29T06:13:40.443+0800	info	database/db.go:133	set setting key:settings.preferences value:{"language":"zh-cn","units":{"temperature":"celsius"}}
+2021-03-29T06:13:40.445+0800	debug	database/db.go:152	insert data,id:1 , value: {"language":"zh-cn","units":{"temperature":"celsius"}}
+2021-03-29T06:13:40.445+0800	info	gateway/core.go:32	gateway start.....
+2021-03-29T06:13:40.446+0800	info	plugin/ipc_server.go:85	plugin server execute on port: localhost:9500
+2021-04-03T05:56:36.117+0800	debug	log/log.go:63	logger init succeed
+2021-04-03T05:56:36.118+0800	info	config/config.go:165	gateway start path: /Users/liuguilin/Desktop/web-things/gateway/profile
+2021-04-03T05:56:36.120+0800	debug	database/db.go:30	instance init succeed
+2021-04-03T05:56:36.123+0800	info	database/db.go:133	set setting key:addons.yeelight-adapter-python value:{"id":"yeelight-adapter-python","name":"Yeelight","short_name":"Yeelight","author":"WebThingsIO","description":"Yeelight smart bulb adapter plugin for WebThings Gateway","license":"MPL-2.0","homepage_url":"https://github.com/WebThingsIO/yeelight-adapter#readme","version":"0.4.3","schema":{},"exec":"python3 {path}/main.py","enabled":true,"primary_type":"adapter","content_scripts":"","web_accessible_resources":""}
+2021-04-03T05:56:36.124+0800	debug	database/db.go:152	insert data,id:2 , value: {"id":"yeelight-adapter-python","name":"Yeelight","short_name":"Yeelight","author":"WebThingsIO","description":"Yeelight smart bulb adapter plugin for WebThings Gateway","license":"MPL-2.0","homepage_url":"https://github.com/WebThingsIO/yeelight-adapter#readme","version":"0.4.3","schema":{},"exec":"python3 {path}/main.py","enabled":true,"primary_type":"adapter","content_scripts":"","web_accessible_resources":""}
+2021-04-03T05:56:36.124+0800	info	database/db.go:133	set setting key:addons.config.yeelight-adapter-python value:null
+2021-04-03T05:56:36.125+0800	debug	database/db.go:152	insert data,id:3 , value: null
+2021-04-03T05:56:36.125+0800	info	database/db.go:133	set setting key:addons.config.yeelight-adapter-python value:null
+2021-04-03T05:56:36.126+0800	info	gateway/core.go:32	gateway start.....
+2021-04-03T05:56:36.126+0800	info	plugin/ipc_server.go:85	plugin server execute on port: localhost:9500
+2021-04-03T05:56:36.129+0800	debug	plugin/plugin.go:276	plugin(yeelight-adapter-python) execute 	
+
+2021-04-03T05:56:36.740+0800	info	plugin/plugin.go:244	plugin(yeelight-adapter-python) out: Traceback (most recent call last):
+  File "/Users/liuguilin/Desktop/web-things/gateway/profile/addons/yeelight-adapter-python/main.py", line 11, in <module>
+ 	
+
+2021-04-03T05:56:36.740+0800	info	plugin/plugin.go:244	plugin(yeelight-adapter-python) out:     from pkg.yeelight_adapter import YeelightAdapter
+  File "/Users/liuguilin/Desktop/web-things/gateway/profile/addons/yeelight-adapter-python/pkg/yeelight_adapter.py", line 5, in <module>
+ 	
+
+2021-04-03T05:56:36.740+0800	info	plugin/plugin.go:244	plugin(yeelight-adapter-python) out:     from yeelight import discover_bulbs
+ModuleNotFoundError: No module named 'yeelight'
+ 	
+

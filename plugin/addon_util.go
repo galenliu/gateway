@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"gateway/pkg/database"
 	"gateway/pkg/util"
-	"gateway/server/models/thing"
+	"gateway/server/models"
 	json "github.com/json-iterator/go"
 	"io/ioutil"
 	"path"
@@ -160,7 +160,7 @@ func loadManifest(destPath, packetId string) (*AddonInfo, *interface{}, error) {
 	return &addonInfo, &manifest.Options.Default, nil
 }
 
-func UnmarshalWebThing(data []byte) (*thing.Thing, error) {
+func MarshalWebThing(data []byte) (*models.Thing, error) {
 
 	id := json.Get(data, "id").ToString()
 	if id == "" {
@@ -178,7 +178,7 @@ func UnmarshalWebThing(data []byte) (*thing.Thing, error) {
 	var atType []string
 	json.Get(data, "@type").ToVal(&atType)
 
-	t := &thing.Thing{
+	t := &models.Thing{
 		AtContext:           atContext,
 		Title:               title,
 		ID:                  id,
@@ -199,9 +199,9 @@ func UnmarshalWebThing(data []byte) (*thing.Thing, error) {
 	var props map[string]addon.Property
 	json.Get(data, "properties").ToVal(&props)
 	if len(props) > 0 {
-		t.Properties = make(map[string]*thing.Property)
+		t.Properties = make(map[string]*models.Property)
 		for n, p := range props {
-			prop := &thing.Property{
+			prop := &models.Property{
 				Name:        n,
 				AtType:      p.AtType,
 				Type:        p.Type,

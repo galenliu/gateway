@@ -1,7 +1,6 @@
 package bus
 
 import (
-	"fmt"
 	"gateway/pkg/log"
 	"github.com/asaskevich/EventBus"
 	"sync"
@@ -39,7 +38,6 @@ func Publish(topic string, args ...interface{}) {
 	if instance == nil {
 		initBus()
 	}
-	log.Info(fmt.Sprintf(topic+" has callback %v", instance.HasCallback(topic)))
 	if !instance.HasCallback(topic) {
 		return
 	}

@@ -3,7 +3,6 @@ package models
 import (
 	"fmt"
 	"gateway/plugin"
-	"gateway/server/models/thing"
 	"sync"
 )
 
@@ -18,7 +17,7 @@ var instanceActions *Actions
 
 type Actions struct {
 	things *Things
-	List   map[string]*thing.Action
+	List   map[string]*Action
 }
 
 func NewActions() *Actions {
@@ -26,7 +25,7 @@ func NewActions() *Actions {
 		func() {
 
 			instanceActions = &Actions{}
-			instanceActions.List = make(map[string]*thing.Action)
+			instanceActions.List = make(map[string]*Action)
 
 		},
 	)
@@ -34,7 +33,7 @@ func NewActions() *Actions {
 
 }
 
-func (actions *Actions) Add(action *thing.Action) {
+func (actions *Actions) Add(action *Action) {
 
 	actions.List[action.ID] = action
 	if action.ThingId != "" {

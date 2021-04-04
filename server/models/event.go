@@ -1,4 +1,4 @@
-package thing
+package models
 
 import json "github.com/json-iterator/go"
 

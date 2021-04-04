@@ -8,7 +8,7 @@ import (
 	"gateway/pkg/database"
 	"gateway/pkg/log"
 	"gateway/pkg/util"
-	"gateway/server/models/thing"
+	"gateway/server/models"
 	json "github.com/json-iterator/go"
 	"path"
 	"time"
@@ -62,17 +62,17 @@ func DisableAddon(addonId string) error {
 	return nil
 }
 
-func GetThings() []*thing.Thing {
-	var ts []*thing.Thing
+func GetThings() []*models.Thing {
+	var ts []*models.Thing
 	for _, d := range instance.devices {
 		data, err := json.MarshalIndent(d, "", " ")
 		if err != nil {
 			log.Error("Marshal device to webThing err:", err)
 			continue
 		}
-		th, e := UnmarshalWebThing(data)
+		th, e := MarshalWebThing(data)
 		if e != nil {
-			log.Error("UnmarshalWebThing err:", e)
+			log.Error("MarshalWebThing err:", e)
 			continue
 		}
 		ts = append(ts, th)

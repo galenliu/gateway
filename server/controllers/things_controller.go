@@ -39,7 +39,6 @@ func (tc *ThingsController) handleCreateThing(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, "bad request")
 
 	}
-
 	t := tc.Container.GetThing(id)
 	if t != nil {
 		return fiber.NewError(http.StatusBadRequest, "thing already added")
@@ -48,9 +47,8 @@ func (tc *ThingsController) handleCreateThing(c *fiber.Ctx) error {
 	des, e := tc.Container.CreateThing(id, c.Body())
 	if e != nil {
 		return fiber.NewError(http.StatusInternalServerError, fmt.Sprintf("create thing(%s) err: %v", id, e.Error()))
-
 	}
-	return c.SendString(des)
+	return c.Status(fiber.StatusOK).JSON(des)
 }
 
 // DELETE /things/:thingId
@@ -90,7 +88,6 @@ func (tc *ThingsController) handleGetThings(c *fiber.Ctx) error {
 	if websocket.IsWebSocketUpgrade(c) {
 		return c.Next()
 	}
-	log.Debug("GET things")
 	ts := tc.Container.GetListThings()
 	data, err := json.MarshalIndent(ts, "", " ")
 	if err != nil {

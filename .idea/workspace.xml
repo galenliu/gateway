@@ -23,38 +23,37 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9f4f53eb-6f7f-48b5-82a2-b5196c9afd72" name="默认的" comment="0402">
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/component/property-list.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/component/thing-icon-view.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/profile/addons/yeelight-adapter-python" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/profile/config/database.sqlite3" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/profile/logger/log.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gateway.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gateway.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/webResources.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app" beforeDir="false" afterPath="$PROJECT_DIR$/app" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/component/thing-property.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/component/thing-property.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/js/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/js/api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/models/thing-model.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/models/thing-model.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/light.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/capability/light.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/on-off-switch.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/capability/on-off-switch.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/schema-impl/capability/thing.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/schema-impl/capability/thing.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/views/AddThing.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/AddThing.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/default.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/default.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/views/Things.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/Things.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gateway-addon" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-addon" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-addon/action.go" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-addon/action.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-addon/addon_manager.go" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-addon/addon_manager.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-addon/event.go" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-addon/event.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-addon/property.go" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-addon/property.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway-addon/adapter.go" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-addon/adapter.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/bus/bus.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/bus/bus.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/plugin/addon_manager.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/addon_manager.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/plugin/addon_util.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/addon_util.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/ipc_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/ipc_server.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/plugin/manager.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/manager.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/plugin.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/plugin.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/plugin_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/plugin_server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/controllers/root_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/root_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/actions_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/actions_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/new_things_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/new_things_controller.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/controllers/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/router.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/controllers/things_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/things_controller.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/controllers/ws-controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/ws-controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/models/constant.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/models/thing/thing.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/models/thing/thing.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/models/actions.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/models/actions.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/models/thing/action.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/models/action.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/models/thing/event.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/models/event.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/models/thing/property.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/models/property.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/models/thing/thing.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/models/thing.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/models/things.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/models/things.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/static.go" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,7 +72,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../../Program Files/Go" />
+  <component name="GOROOT" url="file:///usr/local/go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="ROOT_SYNC" value="DONT_SYNC" />
@@ -88,6 +87,12 @@
   </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/server/controllers/actions_controller.go" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/app/src/views/Things.jsx" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/server/controllers/router.go" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/cmd/main.go" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="JupyterTrust" id="1dc2f251-25ea-4b2e-8afb-48f51c4c69e0" />
   <component name="ProjectId" id="1jm2mA3bK0GS7Pr1J1QEfTwdLMV" />
@@ -135,11 +140,11 @@
       <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\profile\addons" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/server/models" />
       <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\addon_manager" />
       <recent name="C:\Users\刘桂林\Desktop\web-things\gateway" />
       <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\plugin\addon_manager" />
       <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\homekit\transport" />
-      <recent name="C:\Users\刘桂林\Desktop\web-things\gateway\homekit\cmd" />
     </key>
   </component>
   <component name="RunManager" selected="npm.start">
@@ -147,8 +152,8 @@
       <module name="gateway" />
       <working_directory value="$PROJECT_DIR$" />
       <kind value="FILE" />
-      <filePath value="$PROJECT_DIR$/cmd/main.go" />
       <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/cmd/main.go" />
       <method v="2" />
     </configuration>
     <configuration name="start" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">

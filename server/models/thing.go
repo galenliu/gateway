@@ -1,4 +1,4 @@
-package thing
+package models
 
 import (
 	"addon"
@@ -69,8 +69,10 @@ func (t *Thing) GetProperty(propName string) *Property {
 	return prop
 }
 
-func (t *Thing) GetId() string {
-	return t.ID
+func (t *Thing) GetID() string {
+	sl := strings.Split(t.ID, "/")
+	id := sl[len(sl)-1]
+	return id
 }
 
 func (t *Thing) SetTitle(title string) string {
@@ -92,7 +94,7 @@ func (t *Thing) SetSelectedCapability(selectedCapability string) {
 	t.SelectedCapability = selectedCapability
 }
 
-func (t *Thing) SetConnected(connected bool) {
+func (t *Thing) setConnected(connected bool) {
 	sl := strings.Split(t.ID, "/")
 	id := sl[len(sl)-1]
 	bus.Publish(util.CONNECTED, id, connected)

@@ -11,7 +11,7 @@ import (
 	"gateway/pkg/database"
 	"gateway/pkg/log"
 	"gateway/pkg/util"
-	"gateway/server/models/thing"
+	"gateway/server/models"
 	json "github.com/json-iterator/go"
 	"github.com/xiam/to"
 	"io"
@@ -25,8 +25,8 @@ import (
 
 var instance *AddonManager
 
-type ThingAdded func(*thing.Thing)
-type ThingRemoved func(*thing.Thing)
+type ThingAdded func(*models.Thing)
+type ThingRemoved func(*models.Thing)
 type PropertyChanged func(property addon.Property)
 
 type Extension struct {
@@ -84,7 +84,7 @@ func (manager *AddonManager) handleDeviceAdded(device *addon.Device) {
 		log.Info("device marshal err: %s", err.Error())
 		return
 	}
-	th, e := UnmarshalWebThing(d)
+	th, e := MarshalWebThing(d)
 	if e != nil {
 		log.Info("device marshal to webThing err: %s", e.Error())
 	}

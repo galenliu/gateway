@@ -4,10 +4,9 @@ import (
 	"gateway/config"
 	"gateway/pkg/log"
 	"gateway/pkg/util"
-	"gateway/server"
+	//"gateway/server"
 	"gateway/server/models"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/websocket/v2"
@@ -24,8 +23,6 @@ type Config struct {
 	LogDir      string
 }
 
-var instance *Web
-
 type Web struct {
 	*fiber.App
 	config Config
@@ -37,7 +34,7 @@ func NewWebAPP(conf Config) *Web {
 	web.things = models.NewThings()
 	web.config = conf
 	web.App = CollectRoute(conf)
-	instance = &web
+
 	return &web
 }
 
@@ -47,9 +44,9 @@ func CollectRoute(conf Config) *fiber.App {
 	var app = fiber.New()
 	app.Use(recover.New())
 
-	app.Use("/", filesystem.New(filesystem.Config{
-		Root: http.FS(server.File),
-	}))
+	//app.Use("/", filesystem.New(filesystem.Config{
+	//	Root: http.FS(server.File),
+	//}))
 
 	//logger
 	app.Use(logger.New())

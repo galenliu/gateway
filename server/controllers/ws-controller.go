@@ -7,7 +7,6 @@ import (
 	"gateway/pkg/util"
 	AddonManager "gateway/plugin"
 	"gateway/server/models"
-	"gateway/server/models/thing"
 	"github.com/gofiber/websocket/v2"
 	json "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
@@ -23,13 +22,13 @@ type WsHandler struct {
 	ws                   *websocket.Conn
 	locker               *sync.Mutex
 	done                 chan struct{}
-	subscriptionThings   map[string]*thing.Thing
+	subscriptionThings   map[string]*models.Thing
 	subscribedEventNames map[string]bool
 }
 
 func NewWsHandler() *WsHandler {
 	controller := &WsHandler{}
-	controller.subscriptionThings = make(map[string]*thing.Thing, 10)
+	controller.subscriptionThings = make(map[string]*models.Thing, 10)
 	controller.subscribedEventNames = make(map[string]bool)
 	controller.locker = new(sync.Mutex)
 	controller.Container = models.NewThings()
@@ -40,9 +39,95 @@ func NewWsHandler() *WsHandler {
 func handleWebsocket(c *websocket.Conn) {
 	log.Info("handler websocket....")
 	controller := NewWsHandler()
-	controller.thingId, _ = c.Locals("thingId").(string)
+	thingId, _ := c.Locals("thingId").(string)
 	controller.ws = c
 	controller.handlerConn()
+	go handlerConnection(c, thingId)
+}
+func handlerConnection(c *websocket.Conn, thingId string) {
+	Things := models.NewThings()
+
+	sendMessage := func(data map[string]interface{}) {
+		d, _ := json.MarshalIndent(&data, "", " ")
+		writeErr := c.WriteMessage(websocket.TextMessage, d)
+		if writeErr != nil {
+			return
+		}
+	}
+
+	addThing := func(thing *models.Thing) {
+		m := make(map[string]interface{})
+		m["id"] = thing.GetID()
+		m["messageType"] = util.PropertyStatus
+		propertyValues := make(map[string]interface{})
+		for propName, _ := range thing.Properties {
+			value, err := AddonManager.GetPropertyValue(thing.GetID(), propName)
+			if err != nil {
+				continue
+			} else {
+				propertyValues[propName] = value
+			}
+		}
+		m["data"] = propertyValues
+		sendMessage(m)
+	}
+
+	onThingAdded := func(thing *models.Thing) {
+		m := make(map[string]interface{})
+		m["id"] = thing.GetID()
+		m["messageType"] = util.ThingAdded
+		m["data"] = struct{}{}
+		sendMessage(m)
+		addThing(thing)
+	}
+
+	onPropertyChanged := func(data []byte) {
+		deviceId := json.Get(data, "deviceId").ToString()
+		if thingId != "" && thingId != deviceId {
+			return
+		}
+		name := gjson.GetBytes(data, "name").String()
+		v := gjson.GetBytes(data, "value").Value()
+		if name == "" || v == nil {
+			return
+		}
+		m := make(map[string]interface{})
+		m["id"] = deviceId
+		m["messageType"] = util.PropertyStatus
+		m["data"] = map[string]interface{}{
+			name: v,
+		}
+		sendMessage(m)
+	}
+	_ = bus.Subscribe(util.PropertyChanged, onPropertyChanged)
+	Things.Subscribe(util.ThingAdded, onThingAdded)
+
+	if thingId != "" {
+		m := make(map[string]interface{})
+		t := Things.GetThing(thingId)
+		if t == nil {
+			m["messageType"] = util.ERROR
+			m["data"] = map[string]interface{}{
+				"code":    http.StatusBadRequest,
+				"status":  "400 Bed Request",
+				"message": fmt.Sprintf("Thing(%s) not found", thingId),
+			}
+			sendMessage(m)
+			return
+		}
+		addThing(t)
+	} else {
+		for _, t := range Things.GetThings() {
+			addThing(t)
+		}
+	}
+
+	clearFunc := func() {
+		Things.Unsubscribe(util.ThingAdded, onThingAdded)
+		_ = bus.Unsubscribe(util.PropertyChanged, onPropertyChanged)
+	}
+
+	defer clearFunc()
 
 }
 
@@ -83,7 +168,6 @@ func (controller *WsHandler) handlerConn() {
 		if controller.ws != nil {
 			_ = controller.ws.Close()
 		}
-
 	}()
 
 	for {
@@ -173,7 +257,7 @@ func (controller *WsHandler) handleMessage(bytes []byte) {
 			var actionParams map[string]interface{}
 			json.Get(bytes, "data", actionName, "input").ToVal(&actionParams)
 			th := controller.Container.GetThing(id)
-			action := thing.NewAction(actionName, actionParams, th)
+			action := models.NewAction(actionName, actionParams, th)
 			controller.Container.Actions.Add(action)
 			err := AddonManager.RequestAction(id, action.ID, actionName, actionParams)
 			if err != nil {
@@ -186,7 +270,7 @@ func (controller *WsHandler) handleMessage(bytes []byte) {
 	}
 }
 
-func (controller *WsHandler) addThing(thing *thing.Thing) {
+func (controller *WsHandler) addThing(thing *models.Thing) {
 
 	sl := strings.Split(thing.ID, "/")
 	id := sl[len(sl)-1]
@@ -209,7 +293,7 @@ func (controller *WsHandler) addThing(thing *thing.Thing) {
 	controller.onConnected(id, thing.IsConnected())
 }
 
-func (controller *WsHandler) onThingAdded(thing *thing.Thing) {
+func (controller *WsHandler) onThingAdded(thing *models.Thing) {
 
 	sl := strings.Split(thing.ID, "/")
 	id := sl[len(sl)-1]
@@ -234,7 +318,7 @@ func (controller *WsHandler) onConnected(deviceId string, connected bool) {
 	controller.sendMessage(m)
 }
 
-func (controller *WsHandler) onModified(thing *thing.Thing) {
+func (controller *WsHandler) onModified(thing *models.Thing) {
 
 	sl := strings.Split(thing.ID, "/")
 	id := sl[len(sl)-1]
@@ -248,7 +332,7 @@ func (controller *WsHandler) onModified(thing *thing.Thing) {
 	controller.sendMessage(m)
 }
 
-func (controller *WsHandler) onActionStatus(action *thing.Action) {
+func (controller *WsHandler) onActionStatus(action *models.Action) {
 	if action.ThingId == "" {
 		return
 	}
@@ -266,7 +350,7 @@ func (controller *WsHandler) onActionStatus(action *thing.Action) {
 	}
 }
 
-func (controller *WsHandler) onEvent(event *thing.Event) {
+func (controller *WsHandler) onEvent(event *models.Event) {
 	if !controller.subscribedEventNames[event.Name] {
 		return
 	}
@@ -277,7 +361,7 @@ func (controller *WsHandler) onEvent(event *thing.Event) {
 
 }
 
-func (controller *WsHandler) onRemoved(thing *thing.Thing) {
+func (controller *WsHandler) onRemoved(thing *models.Thing) {
 
 	sl := strings.Split(thing.ID, "/")
 	id := sl[len(sl)-1]

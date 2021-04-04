@@ -5,7 +5,6 @@ import (
 	"gateway/pkg/log"
 	"gateway/plugin"
 	"gateway/server/models"
-	"gateway/server/models/thing"
 	"github.com/gofiber/fiber/v2"
 	"net/http"
 )
@@ -23,7 +22,7 @@ func NewActionsController() *ActionsController {
 func (controller *ActionsController) handleActions(c *fiber.Ctx) error {
 
 	// POST /actions
-	var action *thing.Action
+	var action *models.Action
 	var thingId = c.Params("thingId")
 	var actionInfo map[string]struct {
 		Input map[string]interface{} `json:"input"`
@@ -40,9 +39,9 @@ func (controller *ActionsController) handleActions(c *fiber.Ctx) error {
 	}
 
 	if thingId != "" {
-		action = thing.NewThingAction(thingId, actionName, input)
+		action = models.NewThingAction(thingId, actionName, input)
 	} else {
-		action = thing.NewAction(actionName, input, nil)
+		action = models.NewAction(actionName, input, nil)
 	}
 	controller.Actions.Add(action)
 

@@ -1,6 +1,7 @@
 /app/node_modules/
 /app/.idea
 .idea/
+.idea
 .vscode/
 /server/static/*.html
 /server/static/*.js
