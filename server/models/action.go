@@ -1,6 +1,7 @@
 package models
 
 import (
+	"addon/wot"
 	"fmt"
 	"gateway/pkg/bus"
 	"gateway/pkg/util"
@@ -17,15 +18,22 @@ func generateActionId() string {
 }
 
 type Action struct {
-	ID            string                 `json:"id"`
-	Name          string                 `json:"name"`
-	Input         map[string]interface{} `json:"input"`
-	Href          string                 `json:"href"`
-	Status        string                 `json:"status"`
-	TimeRequested string                 `json:"time_requested"`
-	TimeCompleted string                 `json:"time_completed,omitempty"`
-	Error         string                 `json:"error,omitempty"`
+	*wot.InteractionAffordance
+
+	ID          string `json:"id"`
+	Description string `json:"description"`
+	Name        string `json:"name"`
+
+	Href          string `json:"href"`
+	Status        string `json:"status"`
+	TimeRequested string `json:"time_requested"`
+	TimeCompleted string `json:"time_completed,omitempty"`
+	Error         string `json:"error,omitempty"`
 	ThingId       string
+
+	Title  string                 `json:"title"`
+	AtType string                 `json:"@type"`
+	Input  map[string]interface{} `json:"input"`
 }
 
 type Input struct {

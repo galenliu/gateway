@@ -13,7 +13,7 @@ type NewThingsController struct {
 	locker     *sync.Mutex
 	container  *models.Things
 	ws         *websocket.Conn
-	foundThing chan *models.Thing
+	foundThing chan string
 	closeChan  chan struct{}
 }
 
@@ -21,7 +21,7 @@ func NewNewThingsController(ws *websocket.Conn) *NewThingsController {
 	controller := &NewThingsController{}
 	controller.locker = new(sync.Mutex)
 	controller.closeChan = make(chan struct{})
-	controller.foundThing = make(chan *models.Thing)
+	controller.foundThing = make(chan string)
 	controller.container = models.NewThings()
 	controller.ws = ws
 	return controller
@@ -58,18 +58,22 @@ func (controller *NewThingsController) handlerConnection() {
 		case <-controller.closeChan:
 			log.Info("new things websocket disconnection")
 			return
-		case t := <-controller.foundThing:
-			err := controller.ws.WriteJSON(t)
-			if err != nil {
-				controller.closeChan <- struct{}{}
+		case s := <-controller.foundThing:
+			thing := models.NewThing(s)
+			if thing != nil {
+				err := controller.ws.WriteJSON(thing)
+				if err != nil {
+					controller.closeChan <- struct{}{}
+				}
 			}
+
 		}
 
 	}
 }
 
-func (controller *NewThingsController) handleNewThing(thing *models.Thing) {
-	controller.foundThing <- thing
+func (controller *NewThingsController) handleNewThing(data string) {
+	controller.foundThing <- data
 }
 
 func handleNewThingsWebsocket(conn *websocket.Conn) {

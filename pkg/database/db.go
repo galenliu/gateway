@@ -130,7 +130,7 @@ func GetSetting(key string) (value string, err error) {
 
 func SetSetting(key, value string) error {
 
-	log.Info("set setting key:%v value:%v", key, value)
+	log.Info("set setting key:%s value:%s \t\n", key, value)
 	_, err := GetSetting(key)
 	if err == nil {
 		_, e := instance.Exec(`update settings set value=@value where key=@key`, sql.Named("value", value), sql.Named("key", key))
@@ -149,7 +149,7 @@ func SetSetting(key, value string) error {
 	if eee != nil {
 		return eee
 	}
-	log.Debug("insert data,id:%d , value: %s", id, value)
+	log.Debug("insert data,id:%d , value: %s \t\n", id, value)
 	return nil
 }
 
@@ -170,7 +170,7 @@ func CreateThing(id, description string) error {
 	if eee != nil {
 		return eee
 	}
-	fmt.Printf("insert data,id:%d , value: %s", id, description)
+	fmt.Printf("insert data,id:%s , value: %s \t\n", id, description)
 	return nil
 }
 

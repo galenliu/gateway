@@ -1,11 +1,8 @@
 package plugin
 
 import (
-	"addon"
 	"fmt"
 	"gateway/pkg/database"
-	"gateway/pkg/util"
-	"gateway/server/models"
 	json "github.com/json-iterator/go"
 	"io/ioutil"
 	"path"
@@ -160,144 +157,144 @@ func loadManifest(destPath, packetId string) (*AddonInfo, *interface{}, error) {
 	return &addonInfo, &manifest.Options.Default, nil
 }
 
-func MarshalWebThing(data []byte) (*models.Thing, error) {
+//func MarshalWebThing(data []byte) (*models.Thing, error) {
+//
+//	id := json.Get(data, "id").ToString()
+//	if id == "" {
+//		return nil, fmt.Errorf("id necessary")
+//	}
+//	title := json.Get(data, "title").ToString()
+//	if title == "" {
+//		title = id
+//	}
+//	id = fmt.Sprintf("/things/%s", id)
+//
+//	var atContext []string
+//	json.Get(data, "@context").ToVal(&atContext)
+//
+//	var atType []string
+//	json.Get(data, "@type").ToVal(&atType)
+//
+//	t := &models.Thing{
+//		AtContext:           atContext,
+//		Title:               title,
+//		ID:                  id,
+//		AtType:              atType,
+//		Description:         json.Get(data, "description").ToString(),
+//		Properties:          nil,
+//		Actions:             nil,
+//		Events:              nil,
+//		Forms:               nil,
+//		CredentialsRequired: json.Get(data, "credentialsRequired").ToBool(),
+//	}
+//
+//	var pin *addon.PIN
+//	json.Get(data, "pin").ToVal(&pin)
+//	if pin != nil {
+//		t.Pin = *pin
+//	}
+//	var props map[string]addon.Property
+//	json.Get(data, "properties").ToVal(&props)
+//	if len(props) > 0 {
+//		t.Properties = make(map[string]*models.Property)
+//		for n, p := range props {
+//			prop := &models.Property{
+//				Name:        n,
+//				AtType:      p.AtType,
+//				Type:        p.Type,
+//				Title:       p.Title,
+//				Description: p.Description,
+//				Unit:        p.Unit,
+//				ReadOnly:    p.ReadOnly,
+//				Visible:     p.Visible,
+//				Minimum:     p.Minimum,
+//				Maximum:     p.Maximum,
+//				Enum:        p.Enum,
+//				ThingId:     t.ID,
+//			}
+//			prop.Forms = append(prop.Forms, util.NewForm("href", fmt.Sprintf("%s/properties/%s", t.ID, prop.Name)))
+//			t.Properties[n] = prop
+//		}
+//		t.Forms = append(t.Forms, util.NewForm("rel", "alternate", "mediaType", "text/html", "href", fmt.Sprintf("/things/%s", id)))
+//		t.Forms = append(t.Forms, util.NewForm("rel", "alternate", "href", fmt.Sprintf("/things/%s/", id)))
+//	}
+//	return t, nil
+//}
 
-	id := json.Get(data, "id").ToString()
-	if id == "" {
-		return nil, fmt.Errorf("id necessary")
-	}
-	title := json.Get(data, "title").ToString()
-	if title == "" {
-		title = id
-	}
-	id = fmt.Sprintf("/things/%s", id)
-
-	var atContext []string
-	json.Get(data, "@context").ToVal(&atContext)
-
-	var atType []string
-	json.Get(data, "@type").ToVal(&atType)
-
-	t := &models.Thing{
-		AtContext:           atContext,
-		Title:               title,
-		ID:                  id,
-		AtType:              atType,
-		Description:         json.Get(data, "description").ToString(),
-		Properties:          nil,
-		Actions:             nil,
-		Events:              nil,
-		Forms:               nil,
-		CredentialsRequired: json.Get(data, "credentialsRequired").ToBool(),
-	}
-
-	var pin *addon.PIN
-	json.Get(data, "pin").ToVal(&pin)
-	if pin != nil {
-		t.Pin = *pin
-	}
-	var props map[string]addon.Property
-	json.Get(data, "properties").ToVal(&props)
-	if len(props) > 0 {
-		t.Properties = make(map[string]*models.Property)
-		for n, p := range props {
-			prop := &models.Property{
-				Name:        n,
-				AtType:      p.AtType,
-				Type:        p.Type,
-				Title:       p.Title,
-				Description: p.Description,
-				Unit:        p.Unit,
-				ReadOnly:    p.ReadOnly,
-				Visible:     p.Visible,
-				Minimum:     p.Minimum,
-				Maximum:     p.Maximum,
-				Enum:        p.Enum,
-				ThingId:     t.ID,
-			}
-			prop.Forms = append(prop.Forms, util.NewForm("href", fmt.Sprintf("%s/properties/%s", t.ID, prop.Name)))
-			t.Properties[n] = prop
-		}
-		t.Forms = append(t.Forms, util.NewForm("rel", "alternate", "mediaType", "text/html", "href", fmt.Sprintf("/things/%s", id)))
-		t.Forms = append(t.Forms, util.NewForm("rel", "alternate", "href", fmt.Sprintf("/things/%s/", id)))
-	}
-	return t, nil
-}
-
-func UnmarshalDevice(d []byte) (*addon.Device, error) {
-
-	id := json.Get(d, "id").ToString()
-	if id == "" {
-		return nil, fmt.Errorf("device id lost")
-	}
-	title := json.Get(d, "title").ToString()
-	if title == "" {
-		title = id
-	}
-
-	atContext := json.Get(d, "@context").Keys()
-	if len(atContext) == 0 {
-		t := json.Get(d, "@context").ToString()
-		if t != "" {
-			atContext = append(atContext, t)
-		}
-	}
-
-	var atType []string
-	json.Get(d, `@type`).ToVal(&atType)
-	if len(atType) == 0 {
-		return nil, fmt.Errorf("@type lost")
-	}
-
-	var properties map[string]*addon.Property
-	json.Get(d, "properties").ToVal(&properties)
-
-	var actions map[string]*addon.Action
-	json.Get(d, "actions").ToVal(&actions)
-
-	var events map[string]*addon.Event
-	json.Get(d, "actions").ToVal(&events)
-
-	var pin *addon.PIN
-	json.Get(d, "pin").ToVal(&pin)
-
-	device := &addon.Device{
-		ID:                  id,
-		AtContext:           atContext,
-		Title:               title,
-		AtType:              atType,
-		Description:         json.Get(d, "description").ToString(),
-		CredentialsRequired: json.Get(d, "credentialsRequired").ToBool(),
-		Pin:                 addon.PIN{},
-		AdapterId:           json.Get(d, "adapterId").ToString(),
-	}
-	if len(properties) > 0 {
-		device.Properties = make(map[string]addon.IProperty)
-		for n, p := range properties {
-			p.DeviceId = id
-			device.Properties[n] = p
-		}
-	}
-
-	if len(events) > 0 {
-		device.Events = make(map[string]*addon.Event)
-		for n, e := range events {
-			e.DeviceId = id
-			device.Events[n] = e
-		}
-	}
-
-	if len(actions) > 0 {
-		device.Actions = make(map[string]*addon.Action)
-		for n, a := range actions {
-			a.DeviceId = id
-			device.Actions[n] = a
-		}
-	}
-
-	if pin != nil {
-		device.Pin = *pin
-	}
-
-	return device, nil
-}
+//func UnmarshalDevice(d []byte) (*addon.Device, error) {
+//
+//	id := json.Get(d, "id").ToString()
+//	if id == "" {
+//		return nil, fmt.Errorf("device id lost")
+//	}
+//	title := json.Get(d, "title").ToString()
+//	if title == "" {
+//		title = id
+//	}
+//
+//	atContext := json.Get(d, "@context").Keys()
+//	if len(atContext) == 0 {
+//		t := json.Get(d, "@context").ToString()
+//		if t != "" {
+//			atContext = append(atContext, t)
+//		}
+//	}
+//
+//	var atType []string
+//	json.Get(d, `@type`).ToVal(&atType)
+//	if len(atType) == 0 {
+//		return nil, fmt.Errorf("@type lost")
+//	}
+//
+//	var properties map[string]*addon.Property
+//	json.Get(d, "properties").ToVal(&properties)
+//
+//	var actions map[string]*addon.Action
+//	json.Get(d, "actions").ToVal(&actions)
+//
+//	var events map[string]*addon.Event
+//	json.Get(d, "actions").ToVal(&events)
+//
+//	var pin *addon.PIN
+//	json.Get(d, "pin").ToVal(&pin)
+//
+//	device := &addon.Device{
+//		ID:                  id,
+//		AtContext:           atContext,
+//		Title:               title,
+//		AtType:              atType,
+//		Description:         json.Get(d, "description").ToString(),
+//		CredentialsRequired: json.Get(d, "credentialsRequired").ToBool(),
+//		Pin:                 addon.PIN{},
+//		AdapterId:           json.Get(d, "adapterId").ToString(),
+//	}
+//	if len(properties) > 0 {
+//		device.Properties = make(map[string]addon.IProperty)
+//		for n, p := range properties {
+//			p.DeviceId = id
+//			device.Properties[n] = p
+//		}
+//	}
+//
+//	if len(events) > 0 {
+//		device.Events = make(map[string]*addon.Event)
+//		for n, e := range events {
+//			e.DeviceId = id
+//			device.Events[n] = e
+//		}
+//	}
+//
+//	if len(actions) > 0 {
+//		device.Actions = make(map[string]*addon.Action)
+//		for n, a := range actions {
+//			a.DeviceId = id
+//			device.Actions[n] = a
+//		}
+//	}
+//
+//	if pin != nil {
+//		device.Pin = *pin
+//	}
+//
+//	return device, nil
+//}

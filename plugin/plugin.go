@@ -119,9 +119,10 @@ func (plugin *Plugin) handleMessage(data []byte) {
 			log.Info("marshal device err")
 			return
 		}
-		newDevice, err := UnmarshalDevice([]byte(data))
-		if err != nil {
-			log.Error(err.Error())
+		var newDevice = addon.NewDeivceFormString(data)
+
+		if newDevice == nil {
+			log.Error("device add err:")
 			return
 		}
 		newDevice.AdapterId = adapterId

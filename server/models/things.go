@@ -5,7 +5,7 @@ import (
 	"gateway/pkg/bus"
 	"gateway/pkg/database"
 	"gateway/pkg/util"
-	"gateway/plugin"
+	AddonManager "gateway/plugin"
 	"github.com/tidwall/gjson"
 	"sync"
 )
@@ -25,14 +25,14 @@ func NewThings() *Things {
 			instance.things = make(map[string]*Thing)
 			instance.GetThings()
 			instance.Actions = NewActions()
-			_ = bus.Subscribe(util.ThingAdded, instance.handleNewThing)
+			AddonManager.Subscribe(util.ThingAdded, instance.handleNewThing)
 		},
 	)
 	return instance
 }
 
 func (ts *Things) GetThing(id string) *Thing {
-	t, ok := ts.things["/things/"+id]
+	t, ok := ts.things[id]
 	if !ok {
 		return nil
 	}
@@ -57,7 +57,7 @@ func (ts *Things) GetThings() map[string]*Thing {
 		return ts.things
 	}
 	for _, t := range GetThingsFormDataBase() {
-		ts.things[t.ID] = t
+		ts.things[t.GetID()] = t
 	}
 	return ts.things
 }
@@ -72,44 +72,44 @@ func (ts *Things) GetListThings() (lt []*Thing) {
 
 //get instance with out database
 func (ts *Things) GetNewThings() []*Thing {
-	var connectedThings []*Thing
-	//connectedThings = new([]*thing.Thing)
-	connectedThings = plugin.GetThings()
-	//bus.Publish(bus.GetThings, &connectedThings)
+
+	connectedThings := AddonManager.GetDevices()
+
 	storedThings := ts.GetThings()
+
 	var things []*Thing
-	var newList []*Thing
 	for _, connected := range connectedThings {
 		for _, storedThing := range storedThings {
-			if connected.ID != storedThing.ID {
-				newList = append(newList, connected)
+			if connected.GetID() != storedThing.GetID() {
+				things = append(things, NewThing(connected.GetDescription()))
 			}
 		}
 	}
 	return things
 }
 
-func (ts *Things) CreateThing(id string, description []byte) (string, error) {
-	var th = NewThing(id, description)
+func (ts *Things) CreateThing(id string, description string) (string, error) {
+	var th = NewThing(description)
+	th.ID = id
 	if th == nil {
 		return "", fmt.Errorf("thing description invaild")
 	}
-	err := database.CreateThing(th.ID, th.GetDescription())
+	err := database.CreateThing(th.GetID(), th.GetDescription())
 	if err != nil {
 		return "", err
 	}
-	ts.things[th.ID] = th
-	ts.Publish(util.ThingAdded, th)
+	ts.things[th.GetID()] = th
+	go ts.Publish(util.ThingAdded, th)
 	return th.GetDescription(), err
 }
 
-func (ts *Things) handleNewThing(data []byte) {
-	id := gjson.GetBytes(data, "id").String()
+func (ts *Things) handleNewThing(data string) {
+	id := gjson.Get(data, "id").String()
 	t := ts.GetThing(id)
 	if t == nil {
 		return
 	}
-	t.update(NewThing(id, data))
+	t.update(NewThing(data))
 	t.setConnected(true)
 }
 
@@ -119,36 +119,35 @@ func (ts *Things) RemoveThing(thingId string) error {
 	//if t == nil {
 	//	return fmt.Errorf("thing not found")
 	//}
-	id := "/things/" + thingId
-	err := database.RemoveThing(id)
+
+	err := database.RemoveThing(thingId)
 	if err != nil {
 		return err
 	}
-	delete(ts.things, id)
+	delete(ts.things, thingId)
 	return nil
 }
 
 func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) ([]byte, error) {
 	var th = ts.GetThing(thingId)
 	if th == nil {
-		return nil, fmt.Errorf("thing can not found")
+		return nil, fmt.Errorf("thing(%s) can not found", thingId)
 	}
 	prop := th.GetProperty(propName)
 	if prop == nil {
 		return nil, fmt.Errorf("propertyName not found")
 	}
-	return plugin.SetProperty(thingId, propName, value)
+	return AddonManager.SetProperty(thingId, propName, value)
 
 }
 
 func GetThingsFormDataBase() (list []*Thing) {
-
 	var ts = database.GetThings()
 	if ts == nil {
 		return nil
 	}
-	for id, des := range ts {
-		t := NewThing(id, []byte(des))
+	for _, des := range ts {
+		t := NewThing(des)
 		if t != nil {
 			t.Connected = false
 			list = append(list, t)

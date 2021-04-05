@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"gateway/pkg/bus"
 	"gateway/plugin"
 	"sync"
 )
@@ -93,4 +94,16 @@ func (actions *Actions) Remove(actionId string) error {
 	action.UpdateStatus("deleted")
 	delete(actions.List, actionId)
 	return nil
+}
+
+func (actions *Actions) Subscribe(typ string, f interface{}) {
+	_ = bus.Subscribe("Actions."+typ, f)
+}
+
+func (actions *Actions) Unsubscribe(typ string, f interface{}) {
+	_ = bus.Unsubscribe("Actions."+typ, f)
+}
+
+func (actions *Actions) Publish(typ string, args ...interface{}) {
+	bus.Publish("Actions."+typ, args...)
 }

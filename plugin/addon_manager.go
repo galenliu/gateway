@@ -8,7 +8,6 @@ import (
 	"gateway/pkg/database"
 	"gateway/pkg/log"
 	"gateway/pkg/util"
-	"gateway/server/models"
 	json "github.com/json-iterator/go"
 	"path"
 	"time"
@@ -62,22 +61,11 @@ func DisableAddon(addonId string) error {
 	return nil
 }
 
-func GetThings() []*models.Thing {
-	var ts []*models.Thing
-	for _, d := range instance.devices {
-		data, err := json.MarshalIndent(d, "", " ")
-		if err != nil {
-			log.Error("Marshal device to webThing err:", err)
-			continue
-		}
-		th, e := MarshalWebThing(data)
-		if e != nil {
-			log.Error("MarshalWebThing err:", e)
-			continue
-		}
-		ts = append(ts, th)
+func GetDevices() (device []addon.IDevice) {
+	for _, dev := range instance.devices {
+		device = append(device, dev)
 	}
-	return ts
+	return
 }
 
 func GetDevice(deviceId string) addon.IDevice {
@@ -99,13 +87,14 @@ func SetProperty(deviceId, propName string, newValue interface{}) ([]byte, error
 	changed := func(data []byte) {
 		propChan <- data
 	}
-	_ = bus.Subscribe(util.PropertyChanged, changed)
-	defer bus.Unsubscribe(util.PropertyChanged, changed)
+	go Subscribe(util.PropertyChanged, changed)
+	defer Unsubscribe(util.PropertyChanged, changed)
 	for {
 		select {
 		case data := <-propChan:
 			return data, nil
 		case <-closeChan:
+			log.Error("set property(name: %s value: %s) timeout", propName, newValue)
 			return nil, fmt.Errorf("timeout")
 		}
 	}
@@ -241,4 +230,16 @@ func UninstallAddon(addonId string, disable bool) error {
 	}
 	delete(instance.installAddons, addonId)
 	return nil
+}
+
+func Subscribe(typ string, f interface{}) {
+	_ = bus.Subscribe(typ, f)
+}
+
+func Unsubscribe(typ string, f interface{}) {
+	_ = bus.Unsubscribe(typ, f)
+}
+
+func Publish(typ string, args ...interface{}) {
+	bus.Publish(typ, args...)
 }

@@ -7,11 +7,10 @@ import (
 	"context"
 	"fmt"
 	"gateway/config"
-	"gateway/pkg/bus"
 	"gateway/pkg/database"
 	"gateway/pkg/log"
 	"gateway/pkg/util"
-	"gateway/server/models"
+
 	json "github.com/json-iterator/go"
 	"github.com/xiam/to"
 	"io"
@@ -25,8 +24,6 @@ import (
 
 var instance *AddonManager
 
-type ThingAdded func(*models.Thing)
-type ThingRemoved func(*models.Thing)
 type PropertyChanged func(property addon.Property)
 
 type Extension struct {
@@ -79,33 +76,24 @@ func NewAddonsManager() *AddonManager {
 func (manager *AddonManager) handleDeviceAdded(device *addon.Device) {
 	manager.devices[device.GetID()] = device
 	//d, err := json.MarshalIndent(device, "", " ")
-	d, err := json.MarshalIndent(device, "", " ")
+	d, err := json.MarshalToString(device)
 	if err != nil {
 		log.Info("device marshal err: %s", err.Error())
 		return
 	}
-	th, e := MarshalWebThing(d)
-	if e != nil {
-		log.Info("device marshal to webThing err: %s", e.Error())
-	}
-	bus.Publish(util.ThingAdded, th)
+	Publish(util.ThingAdded, d)
 }
 
-//func (manager *AddonManager) handleDeviceRemoved(device *addon.Device) {
-//	delete(manager.devices, device.id)
-//	bus.Publish(util.ThingRemoved, asWebThing(device))
-//}
-
 func (manager *AddonManager) actionNotify(action *addon.Action) {
-	bus.Publish(util.ActionStatus, action)
+	Publish(util.ActionStatus, action)
 }
 
 func (manager *AddonManager) eventNotify(event *addon.Event) {
-	bus.Publish(util.EVENT, event)
+	Publish(util.EVENT, event)
 }
 
 func (manager *AddonManager) connectedNotify(device *addon.Device, connected bool) {
-	bus.Publish(util.CONNECTED, connected)
+	Publish(util.CONNECTED, connected)
 }
 
 func (manager *AddonManager) addAdapter(adapter *Adapter) {
@@ -144,13 +132,13 @@ func (manager *AddonManager) handleSetProperty(deviceId, propName string, setVal
 
 	var newValue interface{}
 	if property.GetType() == addon.TypeBoolean {
-		newValue = to.Bool(setValue)
+		newValue = to.Bool(to.Bytes(setValue))
 	}
 	if property.GetType() == addon.TypeInteger || property.GetAtType() == addon.TypeNumber {
 		newValue = to.Int64(to.Bytes(setValue))
 	}
 	if property.GetType() == addon.TypeString {
-		newValue = to.String(setValue)
+		newValue = string(to.Bytes(setValue))
 	}
 	if property == nil {
 		return fmt.Errorf("device or property not found")

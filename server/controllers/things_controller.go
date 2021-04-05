@@ -44,7 +44,7 @@ func (tc *ThingsController) handleCreateThing(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, "thing already added")
 	}
 
-	des, e := tc.Container.CreateThing(id, c.Body())
+	des, e := tc.Container.CreateThing(id, string(c.Body()))
 	if e != nil {
 		return fiber.NewError(http.StatusInternalServerError, fmt.Sprintf("create thing(%s) err: %v", id, e.Error()))
 	}

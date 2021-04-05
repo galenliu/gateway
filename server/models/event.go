@@ -1,11 +1,21 @@
 package models
 
-import json "github.com/json-iterator/go"
+import (
+	"addon/wot"
+	json "github.com/json-iterator/go"
+)
 
 type Event struct {
+	*wot.InteractionAffordance
+
 	ID      string `json:"-" gorm:"primaryKey"`
 	Name    string `json:"name"`
 	ThingId string `json:"thingId"`
+}
+
+func NewEventFromString(data string) *Event {
+	var e = Event{}
+	return &e
 }
 
 func NewEvent() *Event {
