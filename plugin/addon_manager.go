@@ -9,9 +9,12 @@ import (
 	"gateway/pkg/log"
 	"gateway/pkg/util"
 	json "github.com/json-iterator/go"
+	"github.com/xiam/to"
 	"path"
 	"time"
 )
+
+type Map = map[string]interface{}
 
 func GetInstallAddons() ([]byte, error) {
 	instance.locker.Lock()
@@ -76,23 +79,25 @@ func GetDevice(deviceId string) addon.IDevice {
 	return device
 }
 
-func SetProperty(deviceId, propName string, newValue interface{}) ([]byte, error) {
+func SetProperty(deviceId, propName string, newValue interface{}) (interface{}, error) {
 
 	go instance.handleSetProperty(deviceId, propName, newValue)
 	closeChan := make(chan struct{})
-	propChan := make(chan []byte)
+	propChan := make(chan Map)
 	time.AfterFunc(3*time.Second, func() {
 		closeChan <- struct{}{}
 	})
-	changed := func(data []byte) {
-		propChan <- data
+	changed := func(data Map) {
+		if to.String(data["deviceId"]) == deviceId && to.String(data["name"]) == propName {
+			propChan <- data
+		}
 	}
 	go Subscribe(util.PropertyChanged, changed)
 	defer Unsubscribe(util.PropertyChanged, changed)
 	for {
 		select {
 		case data := <-propChan:
-			return data, nil
+			return data["value"], nil
 		case <-closeChan:
 			log.Error("set property(name: %s value: %s) timeout", propName, newValue)
 			return nil, fmt.Errorf("timeout")

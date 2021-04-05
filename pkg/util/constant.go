@@ -1,6 +1,9 @@
 package util
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/gofiber/fiber/v2"
+)
 
 const (
 	// Web server routes
@@ -85,3 +88,5 @@ var (
 	ShortVersion = fmt.Sprintf("%v.%v", MajorVersion, MinorVersion)
 	Version      = fmt.Sprintf("%v.%v", ShortVersion, PatchVersion)
 )
+
+type Map = fiber.Map

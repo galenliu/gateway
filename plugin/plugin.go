@@ -168,20 +168,19 @@ func (plugin *Plugin) handleMessage(data []byte) {
 
 	case DevicePropertyChangedNotification:
 
-		js := json.Get(data, "data", "property")
+		prop := gjson.GetBytes(data, "data.property").String()
+		propName := gjson.GetBytes(data, "data.property.name").String()
 
-		propName := js.Get("name").ToString()
 		property := device.GetProperty(propName)
 		if property == nil {
 			log.Info("propName err")
 			return
 		}
-		bt := []byte(js.ToString())
-		if len(bt) == 0 {
+		if len(prop) == 0 {
 			return
 		}
-		property.Update(bt)
-		bus.Publish(util.PropertyChanged, property.GetNotifyDescription())
+		property.DoPropertyChanged(prop)
+		Publish(util.PropertyChanged, property.AsDict())
 		return
 
 	case DeviceActionStatusNotification:

@@ -122,8 +122,8 @@ func (tc *ThingsController) handleSetProperty(c *fiber.Ctx) error {
 		log.Error("Failed set thing(%s) property:(%s) value:(%s),err:(%s)", thingId, propName, value, e.Error())
 		return fiber.NewError(fiber.StatusGatewayTimeout, e.Error())
 	}
-	newValue := gjson.GetBytes(prop, "value").String()
-	data := map[string]interface{}{propName: newValue}
+
+	data := map[string]interface{}{propName: prop}
 	return c.Status(fiber.StatusOK).JSON(data)
 }
 

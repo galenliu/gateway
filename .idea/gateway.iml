@@ -6,8 +6,17 @@
     </facet>
   </component>
   <component name="NewModuleRootManager">
-    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/.idea/dataSources" />
+      <excludeFolder url="file://$MODULE_DIR$/profile/addons/buspro-adapter" />
+      <excludeFolder url="file://$MODULE_DIR$/profile/addons/tplink-adapter" />
+      <excludeFolder url="file://$MODULE_DIR$/profile/addons/tuya-adapter" />
+      <excludeFolder url="file://$MODULE_DIR$/profile/config" />
+      <excludeFolder url="file://$MODULE_DIR$/profile/logger" />
+      <excludeFolder url="file://$MODULE_DIR$/server/static" />
+    </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Python 3.9 interpreter library" level="application" />
   </component>
 </module>

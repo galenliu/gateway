@@ -8,9 +8,11 @@ import (
 	"gateway/server/models"
 	"github.com/gofiber/websocket/v2"
 	json "github.com/json-iterator/go"
-	"github.com/tidwall/gjson"
+	"github.com/xiam/to"
 	"net/http"
 )
+
+type Map = map[string]interface{}
 
 //type WsHandler struct {
 //	thingId              string
@@ -156,17 +158,17 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 		addThing(thing)
 	}
 
-	onPropertyChanged := func(data []byte) {
-		deviceId := json.Get(data, "deviceId").ToString()
+	onPropertyChanged := func(p Map) {
+		deviceId := to.String(p["deviceId"])
 		if thingId != "" && thingId != deviceId {
 			return
 		}
-		name := gjson.GetBytes(data, "name").String()
-		v := gjson.GetBytes(data, "value").Value()
+		name := to.String(p["name"])
+		v := p["value"]
 		if name == "" || v == nil {
 			return
 		}
-		m := make(map[string]interface{})
+		m := make(Map)
 		m["id"] = deviceId
 		m["messageType"] = util.PropertyStatus
 		m["data"] = map[string]interface{}{

@@ -2,6 +2,7 @@
 /app/.idea
 .idea/
 .idea
+.idea/workspace.xml
 .vscode/
 /server/static/*.html
 /server/static/*.js
@@ -11,3 +12,4 @@
 /miot/
 
 
+/profile/

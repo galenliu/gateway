@@ -128,7 +128,7 @@ func (ts *Things) RemoveThing(thingId string) error {
 	return nil
 }
 
-func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) ([]byte, error) {
+func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) (interface{}, error) {
 	var th = ts.GetThing(thingId)
 	if th == nil {
 		return nil, fmt.Errorf("thing(%s) can not found", thingId)
