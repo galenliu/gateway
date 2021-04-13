@@ -21,7 +21,7 @@ func NewGateway() (gateway *HomeGateway, err error) {
 
 	gateway = &HomeGateway{}
 	gateway.AddonsManager = plugin.NewAddonsManager()
-	gateway.Web = controllers.NewWebAPP(controllers.NewDefaultWebConfig())
+	gateway.Web = controllers.NewWebAPP()
 	gateway.closeChan = make(chan struct{})
 	//update the gateway preferences
 	return gateway, err

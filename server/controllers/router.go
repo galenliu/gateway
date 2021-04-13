@@ -29,15 +29,15 @@ type Web struct {
 	things *models.Things
 }
 
-func NewWebAPP(conf Config, opts ...webOption) *Web {
-	options := defaultConfig
+func NewWebAPP(opts ...webOption) *Web {
+	options := NewDefaultWebConfig()
 	for _, o := range opts {
 		o(&options)
 	}
 	web := Web{}
 	web.things = models.NewThings()
-	web.config = conf
-	web.App = CollectRoute(conf)
+	web.config = options
+	web.App = CollectRoute(options)
 
 	return &web
 }
@@ -164,15 +164,6 @@ func NewDefaultWebConfig() Config {
 		LogDir:      config.GetLogDir(),
 	}
 	return conf
-}
-
-var defaultConfig = Config{
-	HttpPort:    config.GetPorts().HTTP,
-	HttpsPort:   config.GetPorts().HTTPS,
-	StaticDir:   "./dist",
-	TemplateDir: "./dist",
-	UploadDir:   config.GetUploadDir(),
-	LogDir:      config.GetLogDir(),
 }
 
 type webOption func(*Config)
