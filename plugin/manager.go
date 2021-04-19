@@ -6,10 +6,10 @@ import (
 	"compress/gzip"
 	"context"
 	"fmt"
-	"gateway/config"
-	"gateway/pkg/database"
-	"gateway/pkg/log"
-	"gateway/pkg/util"
+	"github.com/galenliu/gateway/config"
+	"github.com/galenliu/gateway/pkg/database"
+	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/util"
 
 	json "github.com/json-iterator/go"
 	"github.com/xiam/to"
@@ -124,6 +124,9 @@ func (manager *AddonManager) findAdapter(adapterId string) (*Adapter, error) {
 
 func (manager *AddonManager) handleSetProperty(deviceId, propName string, setValue interface{}) error {
 	device := manager.getDevice(deviceId)
+	if device == nil {
+		return fmt.Errorf("device id err")
+	}
 	adapter := manager.getAdapter(device.GetAdapterId())
 	if adapter == nil {
 		return fmt.Errorf("adapter id err")

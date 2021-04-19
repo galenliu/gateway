@@ -4,7 +4,7 @@ import (
 	"addon"
 	"context"
 	"fmt"
-	"gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/log"
 	"sync"
 )
 

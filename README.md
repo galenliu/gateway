@@ -1,60 +1,83 @@
 //git submodule update –init –recursive
 
-
 ### plugin API:
-
 
 ### App API说明:
 
 ***GET /things***  获取所有的things(json)
 
+***协议： websocket router:  /new_thing***
 
-***协议： websocket  router:  /new_thing***
 ```json
 {
-  "id": "virtual-things-1",
-  "title": "Virtual Multi-level Switch",
-  "@context": "https://iot.mozilla.org/schemas",
-  "@type": [
-    "OnOffSwitch",
-    "MultiLevelSwitch"
-  ],
-  "description": "",
+  "@context": ["https://webthings.io/schemas"],
+  "title": "Light192.168.0.102",
+  "id": "/things/Light192.168.0.102",
+  "@type": ["Light"],
   "properties": {
     "level": {
-      "name": "level",
-      "value": 0,
-      "visible": true,
-      "title": "Level",
-      "type": "number",
-      "@type": "LevelProperty",
+      "@type": "BrightnessProperty",
+      "title": "Brightness",
+      "forms": [{
+        "href": "/things/Light192.168.0.102/properties/level"
+      }],
+      "type": "integer",
       "unit": "percent",
+      "writeOnly": false,
+      "schema": {
+        "minimum": 100
+      },
+      "name": "level",
+      "readOnly": false,
+      "visible": false,
       "minimum": 0,
       "maximum": 100,
-      "readOnly": false,
-      "links": [],
-      "href": "/things/virtual-things-1/properties/level"
+      "thingId": ""
     },
     "on": {
-      "name": "on",
-      "value": false,
-      "visible": true,
-      "title": "On/Off",
-      "type": "boolean",
       "@type": "OnOffProperty",
-      "links": [],
-      "href": "/things/virtual-things-1/properties/on"
+      "title": "On/Off",
+      "forms": [{
+        "href": "/things/Light192.168.0.102/properties/on"
+      }],
+      "type": "boolean",
+      "writeOnly": false,
+      "schema": null,
+      "name": "on",
+      "readOnly": false,
+      "visible": false,
+      "thingId": ""
+    },
+    "hue": {
+      "@type": "ColorProperty",
+      "title": "Hue",
+      "forms": [{
+        "href": "/things/Light192.168.0.102/properties/hue"
+      }],
+      "type": "string",
+      "writeOnly": false,
+      "schema": null,
+      "name": "hue",
+      "readOnly": false,
+      "visible": false,
+      "thingId": ""
     }
   },
-  "actions": {},
-  "events": {},
-  "links": [],
-  "baseHref": null,
-  "pin": {
-    "required": false,
-    "pattern": ""
+  "forms": [{
+    "rel": "properties",
+    "href": " /things/Light192.168.0.102/properties"
+  }, {
+    "href": "/things/Light192.168.0.102",
+    "rel": "alternate",
+    "mediaType": "text/html"
+  }, {
+    "rel": "alternate",
+    "href": "wss://localhost/things/Light192.168.0.102"
+  }],
+  "Pin": {
+    "required": false
   },
-  "credentialsRequired": false,
-  "href": "/things/virtual-things-1"
+  "selectedCapability": "Light",
+  "connected": false
 }
 ```

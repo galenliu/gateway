@@ -2,7 +2,7 @@ package plugin
 
 import (
 	"fmt"
-	"gateway/pkg/database"
+	"github.com/galenliu/gateway/pkg/database"
 	json "github.com/json-iterator/go"
 	"io/ioutil"
 	"path"

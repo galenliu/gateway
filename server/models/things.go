@@ -2,10 +2,11 @@ package models
 
 import (
 	"fmt"
-	"gateway/pkg/bus"
-	"gateway/pkg/database"
-	"gateway/pkg/util"
-	AddonManager "gateway/plugin"
+	"github.com/galenliu/gateway/pkg/bus"
+	"github.com/galenliu/gateway/pkg/database"
+	"github.com/galenliu/gateway/pkg/util"
+	AddonManager "github.com/galenliu/gateway/plugin"
+	json "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
 	"sync"
 )
@@ -39,7 +40,7 @@ func (ts *Things) GetThing(id string) *Thing {
 	return t
 }
 
-func (ts *Things) FindThingProperty(thingId string, propertyName string) *Property {
+func (ts *Things) FindThingProperty(thingId string, propertyName string) interface{} {
 	th := ts.GetThing(thingId)
 	if th == nil {
 		return nil
@@ -57,6 +58,7 @@ func (ts *Things) GetThings() map[string]*Thing {
 		return ts.things
 	}
 	for _, t := range GetThingsFormDataBase() {
+
 		ts.things[t.GetID()] = t
 	}
 	return ts.things
@@ -70,13 +72,29 @@ func (ts *Things) GetListThings() (lt []*Thing) {
 	return
 }
 
-//get instance with out database
+func GetThingsFormDataBase() []*Thing {
+	var ts = database.GetThings()
+	var list []*Thing
+	if ts == nil {
+		return nil
+	}
+	for _, des := range ts {
+		var t Thing
+		err := json.UnmarshalFromString(des, &t)
+		if err == nil {
+			if &t != nil {
+				t.Connected = false
+				list = append(list, &t)
+			}
+		}
+	}
+	return list
+}
+
 func (ts *Things) GetNewThings() []*Thing {
 
 	connectedThings := AddonManager.GetDevices()
-
 	storedThings := ts.GetThings()
-
 	var things []*Thing
 	for _, connected := range connectedThings {
 		for _, storedThing := range storedThings {
@@ -89,17 +107,21 @@ func (ts *Things) GetNewThings() []*Thing {
 }
 
 func (ts *Things) CreateThing(id string, description string) (string, error) {
-	var th = NewThing(description)
+	var th Thing
+	e := json.UnmarshalFromString(description, &th)
+	if e != nil {
+		return "", e
+	}
 	th.ID = id
-	if th == nil {
+	if &th == nil {
 		return "", fmt.Errorf("thing description invaild")
 	}
 	err := database.CreateThing(th.GetID(), th.GetDescription())
 	if err != nil {
 		return "", err
 	}
-	ts.things[th.GetID()] = th
-	go ts.Publish(util.ThingAdded, th)
+	ts.things[th.GetID()] = &th
+	go ts.Publish(util.ThingAdded, &th)
 	return th.GetDescription(), err
 }
 
@@ -139,21 +161,6 @@ func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) 
 	}
 	return AddonManager.SetProperty(thingId, propName, value)
 
-}
-
-func GetThingsFormDataBase() (list []*Thing) {
-	var ts = database.GetThings()
-	if ts == nil {
-		return nil
-	}
-	for _, des := range ts {
-		t := NewThing(des)
-		if t != nil {
-			t.Connected = false
-			list = append(list, t)
-		}
-	}
-	return
 }
 
 func (ts *Things) Subscribe(typ string, f interface{}) {

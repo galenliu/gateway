@@ -6,7 +6,7 @@ import (
 )
 
 type Event struct {
-	*wot.InteractionAffordance
+	*wot.EventAffordance
 
 	ID      string `json:"-" gorm:"primaryKey"`
 	Name    string `json:"name"`

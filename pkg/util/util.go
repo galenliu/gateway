@@ -6,7 +6,7 @@ import (
 	"encoding/binary"
 	"encoding/gob"
 	"fmt"
-	"gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/log"
 	"io"
 	"io/ioutil"
 	"math"
@@ -94,19 +94,6 @@ func GetDefaultConfigDir() string {
 	dir, _ := os.UserHomeDir()
 	dirPath := path.Join(dir, ConfDirName)
 	return dirPath
-}
-
-type Form map[string]string
-
-func NewForm(args ...string) Form {
-	m := make(map[string]string, 0)
-	for i, _ := range args {
-		if i%2 == 0 {
-			continue
-		}
-		m[args[i-1]] = args[i]
-	}
-	return m
 }
 
 func ByteToFloat64(bytes []byte) float64 {

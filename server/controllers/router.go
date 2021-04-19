@@ -1,15 +1,16 @@
 package controllers
 
 import (
-	"gateway/config"
-	"gateway/pkg/log"
-	"gateway/pkg/util"
-	//"gateway/server"
-	"gateway/server/models"
+	"github.com/galenliu/gateway/config"
+	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/util"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/websocket/v2"
+
+	//"gateway/server"
+	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/gofiber/websocket/v2"
 	"net/http"
 	"strconv"
 )

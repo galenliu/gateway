@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"fmt"
-	"gateway/pkg/log"
-	"gateway/pkg/util"
-	AddonManager "gateway/plugin"
-	"gateway/server/models"
+	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/util"
+	AddonManager "github.com/galenliu/gateway/plugin"
+	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/websocket/v2"
 	json "github.com/json-iterator/go"
 	"github.com/xiam/to"

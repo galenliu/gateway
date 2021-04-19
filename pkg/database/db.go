@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/log"
 	_ "github.com/mattn/go-sqlite3"
 	"os"
 	"path"

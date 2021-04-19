@@ -4,10 +4,10 @@ import (
 	"addon"
 	"addon/wot"
 	"fmt"
-	"gateway/pkg/bus"
-	"gateway/pkg/database"
-	"gateway/pkg/log"
-	"gateway/pkg/util"
+	"github.com/galenliu/gateway/pkg/bus"
+	"github.com/galenliu/gateway/pkg/database"
+	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/util"
 	json "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
 	"strings"
@@ -23,7 +23,7 @@ type Thing struct {
 	Properties map[string]*Property `json:"properties"`
 	Actions    map[string]*Action   `json:"actions,omitempty"`
 	Events     map[string]*Event    `json:"events,omitempty"`
-	Forms      []map[string]string  `json:"forms,omitempty"`
+	Forms      []wot.Form           `json:"forms,omitempty"`
 
 	//The configuration  of the device
 	Pin                 addon.PIN
@@ -100,18 +100,17 @@ func NewThing(description string) (thing *Thing) {
 	}
 	var props = gjson.Get(description, "properties").Map()
 	if len(props) > 0 {
-		t.Properties = make(map[string]*Property)
-		for name, p := range props {
-			var property Property
-			err := json.UnmarshalFromString(p.String(), &property)
-			if err != nil {
-				continue
+		for name, data := range props {
+			prop := NewProperty(data.String())
+			if prop != nil {
+				if prop.Forms == nil {
+					prop.Forms = append(prop.Forms, wot.Form{
+						Href: fmt.Sprintf("%s/properties/%s", t.ID, name),
+					})
+				}
+				t.Properties[name] = prop
 			}
-			property.Forms = append(property.Forms, wot.NewForm("href", fmt.Sprintf("%s/properties/%s", t.ID, name)))
-			t.Properties[name] = &property
 		}
-
-		t.Forms = append(t.Forms, wot.NewForm("rel", "properties", "href", t.ID+util.PropertiesPath))
 	}
 
 	var actions = gjson.Get(description, "actions").Map()
@@ -124,11 +123,13 @@ func NewThing(description string) (thing *Thing) {
 				continue
 			}
 			action.ID = a.Get("id").String()
-			action.Forms = append(action.Forms, wot.NewForm("href", fmt.Sprintf("%s/actions/%s", t.ID, name)))
+			if action.Forms == nil {
+				action.Forms = append(action.Forms, wot.Form{Href: fmt.Sprintf("%s/actions/%s", t.ID, name)})
+			}
 			t.Actions[name] = &action
 		}
 
-		t.Forms = append(t.Forms, wot.NewForm("rel", "actions", "href", t.ID+util.ActionsPath))
+		t.Forms = append(t.Forms, wot.Form{Rel: "actions", Href: thingId + util.ActionsPath})
 	}
 
 	var events = gjson.Get(description, "events").Map()
@@ -143,113 +144,21 @@ func NewThing(description string) (thing *Thing) {
 			if !e.Get("id").Exists() {
 				continue
 			}
-
 			event.ID = e.Get("id").String()
-
-			event.Forms = append(event.Forms, wot.NewForm("href", fmt.Sprintf("%s/events/%s", t.ID, name)))
+			if event.Forms == nil {
+				event.Forms = append(event.Forms, wot.Form{Href: fmt.Sprintf("%s/events/%s", thingId, name)})
+			}
 			t.Events[name] = &event
 		}
-		t.Forms = append(t.Forms, wot.NewForm("rel", "actions", "href", t.ID+util.EventsPath))
+		t.Forms = append(t.Forms, wot.Form{Rel: "actions", Href: t.ID + util.EventsPath})
 	}
-	t.Forms = append(t.Forms, wot.NewForm("rel", "alternate", "mediaType", "text/html", "href", t.ID))
-	t.Forms = append(t.Forms, wot.NewForm("rel", "alternate", "href", fmt.Sprintf("wss://localhost/%s", t.ID)))
+	if t.Forms == nil {
+		t.Forms = append(t.Forms, wot.Form{Rel: "alternate", ContentType: "text/html", Href: t.ID})
+		t.Forms = append(t.Forms, wot.Form{Rel: "alternate", Href: fmt.Sprintf("wss://localhost/%s", thingId)})
+	}
 
 	return t
 }
-
-//func UnmarshalDevice(d []byte) (*addon.Device, error) {
-//
-//	id := json.Get(d, "id").ToString()
-//	if id == "" {
-//		return nil, fmt.Errorf("device id lost")
-//	}
-//	title := json.Get(d, "title").ToString()
-//	if title == "" {
-//		title = id
-//	}
-//
-//	atContext := json.Get(d, "@context").Keys()
-//	if len(atContext) == 0 {
-//		t := json.Get(d, "@context").ToString()
-//		if t != "" {
-//			atContext = append(atContext, t)
-//		}
-//	}
-//
-//	var atType []string
-//	json.Get(d, `@type`).ToVal(&atType)
-//	if len(atType) == 0 {
-//		return nil, fmt.Errorf("@type lost")
-//	}
-//
-//	var properties map[string]*addon.Property
-//	json.Get(d, "properties").ToVal(&properties)
-//
-//	var actions map[string]*addon.Action
-//	json.Get(d, "actions").ToVal(&actions)
-//
-//	var events map[string]*addon.Event
-//	json.Get(d, "actions").ToVal(&events)
-//
-//	var pin *addon.PIN
-//	json.Get(d, "pin").ToVal(&pin)
-//
-//	device := &addon.Device{
-//		ID:                  id,
-//		AtContext:           atContext,
-//		Title:               title,
-//		AtType:              atType,
-//		Description:         json.Get(d, "description").ToString(),
-//		CredentialsRequired: json.Get(d, "credentialsRequired").ToBool(),
-//		Pin:                 addon.PIN{},
-//		AdapterId:           json.Get(d, "adapterId").ToString(),
-//	}
-//	if len(properties) > 0 {
-//		device.Properties = make(map[string]addon.IProperty)
-//		for n, p := range properties {
-//			p.DeviceId = id
-//			device.Properties[n] = p
-//		}
-//	}
-//
-//	if len(events) > 0 {
-//		device.Events = make(map[string]*addon.Event)
-//		for n, e := range events {
-//			e.DeviceId = id
-//			device.Events[n] = e
-//		}
-//	}
-//
-//	if len(actions) > 0 {
-//		device.Actions = make(map[string]*addon.Action)
-//		for n, a := range actions {
-//			a.DeviceId = id
-//			device.Actions[n] = a
-//		}
-//	}
-//
-//	if pin != nil {
-//		device.Pin = *pin
-//	}
-//
-//	return device, nil
-//
-//	id := gjson.Get(description, "id").String()
-//	if id == "" {
-//		return nil
-//	}
-//	th.ID = fmt.
-//
-//
-//		err := json.Unmarshal(description, &th)
-//	if len(th.AtContext) == 0 {
-//		th.AtContext = []string{"https://webthings.io/schemas/"}
-//	}
-//	if err != nil {
-//		return nil
-//	}
-//	return &th
-//}
 
 func (t *Thing) setSelectedCapability(sel string) {
 	t.SelectedCapability = sel
@@ -257,7 +166,7 @@ func (t *Thing) setSelectedCapability(sel string) {
 	t.Publish(util.MODIFIED, t)
 }
 
-func (t *Thing) findProperty(propName string) (*Property, error) {
+func (t *Thing) findProperty(propName string) (interface{}, error) {
 	prop, ok := t.Properties[propName]
 	if !ok {
 		return nil, fmt.Errorf("thing(%s) can not found properties(%s)", t.ID, propName)
@@ -265,7 +174,7 @@ func (t *Thing) findProperty(propName string) (*Property, error) {
 	return prop, nil
 }
 
-func (t *Thing) GetProperty(propName string) *Property {
+func (t *Thing) GetProperty(propName string) interface{} {
 	prop, ok := t.Properties[propName]
 	if !ok {
 		log.Debug("thing(%s) can not found properties(%s)", t.ID, propName)
@@ -315,7 +224,6 @@ func (t *Thing) RemoveAction(a *Action) bool {
 	return ok
 }
 
-//thing save to database must do this:
 func (t *Thing) GetDescription() string {
 	s, err := json.MarshalToString(t)
 	if err != nil {
@@ -336,25 +244,33 @@ func (t *Thing) update(thing *Thing) {
 	t.Actions = thing.Actions
 	t.Events = thing.Events
 
-	if t.SelectedCapability != "" {
+	if thing.SelectedCapability != "" {
 		for _, s := range t.AtType {
-			if s == t.SelectedCapability {
-				break
+			if s == thing.SelectedCapability {
+				t.setSelectedCapability(thing.SelectedCapability)
 			}
 			break
 		}
-		t.SelectedCapability = ""
 	}
-
 	_ = database.UpdateThing(t.GetID(), t.GetDescription())
 }
 
 func (t *Thing) Subscribe(typ string, f interface{}) {
-	go bus.Subscribe(t.GetID()+"."+typ, f)
+	go func() {
+		err := bus.Subscribe(t.GetID()+"."+typ, f)
+		if err != nil {
+			log.Error(err.Error())
+		}
+	}()
 }
 
 func (t *Thing) Unsubscribe(typ string, f interface{}) {
-	go bus.Subscribe(t.GetID()+"."+typ, f)
+	go func() {
+		err := bus.Subscribe(t.GetID()+"."+typ, f)
+		if err != nil {
+			log.Error(err.Error())
+		}
+	}()
 }
 
 func (t *Thing) Publish(typ string, args ...interface{}) {

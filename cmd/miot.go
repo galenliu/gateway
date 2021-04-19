@@ -30,11 +30,11 @@ import (
 //http://miot-spec.org/miot-spec-v2/spec/events
 
 var MiotTypes = map[string]string{
-	"devices":   "http://miot-spec.org/miot-spec-v2/spec/devices",
-	"service":  "http://miot-spec.org/miot-spec-v2/spec/services",
+	"devices":    "http://miot-spec.org/miot-spec-v2/spec/devices",
+	"service":    "http://miot-spec.org/miot-spec-v2/spec/services",
 	"properties": "http://miot-spec.org/miot-spec-v2/spec/properties",
-	"actions":   "http://miot-spec.org/miot-spec-v2/spec/actions",
-	"events":   "http://miot-spec.org/miot-spec-v2/spec/events",
+	"actions":    "http://miot-spec.org/miot-spec-v2/spec/actions",
+	"events":     "http://miot-spec.org/miot-spec-v2/spec/events",
 }
 
 var (

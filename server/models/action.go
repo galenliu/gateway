@@ -3,8 +3,8 @@ package models
 import (
 	"addon/wot"
 	"fmt"
-	"gateway/pkg/bus"
-	"gateway/pkg/util"
+	"github.com/galenliu/gateway/pkg/bus"
+	"github.com/galenliu/gateway/pkg/util"
 	json "github.com/json-iterator/go"
 	"strconv"
 	"time"
@@ -18,22 +18,21 @@ func generateActionId() string {
 }
 
 type Action struct {
-	*wot.InteractionAffordance
+	*wot.ActionAffordance
 
-	ID          string `json:"id"`
-	Description string `json:"description"`
-	Name        string `json:"name"`
+	ID   string `json:"id"`
+	Href string `json:"href"`
+	Name string `json:"name"`
 
-	Href          string `json:"href"`
 	Status        string `json:"status"`
 	TimeRequested string `json:"time_requested"`
 	TimeCompleted string `json:"time_completed,omitempty"`
-	Error         string `json:"error,omitempty"`
-	ThingId       string
 
-	Title  string                 `json:"title"`
-	AtType string                 `json:"@type"`
-	Input  map[string]interface{} `json:"input"`
+	ThingId string
+
+	Input map[string]interface{} `json:"input"`
+
+	Error string `json:"error,omitempty"`
 }
 
 type Input struct {

@@ -16,7 +16,6 @@
   },
   "log": {
     "verbose": true,
-
     "log_rotate_days": 30
   },
   "database": {

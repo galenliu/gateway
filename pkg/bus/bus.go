@@ -1,8 +1,8 @@
 package bus
 
 import (
-	"gateway/pkg/log"
 	"github.com/asaskevich/EventBus"
+	"github.com/galenliu/gateway/pkg/log"
 	"sync"
 )
 

@@ -2,8 +2,8 @@ package plugin
 
 import (
 	"fmt"
-	"gateway/config"
-	"gateway/pkg/log"
+	"github.com/galenliu/gateway/config"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/gorilla/websocket"
 	"net/http"
 	"strconv"

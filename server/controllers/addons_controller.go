@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"gateway/pkg/database"
-	"gateway/pkg/log"
-	"gateway/plugin"
+	"github.com/galenliu/gateway/pkg/database"
+	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/plugin"
 	"github.com/gofiber/fiber/v2"
 	json "github.com/json-iterator/go"
 	"net/http"

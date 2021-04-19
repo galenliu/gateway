@@ -8,11 +8,10 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"gateway/pkg/log"
-	AddonManager "gateway/plugin"
-	"gateway/server/models"
+	"github.com/galenliu/gateway/pkg/log"
+	AddonManager "github.com/galenliu/gateway/plugin"
+	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
-
 	"github.com/gofiber/websocket/v2"
 	"github.com/tidwall/gjson"
 	"net/http"
@@ -93,6 +92,7 @@ func (tc *ThingsController) handleGetThings(c *fiber.Ctx) error {
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
+	log.Info("/things: \t\n %s", string(data))
 	return c.Status(fiber.StatusOK).SendString(string(data))
 }
 

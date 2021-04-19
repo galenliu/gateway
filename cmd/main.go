@@ -3,13 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	core "gateway"
-	"gateway/config"
-	"gateway/pkg/log"
-	"gateway/pkg/util"
+	"github.com/galenliu/gateway/config"
+	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/util"
+	"github.com/galenliu/gateway/plugin"
+	"github.com/galenliu/gateway/server/controllers"
 	"os"
 	"os/signal"
-	"syscall"
 )
 
 var (
@@ -44,21 +44,20 @@ func main() {
 	}
 
 	//create core instance
-	gw, err := core.NewGateway()
+	gw, err := NewGateway()
 	CheckError(err)
 
 	//handle signal
-	signal.Notify(c, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(c)
 	var systemCall = func() {
 		systemCall := <-c
 		log.Info("exited system call %v", systemCall)
 		gw.Close()
 		os.Exit(0)
 	}
-	go systemCall()
-
-	//run core
-	CheckError(gw.Start())
+	//start
+	gw.Start()
+	systemCall()
 
 }
 
@@ -66,5 +65,37 @@ func CheckError(err error) {
 	if err != nil {
 		fmt.Print(err)
 		os.Exit(1)
+	}
+}
+
+type HomeGateway struct {
+	Preferences   *config.Preferences
+	AddonsManager *plugin.AddonManager
+	Web           *controllers.Web
+	closeChan     chan struct{}
+}
+
+func NewGateway() (gateway *HomeGateway, err error) {
+
+	gateway = &HomeGateway{}
+	gateway.AddonsManager = plugin.NewAddonsManager()
+	gateway.Web = controllers.NewWebAPP()
+	gateway.closeChan = make(chan struct{})
+	//update the gateway preferences
+	return gateway, err
+}
+
+func (gateway *HomeGateway) Start() {
+	log.Info("gateway start.....")
+	go gateway.Web.Start()
+	go gateway.AddonsManager.Start()
+}
+
+func (gateway *HomeGateway) Close() {
+	gateway.closeChan <- struct{}{}
+	gateway.AddonsManager.Close()
+	err := gateway.Web.Close()
+	if err != nil {
+		log.Error(err.Error())
 	}
 }

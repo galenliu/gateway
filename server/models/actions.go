@@ -2,8 +2,8 @@ package models
 
 import (
 	"fmt"
-	"gateway/pkg/bus"
-	"gateway/plugin"
+	"github.com/galenliu/gateway/pkg/bus"
+	"github.com/galenliu/gateway/plugin"
 	"sync"
 )
 

@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"gateway/pkg/bus"
-	"gateway/pkg/log"
-	"gateway/pkg/util"
-	"gateway/server/models"
+	"github.com/galenliu/gateway/pkg/bus"
+	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/util"
+	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/websocket/v2"
 	"sync"
 )

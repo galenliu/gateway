@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"fmt"
-	"gateway/pkg/log"
-	"gateway/plugin"
-	"gateway/server/models"
+	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/plugin"
+	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
 	"net/http"
 )

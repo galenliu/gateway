@@ -3,9 +3,9 @@ package config
 import (
 	_ "embed"
 	"fmt"
-	"gateway/pkg/database"
-	"gateway/pkg/log"
-	"gateway/pkg/util"
+	"github.com/galenliu/gateway/pkg/database"
+	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/util"
 	json "github.com/json-iterator/go"
 	"sync"
 

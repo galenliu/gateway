@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"gateway/config"
-	"gateway/pkg/log"
+	"github.com/galenliu/gateway/config"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/gofiber/fiber/v2"
 )
 

@@ -2,7 +2,7 @@ package plugin
 
 //	plugin server
 import (
-	"gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/log"
 	json "github.com/json-iterator/go"
 	"sync"
 )
