@@ -77,7 +77,7 @@ func (manager *AddonManager) handleDeviceAdded(device *addon.Device) {
 	manager.devices[device.GetID()] = device
 	//d, err := json.MarshalIndent(device, "", " ")
 	d := device.AsDict()
-	data, err := json.MarshalToString(d)
+	data, err := json.Marshal(d)
 	if err != nil {
 		log.Info("device marshal err")
 	}

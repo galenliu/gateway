@@ -37,8 +37,8 @@ type Thing struct {
 
 	Security interface{} `json:"security,omitempty"`
 	//The configuration  of the device
-	Pin                 addon.PIN `json:"pin,omitempty"`
-	CredentialsRequired bool      `json:"credentialsRequired,omitempty"`
+	Pin                 *addon.PIN `json:"pin,omitempty"`
+	CredentialsRequired bool       `json:"credentialsRequired,omitempty"`
 
 	//The state  of the thing
 	SelectedCapability string `json:"selectedCapability"`
@@ -46,8 +46,8 @@ type Thing struct {
 	IconData           string `json:"iconData,omitempty"`
 }
 
-// NewThing 把传入description组装成一个thing对象
-func NewThing(description string) (thing *Thing) {
+// NewThingFromString 把传入description组装成一个thing对象
+func NewThingFromString(description string) (thing *Thing) {
 
 	id := gjson.Get(description, "id").String()
 	if id == "" {
@@ -111,72 +111,77 @@ func NewThing(description string) (thing *Thing) {
 		var pin addon.PIN
 		pin.Required = gjson.Get(description, "pin.required").Bool()
 		pin.Pattern = gjson.Get(description, "pin.pattern").Value()
-		t.Pin = pin
+		t.Pin = &pin
 	}
-	var props = gjson.Get(description, "properties").Map()
-	if len(props) > 0 {
-		t.Properties = make(map[string]*Property)
-		for name, data := range props {
-			prop := NewProperty(data.String())
-			if prop != nil {
-				if prop.InteractionAffordance == nil {
-					prop.InteractionAffordance = new(wot.InteractionAffordance)
+
+	if gjson.Get(description, "properties").Exists() {
+		var props = gjson.Get(description, "properties").Map()
+		if len(props) > 0 {
+			t.Properties = make(map[string]*Property)
+			for name, data := range props {
+				prop := NewPropertyFromString(data.String())
+				if prop != nil {
+					if prop.Forms == nil {
+						prop.Forms = append(prop.Forms, wot.Form{
+							Href:        fmt.Sprintf("%s%s/%s", thingId, util.PropertiesPath, name),
+							ContentType: wot.ApplicationJson,
+							Op:          []string{wot.ReadProperty, wot.WriteProperty},
+						})
+					}
+					t.Properties[name] = prop
 				}
-				if prop.Forms == nil {
-					prop.Forms = append(prop.Forms, wot.Form{
-						Href: fmt.Sprintf("%s/properties/%s", thingId, name),
-					})
-				}
-				if prop.Name == "" {
-					prop.Name = name
-				}
-				t.Properties[name] = prop
 			}
+		}
+		t.Forms = append(t.Forms, wot.Form{Op: []string{wot.ReadallProperties, wot.WriteAllProperties}, Href: thingId + util.PropertiesPath, ContentType: wot.ApplicationJson})
+	}
+
+	if gjson.Get(description, "actions").Exists() {
+		var actions = gjson.Get(description, "actions").Map()
+		if len(actions) > 0 {
+			t.Actions = make(map[string]*Action)
+			for name, a := range actions {
+				var action Action
+				err := json.UnmarshalFromString(a.String(), &action)
+				if err != nil {
+					continue
+				}
+				action.ID = a.Get("id").String()
+				if action.Forms == nil {
+					action.Forms = append(action.Forms, wot.Form{Href: fmt.Sprintf("%s/actions/%s", t.ID, name)})
+				}
+				if action.Name == "" {
+					action.Name = name
+				}
+				t.Actions[name] = &action
+			}
+
+			t.Forms = append(t.Forms, wot.Form{Rel: "actions", Href: thingId + util.ActionsPath})
 		}
 	}
 
-	var actions = gjson.Get(description, "actions").Map()
-	if len(actions) > 0 {
-		t.Actions = make(map[string]*Action)
-		for name, a := range actions {
-			var action Action
-			err := json.UnmarshalFromString(a.String(), &action)
-			if err != nil {
-				continue
+	if gjson.Get(description, "events").Exists() {
+		var events = gjson.Get(description, "events").Map()
+		if len(events) > 0 {
+			t.Events = make(map[string]*Event)
+			for name, e := range events {
+				var event Event
+				err := json.UnmarshalFromString(e.String(), &event)
+				if err != nil {
+					continue
+				}
+				if !e.Get("id").Exists() {
+					continue
+				}
+				event.ID = e.Get("id").String()
+				if event.Forms == nil {
+					event.Forms = append(event.Forms, wot.Form{Href: fmt.Sprintf("%s/events/%s", thingId, name)})
+				}
+				t.Events[name] = &event
 			}
-			action.ID = a.Get("id").String()
-			if action.Forms == nil {
-				action.Forms = append(action.Forms, wot.Form{Href: fmt.Sprintf("%s/actions/%s", t.ID, name)})
-			}
-			if action.Name == "" {
-				action.Name = name
-			}
-			t.Actions[name] = &action
+			t.Forms = append(t.Forms, wot.Form{Rel: "actions", Href: t.ID + util.EventsPath})
 		}
-
-		t.Forms = append(t.Forms, wot.Form{Rel: "actions", Href: thingId + util.ActionsPath})
 	}
 
-	var events = gjson.Get(description, "events").Map()
-	if len(events) > 0 {
-		t.Events = make(map[string]*Event)
-		for name, e := range events {
-			var event Event
-			err := json.UnmarshalFromString(e.String(), &event)
-			if err != nil {
-				continue
-			}
-			if !e.Get("id").Exists() {
-				continue
-			}
-			event.ID = e.Get("id").String()
-			if event.Forms == nil {
-				event.Forms = append(event.Forms, wot.Form{Href: fmt.Sprintf("%s/events/%s", thingId, name)})
-			}
-			t.Events[name] = &event
-		}
-		t.Forms = append(t.Forms, wot.Form{Rel: "actions", Href: t.ID + util.EventsPath})
-	}
 	if t.Forms == nil {
 		t.Forms = append(t.Forms, wot.Form{Rel: "alternate", ContentType: "text/html", Href: t.ID})
 		t.Forms = append(t.Forms, wot.Form{Rel: "alternate", Href: fmt.Sprintf("wss://localhost/%s", thingId)})
@@ -184,9 +189,21 @@ func NewThing(description string) (thing *Thing) {
 	return t
 }
 
-func (t *Thing) setSelectedCapability(sel string) {
-	t.SelectedCapability = sel
-	t.Publish(util.MODIFIED, t)
+func (t *Thing) setSelectedCapability(s string) {
+	if t.SelectedCapability == s {
+		return
+	}
+	for _, typ := range t.AtType {
+		if s == typ {
+			t.SelectedCapability = s
+			err := t.save()
+			if err != nil {
+				return
+			}
+			t.Publish(util.MODIFIED, t)
+		}
+	}
+
 }
 
 func (t *Thing) GetID() string {
@@ -196,9 +213,14 @@ func (t *Thing) GetID() string {
 }
 
 func (t *Thing) SetTitle(title string) string {
-	t.Title = title
-	_ = t.update
-	t.Publish(util.MODIFIED, t)
+	if t.Title != title {
+		t.Title = title
+		err := t.save()
+		if err != nil {
+			log.Info(err.Error())
+		}
+		t.Publish(util.MODIFIED, t)
+	}
 	return t.GetDescription()
 }
 
@@ -211,10 +233,12 @@ func (t *Thing) SetSelectedCapability(selectedCapability string) {
 }
 
 func (t *Thing) setConnected(connected bool) {
-
+	err := t.save()
+	if err != nil {
+		log.Info(err.Error())
+	}
 	t.Publish(util.CONNECTED, connected)
 	t.Connected = connected
-
 }
 
 func (t *Thing) IsConnected() bool {
@@ -227,35 +251,20 @@ func (t *Thing) RemoveAction(a *Action) bool {
 }
 
 func (t *Thing) GetDescription() string {
-	s, err := json.MarshalToString(t)
+	s, err := json.MarshalIndent(t, "", "  ")
 	if err != nil {
 		return ""
 	}
-	return s
+	return string(s)
 }
 
-func (t *Thing) update(data string) {
-	thing := NewThing(data)
-	t.AtContext = thing.AtContext
-	t.AtType = thing.AtType
+func (t *Thing) updateFromString(data string) {
+	thing := NewThingFromString(data)
+	t.SetTitle(thing.Title)
 	t.Description = thing.Description
-	t.Properties = thing.Properties
-	t.Actions = thing.Actions
-	t.Events = thing.Events
-
 	if thing.SelectedCapability != "" {
-		for _, s := range t.AtType {
-			if s == thing.SelectedCapability {
-				t.SelectedCapability = thing.SelectedCapability
-			}
-			break
-		}
+		t.setSelectedCapability(thing.SelectedCapability)
 	}
-	err := t.save()
-	if err != nil {
-		return
-	}
-	t.Publish(util.MODIFIED, t)
 }
 
 func (t *Thing) save() error {

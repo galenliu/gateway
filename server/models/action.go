@@ -35,6 +35,20 @@ type Action struct {
 	Error string `json:"error,omitempty"`
 }
 
+func NewActionFromString(data string) *Action {
+	var this = Action{}
+	aa := wot.NewActionAffordanceFromString(data)
+	if aa.Forms == nil {
+		aa.Forms = append(aa.Forms, wot.Form{
+			Href: "",
+			Op:   []string{wot.InvokeAction},
+		})
+	}
+
+	this.ActionAffordance = aa
+	return &this
+}
+
 type Input struct {
 	Timeout string `json:"timeout,omitempty"`
 	ID      int    `json:"id,omitempty"`

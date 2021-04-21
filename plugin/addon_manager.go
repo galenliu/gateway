@@ -9,7 +9,6 @@ import (
 	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
 	json "github.com/json-iterator/go"
-	"github.com/xiam/to"
 	"path"
 	"time"
 )
@@ -83,21 +82,24 @@ func SetProperty(deviceId, propName string, newValue interface{}) (interface{}, 
 
 	go instance.handleSetProperty(deviceId, propName, newValue)
 	closeChan := make(chan struct{})
-	propChan := make(chan Map)
+	propChan := make(chan interface{})
 	time.AfterFunc(3*time.Second, func() {
 		closeChan <- struct{}{}
 	})
-	changed := func(data Map) {
-		if to.String(data["deviceId"]) == deviceId && to.String(data["name"]) == propName {
-			propChan <- data
+	changed := func(data []byte) {
+		id := json.Get(data, "deviceId").ToString()
+		name := json.Get(data, "name").ToString()
+		value := json.Get(data, "value").GetInterface()
+		if id == deviceId && name == propName {
+			propChan <- value
 		}
 	}
 	go Subscribe(util.PropertyChanged, changed)
 	defer Unsubscribe(util.PropertyChanged, changed)
 	for {
 		select {
-		case data := <-propChan:
-			return data["value"], nil
+		case v := <-propChan:
+			return v, nil
 		case <-closeChan:
 			log.Error("set property(name: %s value: %s) timeout", propName, newValue)
 			return nil, fmt.Errorf("timeout")

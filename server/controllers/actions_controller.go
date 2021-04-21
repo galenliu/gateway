@@ -48,7 +48,7 @@ func (controller *ActionsController) handleActions(c *fiber.Ctx) error {
 	var actionDesc string
 	actionDesc = action.GetDescription()
 	if actionDesc == "" {
-		return fiber.NewError(http.StatusBadGateway, "action GetDescription err")
+		return fiber.NewError(http.StatusBadGateway, "action MarshalJson err")
 	}
 	return c.SendString(actionDesc)
 }

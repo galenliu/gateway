@@ -14,13 +14,17 @@ type Event struct {
 }
 
 func NewEventFromString(data string) *Event {
-	var e = Event{}
-	return &e
-}
-
-func NewEvent() *Event {
-	e := &Event{}
-	return e
+	var this = Event{}
+	aa := wot.NewEventAffordanceFromString(data)
+	if aa.Forms == nil {
+		aa.Forms = append(aa.Forms, wot.Form{
+			Href:        "",
+			ContentType: wot.ApplicationJson,
+			Op:          []string{wot.SubscribeEvent},
+		})
+	}
+	this.EventAffordance = aa
+	return &this
 }
 
 func (e Event) GetThingId() string {

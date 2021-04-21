@@ -98,7 +98,7 @@ func CollectRoute(conf Config) *fiber.App {
 
 	}
 
-	//NewThing Controller
+	//NewThingFromString Controller
 	{
 		newThingsGroup := app.Group(util.NewThingsPath)
 		newThingsGroup.Use("/", func(c *fiber.Ctx) error {

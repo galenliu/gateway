@@ -8,7 +8,6 @@ import (
 	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/websocket/v2"
 	json "github.com/json-iterator/go"
-	"github.com/xiam/to"
 	"net/http"
 )
 
@@ -158,13 +157,13 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 		addThing(thing)
 	}
 
-	onPropertyChanged := func(p Map) {
-		deviceId := to.String(p["deviceId"])
+	onPropertyChanged := func(data []byte) {
+		deviceId := json.Get(data, "deviceId").ToString()
 		if thingId != "" && thingId != deviceId {
 			return
 		}
-		name := to.String(p["name"])
-		v := p["value"]
+		name := json.Get(data, "name").ToString()
+		v := json.Get(data, "name").GetInterface()
 		if name == "" || v == nil {
 			return
 		}
@@ -518,7 +517,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 //			m["id"] = action.ThingId
 //			m["messageType"] = util.ActionStatus
 //			m["data"] = map[string]interface{}{
-//				action.Name: action.GetDescription(),
+//				action.Name: action.MarshalJson(),
 //			}
 //			controller.sendMessage(m)
 //
@@ -533,7 +532,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 //	m := make(map[string]interface{})
 //	m["id"] = event.GetThingId()
 //	m["messageType"] = util.EVENT
-//	m["data"] = map[string]interface{}{event.Name: event.GetDescription()}
+//	m["data"] = map[string]interface{}{event.Name: event.MarshalJson()}
 //
 //}
 //

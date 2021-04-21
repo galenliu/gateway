@@ -54,9 +54,10 @@ const (
 	REMOVED         = "removed"
 	RequestAction   = "requestAction"
 	SetProperty     = "setProperty"
-	ThingAdded      = "thingAdded"
-	ThingModified   = "thingModified"
-	ThingRemoved    = "thingRemoved"
+	//ThingAdded event args: []byte
+	ThingAdded    = "thingAdded"
+	ThingModified = "thingModified"
+	ThingRemoved  = "thingRemoved"
 
 	// OAuth things
 	AccessToken       = "access_token"

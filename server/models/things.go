@@ -7,7 +7,6 @@ import (
 	"github.com/galenliu/gateway/pkg/util"
 	AddonManager "github.com/galenliu/gateway/plugin"
 	json "github.com/json-iterator/go"
-	"github.com/tidwall/gjson"
 	"sync"
 )
 
@@ -65,7 +64,7 @@ func GetThingsFormDataBase() []*Thing {
 		return nil
 	}
 	for _, des := range ts {
-		t := NewThing(des)
+		t := NewThingFromString(des)
 		if t != nil {
 			t.Connected = false
 			list = append(list, t)
@@ -81,7 +80,7 @@ func (ts *Things) GetNewThings() []*Thing {
 	for _, connected := range connectedThings {
 		for _, storedThing := range storedThings {
 			if connected.GetID() != storedThing.GetID() {
-				things = append(things, NewThing(connected.GetDescription()))
+				things = append(things, NewThingFromString(connected.GetDescription()))
 			}
 		}
 	}
@@ -107,14 +106,16 @@ func (ts *Things) CreateThing(id string, description string) (string, error) {
 	return th.GetDescription(), err
 }
 
-func (ts *Things) handleNewThing(data string) {
-	id := gjson.Get(data, "id").String()
+func (ts *Things) handleNewThing(data []byte) {
+	id := json.Get(data, "id").ToString()
 	t := ts.GetThing(id)
 	if t == nil {
 		return
 	}
-	t.update(data)
-	t.setConnected(true)
+	t.updateFromString(string(data))
+	if !t.Connected {
+		t.setConnected(true)
+	}
 }
 
 func (ts *Things) RemoveThing(thingId string) error {

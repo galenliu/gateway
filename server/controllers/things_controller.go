@@ -1,11 +1,8 @@
-// @Title  things_controllers
-// @Description  app router
-// @Author  liuguilin
-// @update  liuguilin
-
 package controllers
 
 import (
+	"bytes"
+	j "encoding/json"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/log"
 	AddonManager "github.com/galenliu/gateway/plugin"
@@ -88,13 +85,14 @@ func (tc *ThingsController) handleGetThings(c *fiber.Ctx) error {
 		return c.Next()
 	}
 	ts := tc.Container.GetListThings()
-	data, err := json.MarshalIndent(ts, "", "  ")
-
+	data, err := json.Marshal(ts)
+	var str bytes.Buffer
+	err = j.Indent(&str, data, "", "  ")
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
-	log.Info("/things: \t\n %s", string(data))
-	return c.Status(fiber.StatusOK).SendString(string(data))
+	log.Info("/things: \t\n %s", str.String())
+	return c.Status(fiber.StatusOK).SendString(str.String())
 }
 
 //patch things

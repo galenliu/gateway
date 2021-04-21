@@ -59,7 +59,7 @@ func (controller *NewThingsController) handlerConnection() {
 			log.Info("new things websocket disconnection")
 			return
 		case s := <-controller.foundThing:
-			thing := models.NewThing(s)
+			thing := models.NewThingFromString(s)
 			if thing != nil {
 				err := controller.ws.WriteJSON(thing)
 				if err != nil {
@@ -72,8 +72,8 @@ func (controller *NewThingsController) handlerConnection() {
 	}
 }
 
-func (controller *NewThingsController) handleNewThing(data string) {
-	controller.foundThing <- data
+func (controller *NewThingsController) handleNewThing(data []byte) {
+	controller.foundThing <- string(data)
 }
 
 func handleNewThingsWebsocket(conn *websocket.Conn) {

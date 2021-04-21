@@ -87,7 +87,12 @@ func NewGateway() (gateway *HomeGateway, err error) {
 
 func (gateway *HomeGateway) Start() {
 	log.Info("gateway start.....")
-	go gateway.Web.Start()
+	go func() {
+		err := gateway.Web.Start()
+		if err != nil {
+
+		}
+	}()
 	go gateway.AddonsManager.Start()
 }
 
