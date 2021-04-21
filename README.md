@@ -1,15 +1,21 @@
 # WebThings Gateway
 
-- ## Architectural Aspects of a Thing
+## Documentation
 
-![img_2.png](img_2.png)
+- [W3C Web of Things (WoT) Thing Description](https://w3c.github.io/wot-thing-description/)
+- [W3C Web of Things (WoT) Architecture](https://w3c.github.io/wot-architecture)
+- [WoT Capability Schemas](https://webthings.io/schemas)
 
-- ## Web Thing Gateway
+## Architectural Aspects of a Thing
 
-![img_1.png](img_1.png)
-![img.png](img.png)
+![img_2.png](img/img_2.png)
 
-- ## Thing Description (JSON)
+## Web Thing Gateway
+
+![img_1.png](img/img_1.png)
+![img.png](img/img.png)
+
+## Thing Description (JSON)
 
 ```json
 {
