@@ -2,9 +2,9 @@
 package plugin
 
 import (
-	"addon"
 	"context"
 	"fmt"
+	"github.com/galenliu/gateway-addon"
 	"github.com/galenliu/gateway/config"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/log"
@@ -119,7 +119,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 			log.Info("marshal device err")
 			return
 		}
-		var newDevice = addon.NewDeivceFormString(data)
+		var newDevice = addon.NewDeviceFormString(data)
 
 		if newDevice == nil {
 			log.Error("device add err:")

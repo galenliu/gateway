@@ -24,10 +24,8 @@ type Actions struct {
 func NewActions() *Actions {
 	one.Do(
 		func() {
-
 			instanceActions = &Actions{}
 			instanceActions.List = make(map[string]*Action)
-
 		},
 	)
 	return instanceActions

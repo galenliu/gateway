@@ -6,13 +6,13 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/log"
 	AddonManager "github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
+	json "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
 	"net/http"
 	"strings"
@@ -88,7 +88,8 @@ func (tc *ThingsController) handleGetThings(c *fiber.Ctx) error {
 		return c.Next()
 	}
 	ts := tc.Container.GetListThings()
-	data, err := json.MarshalIndent(ts, "", " ")
+	data, err := json.MarshalIndent(ts, "", "  ")
+
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}

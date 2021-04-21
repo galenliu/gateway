@@ -25,7 +25,6 @@ func NewThings() *Things {
 			instance = &Things{}
 			instance.things = make(map[string]*Thing)
 			instance.GetThings()
-			instance.Actions = NewActions()
 			AddonManager.Subscribe(util.ThingAdded, instance.handleNewThing)
 		},
 	)
@@ -40,25 +39,12 @@ func (ts *Things) GetThing(id string) *Thing {
 	return t
 }
 
-func (ts *Things) FindThingProperty(thingId string, propertyName string) interface{} {
-	th := ts.GetThing(thingId)
-	if th == nil {
-		return nil
-	}
-	property := th.GetProperty(propertyName)
-	if property != nil {
-		return property
-	}
-	return nil
-}
-
-//if models instance is null,read new instance from the database
+// GetThings if models instance is null,read new instance from the database
 func (ts *Things) GetThings() map[string]*Thing {
 	if len(ts.things) > 0 {
 		return ts.things
 	}
 	for _, t := range GetThingsFormDataBase() {
-
 		ts.things[t.GetID()] = t
 	}
 	return ts.things
@@ -79,20 +65,16 @@ func GetThingsFormDataBase() []*Thing {
 		return nil
 	}
 	for _, des := range ts {
-		var t Thing
-		err := json.UnmarshalFromString(des, &t)
-		if err == nil {
-			if &t != nil {
-				t.Connected = false
-				list = append(list, &t)
-			}
+		t := NewThing(des)
+		if t != nil {
+			t.Connected = false
+			list = append(list, t)
 		}
 	}
 	return list
 }
 
 func (ts *Things) GetNewThings() []*Thing {
-
 	connectedThings := AddonManager.GetDevices()
 	storedThings := ts.GetThings()
 	var things []*Thing
@@ -131,7 +113,7 @@ func (ts *Things) handleNewThing(data string) {
 	if t == nil {
 		return
 	}
-	t.update(NewThing(data))
+	t.update(data)
 	t.setConnected(true)
 }
 
@@ -154,10 +136,6 @@ func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) 
 	var th = ts.GetThing(thingId)
 	if th == nil {
 		return nil, fmt.Errorf("thing(%s) can not found", thingId)
-	}
-	prop := th.GetProperty(propName)
-	if prop == nil {
-		return nil, fmt.Errorf("propertyName not found")
 	}
 	return AddonManager.SetProperty(thingId, propName, value)
 

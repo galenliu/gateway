@@ -1,8 +1,8 @@
 package models
 
 import (
-	"addon/wot"
-	json "github.com/json-iterator/go"
+	"encoding/json"
+	"github.com/galenliu/gateway-addon/wot"
 	"github.com/tidwall/gjson"
 )
 
@@ -17,64 +17,78 @@ type Property struct {
 
 func NewProperty(description string) *Property {
 
-	var property Property
-	property.SetAtType(gjson.Get(description, "@type").String())
-	property.SetTitle(gjson.Get(description, "title").String())
+	var property = Property{PropertyAffordance: new(wot.PropertyAffordance)}
+
+	var i wot.InteractionAffordance
+	err := json.Unmarshal([]byte(description), &i)
+	if err != nil {
+		property.InteractionAffordance = &i
+	}
+
+	if !gjson.Get(description, "type").Exists() {
+		return nil
+	}
 	typ := gjson.Get(description, "type").String()
 	if typ == "" {
 		return nil
 	}
 	switch typ {
-
 	case "array":
 		var prop wot.ArraySchema
-		err := json.UnmarshalFromString(description, &prop)
-		if err != nil {
-			property.IDataSchema = prop
+		err := json.Unmarshal([]byte(description), &prop)
+		if err == nil {
+			property.IDataSchema = &prop
 		}
 
-	case "boolean ":
+	case "boolean":
 		var prop wot.BooleanSchema
-		err := json.UnmarshalFromString(description, &prop)
-		if err != nil {
-			property.IDataSchema = prop
+		err := json.Unmarshal([]byte(description), &prop)
+		if err == nil {
+			property.IDataSchema = &prop
 		}
 
 	case "number":
 		var prop wot.NumberSchema
-		err := json.UnmarshalFromString(description, &prop)
-		if err != nil {
-			property.IDataSchema = prop
+		err := json.Unmarshal([]byte(description), &prop)
+		if err == nil {
+			property.IDataSchema = &prop
 		}
 
 	case "integer":
 		var prop wot.IntegerSchema
-		err := json.UnmarshalFromString(description, &prop)
-		if err != nil {
-			property.IDataSchema = prop
+		err := json.Unmarshal([]byte(description), &prop)
+		if err == nil {
+			property.IDataSchema = &prop
 		}
 
 	case "object":
 		var prop wot.ObjectSchema
-		err := json.UnmarshalFromString(description, &prop)
-		if err != nil {
-			property.IDataSchema = prop
+		err := json.Unmarshal([]byte(description), &prop)
+		if err == nil {
+			property.IDataSchema = &prop
 		}
 
 	case "string":
 		var prop wot.StringSchema
-		err := json.UnmarshalFromString(description, &prop)
-		if err != nil {
-			property.IDataSchema = prop
+		err := json.Unmarshal([]byte(description), &prop)
+		if err == nil {
+			property.IDataSchema = &prop
 		}
 
 	case "null":
 		var prop wot.NullSchema
-		err := json.UnmarshalFromString(description, &prop)
-		if err != nil {
-			property.IDataSchema = prop
+		err := json.Unmarshal([]byte(description), &prop)
+		if err == nil {
+			property.IDataSchema = &prop
 		}
-
+	default:
+		return nil
+	}
+	if !gjson.Get(description, "@type").Exists() {
+		return nil
+	}
+	if !gjson.Get(description, "title").Exists() {
+		property.SetTitle(gjson.Get(description, "title").String())
 	}
 	return &property
 }

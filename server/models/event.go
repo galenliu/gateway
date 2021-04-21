@@ -1,7 +1,7 @@
 package models
 
 import (
-	"addon/wot"
+	"github.com/galenliu/gateway-addon/wot"
 	json "github.com/json-iterator/go"
 )
 

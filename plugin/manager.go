@@ -1,11 +1,11 @@
 package plugin
 
 import (
-	"addon"
 	"archive/tar"
 	"compress/gzip"
 	"context"
 	"fmt"
+	"github.com/galenliu/gateway-addon"
 	"github.com/galenliu/gateway/config"
 	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/log"
@@ -76,12 +76,12 @@ func NewAddonsManager() *AddonManager {
 func (manager *AddonManager) handleDeviceAdded(device *addon.Device) {
 	manager.devices[device.GetID()] = device
 	//d, err := json.MarshalIndent(device, "", " ")
-	d, err := json.MarshalToString(device)
+	d := device.AsDict()
+	data, err := json.MarshalToString(d)
 	if err != nil {
-		log.Info("device marshal err: %s", err.Error())
-		return
+		log.Info("device marshal err")
 	}
-	Publish(util.ThingAdded, d)
+	Publish(util.ThingAdded, data)
 }
 
 func (manager *AddonManager) actionNotify(action *addon.Action) {

@@ -1,9 +1,9 @@
 package plugin
 
 import (
-	"addon"
 	"context"
 	"fmt"
+	"github.com/galenliu/gateway-addon"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/log"

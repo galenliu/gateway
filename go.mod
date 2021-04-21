@@ -3,13 +3,14 @@ module github.com/galenliu/gateway
 go 1.16
 
 require (
-	addon v1.0.0
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/brutella/hc v1.2.4
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fasthttp/websocket v1.4.3 // indirect
+	github.com/galenliu/gateway-addon v1.0.0
+	github.com/gin-gonic/gin v1.7.1
 	github.com/gofiber/fiber/v2 v2.7.1
-	github.com/gofiber/websocket/v2 v2.0.3 // indirect
+	github.com/gofiber/websocket/v2 v2.0.3
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/gorilla/websocket v1.4.2
 	github.com/json-iterator/go v1.1.10
@@ -35,4 +36,4 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
-replace addon v1.0.0 => ./gateway-addon
+replace github.com/galenliu/gateway-addon v1.0.0 => ./gateway-addon

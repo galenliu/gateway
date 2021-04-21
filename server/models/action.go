@@ -1,8 +1,8 @@
 package models
 
 import (
-	"addon/wot"
 	"fmt"
+	"github.com/galenliu/gateway-addon/wot"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/util"
 	json "github.com/json-iterator/go"

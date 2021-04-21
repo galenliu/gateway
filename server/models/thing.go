@@ -1,9 +1,9 @@
 package models
 
 import (
-	"addon"
-	"addon/wot"
 	"fmt"
+	"github.com/galenliu/gateway-addon"
+	"github.com/galenliu/gateway-addon/wot"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/log"
@@ -11,23 +11,34 @@ import (
 	json "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
 	"strings"
+	"time"
 )
 
 type Thing struct {
-	AtContext   []string `json:"@context"`
-	Title       string   `json:"title"`
-	ID          string   `json:"id"`
-	AtType      []string `json:"@type"`
-	Description string   `json:"description,omitempty"`
+	AtContext    []string `json:"@context"`
+	Title        string   `json:"title"`
+	Titles       []string `json:"titles,omitempty"`
+	ID           string   `json:"id"`
+	AtType       []string `json:"@type"`
+	Description  string   `json:"description,omitempty"`
+	Descriptions []string `json:"descriptions,omitempty"`
 
-	Properties map[string]*Property `json:"properties"`
+	Properties map[string]*Property `json:"properties,omitempty"`
 	Actions    map[string]*Action   `json:"actions,omitempty"`
 	Events     map[string]*Event    `json:"events,omitempty"`
-	Forms      []wot.Form           `json:"forms,omitempty"`
 
+	Forms   []wot.Form  `json:"forms,omitempty"`
+	Links   []wot.Link  `json:"links,omitempty"`
+	Support interface{} `json:"support,omitempty"`
+
+	Version  interface{} `json:"version,omitempty"`
+	Created  *time.Time  `json:"created,omitempty"`
+	Modified *time.Time  `json:"modified,omitempty"`
+
+	Security interface{} `json:"security,omitempty"`
 	//The configuration  of the device
-	Pin                 addon.PIN
-	CredentialsRequired bool `json:"credentialsRequired,omitempty"`
+	Pin                 addon.PIN `json:"pin,omitempty"`
+	CredentialsRequired bool      `json:"credentialsRequired,omitempty"`
 
 	//The state  of the thing
 	SelectedCapability string `json:"selectedCapability"`
@@ -35,6 +46,7 @@ type Thing struct {
 	IconData           string `json:"iconData,omitempty"`
 }
 
+// NewThing 把传入description组装成一个thing对象
 func NewThing(description string) (thing *Thing) {
 
 	id := gjson.Get(description, "id").String()
@@ -45,7 +57,10 @@ func NewThing(description string) (thing *Thing) {
 	if title == "" {
 		title = id
 	}
-	thingId := fmt.Sprintf("/things/%s", id)
+
+	sl := strings.Split(id, "/")
+	tid := sl[len(sl)-1]
+	thingId := fmt.Sprintf("%s/%s", util.ThingsPath, tid)
 
 	var atContext []string
 	for _, c := range gjson.Get(description, "@context").Array() {
@@ -100,13 +115,20 @@ func NewThing(description string) (thing *Thing) {
 	}
 	var props = gjson.Get(description, "properties").Map()
 	if len(props) > 0 {
+		t.Properties = make(map[string]*Property)
 		for name, data := range props {
 			prop := NewProperty(data.String())
 			if prop != nil {
+				if prop.InteractionAffordance == nil {
+					prop.InteractionAffordance = new(wot.InteractionAffordance)
+				}
 				if prop.Forms == nil {
 					prop.Forms = append(prop.Forms, wot.Form{
-						Href: fmt.Sprintf("%s/properties/%s", t.ID, name),
+						Href: fmt.Sprintf("%s/properties/%s", thingId, name),
 					})
+				}
+				if prop.Name == "" {
+					prop.Name = name
 				}
 				t.Properties[name] = prop
 			}
@@ -125,6 +147,9 @@ func NewThing(description string) (thing *Thing) {
 			action.ID = a.Get("id").String()
 			if action.Forms == nil {
 				action.Forms = append(action.Forms, wot.Form{Href: fmt.Sprintf("%s/actions/%s", t.ID, name)})
+			}
+			if action.Name == "" {
+				action.Name = name
 			}
 			t.Actions[name] = &action
 		}
@@ -156,31 +181,12 @@ func NewThing(description string) (thing *Thing) {
 		t.Forms = append(t.Forms, wot.Form{Rel: "alternate", ContentType: "text/html", Href: t.ID})
 		t.Forms = append(t.Forms, wot.Form{Rel: "alternate", Href: fmt.Sprintf("wss://localhost/%s", thingId)})
 	}
-
 	return t
 }
 
 func (t *Thing) setSelectedCapability(sel string) {
 	t.SelectedCapability = sel
-	_ = t.update
 	t.Publish(util.MODIFIED, t)
-}
-
-func (t *Thing) findProperty(propName string) (interface{}, error) {
-	prop, ok := t.Properties[propName]
-	if !ok {
-		return nil, fmt.Errorf("thing(%s) can not found properties(%s)", t.ID, propName)
-	}
-	return prop, nil
-}
-
-func (t *Thing) GetProperty(propName string) interface{} {
-	prop, ok := t.Properties[propName]
-	if !ok {
-		log.Debug("thing(%s) can not found properties(%s)", t.ID, propName)
-		return nil
-	}
-	return prop
 }
 
 func (t *Thing) GetID() string {
@@ -198,10 +204,6 @@ func (t *Thing) SetTitle(title string) string {
 
 func (t *Thing) GetTitle() string {
 	return t.Title
-}
-
-func (t *Thing) AddAction(action *Action) error {
-	return nil
 }
 
 func (t *Thing) SetSelectedCapability(selectedCapability string) {
@@ -232,11 +234,8 @@ func (t *Thing) GetDescription() string {
 	return s
 }
 
-func (t *Thing) save() (err error) {
-	return database.SetSetting(t.ID, t.GetDescription())
-}
-
-func (t *Thing) update(thing *Thing) {
+func (t *Thing) update(data string) {
+	thing := NewThing(data)
 	t.AtContext = thing.AtContext
 	t.AtType = thing.AtType
 	t.Description = thing.Description
@@ -247,12 +246,24 @@ func (t *Thing) update(thing *Thing) {
 	if thing.SelectedCapability != "" {
 		for _, s := range t.AtType {
 			if s == thing.SelectedCapability {
-				t.setSelectedCapability(thing.SelectedCapability)
+				t.SelectedCapability = thing.SelectedCapability
 			}
 			break
 		}
 	}
-	_ = database.UpdateThing(t.GetID(), t.GetDescription())
+	err := t.save()
+	if err != nil {
+		return
+	}
+	t.Publish(util.MODIFIED, t)
+}
+
+func (t *Thing) save() error {
+	err := database.UpdateThing(t.GetID(), t.GetDescription())
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (t *Thing) Subscribe(typ string, f interface{}) {
