@@ -55,7 +55,7 @@ UriVariables map[string]IDataSchema `json:"uriVariables,omitempty"`
 
 #### 以下以灯泡为例，做说明
 
-![img_1.png](img_1.png)
+![img_1.png](img/light1.png)
 
 - 灯泡有亮度、颜色、开关等各种参数和能改变这些参数的行为，可统称为设备的属性(Property为InteractionAffordance DataSchema的子类) 于是一个设备的属性可有如下的结构：
 
@@ -240,7 +240,7 @@ type ActionAffordance struct {
 
 - ## Web Thing Gateway
 
-Web Thing Gateway的目标，通过把不同协议的设备，转换成WOT的数据模式，来达到物与物，物与人之间的交互。 Gateway的设备接入层，用到了类似Chrome浏览器的插件系统，插件完成不同设备不同协议向WOT间的转换。
+Web Thing Gateway的目标，通过把不同协议的设备，转换成WOT的数据模型，来达到物与物，物与人之间的交互。 Gateway的设备接入层，用到了类似Chrome浏览器的插件系统，插件完成不同设备不同协议向WOT间的转换。
 ![img_1.png](img/img_1.png)
 ![img.png](img/img.png)
 
