@@ -145,7 +145,7 @@ func (tc *ThingsController) handleGetProperties(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 	var result = make(map[string]interface{})
-	for propName, _ := range th.Properties {
+	for propName := range th.Properties {
 		v, err := AddonManager.GetPropertyValue(id, propName)
 		if err != nil {
 			log.Info("get property err: %s", err.Error())

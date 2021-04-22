@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var actionId int = 0
+var actionId = 0
 
 func generateActionId() string {
 	actionId = actionId + 1

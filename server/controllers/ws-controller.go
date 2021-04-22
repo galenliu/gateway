@@ -136,7 +136,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 		m["id"] = thing.GetID()
 		m["messageType"] = util.PropertyStatus
 		propertyValues := make(map[string]interface{})
-		for propName, _ := range thing.Properties {
+		for propName := range thing.Properties {
 			value, err := AddonManager.GetPropertyValue(thing.GetID(), propName)
 			if err != nil {
 				continue
@@ -268,7 +268,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 		case util.RequestAction:
 			var actionNames map[string]interface{}
 			json.Get(bytes, "data").ToVal(&actionNames)
-			for actionName, _ := range actionNames {
+			for actionName := range actionNames {
 				var actionParams map[string]interface{}
 				json.Get(bytes, "data", actionName, "input").ToVal(&actionParams)
 				th := Things.GetThing(id)
