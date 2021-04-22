@@ -4,3 +4,6 @@
 [submodule "app"]
 	path = app
 	url = https://github.com/galenliu/app.git
+[submodule "yeelight-adapter-python"]
+	path = app
+	url = https://github.com/galenliu/yeelight-adapter-python.git
