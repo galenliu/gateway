@@ -57,12 +57,12 @@ UriVariables map[string]IDataSchema `json:"uriVariables,omitempty"`
 
 ![img_1.png](img_1.png)
 
-- 灯泡有亮度、颜色、开关等各种参数和能改变这些参数的行为，可把这一类称为设备的属性(Property)。 于是一个设备有如下数据结构：
+- 灯泡有亮度、颜色、开关等各种参数和能改变这些参数的行为，可统称为设备的属性(Property)。 于是一个设备有如下数据结构：
 
 ```golang
 type PropertyAffordance struct {
-InteractionAffordance
-DataSchema
+    *InteractionAffordance
+    *DataSchema
 Observable bool `json:"observable"`
 }
 
