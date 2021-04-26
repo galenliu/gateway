@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
+	AddonManager "github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/websocket/v2"
 	"sync"
@@ -37,10 +37,13 @@ func (controller *NewThingsController) handlerConnection() {
 			return
 		}
 	}
-	_ = bus.Subscribe(util.ThingAdded, controller.handleNewThing)
+	AddonManager.Subscribe(util.ThingAdded, controller.handleNewThing)
 	defer func() {
-		controller.ws.Close()
-		_ = bus.Unsubscribe(util.ThingAdded, controller.handleNewThing)
+		err := controller.ws.Close()
+		if err != nil {
+			log.Error(err.Error())
+		}
+		AddonManager.Unsubscribe(util.ThingAdded, controller.handleNewThing)
 	}()
 
 	go func() {

@@ -10,8 +10,8 @@ import (
 	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
-
 	json "github.com/json-iterator/go"
+
 	"github.com/xiam/to"
 	"io"
 	"io/ioutil"
@@ -77,7 +77,7 @@ func (manager *AddonManager) handleDeviceAdded(device *addon.Device) {
 	manager.devices[device.GetID()] = device
 	//d, err := json.MarshalIndent(device, "", " ")
 	d := device.AsDict()
-	data, err := json.Marshal(d)
+	data, err := json.MarshalIndent(d, "", "  ")
 	if err != nil {
 		log.Info("device marshal err")
 	}

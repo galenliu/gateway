@@ -88,11 +88,8 @@ func (ts *Things) GetNewThings() []*Thing {
 }
 
 func (ts *Things) CreateThing(id string, description string) (string, error) {
-	var th Thing
-	e := json.UnmarshalFromString(description, &th)
-	if e != nil {
-		return "", e
-	}
+
+	th := NewThingFromString(description)
 	th.ID = id
 	if &th == nil {
 		return "", fmt.Errorf("thing description invaild")
@@ -101,8 +98,8 @@ func (ts *Things) CreateThing(id string, description string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	ts.things[th.GetID()] = &th
-	go ts.Publish(util.ThingAdded, &th)
+	ts.things[th.GetID()] = th
+	go ts.Publish(util.ThingAdded, th)
 	return th.GetDescription(), err
 }
 

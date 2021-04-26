@@ -180,7 +180,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 			return
 		}
 		property.DoPropertyChanged(prop)
-		Publish(util.PropertyChanged, property.MarshalJson())
+		Publish(util.PropertyChanged, property.AsDict())
 		return
 
 	case DeviceActionStatusNotification:
