@@ -69,7 +69,7 @@ type PropertyAffordance struct {
 
 ```
 
-- 序列化的Property基本表示(这个灯有一个名为BrightnessProperty的integer属性，可向 "/things/lamp/properties/brightness"提交0-100间的integer来改变亮度)。
+- 序列化的Property基本结构。(这个灯有一个名为BrightnessProperty的integer属性，可向 "/things/lamp/properties/brightness"提交0-100间的integer来改变亮度)。
 
 ```json
 {
