@@ -53,7 +53,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 
 	var messageType = gjson.GetBytes(data, "messageType").Uint()
 	if config.IsVerbose() {
-		log.Info("Read messageType: %s \t\n Data: %s", MessageTypeToString(int(messageType)), gjson.GetBytes(data, "data").String())
+		log.Info("Read messageType: %s \t\n %s", MessageTypeToString(int(messageType)), util.JsonIndent(gjson.GetBytes(data, "data").String()))
 	}
 	//如果为0，则消息不合法(如：缺少 messageType字段)
 	if messageType == 0 {

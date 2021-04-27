@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"encoding/gob"
+	"encoding/json"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/log"
 	"io"
@@ -113,4 +114,13 @@ func GetBytes(key interface{}) []byte {
 
 func InterfaceToFloat64(data interface{}) float64 {
 	return ByteToFloat64(GetBytes(data))
+}
+
+func JsonIndent(data string) string {
+	var bf bytes.Buffer
+	err := json.Indent(&bf, []byte(data), "", " ")
+	if err != nil {
+		return ""
+	}
+	return bf.String()
 }
