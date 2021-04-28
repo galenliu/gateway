@@ -5,5 +5,5 @@
 	path = app
 	url = https://github.com/galenliu/app.git
 [submodule "yeelight-adapter-python"]
-	path = app
+	path = ./profile/addons/yeelight-adapter-python
 	url = https://github.com/galenliu/yeelight-adapter-python.git
