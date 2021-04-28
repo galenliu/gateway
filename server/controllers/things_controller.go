@@ -1,10 +1,9 @@
 package controllers
 
 import (
-	"bytes"
-	j "encoding/json"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/util"
 	AddonManager "github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
@@ -86,13 +85,12 @@ func (tc *ThingsController) handleGetThings(c *fiber.Ctx) error {
 	}
 	ts := tc.Container.GetListThings()
 	data, err := json.Marshal(ts)
-	var str bytes.Buffer
-	err = j.Indent(&str, data, "", "  ")
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
-	log.Info("/things: \t\n %s", str.String())
-	return c.Status(fiber.StatusOK).SendString(str.String())
+	js := util.JsonIndent(string(data))
+	log.Info("/things: \t\n %s", js)
+	return c.Status(fiber.StatusOK).SendString(js)
 }
 
 //patch things

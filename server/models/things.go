@@ -43,7 +43,7 @@ func (ts *Things) GetThings() map[string]*Thing {
 	if len(ts.things) > 0 {
 		return ts.things
 	}
-	for _, t := range GetThingsFormDataBase() {
+	for _, t := range ts.GetThingsFormDataBase() {
 		ts.things[t.GetID()] = t
 	}
 	return ts.things
@@ -57,13 +57,13 @@ func (ts *Things) GetListThings() (lt []*Thing) {
 	return
 }
 
-func GetThingsFormDataBase() []*Thing {
-	var ts = database.GetThings()
+func (ts *Things) GetThingsFormDataBase() []*Thing {
+	var things = database.GetThings()
 	var list []*Thing
 	if ts == nil {
 		return nil
 	}
-	for _, des := range ts {
+	for _, des := range things {
 		t := NewThingFromString(des)
 		if t != nil {
 			t.Connected = false

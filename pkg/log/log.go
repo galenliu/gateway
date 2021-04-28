@@ -29,7 +29,7 @@ func InitLogger(logDir string, debug bool, logRotateDays int) {
 
 	hook := lumberjack.Logger{
 		Filename:   path.Join(logDir, "log.txt"), // 日志文件路径
-		MaxSize:    8,                            // 每个日志文件保存的大小 单位:M
+		MaxSize:    2,                            // 每个日志文件保存的大小 单位:M
 		MaxAge:     logRotateDays,                // 文件最多保存多少天
 		MaxBackups: 30,                           // 日志文件最多保存多少个备份
 		Compress:   false,                        // 是否压缩
