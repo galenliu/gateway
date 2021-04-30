@@ -151,8 +151,11 @@ func (web *Web) Start() error {
 	return nil
 }
 
-func (web *Web) Close() error {
-	return web.App.Shutdown()
+func (web *Web) Stop() {
+	err := web.App.Shutdown()
+	if err != nil {
+		log.Error(err.Error())
+	}
 }
 
 func NewDefaultWebConfig() Config {

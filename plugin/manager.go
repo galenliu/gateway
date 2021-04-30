@@ -150,7 +150,7 @@ func (manager *AddonManager) handleSetProperty(deviceId, propName string, setVal
 	data[addon.Did] = device.GetID()
 	data["propertyName"] = property.GetName()
 	data["propertyValue"] = newValue
-	go adapter.send(DeviceSetPropertyCommand, data)
+	go adapter.Send(DeviceSetPropertyCommand, data)
 	return nil
 }
 
@@ -373,12 +373,17 @@ func (manager *AddonManager) unloadAddon(packageId string) error {
 	return nil
 }
 
-func (manager *AddonManager) Start() {
-	manager.pluginServer.Start()
+func (manager *AddonManager) Start() error {
+	err := manager.pluginServer.Start()
+	if err != nil {
+		manager.running = false
+		return err
+	}
 	manager.running = true
+	return nil
 }
 
-func (manager *AddonManager) Close() {
+func (manager *AddonManager) Stop() {
 	manager.pluginServer.Stop()
 	manager.running = false
 }

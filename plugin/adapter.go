@@ -10,6 +10,10 @@ import (
 
 type pairingFunc func(ctx context.Context, cancelFunc func())
 
+type managerProxy interface {
+	handleDeviceAdded(device *addon.Device)
+}
+
 type Adapter struct {
 	id             string
 	name           string
@@ -22,10 +26,10 @@ type Adapter struct {
 	pairingContext context.Context
 	manifest       interface{}
 	packageName    string
-	manager        *AddonManager
+	manager        managerProxy
 }
 
-func NewAdapter(manager *AddonManager, name, adapterId, pluginId, packageName string) *Adapter {
+func NewAdapter(manager managerProxy, name, adapterId, pluginId, packageName string) *Adapter {
 	proxy := &Adapter{}
 	proxy.id = adapterId
 	proxy.name = name
@@ -41,20 +45,20 @@ func (adapter *Adapter) pairing(timeout float64) {
 	log.Info(fmt.Sprintf("adapter: %s start pairing", adapter.id))
 	data := make(map[string]interface{})
 	data["timeout"] = timeout
-	adapter.send(AdapterStartPairingCommand, data)
+	adapter.Send(AdapterStartPairingCommand, data)
 }
 
 func (adapter *Adapter) cancelPairing() {
 	log.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.id))
 	data := make(map[string]interface{})
-	adapter.send(AdapterCancelPairingCommand, data)
+	adapter.Send(AdapterCancelPairingCommand, data)
 }
 
 func (adapter *Adapter) removeThing(device addon.IDevice) {
 	log.Info(fmt.Sprintf("adapter delete thing Id: %v", device.GetID()))
 	data := make(map[string]interface{})
 	data["deviceId"] = device.GetID()
-	adapter.send(AdapterRemoveDeviceRequest, data)
+	adapter.Send(AdapterRemoveDeviceRequest, data)
 
 }
 
@@ -62,14 +66,14 @@ func (adapter *Adapter) cancelRemoveThing(deviceId string) {
 	log.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.id))
 	data := make(map[string]interface{})
 	data["deviceId"] = deviceId
-	adapter.send(AdapterCancelRemoveDeviceCommand, data)
+	adapter.Send(AdapterCancelRemoveDeviceCommand, data)
 }
 
 func (adapter *Adapter) getManager() *AddonManager {
 	return adapter.plugin.pluginServer.manager
 }
 
-func (adapter *Adapter) send(messageType int, data map[string]interface{}) {
+func (adapter *Adapter) Send(messageType int, data map[string]interface{}) {
 	data["adapterId"] = adapter.id
 	adapter.plugin.send(messageType, data)
 }

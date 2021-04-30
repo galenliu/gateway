@@ -2,6 +2,7 @@ package plugin
 
 //	plugin server
 import (
+	"fmt"
 	"github.com/galenliu/gateway/pkg/log"
 	json "github.com/json-iterator/go"
 	"sync"
@@ -91,8 +92,8 @@ func (s *PluginsServer) registerPlugin(packageId string) *Plugin {
 	return plugin
 }
 
-//create goroutines handle ipc massage
-func (s *PluginsServer) Start() {
+// Start create goroutines handle ipc massage
+func (s *PluginsServer) Start() error {
 	go s.ipc.Serve()
 	for {
 		select {
@@ -100,13 +101,12 @@ func (s *PluginsServer) Start() {
 		case conn := <-s.ipc.wsChan:
 			go s.handlerConnection(conn)
 		case <-s.closeChan:
-			log.Debug("plugin server closed")
-			return
+			return fmt.Errorf("plugin server closed")
 		}
 	}
 }
 
-//if server stop, also need to stop all of package
+// Stop if server stop, also need to stop all of package
 func (s *PluginsServer) Stop() {
 	s.ipc.close()
 	s.closeChan <- struct{}{}

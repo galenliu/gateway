@@ -80,7 +80,12 @@ func GetDevice(deviceId string) addon.IDevice {
 
 func SetProperty(deviceId, propName string, newValue interface{}) (interface{}, error) {
 
-	go instance.handleSetProperty(deviceId, propName, newValue)
+	go func() {
+		err := instance.handleSetProperty(deviceId, propName, newValue)
+		if err != nil {
+			log.Error(err.Error())
+		}
+	}()
 	closeChan := make(chan struct{})
 	propChan := make(chan interface{})
 	time.AfterFunc(3*time.Second, func() {

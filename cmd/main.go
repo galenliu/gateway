@@ -22,10 +22,15 @@ func init() {
 	flag.BoolVar(&showVersion, "version", false, "version")
 }
 
+type Runner interface {
+	Start() error
+	Stop()
+}
+
 func main() {
 
 	var err error
-	c := make(chan os.Signal)
+	sig := make(chan os.Signal, 1)
 
 	// 首先解析命令行参数
 	flag.Parse()
@@ -44,21 +49,21 @@ func main() {
 	}
 
 	//create core instance
-	gw, err := NewGateway()
+	runner, err := NewGateway()
 	CheckError(err)
 
 	//handle signal
-	signal.Notify(c)
+	signal.Notify(sig)
 	var systemCall = func() {
-		systemCall := <-c
-		log.Info("exited system call %v", systemCall)
-		gw.Close()
+		callMessage := <-sig
+		log.Info("exited system call %v", callMessage)
+		runner.Stop()
 		os.Exit(0)
 	}
 	//start
-	gw.Start()
+	runner.Start()
 	systemCall()
-
+	log.Info("exited")
 }
 
 func CheckError(err error) {
@@ -69,17 +74,15 @@ func CheckError(err error) {
 }
 
 type HomeGateway struct {
-	Preferences   *config.Preferences
-	AddonsManager *plugin.AddonManager
-	Web           *controllers.Web
-	closeChan     chan struct{}
+	Preferences *config.Preferences
+	closeChan   chan struct{}
+	Tasks       []Runner
 }
 
 func NewGateway() (gateway *HomeGateway, err error) {
-
 	gateway = &HomeGateway{}
-	gateway.AddonsManager = plugin.NewAddonsManager()
-	gateway.Web = controllers.NewWebAPP()
+	gateway.Tasks = append(gateway.Tasks, plugin.NewAddonsManager())
+	gateway.Tasks = append(gateway.Tasks, controllers.NewWebAPP())
 	gateway.closeChan = make(chan struct{})
 	//update the gateway preferences
 	return gateway, err
@@ -87,20 +90,25 @@ func NewGateway() (gateway *HomeGateway, err error) {
 
 func (gateway *HomeGateway) Start() {
 	log.Info("gateway start.....")
-	go func() {
-		err := gateway.Web.Start()
-		if err != nil {
+	func() {
+		for _, task := range gateway.Tasks {
+			task := task
+			go func() {
+				err := task.Start()
+				if err != nil {
+					log.Error(err.Error())
+				}
+			}()
 
 		}
 	}()
-	go gateway.AddonsManager.Start()
 }
 
-func (gateway *HomeGateway) Close() {
+func (gateway *HomeGateway) Stop() {
 	gateway.closeChan <- struct{}{}
-	gateway.AddonsManager.Close()
-	err := gateway.Web.Close()
-	if err != nil {
-		log.Error(err.Error())
-	}
+	go func() {
+		for _, task := range gateway.Tasks {
+			task.Stop()
+		}
+	}()
 }

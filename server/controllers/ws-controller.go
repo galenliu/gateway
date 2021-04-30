@@ -48,6 +48,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 
 	sendMessage := func(data map[string]interface{}) {
 		d, _ := json.MarshalIndent(&data, "", " ")
+		log.Info(util.JsonIndent(string(d)))
 		writeErr := c.WriteMessage(websocket.TextMessage, d)
 		if writeErr != nil {
 			return
