@@ -10,5 +10,6 @@ func rootHandler(c *fiber.Ctx) error {
 	if configs.IsVerbose() {
 		log.Info("url:%s path: %s", c.BaseURL(), c.Path())
 	}
+
 	return c.Next()
 }

@@ -2,7 +2,6 @@ package configs
 
 import (
 	_ "embed"
-	"fmt"
 	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
@@ -178,13 +177,13 @@ func NewConfig(config string) *Config {
 		//init logger
 		log.InitLogger(rtc.LogDir, true, rtc.Log.LogRotateDays)
 
-		log.Info(fmt.Sprintf("gateway start path: %s", rtc.ProfileDir))
-
 		//init database
 		if rtc.Database.RemoveBeforeOpen {
 			database.ResetDB(rtc.ConfigDir)
 		}
 		err = database.InitDB(rtc.ConfigDir)
+
+		log.Info("gateway loaded config on path: %s", rtc.ProfileDir)
 
 		if err != nil {
 			return
@@ -193,6 +192,7 @@ func NewConfig(config string) *Config {
 		err = UpdateOrCreatePreferences()
 		return
 	})
+
 	return instance
 }
 

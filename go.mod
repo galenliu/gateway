@@ -25,6 +25,7 @@ require (
 	github.com/savsgio/gotils v0.0.0-20210316171653-c54912823645 // indirect
 	github.com/tidwall/gjson v1.7.4
 	go.uber.org/zap v1.16.0
+	golang.org/x/crypto v0.0.0-20210506145944-38f3c27a63bf // indirect
 	golang.org/x/net v0.0.0-20210501142056-aec3718b3fa0 // indirect
 	golang.org/x/sys v0.0.0-20210426230700-d19ff857e887 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect

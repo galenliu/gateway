@@ -209,3 +209,48 @@ func UpdateThing(id string, description string) (err error) {
 	_, err = instance.Exec(`update things set id=@id where description=@description`, sql.Named("id", id), sql.Named("description", description))
 	return
 }
+
+func GetUsersCount() map[string]string {
+	var users = make(map[string]string)
+	rows, err := instance.Query("SELECT id, description FROM users")
+	if err != nil {
+		return nil
+	}
+	for rows.Next() {
+		var id string
+		var description string
+		err = rows.Scan(&id, &description)
+		if err == nil {
+			users[id] = description
+		}
+	}
+	return users
+}
+
+func CreateUser(email, hash, name string) (int64, error) {
+	if email == "" {
+		return 0, fmt.Errorf("email is emtry")
+	}
+	if hash == "" {
+		return 0, fmt.Errorf("password hash error")
+	}
+	stmt, err := instance.Prepare("INSERT INTO users(email,password ,name ,mfaSharedSecret ,mfaEnrolled ,mfaBackupCodes) values(?,?,?,?,?,?)")
+	if err != nil {
+		return 0, err
+	}
+	defer func(stmt *sql.Stmt) {
+		err := stmt.Close()
+		if err != nil {
+			log.Error(err.Error())
+		}
+	}(stmt)
+	res, ee := stmt.Exec(email, hash, name, "", false, "")
+	if ee != nil {
+		return 0, ee
+	}
+	id, eee := res.LastInsertId()
+	if eee != nil {
+		return id, eee
+	}
+	return id, nil
+}

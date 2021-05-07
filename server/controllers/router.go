@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/galenliu/gateway/configs"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/log"
@@ -52,13 +51,6 @@ func CollectRoute(conf Config) *fiber.App {
 	//init
 	var app = fiber.New()
 	app.Use(recover.New())
-
-	app.Get("/swagger/*", swagger.Handler) // default
-
-	app.Get("/swagger/*", swagger.New(swagger.Config{ // custom
-		URL:         "http://example.com/doc.json",
-		DeepLinking: false,
-	}))
 
 	//app.Use("/", filesystem.New(filesystem.Config{
 	//	Root: http.FS(server.File),
@@ -125,6 +117,14 @@ func CollectRoute(conf Config) *fiber.App {
 		}))
 	}
 
+	{
+		usersGroup := app.Group(util.UsersPath)
+		usersController := NewUsersController()
+
+		usersGroup.Get("/count", usersController.getCount)
+		usersGroup.Post("/", usersController.createUser)
+	}
+
 	{ //Addons Controller
 		addonGroup := app.Group(util.AddonsPath)
 		addonController := NewAddonController()
@@ -187,7 +187,7 @@ func NewDefaultWebConfig() Config {
 	return conf
 }
 
-//Web的函数选项
+// WebOption Web的函数选项
 type WebOption func(*Config)
 
 func WithHttpPort(p int) WebOption {
