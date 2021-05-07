@@ -74,13 +74,17 @@ func (ts *Things) GetThingsFormDataBase() []*Thing {
 }
 
 func (ts *Things) GetNewThings() []*Thing {
-	connectedThings := AddonManager.GetDevices()
+	connectedDevices := AddonManager.GetDevices()
 	storedThings := ts.GetThings()
 	var things []*Thing
-	for _, connected := range connectedThings {
+	for _, connected := range connectedDevices {
 		for _, storedThing := range storedThings {
 			if connected.GetID() != storedThing.GetID() {
-				things = append(things, NewThingFromString(connected.GetDescription()))
+				data, err := json.MarshalIndent(connected.AsDict(), "", "  ")
+				if err != nil {
+					continue
+				}
+				things = append(things, NewThingFromString(string(data)))
 			}
 		}
 	}

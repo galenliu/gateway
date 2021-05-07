@@ -1,12 +1,15 @@
 package homekit
 
 import (
-	"gateway/pkg/log"
+	"fmt"
 	"github.com/brutella/hc"
 	"github.com/brutella/hc/accessory"
+	"github.com/brutella/hc/service"
 )
 
-var HCBridge *BridgeProxy
+var Bridge *BridgeProxy
+var stop func()
+var start func()
 
 type BridgeProxy struct {
 	bridge *accessory.Bridge
@@ -15,7 +18,7 @@ type BridgeProxy struct {
 func NewHomeKitBridge(name, sn, manufacturer, model, storagePath string) {
 
 	var bridge *accessory.Bridge
-	HCBridge = &BridgeProxy{bridge}
+	Bridge = &BridgeProxy{bridge}
 
 	info := accessory.Info{
 		Name:             name,
@@ -29,16 +32,31 @@ func NewHomeKitBridge(name, sn, manufacturer, model, storagePath string) {
 		StoragePath: storagePath,
 		Pin:         "1234432312",
 	}
-
 	bridge = accessory.NewBridge(info)
 
-	t, err := hc.NewIPTransport(config, HCBridge.bridge.Accessory)
+	t, err := hc.NewIPTransport(config, Bridge.bridge.Accessory)
 	if err != nil {
-		log.Error("create homekit transport err:", err)
+		fmt.Printf("create homekit transport err:", err)
 		return
 	}
-	hc.OnTermination(func() {
+	stop = func() {
 		<-t.Stop()
-	})
-	t.Start()
+	}
+	start = func() {
+		t.Start()
+	}
+
+}
+
+func (p *BridgeProxy) AddService(s *service.Service) {
+	p.bridge.AddService(s)
+}
+
+func (p *BridgeProxy) Start() error {
+	start()
+	return nil
+}
+
+func (p *BridgeProxy) Stop() {
+	stop()
 }

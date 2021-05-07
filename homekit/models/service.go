@@ -1,9 +1,9 @@
 package models
 
 import (
-	"gateway/pkg/thing"
-	"gateway/plugin"
 	"github.com/brutella/hc/service"
+	"github.com/galenliu/gateway/homekit"
+	"github.com/galenliu/gateway/plugin"
 )
 
 type HCServiceProxy struct {
@@ -14,10 +14,10 @@ type HCServiceProxy struct {
 func (s *HCServiceProxy) NewHCService(typ string) {
 
 	switch typ {
-	case thing.Light:
+	case homekit.Light:
 		sev := service.NewLightbulb()
 		sev.On.OnValueRemoteUpdate(s.OnBoolValueChanged)
-	case thing.OnOffSwitch:
+	case homekit.Switch:
 		sev := service.NewSwitch()
 		sev.On.OnValueRemoteUpdate(s.OnBoolValueChanged)
 	}

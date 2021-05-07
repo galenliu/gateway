@@ -4,21 +4,47 @@ import (
 	"context"
 	"fmt"
 	"github.com/galenliu/gateway-addon"
+	"github.com/galenliu/gateway/configs"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
+	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
 	"path"
+	"sync"
 	"time"
 )
 
 type Map = map[string]interface{}
 
+var instance *AddonManager
+
+func NewAddonsManager() *AddonManager {
+	am := &AddonManager{}
+	instance = am
+
+	am.AddonsDir = configs.GetAddonsDir()
+	am.DataDir = configs.GetAddonsDir()
+	am.verbose = configs.IsVerbose()
+	am.addonsLoaded = false
+	am.isPairing = false
+	am.running = false
+	am.devices = make(map[string]addon.IDevice, 50)
+	am.installAddons = make(map[string]*internal.AddonInfo, 50)
+	am.adapters = make(map[string]*Adapter, 20)
+	am.extensions = make(map[string]Extension)
+
+	am.locker = new(sync.Mutex)
+	am.loadAddons()
+	return am
+}
+
+//获取已安装的add-on
 func GetInstallAddons() ([]byte, error) {
 	instance.locker.Lock()
 	defer instance.locker.Unlock()
-	var addons []*AddonInfo
+	var addons []*internal.AddonInfo
 	for _, v := range instance.installAddons {
 		addons = append(addons, v)
 	}
@@ -232,12 +258,12 @@ func UninstallAddon(addonId string, disable bool) error {
 	util.RemoveDir(path.Join(instance.AddonsDir, addonId))
 
 	if disable {
-		config, err := database.GetSetting(key)
+		setting, err := database.GetSetting(key)
 		if err != nil {
 			log.Error(err.Error())
 		}
-		var addonInfo AddonInfo
-		err = json.UnmarshalFromString(config, &addonInfo)
+		var addonInfo internal.AddonInfo
+		err = json.UnmarshalFromString(setting, &addonInfo)
 		_ = addonInfo.UpdateAddonInfoToDB(false)
 	}
 	delete(instance.installAddons, addonId)

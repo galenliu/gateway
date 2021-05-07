@@ -1,4 +1,4 @@
-package config
+package configs
 
 import (
 	_ "embed"
@@ -115,6 +115,7 @@ func GetAddonListUrls() []string {
 	return instance.AddonManager.ListUrls
 }
 
+// NewConfig 加载配置文件，初始化Log,DataBase,工作目录
 func NewConfig(config string) *Config {
 	once.Do(func() {
 		var data []byte

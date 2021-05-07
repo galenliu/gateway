@@ -6,13 +6,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/galenliu/gateway-addon"
-	"github.com/galenliu/gateway/config"
 	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
+	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
 
-	"github.com/xiam/to"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -21,10 +20,6 @@ import (
 	"strings"
 	"sync"
 )
-
-var instance *AddonManager
-
-type PropertyChanged func(property addon.Property)
 
 type Extension struct {
 	Extensions string
@@ -37,7 +32,7 @@ type AddonManager struct {
 
 	devices       map[string]addon.IDevice
 	adapters      map[string]*Adapter
-	installAddons map[string]*AddonInfo
+	installAddons map[string]*internal.AddonInfo
 
 	extensions map[string]Extension
 
@@ -53,26 +48,6 @@ type AddonManager struct {
 	verbose   bool
 }
 
-func NewAddonsManager() *AddonManager {
-	am := &AddonManager{}
-	instance = am
-
-	am.AddonsDir = config.GetAddonsDir()
-	am.DataDir = config.GetAddonsDir()
-	am.verbose = config.IsVerbose()
-	am.addonsLoaded = false
-	am.isPairing = false
-	am.running = false
-	am.devices = make(map[string]addon.IDevice, 50)
-	am.installAddons = make(map[string]*AddonInfo, 50)
-	am.adapters = make(map[string]*Adapter, 20)
-	am.extensions = make(map[string]Extension)
-
-	am.locker = new(sync.Mutex)
-	am.LoadAddons()
-	return am
-}
-
 func (manager *AddonManager) handleDeviceAdded(device *addon.Device) {
 	manager.devices[device.GetID()] = device
 	//d, err := json.MarshalIndent(device, "", " ")
@@ -85,11 +60,11 @@ func (manager *AddonManager) handleDeviceAdded(device *addon.Device) {
 }
 
 func (manager *AddonManager) actionNotify(action *addon.Action) {
-	Publish(util.ActionStatus, action)
+	Publish(util.ActionStatus, action.MarshalJson())
 }
 
 func (manager *AddonManager) eventNotify(event *addon.Event) {
-	Publish(util.EVENT, event)
+	Publish(util.EVENT, event.MarshalJson())
 }
 
 func (manager *AddonManager) connectedNotify(device *addon.Device, connected bool) {
@@ -111,17 +86,6 @@ func (manager *AddonManager) getAdapter(adapterId string) *Adapter {
 	return adapter
 }
 
-func (manager *AddonManager) findAdapter(adapterId string) (*Adapter, error) {
-	if adapterId == "" {
-		return nil, fmt.Errorf("adapter id none")
-	}
-	adapter, ok := manager.adapters[adapterId]
-	if !ok {
-		return nil, fmt.Errorf("adapter(%s) not found", adapterId)
-	}
-	return adapter, nil
-}
-
 func (manager *AddonManager) handleSetProperty(deviceId, propName string, setValue interface{}) error {
 	device := manager.getDevice(deviceId)
 	if device == nil {
@@ -133,24 +97,17 @@ func (manager *AddonManager) handleSetProperty(deviceId, propName string, setVal
 	}
 	property := device.GetProperty(propName)
 
-	var newValue interface{}
-	if property.GetType() == addon.TypeBoolean {
-		newValue = to.Bool(to.Bytes(setValue))
-	}
-	if property.GetType() == addon.TypeInteger || property.GetAtType() == addon.TypeNumber {
-		newValue = to.Int64(to.Bytes(setValue))
-	}
-	if property.GetType() == addon.TypeString {
-		newValue = string(to.Bytes(setValue))
-	}
 	if property == nil {
-		return fmt.Errorf("device or property not found")
+		return fmt.Errorf("property err")
 	}
+
+	var newValue = property.ToValue(setValue)
+
 	data := make(map[string]interface{})
 	data[addon.Did] = device.GetID()
 	data["propertyName"] = property.GetName()
 	data["propertyValue"] = newValue
-	go adapter.Send(DeviceSetPropertyCommand, data)
+	go adapter.Send(internal.DeviceSetPropertyCommand, data)
 	return nil
 }
 
@@ -173,7 +130,7 @@ func (manager *AddonManager) installAddonFromUrl(id, url, checksum string, enabl
 		return fmt.Errorf(fmt.Sprintf("Download addon err,pakage id:%s err:%s", id, err.Error()))
 	}
 	defer func() {
-		resp.Body.Close()
+		_ = resp.Body.Close()
 		err := os.Remove(destPath)
 		if err != nil {
 			log.Info("remove temp file failed ,err:%s", err.Error())
@@ -202,7 +159,12 @@ func (manager *AddonManager) installAddon(packageId, packagePath string, enabled
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer func() {
+		e := f.Close()
+		if e != nil {
+			log.Error(e.Error())
+		}
+	}()
 
 	zp, _ := gzip.NewReader(f)
 	tr := tar.NewReader(zp)
@@ -234,7 +196,7 @@ func (manager *AddonManager) installAddon(packageId, packagePath string, enabled
 	var key = "addons." + packageId
 	saved, err := database.GetSetting(key)
 	if err == nil && saved != "" {
-		var old AddonInfo
+		var old internal.AddonInfo
 		ee := json.UnmarshalFromString(saved, &old)
 		if ee != nil {
 			old.Enabled = enabled
@@ -254,7 +216,7 @@ func (manager *AddonManager) installAddon(packageId, packagePath string, enabled
 	return nil
 }
 
-func (manager *AddonManager) LoadAddons() {
+func (manager *AddonManager) loadAddons() {
 	if manager.addonsLoaded {
 		return
 	}
@@ -287,7 +249,7 @@ func (manager *AddonManager) loadAddon(packageId string) error {
 
 	addonPath := path.Join(manager.AddonsDir, packageId)
 
-	addonInfo, obj, err := loadManifest(addonPath, packageId)
+	addonInfo, obj, err := internal.LoadManifest(addonPath, packageId)
 
 	if err != nil {
 		return err
@@ -356,8 +318,8 @@ func (manager *AddonManager) unloadAddon(packageId string) error {
 	if ok {
 		delete(manager.extensions, packageId)
 	}
-	plugin, ok1 := manager.pluginServer.Plugins[packageId]
-	if !ok1 {
+	plugin := manager.pluginServer.Plugins[packageId]
+	if plugin == nil {
 		return fmt.Errorf("can not found plugin: %s", packageId)
 	}
 
@@ -374,16 +336,23 @@ func (manager *AddonManager) unloadAddon(packageId string) error {
 }
 
 func (manager *AddonManager) Start() error {
-	err := manager.pluginServer.Start()
-	if err != nil {
-		manager.running = false
-		return err
-	}
+	var err error
+	go func() {
+		err = manager.pluginServer.Start()
+		if err != nil {
+			manager.running = false
+			log.Error(err.Error())
+		}
+	}()
 	manager.running = true
-	return nil
+	if err == nil {
+		Publish(util.PluginServerStarted)
+	}
+	return err
 }
 
 func (manager *AddonManager) Stop() {
 	manager.pluginServer.Stop()
+	Publish(util.PluginServerStopped)
 	manager.running = false
 }

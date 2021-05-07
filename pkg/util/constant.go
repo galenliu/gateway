@@ -59,6 +59,11 @@ const (
 	ThingModified = "thingModified"
 	ThingRemoved  = "thingRemoved"
 
+	WebServerStarted    = "webServerStarted"
+	PluginServerStarted = "pluginServerStarted"
+	WebServerStopped    = "webServerStopped"
+	PluginServerStopped = "pluginServerStopped"
+
 	// OAuth things
 	AccessToken       = "access_token"
 	AuthorizationCode = "authorization_code"

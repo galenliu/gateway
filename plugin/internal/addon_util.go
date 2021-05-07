@@ -1,4 +1,4 @@
-package plugin
+package internal
 
 import (
 	"fmt"
@@ -103,7 +103,7 @@ func GetAddonInfoFromDB(id string) *AddonInfo {
 	return &a
 }
 
-func loadManifest(destPath, packetId string) (*AddonInfo, *interface{}, error) {
+func LoadManifest(destPath, packetId string) (*AddonInfo, *interface{}, error) {
 
 	//load manifest.json\
 	f, err := ioutil.ReadFile(path.Join(destPath, FileName))

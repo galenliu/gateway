@@ -4,6 +4,7 @@ package plugin
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
 	"sync"
 )
@@ -37,9 +38,9 @@ func (s *PluginsServer) messageHandler(data []byte, c *Connection) {
 		return
 	}
 	messageType := m.ToInt()
-	log.Debug("%s: \t\n %s", MessageTypeToString(messageType), string(data))
+	log.Debug("%s: \t\n %s", internal.MessageTypeToString(messageType), string(data))
 
-	if messageType == PluginRegisterRequest {
+	if messageType == internal.PluginRegisterRequest {
 		s.registerHandler(data, c)
 	} else {
 		//获取Plugin，并且把消息交由对应的Plugin处理
@@ -73,8 +74,8 @@ func (s *PluginsServer) loadPlugin(addonPath, id, exec string) {
 }
 
 func (s *PluginsServer) uninstallPlugin(packageId string) {
-	plugin, ok := s.Plugins[packageId]
-	if !ok {
+	plugin := s.Plugins[packageId]
+	if plugin == nil {
 		log.Error("plugin not exist")
 		return
 	}
@@ -95,15 +96,21 @@ func (s *PluginsServer) registerPlugin(packageId string) *Plugin {
 // Start create goroutines handle ipc massage
 func (s *PluginsServer) Start() error {
 	go s.ipc.Serve()
-	for {
-		select {
-		//每一个连接都开一个协程处理了
-		case conn := <-s.ipc.wsChan:
-			go s.handlerConnection(conn)
-		case <-s.closeChan:
-			return fmt.Errorf("plugin server closed")
-		}
+	if !s.manager.running {
+		return fmt.Errorf("addon manager stoped")
 	}
+	go func() {
+		for {
+			select {
+			//每一个连接都开一个协程处理了
+			case conn := <-s.ipc.wsChan:
+				go s.handlerConnection(conn)
+			case <-s.closeChan:
+				fmt.Print("plugin server closed")
+			}
+		}
+	}()
+	return nil
 }
 
 // Stop if server stop, also need to stop all of package

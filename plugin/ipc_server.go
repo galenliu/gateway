@@ -2,7 +2,7 @@ package plugin
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/config"
+	"github.com/galenliu/gateway/configs"
 	"github.com/galenliu/gateway/pkg/log"
 	"github.com/gorilla/websocket"
 	"net/http"
@@ -29,7 +29,7 @@ type IpcServer struct {
 
 func NewIpcServer() *IpcServer {
 	ipc := &IpcServer{
-		addr:   "localhost:" + strconv.Itoa(config.GetIpcPort()),
+		addr:   "localhost:" + strconv.Itoa(configs.GetIpcPort()),
 		wsChan: make(chan *Connection, 2),
 	}
 	return ipc

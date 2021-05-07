@@ -3,13 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/galenliu/gateway/config"
+	"github.com/galenliu/gateway/configs"
 	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/controllers"
 	"os"
 	"os/signal"
+	"syscall"
 )
 
 var (
@@ -27,10 +28,29 @@ type Runner interface {
 	Stop()
 }
 
+// TermFunc defines the function which is executed on termination.
+type TermFunc func(sig os.Signal)
+
+// OnTermination calls a function when the app receives an interrupt of kill signal.
+func OnTermination(fn TermFunc) {
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt)
+	signal.Notify(c, os.Kill)
+	signal.Notify(c, syscall.SIGTERM)
+
+	go func() {
+		select {
+		case sig := <-c:
+			if fn != nil {
+				fn(sig)
+			}
+		}
+	}()
+}
+
 func main() {
 
 	var err error
-	sig := make(chan os.Signal, 1)
 
 	// 首先解析命令行参数
 	flag.Parse()
@@ -42,28 +62,28 @@ func main() {
 	}
 
 	//init config
-	conf := config.NewConfig(proFile)
+	conf := configs.NewConfig(proFile)
 	if conf == nil {
 		log.Info("config is bad")
 		return
 	}
 
 	//create core instance
-	runner, err := NewGateway()
-	CheckError(err)
+	runner, e := NewGateway()
+	CheckError(e)
 
 	//handle signal
-	signal.Notify(sig)
-	var systemCall = func() {
-		callMessage := <-sig
-		log.Info("exited system call %v", callMessage)
+	var systemCall = func(sig os.Signal) {
+		log.Info("exited system call %v", sig.String())
 		runner.Stop()
 		os.Exit(0)
 	}
+
+	OnTermination(systemCall)
+
 	//start
-	runner.Start()
-	systemCall()
-	log.Info("exited")
+	err = runner.Start()
+	CheckError(err)
 }
 
 func CheckError(err error) {
@@ -74,7 +94,7 @@ func CheckError(err error) {
 }
 
 type HomeGateway struct {
-	Preferences *config.Preferences
+	Preferences *configs.Preferences
 	closeChan   chan struct{}
 	Tasks       []Runner
 }
@@ -88,20 +108,17 @@ func NewGateway() (gateway *HomeGateway, err error) {
 	return gateway, err
 }
 
-func (gateway *HomeGateway) Start() {
+func (gateway *HomeGateway) Start() error {
 	log.Info("gateway start.....")
-	func() {
-		for _, task := range gateway.Tasks {
-			task := task
-			go func() {
-				err := task.Start()
-				if err != nil {
-					log.Error(err.Error())
-				}
-			}()
-
+	for _, task := range gateway.Tasks {
+		err := task.Start()
+		if err != nil {
+			log.Error(err.Error())
+			return err
 		}
-	}()
+	}
+
+	return nil
 }
 
 func (gateway *HomeGateway) Stop() {

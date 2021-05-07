@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway-addon"
 	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/plugin/internal"
 	"sync"
 )
 
@@ -45,20 +46,20 @@ func (adapter *Adapter) pairing(timeout float64) {
 	log.Info(fmt.Sprintf("adapter: %s start pairing", adapter.id))
 	data := make(map[string]interface{})
 	data["timeout"] = timeout
-	adapter.Send(AdapterStartPairingCommand, data)
+	adapter.Send(internal.AdapterStartPairingCommand, data)
 }
 
 func (adapter *Adapter) cancelPairing() {
 	log.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.id))
 	data := make(map[string]interface{})
-	adapter.Send(AdapterCancelPairingCommand, data)
+	adapter.Send(internal.AdapterCancelPairingCommand, data)
 }
 
 func (adapter *Adapter) removeThing(device addon.IDevice) {
 	log.Info(fmt.Sprintf("adapter delete thing Id: %v", device.GetID()))
 	data := make(map[string]interface{})
 	data["deviceId"] = device.GetID()
-	adapter.Send(AdapterRemoveDeviceRequest, data)
+	adapter.Send(internal.AdapterRemoveDeviceRequest, data)
 
 }
 
@@ -66,7 +67,7 @@ func (adapter *Adapter) cancelRemoveThing(deviceId string) {
 	log.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.id))
 	data := make(map[string]interface{})
 	data["deviceId"] = deviceId
-	adapter.Send(AdapterCancelRemoveDeviceCommand, data)
+	adapter.Send(internal.AdapterCancelRemoveDeviceCommand, data)
 }
 
 func (adapter *Adapter) getManager() *AddonManager {
