@@ -80,7 +80,7 @@ func (ts *Things) GetNewThings() []*Thing {
 	for _, connected := range connectedDevices {
 		for _, storedThing := range storedThings {
 			if connected.GetID() != storedThing.GetID() {
-				data, err := json.MarshalIndent(connected.AsDict(), "", "  ")
+				data, err := json.MarshalIndent(connected, "", "  ")
 				if err != nil {
 					continue
 				}

@@ -6,13 +6,15 @@ import (
 	"github.com/galenliu/gateway/plugin"
 )
 
-type HCServiceProxy struct {
+type HomeKitService interface {
+}
+
+type HomeKitServiceProxy struct {
 	Service  *service.Service
 	DeviceID string
 }
 
-func (s *HCServiceProxy) NewHCService(typ string) {
-
+func (s *HomeKitServiceProxy) NewHomeKitService(typ string) {
 	switch typ {
 	case homekit.Light:
 		sev := service.NewLightbulb()
@@ -21,9 +23,8 @@ func (s *HCServiceProxy) NewHCService(typ string) {
 		sev := service.NewSwitch()
 		sev.On.OnValueRemoteUpdate(s.OnBoolValueChanged)
 	}
-
 }
 
-func (s *HCServiceProxy) OnBoolValueChanged(value bool) {
+func (s *HomeKitServiceProxy) OnBoolValueChanged(value bool) {
 	_, _ = plugin.SetProperty(s.DeviceID, "", value)
 }

@@ -11,11 +11,11 @@ func NewUsers() *Users {
 	return users
 }
 
-func (u *Users) GetUsersCount() []*User {
+func (u *Users) GetUsersCount() int {
 	if u.users != nil {
-		return u.users
+		return 0
 	}
-	return u.getUsersCount()
+	return len(u.getUsersCount())
 }
 
 func (u *Users) GetUser(email string) *User {

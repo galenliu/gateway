@@ -5,6 +5,9 @@ import (
 	"github.com/brutella/hc"
 	"github.com/brutella/hc/accessory"
 	"github.com/brutella/hc/service"
+	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/plugin"
+	json "github.com/json-iterator/go"
 )
 
 var Bridge *BridgeProxy
@@ -46,6 +49,18 @@ func NewHomeKitBridge(name, sn, manufacturer, model, storagePath string) {
 		t.Start()
 	}
 
+}
+
+func (p *BridgeProxy) GetServices() {
+	devices := plugin.GetDevices()
+	for _, dev := range devices {
+		_, err := json.MarshalIndent(dev, "", "  ")
+		if err != nil {
+			log.Error(err.Error())
+			continue
+		}
+
+	}
 }
 
 func (p *BridgeProxy) AddService(s *service.Service) {

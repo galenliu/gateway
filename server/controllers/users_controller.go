@@ -4,6 +4,7 @@ import (
 	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
 	json "github.com/json-iterator/go"
+	"strconv"
 	"strings"
 )
 
@@ -18,14 +19,8 @@ func NewUsersController() *UserController {
 }
 
 func (u *UserController) getCount(c *fiber.Ctx) error {
-	users := u.Users.GetUsersCount()
-	if users != nil {
-		return c.Status(fiber.StatusOK).JSON(users)
-	}
-	return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-		"code": 0,
-		"msg":  "users not found",
-	})
+	count := u.Users.GetUsersCount()
+	return c.SendString(strconv.Itoa(count))
 }
 
 func (u *UserController) createUser(c *fiber.Ctx) error {

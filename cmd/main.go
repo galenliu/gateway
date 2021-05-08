@@ -38,7 +38,7 @@ func OnTermination(fn TermFunc) {
 	signal.Notify(c, os.Kill)
 	signal.Notify(c, syscall.SIGTERM)
 
-	go func() {
+	func() {
 		select {
 		case sig := <-c:
 			if fn != nil {
@@ -110,7 +110,6 @@ func NewGateway() (gateway *HomeGateway, err error) {
 
 func (gateway *HomeGateway) Start() error {
 	log.Info("gateway start .....")
-
 	for _, task := range gateway.Tasks {
 		err := task.Start()
 		if err != nil {
