@@ -10,3 +10,5 @@
 [submodule "virtual-things-adapter"]
     path = ./profile/addons/virtual-things-adapter
     url = https://github.com/galenliu/virtual-things-adapter.git
+
+

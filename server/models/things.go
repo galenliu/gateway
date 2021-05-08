@@ -107,6 +107,7 @@ func (ts *Things) CreateThing(id string, description string) (string, error) {
 	return th.GetDescription(), err
 }
 
+//Addon Manager New Device Added
 func (ts *Things) handleNewThing(data []byte) {
 	id := json.Get(data, "id").ToString()
 	t := ts.GetThing(id)

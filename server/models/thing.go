@@ -228,10 +228,6 @@ func (t *Thing) GetTitle() string {
 	return t.Title
 }
 
-func (t *Thing) SetSelectedCapability(selectedCapability string) {
-	t.SelectedCapability = selectedCapability
-}
-
 func (t *Thing) setConnected(connected bool) {
 	err := t.save()
 	if err != nil {
@@ -241,13 +237,17 @@ func (t *Thing) setConnected(connected bool) {
 	t.Connected = connected
 }
 
-func (t *Thing) IsConnected() bool {
+func (t *Thing) isConnected() bool {
 	return t.Connected
 }
 
 func (t *Thing) RemoveAction(a *Action) bool {
 	_, ok := t.Actions[a.Name]
 	return ok
+}
+
+func (t *Thing) MarshalJSON() ([]byte, error) {
+	return json.MarshalIndent(t, "", "  ")
 }
 
 func (t *Thing) GetDescription() string {

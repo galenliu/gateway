@@ -6,7 +6,8 @@ import (
 	"github.com/brutella/hc/accessory"
 	"github.com/brutella/hc/service"
 	"github.com/galenliu/gateway/pkg/log"
-	"github.com/galenliu/gateway/plugin"
+	"github.com/galenliu/gateway/pkg/util"
+	"github.com/galenliu/gateway/server/models"
 	json "github.com/json-iterator/go"
 )
 
@@ -16,12 +17,13 @@ var start func()
 
 type BridgeProxy struct {
 	bridge *accessory.Bridge
+	Things *models.Things
 }
 
 func NewHomeKitBridge(name, sn, manufacturer, model, storagePath string) {
 
 	var bridge *accessory.Bridge
-	Bridge = &BridgeProxy{bridge}
+	Bridge = &BridgeProxy{bridge, models.NewThings()}
 
 	info := accessory.Info{
 		Name:             name,
@@ -51,16 +53,26 @@ func NewHomeKitBridge(name, sn, manufacturer, model, storagePath string) {
 
 }
 
-func (p *BridgeProxy) GetServices() {
-	devices := plugin.GetDevices()
-	for _, dev := range devices {
-		_, err := json.MarshalIndent(dev, "", "  ")
-		if err != nil {
-			log.Error(err.Error())
-			continue
-		}
+func (p *BridgeProxy) GetThings() {
+	p.Things.GetThings()
+}
 
-	}
+func (p *BridgeProxy) updateServices() {
+
+}
+
+func (p *BridgeProxy) onThingAdded(data []byte) {
+	deviceId := json.Get(data, "deviceId").ToString()
+	log.Info(deviceId)
+
+}
+
+func (p *BridgeProxy) onThingsModified(data []byte) {
+
+}
+
+func (p *BridgeProxy) onPropertyChanged(data []byte) {
+
 }
 
 func (p *BridgeProxy) AddService(s *service.Service) {
@@ -68,10 +80,16 @@ func (p *BridgeProxy) AddService(s *service.Service) {
 }
 
 func (p *BridgeProxy) Start() error {
+	p.Things.Subscribe(util.ThingAdded, Bridge.onThingAdded)
+	p.Things.Subscribe(util.PropertyChanged, Bridge.onPropertyChanged)
+	p.Things.Subscribe(util.MODIFIED, Bridge.onThingsModified)
 	start()
 	return nil
 }
 
 func (p *BridgeProxy) Stop() {
+	p.Things.Unsubscribe(util.ThingAdded, Bridge.onThingAdded)
+	p.Things.Unsubscribe(util.PropertyChanged, Bridge.onPropertyChanged)
+	p.Things.Unsubscribe(util.MODIFIED, Bridge.onThingsModified)
 	stop()
 }
