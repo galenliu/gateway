@@ -15,15 +15,22 @@ var Bridge *BridgeProxy
 var stop func()
 var start func()
 
+// HService 不同的service实现此接口
+type HService interface {
+	GetService() *service.Service
+	GetID() string
+}
+
 type BridgeProxy struct {
-	bridge *accessory.Bridge
-	Things *models.Things
+	bridge          *accessory.Bridge
+	things          *models.Things
+	homekitServices map[string]HService
 }
 
 func NewHomeKitBridge(name, sn, manufacturer, model, storagePath string) {
 
 	var bridge *accessory.Bridge
-	Bridge = &BridgeProxy{bridge, models.NewThings()}
+	Bridge = &BridgeProxy{bridge, models.NewThings(), make(map[string]HService)}
 
 	info := accessory.Info{
 		Name:             name,
@@ -53,8 +60,19 @@ func NewHomeKitBridge(name, sn, manufacturer, model, storagePath string) {
 
 }
 
+// GetThings get things form things models,add service to bridge
 func (p *BridgeProxy) GetThings() {
-	p.Things.GetThings()
+	mapOfThings := p.things.GetThings()
+	for _, thing := range mapOfThings {
+		s := NewHomekitService(thing)
+		p.addService(s)
+	}
+}
+
+// bridge append service
+func (p *BridgeProxy) addService(s HService) {
+	p.homekitServices[s.GetID()] = s
+	p.bridge.AddService(s.GetService())
 }
 
 func (p *BridgeProxy) updateServices() {
@@ -75,21 +93,17 @@ func (p *BridgeProxy) onPropertyChanged(data []byte) {
 
 }
 
-func (p *BridgeProxy) AddService(s *service.Service) {
-	p.bridge.AddService(s)
-}
-
 func (p *BridgeProxy) Start() error {
-	p.Things.Subscribe(util.ThingAdded, Bridge.onThingAdded)
-	p.Things.Subscribe(util.PropertyChanged, Bridge.onPropertyChanged)
-	p.Things.Subscribe(util.MODIFIED, Bridge.onThingsModified)
+	p.things.Subscribe(util.ThingAdded, Bridge.onThingAdded)
+	p.things.Subscribe(util.PropertyChanged, Bridge.onPropertyChanged)
+	p.things.Subscribe(util.ThingModified, Bridge.onThingsModified)
 	start()
 	return nil
 }
 
 func (p *BridgeProxy) Stop() {
-	p.Things.Unsubscribe(util.ThingAdded, Bridge.onThingAdded)
-	p.Things.Unsubscribe(util.PropertyChanged, Bridge.onPropertyChanged)
-	p.Things.Unsubscribe(util.MODIFIED, Bridge.onThingsModified)
+	p.things.Unsubscribe(util.ThingAdded, Bridge.onThingAdded)
+	p.things.Unsubscribe(util.PropertyChanged, Bridge.onPropertyChanged)
+	p.things.Unsubscribe(util.ThingModified, Bridge.onThingsModified)
 	stop()
 }

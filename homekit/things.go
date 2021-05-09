@@ -11,6 +11,5 @@ func NewThings() *Things {
 }
 
 func (ts *Things) AddThing(data []byte) {
-	thing := NewThing(data)
-	ts.things[thing.id] = thing
+
 }

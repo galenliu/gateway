@@ -2,29 +2,45 @@ package homekit
 
 import (
 	"github.com/brutella/hc/service"
-	"github.com/galenliu/gateway/homekit/things"
-	json "github.com/json-iterator/go"
+	"github.com/galenliu/gateway/server/models"
 )
+
+type homekitService struct {
+	id string
+}
+
+func (s *homekitService) GetID() string {
+	return s.id
+}
+
+type LightBulb struct {
+	*homekitService
+	*service.Lightbulb
+}
+
+func (l *LightBulb) GetService() *service.Service {
+	return l.Service
+}
+
+func NewLightBulb(t *models.Thing) *LightBulb {
+	light := &LightBulb{}
+	light.Lightbulb = service.NewLightbulb()
+	return nil
+}
 
 type Thing struct {
 	id string
 	*service.Service
 }
 
-func NewThing(data []byte) *Thing {
-	var types []string
-	json.Get(data, "@type").ToVal(&types)
-	id := json.Get(data, "id").ToString()
-	if types == nil {
+func NewHomekitService(thing *models.Thing) HService {
+
+	if thing.SelectedCapability == "" {
 		return nil
 	}
-	for _, typ := range types {
-		switch typ {
-		case Light:
-			thing := things.NewLightBulb(data)
-			thing.id = id
-			return thing.Thing
-		}
+	switch thing.SelectedCapability {
+	case Light:
+		return NewLightBulb(thing)
 	}
 	return nil
 }
