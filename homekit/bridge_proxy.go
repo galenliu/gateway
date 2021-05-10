@@ -22,17 +22,17 @@ type HService interface {
 }
 
 type BridgeProxy struct {
-	bridge          *accessory.Bridge
+	*accessory.Bridge
 	things          *models.Things
 	homekitServices map[string]HService
+	info            accessory.Info
+	config          hc.Config
 }
 
-func NewHomeKitBridge(name, sn, manufacturer, model, storagePath string) {
+func NewHomeKitBridge(name, sn, manufacturer, model, storagePath, pin string) {
 
-	var bridge *accessory.Bridge
-	Bridge = &BridgeProxy{bridge, models.NewThings(), make(map[string]HService)}
-
-	info := accessory.Info{
+	b := &BridgeProxy{}
+	b.info = accessory.Info{
 		Name:             name,
 		SerialNumber:     sn,
 		Manufacturer:     manufacturer,
@@ -40,70 +40,69 @@ func NewHomeKitBridge(name, sn, manufacturer, model, storagePath string) {
 		FirmwareRevision: FirmwareRevision,
 		ID:               0,
 	}
-	config := hc.Config{
+	b.config = hc.Config{
 		StoragePath: storagePath,
-		Pin:         "1234432312",
+		Pin:         pin,
 	}
-	bridge = accessory.NewBridge(info)
-
-	t, err := hc.NewIPTransport(config, Bridge.bridge.Accessory)
-	if err != nil {
-		fmt.Printf("create homekit transport err:", err)
-		return
-	}
-	stop = func() {
-		<-t.Stop()
-	}
-	start = func() {
-		t.Start()
-	}
-
+	b.Bridge = accessory.NewBridge(b.info)
 }
 
 // GetThings get things form things models,add service to bridge
-func (p *BridgeProxy) GetThings() {
-	mapOfThings := p.things.GetThings()
+func (br *BridgeProxy) GetThings() {
+	mapOfThings := br.things.GetThings()
 	for _, thing := range mapOfThings {
 		s := NewHomekitService(thing)
-		p.addService(s)
+		br.addService(s)
 	}
 }
 
 // bridge append service
-func (p *BridgeProxy) addService(s HService) {
-	p.homekitServices[s.GetID()] = s
-	p.bridge.AddService(s.GetService())
+func (br *BridgeProxy) addService(s HService) {
+	br.homekitServices[s.GetID()] = s
+	br.Bridge.AddService(s.GetService())
 }
 
-func (p *BridgeProxy) updateServices() {
-
+func (br *BridgeProxy) updateServices() {
+	br.Services = make([]*service.Service, 1)
+	br.GetThings()
 }
 
-func (p *BridgeProxy) onThingAdded(data []byte) {
+func (br *BridgeProxy) onThingAdded(data []byte) {
 	deviceId := json.Get(data, "deviceId").ToString()
 	log.Info(deviceId)
 
 }
 
-func (p *BridgeProxy) onThingsModified(data []byte) {
+func (br *BridgeProxy) onThingsModified(data []byte) {
 
 }
 
-func (p *BridgeProxy) onPropertyChanged(data []byte) {
+func (br *BridgeProxy) onPropertyChanged(data []byte) {
 
 }
 
-func (p *BridgeProxy) Start() error {
-	p.things.Subscribe(util.ThingAdded, Bridge.onThingAdded)
-	p.things.Subscribe(util.PropertyChanged, Bridge.onPropertyChanged)
-	p.things.Subscribe(util.ThingModified, Bridge.onThingsModified)
+func (br *BridgeProxy) Start() error {
+
+	t, err := hc.NewIPTransport(br.config, br.Bridge.Accessory)
+
+	if err != nil {
+		return fmt.Errorf("create homekit transport err:", err)
+
+	}
+	stop = func() {
+		<-t.Stop()
+	}
+	t.Start()
+	br.things.Subscribe(util.ThingAdded, Bridge.onThingAdded)
+	br.things.Subscribe(util.PropertyChanged, Bridge.onPropertyChanged)
+	br.things.Subscribe(util.ThingModified, Bridge.onThingsModified)
 	start()
 	return nil
 }
 
-func (p *BridgeProxy) Stop() {
-	p.things.Unsubscribe(util.ThingAdded, Bridge.onThingAdded)
-	p.things.Unsubscribe(util.PropertyChanged, Bridge.onPropertyChanged)
-	p.things.Unsubscribe(util.ThingModified, Bridge.onThingsModified)
+func (br *BridgeProxy) Stop() {
+	br.things.Unsubscribe(util.ThingAdded, Bridge.onThingAdded)
+	br.things.Unsubscribe(util.PropertyChanged, Bridge.onPropertyChanged)
+	br.things.Unsubscribe(util.ThingModified, Bridge.onThingsModified)
 	stop()
 }
