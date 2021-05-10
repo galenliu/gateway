@@ -22,3 +22,11 @@ func NewPropertyFromString(description string) *Property {
 	}
 	return &property
 }
+
+func (p *Property) GetName() string {
+	return p.Name
+}
+
+func (p *Property) GetThingId() string {
+	return p.ThingId
+}

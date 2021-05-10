@@ -5,42 +5,60 @@ import (
 	"github.com/galenliu/gateway/server/models"
 )
 
-type homekitService struct {
-	id string
+type ServiceProxy struct {
+	*models.Thing
+	*service.Service
+	characteristics map[string]HCharacteristic
 }
 
-func (s *homekitService) GetID() string {
-	return s.id
-}
-
-type LightBulb struct {
-	*homekitService
-	*service.Lightbulb
-}
-
-func (l *LightBulb) GetService() *service.Service {
-	return l.Service
-}
-
-func NewLightBulb(t *models.Thing) *LightBulb {
-	light := &LightBulb{}
-	light.Lightbulb = service.NewLightbulb()
+func NewService(thing *models.Thing) *ServiceProxy {
+	s := &ServiceProxy{}
+	s.Thing = thing
+	s.characteristics = make(map[string]HCharacteristic)
 	return nil
 }
 
-type Thing struct {
-	id string
-	*service.Service
+func (s *ServiceProxy) GetService() *service.Service {
+	return s.Service
 }
 
-func NewHomekitService(thing *models.Thing) HService {
+func (s *ServiceProxy) GetHCharacteristic(name string) HCharacteristic {
+	c, ok := s.characteristics[name]
+	if ok {
+		return c
+	}
+	return nil
+}
 
+//func NewLightBulb(t *models.Thing) *homekitService {
+//	light := &LightBulb{}
+//	light.id = t.ID
+//	light.Lightbulb = service.NewLightbulb()
+//	return nil
+//}
+
+// NewHomekitService return ServiceProxy implement HService
+func NewHomekitService(thing *models.Thing) *ServiceProxy {
+	s := NewService(thing)
 	if thing.SelectedCapability == "" {
 		return nil
 	}
 	switch thing.SelectedCapability {
 	case Light:
-		return NewLightBulb(thing)
+		light := service.NewLightbulb()
+		s.Service = light.Service
+		for _, p := range thing.Properties {
+			char := NewCharacteristicProxy(p)
+			if char == nil {
+				continue
+			}
+			s.characteristics[char.GetName()] = char
+			light.AddCharacteristic(char.GetCharacteristic())
+			return s
+		}
+	default:
+		return nil
+
 	}
 	return nil
 }

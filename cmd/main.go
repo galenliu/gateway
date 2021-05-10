@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/galenliu/gateway/configs"
+	"github.com/galenliu/gateway/homekit"
 	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin"
@@ -79,11 +80,10 @@ func main() {
 		os.Exit(0)
 	}
 
-	OnTermination(systemCall)
-
 	//start
 	err = runner.Start()
 	CheckError(err)
+	OnTermination(systemCall)
 }
 
 func CheckError(err error) {
@@ -103,6 +103,7 @@ func NewGateway() (gateway *HomeGateway, err error) {
 	gateway = &HomeGateway{}
 	gateway.Tasks = append(gateway.Tasks, plugin.NewAddonsManager())
 	gateway.Tasks = append(gateway.Tasks, controllers.NewWebAPP())
+	gateway.Tasks = append(gateway.Tasks, homekit.NewHomeKitBridge("gateway", "WebThings", "webThings", configs.GetConfigDir(), "12344321"))
 	gateway.closeChan = make(chan struct{})
 	//update the gateway preferences
 	return gateway, err

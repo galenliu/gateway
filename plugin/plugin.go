@@ -277,11 +277,14 @@ func (plugin *Plugin) execute() {
 	stderr, _ := cmd.StderrPipe()
 	//stdOut, err := cmd.StdoutPipe()
 
-	err := cmd.Start()
-	if err != nil {
-		log.Info("plugin(%s) run err: %s", plugin.pluginId, err.Error())
-		return
-	}
+	go func() {
+		err := cmd.Start()
+		if err != nil {
+			log.Info("plugin(%s) run err: %s", plugin.pluginId, err.Error())
+			return
+		}
+	}()
+
 	log.Debug(fmt.Sprintf("plugin(%s) execute \t\n", plugin.pluginId))
 	go syncLog(stdout)
 	go syncLog(stderr)

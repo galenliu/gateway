@@ -346,7 +346,7 @@ func (manager *AddonManager) Start() error {
 	}()
 	manager.running = true
 	if err == nil {
-		Publish(util.PluginServerStarted)
+		go Publish(util.PluginServerStarted)
 	}
 	return err
 }
