@@ -5,6 +5,8 @@
 - [W3C Web of Things (WoT) Thing Description](https://w3c.github.io/wot-thing-description/)
 - [W3C Web of Things (WoT) Architecture](https://w3c.github.io/wot-architecture)
 - [WoT Capability Schemas](https://webthings.io/schemas)
+- [Web of Things (WoT) Architecture 1.1](https://w3c.github.io/wot-architecture)
+- [Web Thing API](https://webthings.io/api/)
 
 - ## Thing Description
 
@@ -61,9 +63,9 @@ UriVariables map[string]IDataSchema `json:"uriVariables,omitempty"`
 
 ```golang
 type PropertyAffordance struct {
-    *InteractionAffordance
-    *DataSchema
-    Observable bool `json:"observable"`
+*InteractionAffordance
+*DataSchema
+Observable bool `json:"observable"`
 }
 
 
@@ -93,11 +95,11 @@ type PropertyAffordance struct {
 
 ```go
 type ActionAffordance struct {
-    *InteractionAffordance
-    Input      DataSchema `json:"input,omitempty"`
-    Output     DataSchema `json:"output,omitempty"`
-    Safe       bool        `json:"safe,omitempty"`
-    Idempotent bool        `json:"idempotent,omitempty"`
+*InteractionAffordance
+Input      DataSchema `json:"input,omitempty"`
+Output     DataSchema `json:"output,omitempty"`
+Safe       bool        `json:"safe,omitempty"`
+Idempotent bool        `json:"idempotent,omitempty"`
 }
 ```
 

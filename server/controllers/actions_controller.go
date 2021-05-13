@@ -6,6 +6,7 @@ import (
 	"github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
+	json "github.com/json-iterator/go"
 	"net/http"
 )
 
@@ -19,38 +20,49 @@ func NewActionsController() *ActionsController {
 	}
 }
 
-func (controller *ActionsController) handleActions(c *fiber.Ctx) error {
+func (controller *ActionsController) handleAction(c *fiber.Ctx) error {
 
 	// POST /actions
-	var action *models.Action
 	var thingId = c.Params("thingId")
-	var actionInfo map[string]struct {
-		Input map[string]interface{} `json:"input"`
+
+	action := models.NewAction(c.Body(), thingId)
+	if thingId != "" {
+		t := models.NewThings().GetThing(thingId)
+		if t != nil {
+			err := plugin.RequestAction(thingId, action.ID, action.Name, action.Input)
+			if err != nil {
+				return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+			}
+
+		} else {
+			return c.Status(fiber.StatusBadRequest).SendString("thing id invalid")
+		}
 	}
-	err := c.BodyParser(&actionInfo)
+	err := controller.Actions.Add(action)
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "Bad Request: "+string(c.Body()))
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
-	var actionName string
-	var input map[string]interface{}
-	for k, v := range actionInfo {
-		actionName = k
-		input = v.Input
+
+	data, err := json.MarshalIndent(action, "", " ")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
+	return c.Status(fiber.StatusCreated).Send(data)
+}
+
+func (controller *ActionsController) handleGetActions(c *fiber.Ctx) error {
+
+	// POST /actions
+	var thingId = c.Params("thingId", "")
+	var actionName = c.Params("actionName", "")
 
 	if thingId != "" {
-		action = models.NewThingAction(thingId, actionName, input)
+		actions := controller.Actions.GetAction(thingId, actionName)
+		return c.Status(fiber.StatusOK).JSON(actions)
 	} else {
-		action = models.NewAction(actionName, input, nil)
+		actions := controller.Actions.GetGatewayActions(actionName)
+		return c.Status(fiber.StatusOK).JSON(actions)
 	}
-	controller.Actions.Add(action)
-
-	var actionDesc string
-	actionDesc = action.GetDescription()
-	if actionDesc == "" {
-		return fiber.NewError(http.StatusBadGateway, "action MarshalJson err")
-	}
-	return c.SendString(actionDesc)
 }
 
 func (controller *ActionsController) handleDeleteAction(c *fiber.Ctx) error {

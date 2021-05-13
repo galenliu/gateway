@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/galenliu/gateway-addon"
+	"github.com/galenliu/gateway-addon/wot"
 	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
@@ -46,6 +47,8 @@ type AddonManager struct {
 	locker    *sync.Mutex
 	running   bool
 	verbose   bool
+
+	actions map[string]*wot.ActionAffordance
 }
 
 func (manager *AddonManager) handleDeviceAdded(device *addon.Device) {
@@ -102,7 +105,6 @@ func (manager *AddonManager) handleSetProperty(deviceId, propName string, setVal
 	}
 
 	var newValue = property.ToValue(setValue)
-
 	data := make(map[string]interface{})
 	data[addon.Did] = device.GetID()
 	data["propertyName"] = property.GetName()

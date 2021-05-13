@@ -112,11 +112,15 @@ func NewGateway() (gateway *HomeGateway, err error) {
 func (gateway *HomeGateway) Start() error {
 	log.Info("gateway start .....")
 	for _, task := range gateway.Tasks {
-		err := task.Start()
-		if err != nil {
-			log.Error(err.Error())
-			return err
-		}
+		task := task
+		go func() {
+			err := task.Start()
+			if err != nil {
+
+				log.Error(err.Error())
+			}
+		}()
+
 	}
 
 	return nil

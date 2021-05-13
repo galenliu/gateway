@@ -1,4 +1,4 @@
-package models
+package model
 
 //func toThing(device *addon.Device) *thing.Thing {
 //	thing := &thing.Thing{

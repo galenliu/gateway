@@ -6,6 +6,7 @@ import (
 	"github.com/galenliu/gateway/pkg/util"
 	AddonManager "github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/models"
+	"github.com/galenliu/gateway/server/models/model"
 	"github.com/gofiber/websocket/v2"
 	json "github.com/json-iterator/go"
 	"net/http"
@@ -55,7 +56,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 		}
 	}
 
-	onEvent := func(event *models.Event) {
+	onEvent := func(event *model.Event) {
 		if thingId != "" && event.ThingId != thingId {
 			return
 		}
@@ -81,8 +82,9 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 		if action.ThingId != "" {
 			m["id"] = action.ThingId
 		}
+
 		m["data"] = map[string]interface{}{
-			action.Name: action.GetDescription(),
+			action.Name: action,
 		}
 		sendMessage(m)
 	}
@@ -271,12 +273,13 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 			var actionNames map[string]interface{}
 			json.Get(bytes, "data").ToVal(&actionNames)
 			for actionName := range actionNames {
-				var actionParams map[string]interface{}
-				json.Get(bytes, "data", actionName, "input").ToVal(&actionParams)
-				th := Things.GetThing(id)
-				action := models.NewAction(actionName, actionParams, th)
-				Things.Actions.Add(action)
-				err := AddonManager.RequestAction(id, action.ID, actionName, actionParams)
+				data := json.Get(bytes, "data").ToString()
+				action := models.NewAction([]byte(data), id)
+				err := Things.Actions.Add(action)
+				if err != nil {
+					return
+				}
+				err = AddonManager.RequestAction(id, action.ID, actionName, actionNames)
 				if err != nil {
 					sendError(400, "400 Bad Request", err.Error())
 				}

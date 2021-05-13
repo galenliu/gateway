@@ -8,6 +8,7 @@ import (
 	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
+	"github.com/galenliu/gateway/server/models/model"
 	json "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
 	"strings"
@@ -23,9 +24,9 @@ type Thing struct {
 	Description  string   `json:"description,omitempty"`
 	Descriptions []string `json:"descriptions,omitempty"`
 
-	Properties map[string]*Property `json:"properties,omitempty"`
-	Actions    map[string]*Action   `json:"actions,omitempty"`
-	Events     map[string]*Event    `json:"events,omitempty"`
+	Properties map[string]*model.Property `json:"properties,omitempty"`
+	Actions    map[string]*model.Action   `json:"_actions,omitempty"`
+	Events     map[string]*model.Event    `json:"events,omitempty"`
 
 	Forms   []wot.Form  `json:"forms,omitempty"`
 	Links   []wot.Link  `json:"links,omitempty"`
@@ -117,9 +118,9 @@ func NewThingFromString(description string) (thing *Thing) {
 	if gjson.Get(description, "properties").Exists() {
 		var props = gjson.Get(description, "properties").Map()
 		if len(props) > 0 {
-			t.Properties = make(map[string]*Property)
+			t.Properties = make(map[string]*model.Property)
 			for name, data := range props {
-				prop := NewPropertyFromString(data.String())
+				prop := model.NewPropertyFromString(data.String())
 				if prop != nil {
 					if prop.Forms == nil {
 						prop.Forms = append(prop.Forms, wot.Form{
@@ -135,19 +136,19 @@ func NewThingFromString(description string) (thing *Thing) {
 		t.Forms = append(t.Forms, wot.Form{Op: []string{wot.ReadallProperties, wot.WriteAllProperties}, Href: thingId + util.PropertiesPath, ContentType: wot.ApplicationJson})
 	}
 
-	if gjson.Get(description, "actions").Exists() {
-		var actions = gjson.Get(description, "actions").Map()
+	if gjson.Get(description, "_actions").Exists() {
+		var actions = gjson.Get(description, "_actions").Map()
 		if len(actions) > 0 {
-			t.Actions = make(map[string]*Action)
+			t.Actions = make(map[string]*model.Action)
 			for name, a := range actions {
-				var action Action
+				var action model.Action
 				err := json.UnmarshalFromString(a.String(), &action)
 				if err != nil {
 					continue
 				}
 				action.ID = a.Get("id").String()
 				if action.Forms == nil {
-					action.Forms = append(action.Forms, wot.Form{Href: fmt.Sprintf("%s/actions/%s", t.ID, name)})
+					action.Forms = append(action.Forms, wot.Form{Href: fmt.Sprintf("%s/_actions/%s", t.ID, name)})
 				}
 				if action.Name == "" {
 					action.Name = name
@@ -155,16 +156,16 @@ func NewThingFromString(description string) (thing *Thing) {
 				t.Actions[name] = &action
 			}
 
-			t.Forms = append(t.Forms, wot.Form{Rel: "actions", Href: thingId + util.ActionsPath})
+			t.Forms = append(t.Forms, wot.Form{Rel: "_actions", Href: thingId + util.ActionsPath})
 		}
 	}
 
 	if gjson.Get(description, "events").Exists() {
 		var events = gjson.Get(description, "events").Map()
 		if len(events) > 0 {
-			t.Events = make(map[string]*Event)
+			t.Events = make(map[string]*model.Event)
 			for name, e := range events {
-				var event Event
+				var event model.Event
 				err := json.UnmarshalFromString(e.String(), &event)
 				if err != nil {
 					continue
@@ -178,7 +179,7 @@ func NewThingFromString(description string) (thing *Thing) {
 				}
 				t.Events[name] = &event
 			}
-			t.Forms = append(t.Forms, wot.Form{Rel: "actions", Href: t.ID + util.EventsPath})
+			t.Forms = append(t.Forms, wot.Form{Rel: "_actions", Href: t.ID + util.EventsPath})
 		}
 	}
 
@@ -241,13 +242,17 @@ func (t *Thing) isConnected() bool {
 	return t.Connected
 }
 
-func (t *Thing) RemoveAction(a *Action) bool {
+func (t *Thing) AddAction(a *Action) bool {
 	_, ok := t.Actions[a.Name]
 	return ok
 }
 
-func (t *Thing) MarshalJSON() ([]byte, error) {
-	return json.MarshalIndent(t, "", "  ")
+func (t *Thing) RemoveAction(a *Action) error {
+	_, ok := t.Actions[a.Name]
+	if !ok {
+		return fmt.Errorf("invalid action name :%s", a.Name)
+	}
+	return nil
 }
 
 func (t *Thing) GetDescription() string {

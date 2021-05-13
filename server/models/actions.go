@@ -3,105 +3,144 @@ package models
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/bus"
-	"github.com/galenliu/gateway/plugin"
+	AddonManager "github.com/galenliu/gateway/plugin"
+	"github.com/xiam/to"
 	"sync"
 )
 
 const (
-	ActionPair    = "pair"
-	ActionUnpair  = "unpair"
-	ActionPending = "pending"
+	ActionPair   = "pair"
+	ActionUnpair = "unpair"
+
+	ActionCompleted = "completed"
+	ActionPending   = "pending"
+	ActionCreated   = "created"
+	ActionError     = "error"
+	ActionDeleted   = "deleted"
 )
 
 var one sync.Once
-var instanceActions *Actions
+var _actions *Actions
 
 type Actions struct {
-	things *Things
-	List   map[string]*Action
+	things  *Things
+	actions map[string]*Action
 }
 
 func NewActions() *Actions {
 	one.Do(
 		func() {
-			instanceActions = &Actions{}
-			instanceActions.List = make(map[string]*Action)
+			_actions = &Actions{}
+			_actions.actions = make(map[string]*Action)
+			_actions.things = NewThings()
 		},
 	)
-	return instanceActions
+	return _actions
 
 }
 
-func (actions *Actions) Add(action *Action) {
+func (as *Actions) Add(action *Action) error {
 
-	actions.List[action.ID] = action
+	as.actions[action.ID] = action
 	if action.ThingId != "" {
-		t := actions.things.GetThing(action.ThingId)
+		t := as.things.GetThing(action.ThingId)
 		if t == nil {
-			action.Error = "can not find thing"
-			return
+			return fmt.Errorf("invalid thing id: %s", action.ThingId)
+		}
+		ok := t.AddAction(action)
+		if !ok {
+			return fmt.Errorf("invalid action name: %s", action.Name)
 		}
 	}
+	action.UpdateStatus(ActionPending)
 
 	switch action.Name {
 	case ActionPair:
-		timeout, ok := action.Input["timeout"].(float64)
-		if !ok {
-			return
-		}
-		err := plugin.AddNewThing(timeout)
+		timeout := to.Float64(action.Input["timeout"])
+		err := AddonManager.AddNewThing(timeout)
 		if err != nil {
-			action.Error = err.Error()
+			action.SetError(err.Error())
+			action.UpdateStatus(ActionError)
+			return err
 		}
 		break
 	case ActionUnpair:
 		//id := json.Get(data, "id").ToInt()
 		break
 	default:
-		delete(actions.List, action.ID)
+		delete(as.actions, action.ID)
+		return fmt.Errorf("invalid action name: %s", action.Name)
 	}
-
-}
-
-func (actions *Actions) Remove(actionId string) error {
-	action, ok := actions.List[actionId]
-	if !ok {
-		return fmt.Errorf("Invaild actions id: %v ", actionId)
-	}
-	if action.Status == "pending" {
-		if action.ThingId != "" {
-			if t := actions.things.GetThing(action.ThingId); t != nil {
-				if !t.RemoveAction(action) {
-					return fmt.Errorf(fmt.Sprintf("Invaild action name : %s", action.Name))
-				}
-			}
-		}
-
-	} else {
-		switch action.Name {
-		case ActionPair:
-			plugin.CancelAddNewThing()
-			break
-		case ActionUnpair:
-			plugin.CancelRemoveThing(action.Input["id"].(string))
-			break
-		default:
-			return fmt.Errorf("Invaild action name:" + action.Name)
-		}
-	}
-	action.UpdateStatus("deleted")
-	delete(actions.List, actionId)
 	return nil
 }
 
-func (actions *Actions) Subscribe(typ string, f interface{}) {
+func (as *Actions) Remove(id string) error {
+	a, ok := as.actions[id]
+	if !ok {
+		return fmt.Errorf("invalid action id: %s", id)
+	}
+	if a.ThingId != "" {
+		t := as.things.GetThing(a.ThingId)
+		if t == nil {
+			return fmt.Errorf("invalid thing id : %s", a.ThingId)
+		}
+		err := t.RemoveAction(a)
+		if err != nil {
+			return err
+		}
+	} else {
+		switch a.Name {
+		case ActionPair:
+			AddonManager.CancelAddNewThing()
+			break
+		case ActionUnpair:
+			AddonManager.CancelRemoveThing(to.String(a.Input["id"]))
+			break
+		default:
+			return fmt.Errorf("invalid action name: %s", a.Name)
+		}
+	}
+	a.UpdateStatus(ActionDeleted)
+	delete(as.actions, a.ID)
+	return nil
+}
+
+func (as *Actions) GetAction(thingId string, name string) (actions []*Action) {
+	for _, a := range as.actions {
+		if a.ThingId == thingId {
+			if name == "" {
+				actions = append(actions, a)
+			} else {
+				if a.Name == name {
+					actions = append(actions, a)
+				}
+			}
+		}
+	}
+	return
+}
+
+func (as *Actions) GetGatewayActions(actionName string) (actions []*Action) {
+	for _, a := range as.actions {
+		if a.Name == actionName {
+			actions = append(actions, a)
+		}
+	}
+	return
+}
+
+func (as *Actions) onActionStatus(id string) {
+
+}
+
+func (as *Actions) Subscribe(typ string, f interface{}) {
 	_ = bus.Subscribe("Actions."+typ, f)
 }
 
-func (actions *Actions) Unsubscribe(typ string, f interface{}) {
+func (as *Actions) Unsubscribe(typ string, f interface{}) {
 	_ = bus.Unsubscribe("Actions."+typ, f)
 }
 
-func (actions *Actions) Publish(typ string, args ...interface{}) {
+func (as *Actions) Publish(typ string, args ...interface{}) {
 	bus.Publish("Actions."+typ, args...)
 }

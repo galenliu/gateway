@@ -12,7 +12,7 @@ import (
 	json "github.com/json-iterator/go"
 )
 
-var Bridge *BridgeProxy
+var _bridge *BridgeProxy
 var stop func()
 
 // HService 不同的service实现此接口
@@ -32,20 +32,27 @@ type BridgeProxy struct {
 
 func NewHomeKitBridge(name, manufacturer, model, storagePath, pin string) *BridgeProxy {
 
-	b := &BridgeProxy{}
-	b.info = accessory.Info{
+	_bridge = &BridgeProxy{}
+	_bridge.info = accessory.Info{
 		Name:             name,
 		Manufacturer:     manufacturer,
 		Model:            model,
 		FirmwareRevision: FirmwareRevision,
 	}
-	b.config = hc.Config{
+	_bridge.config = hc.Config{
 		Port:        "22345",
 		StoragePath: storagePath,
 		Pin:         pin,
 	}
-	b.Bridge = accessory.NewBridge(b.info)
-	return b
+	_bridge.Bridge = accessory.NewBridge(_bridge.info)
+
+	light := service.NewLightbulb()
+	light.On.OnValueRemoteUpdate(func(b bool) {
+		log.Info("home kit light: %b", b)
+	})
+	_bridge.AddService(light.Service)
+
+	return _bridge
 }
 
 // GetThings get things form things models,add service to bridge
@@ -63,7 +70,7 @@ func (br *BridgeProxy) GetThings() {
 // bridge append service
 func (br *BridgeProxy) addService(s HService) {
 	br.services[s.GetID()] = s
-	br.Bridge.AddService(s.GetService())
+	br.AddService(s.GetService())
 }
 
 func (br *BridgeProxy) updateServices() {
@@ -71,14 +78,13 @@ func (br *BridgeProxy) updateServices() {
 	br.GetThings()
 }
 
-func (br *BridgeProxy) onThingAdded(data []byte) {
-	deviceId := json.Get(data, "deviceId").ToString()
-	log.Info(deviceId)
-
+func (br *BridgeProxy) onThingAdded(thing *models.Thing) {
+	br.GetThings()
+	log.Info("added thing %v", thing)
 }
 
 func (br *BridgeProxy) onThingsModified(data []byte) {
-
+	log.Error(string(data))
 }
 
 func (br *BridgeProxy) onPropertyChanged(data []byte) {
@@ -96,12 +102,12 @@ func (br *BridgeProxy) onPropertyChanged(data []byte) {
 	if c == nil {
 		return
 	}
-	c.OnPropertChanged(value)
+	c.OnPropertyChanged(value)
 }
 
 func (br *BridgeProxy) Start() error {
 
-	t, err := hc.NewIPTransport(br.config, br.Accessory)
+	t, err := hc.NewIPTransport(br.config, br.Bridge.Accessory)
 	if err != nil {
 		return fmt.Errorf("create homekit transport err:%s", err.Error())
 
@@ -111,15 +117,15 @@ func (br *BridgeProxy) Start() error {
 	}
 	log.Info("homekit bridge start")
 	go t.Start()
-	br.things.Subscribe(util.ThingAdded, Bridge.onThingAdded)
-	plugin.Subscribe(util.PropertyChanged, Bridge.onPropertyChanged)
-	br.things.Subscribe(util.ThingModified, Bridge.onThingsModified)
+	br.things.Subscribe(util.ThingAdded, _bridge.onThingAdded)
+	plugin.Subscribe(util.PropertyChanged, _bridge.onPropertyChanged)
+	br.things.Subscribe(util.ThingModified, _bridge.onThingsModified)
 	return nil
 }
 
 func (br *BridgeProxy) Stop() {
-	br.things.Unsubscribe(util.ThingAdded, Bridge.onThingAdded)
-	plugin.Unsubscribe(util.PropertyChanged, Bridge.onPropertyChanged)
-	br.things.Unsubscribe(util.ThingModified, Bridge.onThingsModified)
+	br.things.Unsubscribe(util.ThingAdded, _bridge.onThingAdded)
+	plugin.Unsubscribe(util.PropertyChanged, _bridge.onPropertyChanged)
+	br.things.Unsubscribe(util.ThingModified, _bridge.onThingsModified)
 	stop()
 }

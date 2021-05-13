@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/galenliu/gateway-addon"
+	"github.com/galenliu/gateway-addon/wot"
 	"github.com/galenliu/gateway/configs"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/database"
@@ -35,12 +36,23 @@ func NewAddonsManager() *AddonManager {
 	am.adapters = make(map[string]*Adapter, 20)
 	am.extensions = make(map[string]Extension)
 
+	//def addon action
+	action := wot.NewActionAffordance()
+	obj := wot.NewObjectSchema()
+	timeout := wot.NewIntegerSchema()
+	timeout.Minimum = 1000
+	timeout.Maximum = 10000
+	obj.Properties["timeout"] = timeout
+	action.Input = obj
+	am.actions = make(map[string]*wot.ActionAffordance)
+	am.actions["pair"] = action
+
 	am.locker = new(sync.Mutex)
 	am.loadAddons()
 	return am
 }
 
-//获取已安装的add-on
+// GetInstallAddons 获取已安装的add-on
 func GetInstallAddons() ([]byte, error) {
 	instance.locker.Lock()
 	defer instance.locker.Unlock()
@@ -228,7 +240,7 @@ func RemoveAction(thingId, actionId, actionName string) error {
 	return nil
 }
 
-func RequestAction(thingId, actionId, actionName string, actionParams interface{}) error {
+func RequestAction(thingId, actionId, actionName string, actionParams map[string]interface{}) error {
 	//TODO
 	return nil
 }

@@ -70,11 +70,16 @@ func CollectRoute(conf Config) *fiber.App {
 	//app.Get("/", controllers.RootHandle())
 	app.Static("/index.htm", "")
 
+	actionsController := NewActionsController()
+	thingsController := NewThingsControllerFunc()
+	usersController := NewUsersController()
+	addonController := NewAddonController()
+
+	Tid := "/:thingId"
+
 	//Things Controller
 	{
 		thingsGroup := app.Group(util.ThingsPath)
-
-		thingsController := NewThingsControllerFunc()
 		//set a properties of a thing.
 		thingsGroup.Put("/:thingId/properties/*", thingsController.handleSetProperty)
 		thingsGroup.Get("/:thingId/properties/*", thingsController.handleGetProperty)
@@ -89,7 +94,10 @@ func CollectRoute(conf Config) *fiber.App {
 		thingsGroup.Get("/", websocket.New(handleWebsocket))
 
 		//Get the properties of a thing
-		thingsGroup.Get("/:thingId/properties", thingsController.handleGetProperties)
+		thingsGroup.Get(Tid+util.PropertiesPath, thingsController.handleGetProperties)
+
+		thingsGroup.Get(Tid+util.ActionsPath, actionsController.handleGetActions)
+		thingsGroup.Post(Tid+util.ActionsPath, actionsController.handleAction)
 
 		// Modify a ThingInfo.
 		thingsGroup.Put("/:thingId", thingsController.handleSetThing)
@@ -119,7 +127,6 @@ func CollectRoute(conf Config) *fiber.App {
 
 	{
 		usersGroup := app.Group(util.UsersPath)
-		usersController := NewUsersController()
 
 		usersGroup.Get("/count", usersController.getCount)
 		usersGroup.Post("/", usersController.createUser)
@@ -127,7 +134,6 @@ func CollectRoute(conf Config) *fiber.App {
 
 	{ //Addons Controller
 		addonGroup := app.Group(util.AddonsPath)
-		addonController := NewAddonController()
 		addonGroup.Get("/", addonController.handlerGetAddons)
 		addonGroup.Post("/", addonController.handlerInstallAddon)
 		addonGroup.Put("/:addonId", addonController.handlerSetAddon)
@@ -144,8 +150,9 @@ func CollectRoute(conf Config) *fiber.App {
 
 	{ //actions Controller
 		actionsGroup := app.Group(util.ActionsPath)
-		actionsController := NewActionsController()
-		actionsGroup.Post("/", actionsController.handleActions)
+
+		actionsGroup.Post("/", actionsController.handleAction)
+		actionsGroup.Get("/", actionsController.handleGetActions)
 		actionsGroup.Delete("/:actionName/:actionId", actionsController.handleDeleteAction)
 	}
 

@@ -94,7 +94,6 @@ func (ts *Things) GetNewThings() []*Thing {
 func (ts *Things) CreateThing(id string, description string) (string, error) {
 
 	th := NewThingFromString(description)
-	th.ID = id
 	if &th == nil {
 		return "", fmt.Errorf("thing description invaild")
 	}
