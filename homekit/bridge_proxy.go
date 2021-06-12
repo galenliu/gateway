@@ -17,9 +17,7 @@ var stop func()
 
 // HService 不同的service实现此接口
 type HService interface {
-	GetService() *service.Service
-	GetHCharacteristic(name string) HCharacteristic
-	GetID() string
+
 }
 
 type BridgeProxy struct {
@@ -33,6 +31,7 @@ type BridgeProxy struct {
 func NewHomeKitBridge(name, manufacturer, model, storagePath, pin string) *BridgeProxy {
 
 	_bridge = &BridgeProxy{}
+	_bridge.things = models.NewThings()
 	_bridge.info = accessory.Info{
 		Name:             name,
 		Manufacturer:     manufacturer,
@@ -45,6 +44,7 @@ func NewHomeKitBridge(name, manufacturer, model, storagePath, pin string) *Bridg
 		Pin:         pin,
 	}
 	_bridge.Bridge = accessory.NewBridge(_bridge.info)
+	_bridge.services = make(map[string]HService)
 
 	light := service.NewLightbulb()
 	light.On.OnValueRemoteUpdate(func(b bool) {
@@ -59,7 +59,7 @@ func NewHomeKitBridge(name, manufacturer, model, storagePath, pin string) *Bridg
 func (br *BridgeProxy) GetThings() {
 	mapOfThings := br.things.GetThings()
 	for _, thing := range mapOfThings {
-		s := NewHomekitService(thing)
+		s := NewThingProxy(thing)
 		if s == nil {
 			continue
 		}
@@ -68,7 +68,7 @@ func (br *BridgeProxy) GetThings() {
 }
 
 // bridge append service
-func (br *BridgeProxy) addService(s HService) {
+func (br *BridgeProxy) addService(s ThingProxy) {
 	br.services[s.GetID()] = s
 	br.AddService(s.GetService())
 }
@@ -117,6 +117,7 @@ func (br *BridgeProxy) Start() error {
 	}
 	log.Info("homekit bridge start")
 	go t.Start()
+	br.GetThings()
 	br.things.Subscribe(util.ThingAdded, _bridge.onThingAdded)
 	plugin.Subscribe(util.PropertyChanged, _bridge.onPropertyChanged)
 	br.things.Subscribe(util.ThingModified, _bridge.onThingsModified)

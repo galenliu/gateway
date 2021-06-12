@@ -2,66 +2,77 @@ package homekit
 
 import (
 	"github.com/brutella/hc/characteristic"
+	addon "github.com/galenliu/gateway-addon"
 	"github.com/galenliu/gateway-addon/properties"
-	"github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/models/model"
-
-	"github.com/xiam/to"
-	"log"
+	"net"
 )
 
-type HCharacteristic interface {
+type PropertyProxy interface {
 	GetName() string
 	SetValue(value interface{})
 	GetCharacteristic() *characteristic.Characteristic
-	SetChangedFunc(func(interface{}))
-	OnPropertyChanged(value interface{})
 }
 
-// CharacteristicProxy 需要实现characteristic的SetValue和OnValueRemoteUpdate二个业务。
-type CharacteristicProxy struct {
+type CharacteristicProxy interface {
+	onChanged(value interface{})
+	setValue(value interface{})
+}
+
+// property 需要实现characteristic的SetValue和OnValueRemoteUpdate二个业务。
+type property struct {
 	*characteristic.Characteristic
 	*model.Property
 	onChangedFunc func(interface{})
+	setValue      func(value interface{})
 }
 
-func (c *CharacteristicProxy) GetCharacteristic() *characteristic.Characteristic {
-	return c.Characteristic
-}
 
-func NewCharacteristicProxy(property *model.Property) HCharacteristic {
-	hc := &CharacteristicProxy{}
-	switch property.AtType {
-	case properties.TypeOnOffProperty:
-		c := characteristic.NewOn()
-		hc.Characteristic = c.Characteristic
-		c.OnValueRemoteUpdate(func(b bool) {
-			hc.SetValue(b)
-		})
-		hc.SetChangedFunc(func(i interface{}) {
-			b := to.Bool(i)
-			c.SetValue(b)
-		})
-		return hc
+
+func NewPropertyProxy(typ string, p *model.Property,onUpdateValue func(interface{}), onChanged func(interface{})) PropertyProxy {
+	proxy := &property{}
+	proxy.Property = p
+
+	switch p.AtType {
+	case addon.OnOffSwitch:
+		switch typ {
+		case addon.Light, addon.OnOffSwitch:
+			c := characteristic.NewOn()
+			proxy.Characteristic = c.Characteristic
+		}
+	case properties.TypeColorProperty:
+		c := characteristic.NewHue()
+		proxy.Characteristic = c.Characteristic
+
+	case properties.TypeBrightnessProperty:
+		c := characteristic.NewBrightness()
+		proxy.Characteristic = c.Characteristic
+
 	default:
 		return nil
 	}
-}
 
-func (c *CharacteristicProxy) SetChangedFunc(f func(interface{})) {
-	c.onChangedFunc = f
-}
-
-func (c *CharacteristicProxy) OnPropertyChanged(value interface{}) {
-	if c.onChangedFunc != nil {
-		c.onChangedFunc(value)
+	if proxy.Characteristic == nil {
+		return nil
 	}
-}
-
-func (c *CharacteristicProxy) SetValue(value interface{}) {
-	_, err := plugin.SetProperty(c.GetThingId(), c.GetName(), value)
-	if err != nil {
-		log.Println(err.Error())
+	if onChanged != nil && proxy.GetCharacteristic() != nil{
+		proxy.GetCharacteristic().OnValueUpdateFromConn(func(conn net.Conn, c *characteristic.Characteristic, newValue, oldValue interface{}) {
+			onChanged(newValue)
+		})
 	}
 
+	if onUpdateValue != nil{
+		proxy.setValue = onUpdateValue
+	}
+	return proxy
+}
+
+func (p *property) GetCharacteristic() *characteristic.Characteristic {
+	return p.Characteristic
+}
+
+func (p *property) SetValue(value interface{}) {
+	if p.setValue != nil {
+		p.setValue(value)
+	}
 }

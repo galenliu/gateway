@@ -12,11 +12,10 @@ require (
 	github.com/gin-gonic/gin v1.7.1
 	github.com/go-oauth2/oauth2/v4 v4.3.0
 	github.com/go-openapi/swag v0.19.15 // indirect
-	github.com/gofiber/fiber/v2 v2.9.0
+	github.com/gofiber/fiber/v2 v2.12.0
 	github.com/gofiber/websocket/v2 v2.0.3
 	github.com/gorilla/websocket v1.4.2
 	github.com/json-iterator/go v1.1.10
-	github.com/klauspost/compress v1.12.1 // indirect
 	github.com/mattn/go-sqlite3 v1.14.5
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
@@ -27,9 +26,7 @@ require (
 	github.com/tidwall/gjson v1.7.4
 	github.com/xiam/to v0.0.0-20200126224905-d60d31e03561
 	go.uber.org/zap v1.16.0
-	golang.org/x/crypto v0.0.0-20210506145944-38f3c27a63bf
-	golang.org/x/net v0.0.0-20210501142056-aec3718b3fa0 // indirect
-	golang.org/x/sys v0.0.0-20210426230700-d19ff857e887 // indirect
+	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 )

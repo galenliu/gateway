@@ -207,6 +207,10 @@ func (t *Thing) setSelectedCapability(s string) {
 
 }
 
+func (t *Thing) GetSelectedCapability() string {
+	return t.SelectedCapability
+}
+
 func (t *Thing) GetID() string {
 	sl := strings.Split(t.ID, "/")
 	id := sl[len(sl)-1]
