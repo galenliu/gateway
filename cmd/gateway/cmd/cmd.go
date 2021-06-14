@@ -22,6 +22,7 @@ const (
 	optionNameDataDir   = "data-dir"
 	optionNameAddonsDir = "addons-dir"
 	optionNameVerbosity = "verbosity"
+	optionNameDBRemoveBeforeOpen ="db-remove-before-open"
 
 	optionNameCacheCapacity            = "cache-capacity"
 	optionNameDBOpenFilesLimit         = "db-open-files-limit"
@@ -115,12 +116,10 @@ func newCommand(opts ...option) (c *command, err error) {
 		return nil, err
 	}
 
-	if err := c.initDeployCmd(); err != nil {
-		return nil, err
-	}
+
 
 	c.initVersionCmd()
-	c.initDBCmd()
+
 
 	if err := c.initConfigurateOptionsCmd(); err != nil {
 		return nil, err
@@ -200,8 +199,11 @@ func (c *command) setAllFlags(cmd *cobra.Command) {
 		}
 		return filepath.Join(filepath.Join(c.homeDir, ".gateway"), "addons")
 	}(), "add-ons directory")
-
+	cmd.Flags().Bool(optionNameDBRemoveBeforeOpen,false,"remove db before open")
 	cmd.Flags().String(optionNameVerbosity, "info", "log verbosity level 0=silent, 1=error, 2=warn, 3=info, 4=debug, 5=trace")
+
+
+
 
 	//cmd.Flags().Uint64(optionNameCacheCapacity, 1000000, fmt.Sprintf("cache capacity in chunks, multiply by %d to get approximate capacity in bytes", swarm.ChunkSize))
 	cmd.Flags().Uint64(optionNameDBOpenFilesLimit, 200, "number of open files allowed by database")

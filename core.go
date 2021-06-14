@@ -6,13 +6,14 @@ import (
 )
 
 type Options struct {
-	DataDir string
+	DataDir            string
+	DBRemoveBeforeOpen bool
 }
 
 type Gateway struct {
 }
 
-func NewGateway(logger logging.Logger,o Options) (*Gateway, error) {
+func NewGateway(logger logging.Logger, o Options) (*Gateway, error) {
 	g := &Gateway{}
 
 	return g, nil

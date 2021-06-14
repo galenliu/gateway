@@ -25,7 +25,7 @@ func (c *command) initStartCmd() (err error) {
 
 	cmd := &cobra.Command{
 		Use:   "start",
-		Short: "Start a WebThings gateway",
+		Short: "Start WebThings gateway",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			if len(args) > 0 {
 				return cmd.Help()
@@ -54,6 +54,7 @@ func (c *command) initStartCmd() (err error) {
 
 			g, err := gateway.NewGateway(logger, gateway.Options{
 				DataDir: c.config.GetString(optionNameDataDir),
+				DBRemoveBeforeOpen: c.config.GetBool(optionNameDBRemoveBeforeOpen),
 			})
 			if err != nil {
 				return err
