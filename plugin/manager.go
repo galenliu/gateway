@@ -57,7 +57,7 @@ func (manager *AddonManager) handleDeviceAdded(device *addon.Device) {
 	d := device.AsDict()
 	data, err := json.MarshalIndent(d, "", "  ")
 	if err != nil {
-		log.Info("device marshal err")
+		logging.Info("device marshal err")
 	}
 	Publish(util.ThingAdded, data)
 }
@@ -78,7 +78,7 @@ func (manager *AddonManager) addAdapter(adapter *Adapter) {
 	manager.locker.Lock()
 	defer manager.locker.Unlock()
 	manager.adapters[adapter.id] = adapter
-	log.Debug(fmt.Sprintf("adapter：(%s) added", adapter.id))
+	logging.Debug(fmt.Sprintf("adapter：(%s) added", adapter.id))
 }
 
 func (manager *AddonManager) getAdapter(adapterId string) *Adapter {
@@ -126,7 +126,7 @@ func (manager *AddonManager) installAddonFromUrl(id, url, checksum string, enabl
 
 	destPath := path.Join(os.TempDir(), id+".tar.gz")
 
-	log.Info("fetching add-on %s as %s", url, destPath)
+	logging.Info("fetching add-on %s as %s", url, destPath)
 	resp, err := http.Get(url)
 	if err != nil {
 		return fmt.Errorf(fmt.Sprintf("Download addon err,pakage id:%s err:%s", id, err.Error()))
@@ -135,7 +135,7 @@ func (manager *AddonManager) installAddonFromUrl(id, url, checksum string, enabl
 		_ = resp.Body.Close()
 		err := os.Remove(destPath)
 		if err != nil {
-			log.Info("remove temp file failed ,err:%s", err.Error())
+			logging.Info("remove temp file failed ,err:%s", err.Error())
 		}
 	}()
 	data, _ := ioutil.ReadAll(resp.Body)
@@ -156,7 +156,7 @@ func (manager *AddonManager) installAddon(packageId, packagePath string, enabled
 	if !manager.addonsLoaded {
 		return fmt.Errorf(`Cannot install add-on before other add-ons have been loaded.`)
 	}
-	log.Info("execute install package id: %s ", packageId)
+	logging.Info("execute install package id: %s ", packageId)
 	f, err := os.Open(packagePath)
 	if err != nil {
 		return err
@@ -164,7 +164,7 @@ func (manager *AddonManager) installAddon(packageId, packagePath string, enabled
 	defer func() {
 		e := f.Close()
 		if e != nil {
-			log.Error(e.Error())
+			logging.Error(e.Error())
 		}
 	}()
 
@@ -206,7 +206,7 @@ func (manager *AddonManager) installAddon(packageId, packagePath string, enabled
 			if err != nil {
 				ee := database.SetSetting(key, newAddonInfo)
 				if ee != nil {
-					log.Error(ee.Error())
+					logging.Error(ee.Error())
 				}
 			}
 
@@ -226,7 +226,7 @@ func (manager *AddonManager) loadAddons() {
 
 	fs, err := os.ReadDir(manager.AddonsDir)
 	if err != nil {
-		log.Error("load addon err: %s", err.Error())
+		logging.Error("load addon err: %s", err.Error())
 		return
 	}
 	manager.pluginServer = NewPluginServer(manager)
@@ -236,7 +236,7 @@ func (manager *AddonManager) loadAddons() {
 			addonId := fi.Name()
 			err = manager.loadAddon(addonId)
 			if err != nil {
-				log.Error("load addon id:%s failed err:%s", addonId, err.Error())
+				logging.Error("load addon id:%s failed err:%s", addonId, err.Error())
 			}
 		}
 	}
@@ -277,7 +277,7 @@ func (manager *AddonManager) loadAddon(packageId string) error {
 		if cfg != "" {
 			eee := database.SetSetting(configKey, cfg)
 			if eee != nil {
-				log.Error(eee.Error())
+				logging.Error(eee.Error())
 			}
 		}
 	}
@@ -343,7 +343,7 @@ func (manager *AddonManager) Start() error {
 		err = manager.pluginServer.Start()
 		if err != nil {
 			manager.running = false
-			log.Error(err.Error())
+			logging.Error(err.Error())
 		}
 	}()
 	manager.running = true

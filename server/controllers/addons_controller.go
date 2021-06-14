@@ -36,7 +36,7 @@ func (addon *AddonController) handlerSetAddon(c *fiber.Ctx) error {
 		err = plugin.DisableAddon(addonId)
 	}
 	if err != nil {
-		log.Error(err.Error())
+		logging.Error(err.Error())
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 	return c.Status(fiber.StatusOK).JSON(enabled)
@@ -54,13 +54,13 @@ func (addon *AddonController) handlerInstallAddon(c *fiber.Ctx) error {
 	}
 	e := plugin.InstallAddonFromUrl(id, url, checksum, true)
 	if e != nil {
-		log.Error(e.Error())
+		logging.Error(e.Error())
 		return fiber.NewError(http.StatusInternalServerError, e.Error())
 	}
 	key := "addons." + id
 	setting, ee := database.GetSetting(key)
 	if ee != nil {
-		log.Error("install add-on err : %s", ee.Error())
+		logging.Error("install add-on err : %s", ee.Error())
 		return fiber.NewError(http.StatusInternalServerError, ee.Error())
 	}
 	return c.Status(fiber.StatusOK).SendString(setting)
@@ -78,13 +78,13 @@ func (addon *AddonController) handlerUpdateAddon(c *fiber.Ctx) error {
 	}
 	e := plugin.InstallAddonFromUrl(id, url, checksum, true)
 	if e != nil {
-		log.Error("install add-on err :%s", e.Error())
+		logging.Error("install add-on err :%s", e.Error())
 		return fiber.NewError(http.StatusInternalServerError, e.Error())
 	}
 	key := "addons." + id
 	setting, ee := database.GetSetting(key)
 	if ee != nil {
-		log.Error(ee.Error())
+		logging.Error(ee.Error())
 		return fiber.NewError(http.StatusInternalServerError, ee.Error())
 	}
 	return c.Status(fiber.StatusOK).SendString(setting)
@@ -119,14 +119,14 @@ func (addon *AddonController) handlerSetAddonConfig(c *fiber.Ctx) error {
 	}
 	err := database.SetSetting(key, config)
 	if err != nil {
-		log.Error(err.Error())
+		logging.Error(err.Error())
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to set config for add-on: "+addonId)
 	}
 	err = plugin.UnloadAddon(addonId)
 	if plugin.AddonEnabled(addonId) {
 		err := plugin.LoadAddon(addonId)
 		if err != nil {
-			log.Error(err.Error())
+			logging.Error(err.Error())
 			return fiber.NewError(fiber.StatusInternalServerError, "Failed to restart add-on: "+addonId)
 		}
 	}

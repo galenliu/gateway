@@ -18,12 +18,12 @@ type Things struct {
 	Actions *Actions
 }
 
-func NewThings() *Things {
+func NewThingsOnce() *Things {
 	once.Do(
 		func() {
 			instance = &Things{}
 			instance.things = make(map[string]*Thing)
-			instance.GetThings()
+			instance.GetMapOfThings()
 			AddonManager.Subscribe(util.ThingAdded, instance.handleNewThing)
 		},
 	)
@@ -38,8 +38,8 @@ func (ts *Things) GetThing(id string) *Thing {
 	return t
 }
 
-// GetThings if models instance is null,read new instance from the database
-func (ts *Things) GetThings() map[string]*Thing {
+// GetMapOfThings if models instance is null,read new instance from the database
+func (ts *Things) GetMapOfThings() map[string]*Thing {
 	if len(ts.things) > 0 {
 		return ts.things
 	}
@@ -50,7 +50,7 @@ func (ts *Things) GetThings() map[string]*Thing {
 }
 
 func (ts *Things) GetListThings() (lt []*Thing) {
-	for key, t := range ts.GetThings() {
+	for key, t := range ts.GetMapOfThings() {
 		t.ID = key
 		lt = append(lt, t)
 	}
@@ -75,7 +75,7 @@ func (ts *Things) GetThingsFormDataBase() []*Thing {
 
 func (ts *Things) GetNewThings() []*Thing {
 	connectedDevices := AddonManager.GetDevices()
-	storedThings := ts.GetThings()
+	storedThings := ts.GetMapOfThings()
 	var things []*Thing
 	for _, connected := range connectedDevices {
 		for _, storedThing := range storedThings {

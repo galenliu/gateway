@@ -27,7 +27,7 @@ func InitDB(dir string) error {
 		return ee
 	}
 
-	log.Debug("instance init succeed")
+	logging.Debug("instance init succeed")
 	return nil
 }
 
@@ -106,7 +106,7 @@ func UpdateValue(k, v string) (err error) {
 
 func QueryValue(k string) (value string, err error) {
 	err = instance.QueryRow("SELECT value FROM data where key = @key", sql.Named("key", k)).Scan(&value)
-	log.Info(k, value)
+	logging.Info(k, value)
 	return value, err
 }
 
@@ -130,7 +130,7 @@ func GetSetting(key string) (value string, err error) {
 
 func SetSetting(key, value string) error {
 
-	log.Info("set setting key:%s value:%s \t\n", key, value)
+	logging.Info("set setting key:%s value:%s \t\n", key, value)
 	_, err := GetSetting(key)
 	if err == nil {
 		_, e := instance.Exec(`update settings set value=@value where key=@key`, sql.Named("value", value), sql.Named("key", key))
@@ -149,7 +149,7 @@ func SetSetting(key, value string) error {
 	if eee != nil {
 		return eee
 	}
-	log.Debug("insert data,id:%d , value: %s \t\n", id, value)
+	logging.Debug("insert data,id:%d , value: %s \t\n", id, value)
 	return nil
 }
 
@@ -241,7 +241,7 @@ func CreateUser(email, hash, name string) (int64, error) {
 	defer func(stmt *sql.Stmt) {
 		err := stmt.Close()
 		if err != nil {
-			log.Error(err.Error())
+			logging.Error(err.Error())
 		}
 	}(stmt)
 	res, ee := stmt.Exec(email, hash, name, "", false, "")

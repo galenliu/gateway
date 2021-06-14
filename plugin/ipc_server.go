@@ -54,7 +54,7 @@ func (c *Connection) readMessage() (data []byte, err error) {
 
 	_, data, err = c.ws.ReadMessage()
 	if err != nil {
-		log.Error("connection read message err:", err.Error())
+		logging.Error("connection read message err:", err.Error())
 		c.connected = false
 	}
 	return
@@ -62,13 +62,13 @@ func (c *Connection) readMessage() (data []byte, err error) {
 
 func (server *IpcServer) handle(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrade.Upgrade(w, r, nil)
-	log.Debug("accept new connection")
+	logging.Debug("accept new connection")
 	if conn == nil {
 		return
 	}
 	//升级协议时可能发生的错误
 	if err != nil {
-		log.Error("ipc server upgrade failed,err: ", err.Error())
+		logging.Error("ipc server upgrade failed,err: ", err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -82,11 +82,11 @@ func (server *IpcServer) handle(w http.ResponseWriter, r *http.Request) {
 
 func (server *IpcServer) Serve() {
 	http.HandleFunc("/", server.handle)
-	log.Info("plugin server execute on port: %s", server.addr)
+	logging.Info("plugin server execute on port: %s", server.addr)
 	err := http.ListenAndServe(server.addr, nil)
-	log.Info(fmt.Sprintf("ipc server listening addr: %s", server.addr))
+	logging.Info(fmt.Sprintf("ipc server listening addr: %s", server.addr))
 	if err != nil {
-		log.Error("ipc server fail,err: %s", err.Error())
+		logging.Error("ipc server fail,err: %s", err.Error())
 	}
 }
 

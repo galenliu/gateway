@@ -29,19 +29,19 @@ type Map = map[string]interface{}
 //	controller.subscriptionThings = make(map[string]*models.Thing, 10)
 //	controller.subscribedEventNames = make(map[string]bool)
 //	controller.locker = new(sync.Mutex)
-//	controller.Container = models.NewThings()
+//	controller.Container = models.NewThingsOnce()
 //	controller.done = make(chan struct{})
 //	return controller
 //}
 
 func handleWebsocket(c *websocket.Conn) {
-	log.Info("handler websocket....")
+	logging.Info("handler websocket....")
 	thingId, _ := c.Locals("thingId").(string)
 	websocketHandler(c, thingId)
 }
 
 func websocketHandler(c *websocket.Conn, thingId string) {
-	Things := models.NewThings()
+	Things := models.NewThingsOnce()
 	Actions := models.NewActions()
 	subscribedEventNames := make(map[string]bool)
 	thingCleanups := map[string]func(){}
@@ -49,7 +49,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 
 	sendMessage := func(data map[string]interface{}) {
 		d, _ := json.MarshalIndent(&data, "", " ")
-		log.Info(util.JsonIndent(string(d)))
+		logging.Info(util.JsonIndent(string(d)))
 		writeErr := c.WriteMessage(websocket.TextMessage, d)
 		if writeErr != nil {
 			return
@@ -195,7 +195,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 		}
 		addThing(t)
 	} else {
-		for _, t := range Things.GetThings() {
+		for _, t := range Things.GetMapOfThings() {
 			addThing(t)
 		}
 	}
@@ -297,7 +297,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 		default:
 			_, data, readErr := c.ReadMessage()
 			if readErr != nil {
-				log.Info("websocket disconnected err: %s", readErr.Error())
+				logging.Info("websocket disconnected err: %s", readErr.Error())
 				done <- struct{}{}
 				return
 			}
@@ -328,7 +328,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 //		}
 //		controller.addThing(t)
 //	} else {
-//		for _, t := range controller.Container.GetThings() {
+//		for _, t := range controller.Container.GetMapOfThings() {
 //			controller.addThing(t)
 //		}
 //	}

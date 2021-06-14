@@ -22,7 +22,7 @@ func NewNewThingsController(ws *websocket.Conn) *NewThingsController {
 	controller.locker = new(sync.Mutex)
 	controller.closeChan = make(chan struct{})
 	controller.foundThing = make(chan string)
-	controller.container = models.NewThings()
+	controller.container = models.NewThingsOnce()
 	controller.ws = ws
 	return controller
 }
@@ -33,7 +33,7 @@ func (controller *NewThingsController) handlerConnection() {
 	for _, t := range newThings {
 		err := controller.ws.WriteJSON(t)
 		if err != nil {
-			log.Error("web socket err: %s", err.Error())
+			logging.Error("web socket err: %s", err.Error())
 			return
 		}
 	}
@@ -41,7 +41,7 @@ func (controller *NewThingsController) handlerConnection() {
 	defer func() {
 		err := controller.ws.Close()
 		if err != nil {
-			log.Error(err.Error())
+			logging.Error(err.Error())
 		}
 		AddonManager.Unsubscribe(util.ThingAdded, controller.handleNewThing)
 	}()
@@ -59,7 +59,7 @@ func (controller *NewThingsController) handlerConnection() {
 	for {
 		select {
 		case <-controller.closeChan:
-			log.Info("new things websocket disconnection")
+			logging.Info("new things websocket disconnection")
 			return
 		case s := <-controller.foundThing:
 			thing := models.NewThingFromString(s)

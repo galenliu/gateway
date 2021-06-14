@@ -27,7 +27,7 @@ func (controller *ActionsController) handleAction(c *fiber.Ctx) error {
 
 	action := models.NewAction(c.Body(), thingId)
 	if thingId != "" {
-		t := models.NewThings().GetThing(thingId)
+		t := models.NewThingsOnce().GetThing(thingId)
 		if t != nil {
 			err := plugin.RequestAction(thingId, action.ID, action.Name, action.Input)
 			if err != nil {
@@ -74,7 +74,7 @@ func (controller *ActionsController) handleDeleteAction(c *fiber.Ctx) error {
 	if thingId != "" {
 		err := plugin.RemoveAction(thingId, actionId, actionName)
 		if err != nil {
-			log.Error(fmt.Sprintf("Removing acotion actionId: %s faild,err: %v", actionId, err))
+			logging.Error(fmt.Sprintf("Removing acotion actionId: %s faild,err: %v", actionId, err))
 			return fiber.NewError(http.StatusBadGateway, err.Error())
 
 		}

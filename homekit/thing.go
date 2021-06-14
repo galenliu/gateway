@@ -10,27 +10,33 @@ import (
 )
 
 type ThingProxy interface {
-	GetService() ServiceProxy
+	GetMapOfServiceProxy() map[string]ServiceProxy
+	GetPropertyProxy(string2 string) PropertyProxy
 	GetID() string
 }
 
-type ServiceProxy interface {
+type _thing struct {
+	*models.Thing
+	servicesProxy map[string]ServiceProxy
 }
 
-type thing struct {
-	*models.Thing
-	ServiceProxy
-	propertiesProxy map[string]PropertyProxy
+func (t *_thing) GetMapOfServiceProxy() map[string]ServiceProxy {
+	return t.servicesProxy
 }
 
 func NewThingProxy(th *models.Thing) ThingProxy {
-	t := &thing{}
+	t := &_thing{}
 	t.Thing = th
-	t.propertiesProxy = make(map[string]PropertyProxy)
+	t.servicesProxy = make(map[string]ServiceProxy)
 	switch th.GetSelectedCapability() {
 	case addon.Light:
 		sev := service.NewLightbulb()
-		t.ServiceProxy = sev
+
+		_ser := &_service{}
+		_ser.Service = sev.Service
+
+		t.servicesProxy[sev.Type] = _ser
+
 		for name, prop := range th.Properties {
 			switch prop.GetAtType() {
 			case addon.OnOffSwitch:
@@ -38,38 +44,53 @@ func NewThingProxy(th *models.Thing) ThingProxy {
 				sev.On.OnValueRemoteUpdate(func(b bool) {
 					t.propertyChangedHandler(name, b)
 				})
-				t.propertiesProxy[name] = NewPropertyProxy(th.GetSelectedCapability(), prop, func(value interface{}) {
+				_ser.propertiesProxy[name] = NewPropertyProxy(th.GetSelectedCapability(), prop, func(value interface{}) {
 					sev.On.SetValue(to.Bool(value))
 				}, nil)
 			}
 		}
-		t.addProperty(sev.Service)
 	}
 
 	return t
 }
 
-func (t *thing) GetService() ServiceProxy {
-	return t.ServiceProxy
+func (t *_thing) GetMapServiceProxy() map[string]ServiceProxy {
+	if len(t.servicesProxy) > 0 {
+		return t.servicesProxy
+	}
+	return nil
 }
 
-func (t *thing) propertyChangedHandler(name string, value interface{}) {
+// GetPropertyProxy return propertyProxy flow the pName
+func (t *_thing) GetPropertyProxy(pName string) PropertyProxy {
+
+	for _, serviceProxy := range t.GetMapOfServiceProxy() {
+		for name, p := range serviceProxy.GetMapOfPropertyProxy() {
+			if name == pName {
+				return p
+			}
+		}
+	}
+	return nil
+}
+
+func (t *_thing) propertyChangedHandler(name string, value interface{}) {
 	_, err := plugin.SetProperty(t.Thing.ID, name, value)
 	if err != nil {
 		return
 	}
 }
 
-func (t *thing) addProperty(ser *service.Service) {
-	for name, prop := range t.Properties {
-		_, ok := t.propertiesProxy[name]
-		if ok {
-			continue
-		}
-		p := NewPropertyProxy(t.GetSelectedCapability(), prop,nil, func(value interface{}) {
-			t.propertyChangedHandler(name, value)
-		}, )
-		t.propertiesProxy[name] = p
-		ser.AddCharacteristic(p.GetCharacteristic())
-	}
-}
+//func (t *_thing) addProperty(ser *service.Service) {
+//	for name, prop := range t.Properties {
+//		_, ok := t.propertiesProxy[name]
+//		if ok {
+//			continue
+//		}
+//		p := NewPropertyProxy(t.GetSelectedCapability(), prop, nil, func(value interface{}) {
+//			t.propertyChangedHandler(name, value)
+//		})
+//		t.propertiesProxy[name] = p
+//		ser.AddCharacteristic(p.GetCharacteristic())
+//	}
+//}

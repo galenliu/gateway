@@ -57,11 +57,11 @@ func (plugin *Plugin) handleMessage(data []byte) {
 
 	var messageType = gjson.GetBytes(data, "messageType").Uint()
 	if configs.IsVerbose() {
-		log.Info("Read messageType: %s \t\n %s", internal.MessageTypeToString(int(messageType)), util.JsonIndent(gjson.GetBytes(data, "data").String()))
+		logging.Info("Read messageType: %s \t\n %s", internal.MessageTypeToString(int(messageType)), util.JsonIndent(gjson.GetBytes(data, "data").String()))
 	}
 	//如果为0，则消息不合法(如：缺少 messageType字段)
 	if messageType == 0 {
-		log.Info("messageType err")
+		logging.Info("messageType err")
 		return
 	}
 	var adapterId = json.Get(data, "data", "adapterId").ToString()
@@ -99,7 +99,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 
 	adapter := plugin.getManager().getAdapter(adapterId)
 	if adapter == nil {
-		log.Info("(%s)adapter not found", internal.MessageTypeToString(int(messageType)))
+		logging.Info("(%s)adapter not found", internal.MessageTypeToString(int(messageType)))
 		return
 	}
 
@@ -120,13 +120,13 @@ func (plugin *Plugin) handleMessage(data []byte) {
 
 		data := gjson.GetBytes(data, "data").Get("device").String()
 		if data == "" {
-			log.Info("marshal device err")
+			logging.Info("marshal device err")
 			return
 		}
 		var newDevice = addon.NewDeviceFormString(data, adapter)
 
 		if newDevice == nil {
-			log.Error("device add err:")
+			logging.Error("device add err:")
 			return
 		}
 		newDevice.AdapterId = adapterId
@@ -138,7 +138,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 	deviceId := json.Get(data, "data", "deviceId").ToString()
 	device := adapter.getDevice(deviceId)
 	if device == nil {
-		log.Info("device cannot found: %s", deviceId)
+		logging.Info("device cannot found: %s", deviceId)
 		return
 	}
 
@@ -162,12 +162,12 @@ func (plugin *Plugin) handleMessage(data []byte) {
 		var pin addon.PIN
 		err := json.UnmarshalFromString(s, &pin)
 		if err != nil {
-			log.Info("pin error")
+			logging.Info("pin error")
 			return
 		}
 		ee := device.SetPin(pin)
 		if ee != nil {
-			log.Info(ee.Error())
+			logging.Info(ee.Error())
 		}
 
 	case internal.DevicePropertyChangedNotification:
@@ -177,7 +177,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 
 		property := device.GetProperty(propName)
 		if property == nil {
-			log.Info("propName err")
+			logging.Info("propName err")
 			return
 		}
 		if len(prop) == 0 {
@@ -232,7 +232,7 @@ func (plugin *Plugin) execute() {
 	command := strings.Replace(plugin.exec, "{path}", plugin.execPath, 1)
 	command = strings.Replace(command, "{nodeLoader}", configs.GetNodeLoader(), 1)
 	if !strings.HasPrefix(command, "python") {
-		log.Error("Now only support plugin with python lang")
+		logging.Error("Now only support plugin with python lang")
 		return
 	}
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -252,7 +252,7 @@ func (plugin *Plugin) execute() {
 					strNum, err := reader.Read(buf)
 					if strNum > 0 {
 						outputByte := buf[:strNum]
-						log.Info(fmt.Sprintf("plugin(%s) out: %s \t\n", plugin.pluginId, string(outputByte)))
+						logging.Info(fmt.Sprintf("plugin(%s) out: %s \t\n", plugin.pluginId, string(outputByte)))
 					}
 					if err != nil {
 						//读到结尾
@@ -280,12 +280,12 @@ func (plugin *Plugin) execute() {
 	go func() {
 		err := cmd.Start()
 		if err != nil {
-			log.Info("plugin(%s) run err: %s", plugin.pluginId, err.Error())
+			logging.Info("plugin(%s) run err: %s", plugin.pluginId, err.Error())
 			return
 		}
 	}()
 
-	log.Debug(fmt.Sprintf("plugin(%s) execute \t\n", plugin.pluginId))
+	logging.Debug(fmt.Sprintf("plugin(%s) execute \t\n", plugin.pluginId))
 	go syncLog(stdout)
 	go syncLog(stderr)
 
@@ -322,7 +322,7 @@ func (plugin *Plugin) handleConnection(c *Connection, d []byte) {
 		default:
 			_, data, err := c.ws.ReadMessage()
 			if err != nil {
-				log.Error("plugin read err :%s", err.Error())
+				logging.Error("plugin read err :%s", err.Error())
 				plugin.registered = false
 				return
 			}
@@ -334,7 +334,7 @@ func (plugin *Plugin) handleConnection(c *Connection, d []byte) {
 
 func (plugin *Plugin) registerAndHandleConnection(c *Connection) {
 	if plugin.registered == true {
-		log.Error("plugin is registered")
+		logging.Error("plugin is registered")
 		return
 	}
 	plugin.conn = c
@@ -344,7 +344,7 @@ func (plugin *Plugin) registerAndHandleConnection(c *Connection) {
 	data["preferences"] = configs.GetPreferences()
 	plugin.send(internal.PluginRegisterResponse, data)
 	plugin.registered = true
-	log.Info("plugin: %s registered", plugin.pluginId)
+	logging.Info("plugin: %s registered", plugin.pluginId)
 	go plugin.handleConnection(c, nil)
 }
 
@@ -359,11 +359,11 @@ func (plugin *Plugin) send(mt int, data map[string]interface{}) {
 	}
 	bt, err := json.MarshalIndent(message, "", " ")
 	if configs.IsVerbose() {
-		log.Debug("Send-- %s : \t\n %s", internal.MessageTypeToString(mt), bt)
+		logging.Debug("Send-- %s : \t\n %s", internal.MessageTypeToString(mt), bt)
 	}
 
 	if err != nil {
-		log.Error(err.Error())
+		logging.Error(err.Error())
 		return
 	}
 	plugin.conn.send(bt)

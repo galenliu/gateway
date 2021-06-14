@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/galenliu/gateway"
 	"github.com/galenliu/gateway/configs"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/gofiber/fiber/v2"
@@ -25,7 +26,7 @@ func (settings *SettingsController) handleGetAddonsInfo(c *fiber.Ctx) error {
 	var addonInfo = addonInfo{
 		Urls:          configs.GetAddonListUrls(),
 		Architecture:  util.GetArch(),
-		Version:       util.Version,
+		Version:       gateway.Version,
 		NodeVersion:   util.GetNodeVersion(),
 		PythonVersion: util.GetPythonVersion(),
 	}

@@ -121,7 +121,7 @@ func SetProperty(deviceId, propName string, newValue interface{}) (interface{}, 
 	go func() {
 		err := instance.handleSetProperty(deviceId, propName, newValue)
 		if err != nil {
-			log.Error(err.Error())
+			logging.Error(err.Error())
 		}
 	}()
 	closeChan := make(chan struct{})
@@ -144,7 +144,7 @@ func SetProperty(deviceId, propName string, newValue interface{}) (interface{}, 
 		case v := <-propChan:
 			return v, nil
 		case <-closeChan:
-			log.Error("set property(name: %s value: %s) timeout", propName, newValue)
+			logging.Error("set property(name: %s value: %s) timeout", propName, newValue)
 			return nil, fmt.Errorf("timeout")
 		}
 	}
@@ -272,7 +272,7 @@ func UninstallAddon(addonId string, disable bool) error {
 	if disable {
 		setting, err := database.GetSetting(key)
 		if err != nil {
-			log.Error(err.Error())
+			logging.Error(err.Error())
 		}
 		var addonInfo internal.AddonInfo
 		err = json.UnmarshalFromString(setting, &addonInfo)

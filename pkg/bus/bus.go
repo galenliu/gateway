@@ -34,7 +34,7 @@ func Unsubscribe(topic string, fn interface{}) error {
 }
 
 func Publish(topic string, args ...interface{}) {
-	log.Info("publish topic: " + topic)
+	logging.Info("publish topic: " + topic)
 	if instance == nil {
 		initBus()
 	}

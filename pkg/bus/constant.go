@@ -3,7 +3,7 @@ package bus
 const (
 	SetProperty = "SetProperty"
 	GetDevices  = "GetDevices"
-	GetThings   = "GetThings"
+	GetThings   = "GetMapOfThings"
 
 	Pair    = "pair"
 	Unpair  = "unpair"

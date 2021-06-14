@@ -34,11 +34,11 @@ func (s *PluginsServer) messageHandler(data []byte, c *Connection) {
 	var m = json.Get(data, "messageType")
 
 	if err := m.LastError(); err != nil {
-		log.Info("messageType err")
+		logging.Info("messageType err")
 		return
 	}
 	messageType := m.ToInt()
-	log.Debug("%s: \t\n %s", internal.MessageTypeToString(messageType), string(data))
+	logging.Debug("%s: \t\n %s", internal.MessageTypeToString(messageType), string(data))
 
 	if messageType == internal.PluginRegisterRequest {
 		s.registerHandler(data, c)
@@ -60,7 +60,7 @@ func (s *PluginsServer) registerHandler(data []byte, c *Connection) {
 func (s *PluginsServer) handlerConnection(c *Connection) {
 	d, err := c.readMessage()
 	if err != nil {
-		log.Info("plugin connection err:", err.Error())
+		logging.Info("plugin connection err:", err.Error())
 		return
 	}
 	s.messageHandler(d, c)
@@ -76,7 +76,7 @@ func (s *PluginsServer) loadPlugin(addonPath, id, exec string) {
 func (s *PluginsServer) uninstallPlugin(packageId string) {
 	plugin := s.Plugins[packageId]
 	if plugin == nil {
-		log.Error("plugin not exist")
+		logging.Error("plugin not exist")
 		return
 	}
 	plugin.unload()

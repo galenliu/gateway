@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -71,10 +70,6 @@ const (
 	READWRITE         = "readwrite"
 	READ              = "read"
 
-	MajorVersion = 1
-	MinorVersion = 0
-	PatchVersion = 0
-
 	AddonsDir = "addons"
 	DataDir   = "data"
 	ConfigDir = "config"
@@ -88,11 +83,6 @@ const (
 	DbPrefUnitsTemp      = "preferences.units.temperature"
 	PrefUnitsTempCelsius = "degree celsius"
 	ConfDirName          = ".gateway"
-)
-
-var (
-	ShortVersion = fmt.Sprintf("%v.%v", MajorVersion, MinorVersion)
-	Version      = fmt.Sprintf("%v.%v", ShortVersion, PatchVersion)
 )
 
 type Map = fiber.Map

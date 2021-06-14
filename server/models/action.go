@@ -39,7 +39,7 @@ func NewAction(data []byte, thingId string) *Action {
 		}
 	}
 	if a.Name == "" {
-		log.Error("action name invalid")
+		logging.Error("action name invalid")
 		return nil
 	}
 

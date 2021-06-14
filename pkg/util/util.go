@@ -7,7 +7,7 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"fmt"
-	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/logging"
 	"io"
 	"io/ioutil"
 	"math"
@@ -40,12 +40,12 @@ func EnsureDir(baseDir string, dirs ...string) error {
 func RemoveDir(dir string) {
 	ff, err := os.Stat(dir)
 	if err != nil {
-		log.Error(err.Error())
+		logging.Error(err.Error())
 	} else {
 		if ff.IsDir() {
 			err := os.RemoveAll(dir)
 			if err != nil {
-				log.Error(err.Error())
+				logging.Error(err.Error())
 			}
 		}
 	}

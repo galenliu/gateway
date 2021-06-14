@@ -20,14 +20,14 @@ type ThingsController struct {
 
 func NewThingsControllerFunc() *ThingsController {
 	tc := &ThingsController{}
-	tc.Container = models.NewThings()
+	tc.Container = models.NewThingsOnce()
 	return tc
 }
 
 // POST /things
 func (tc *ThingsController) handleCreateThing(c *fiber.Ctx) error {
 
-	log.Debug("Post /thing,Body: \t\n %s", c.Body())
+	logging.Debug("Post /thing,Body: \t\n %s", c.Body())
 
 	id := gjson.GetBytes(c.Body(), "id").String()
 	if len(id) < 1 {
@@ -54,7 +54,7 @@ func (tc *ThingsController) handleDeleteThing(c *fiber.Ctx) error {
 	if err != nil {
 		return fiber.NewError(http.StatusInternalServerError, err.Error())
 	}
-	log.Info(fmt.Sprintf("Successfully deleted %v from database", thingId))
+	logging.Info(fmt.Sprintf("Successfully deleted %v from database", thingId))
 	return c.SendStatus(http.StatusNoContent)
 }
 
@@ -89,19 +89,19 @@ func (tc *ThingsController) handleGetThings(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 	js := util.JsonIndent(string(data))
-	log.Info("/things: \t\n %s", js)
+	logging.Info("/things: \t\n %s", js)
 	return c.Status(fiber.StatusOK).SendString(js)
 }
 
 //patch things
 func (tc *ThingsController) handlePatchThings(c *fiber.Ctx) error {
-	log.Info("container controller handle patch container")
+	logging.Info("container controller handle patch container")
 	return nil
 }
 
 //PATCH /things/:thingId
 func (tc *ThingsController) handlePatchThing(c *fiber.Ctx) error {
-	log.Info("container controller handle patch thing")
+	logging.Info("container controller handle patch thing")
 	return nil
 }
 
@@ -116,7 +116,7 @@ func (tc *ThingsController) handleSetProperty(c *fiber.Ctx) error {
 	value := c.Body()
 	prop, e := tc.Container.SetThingProperty(thingId, propName, value)
 	if e != nil {
-		log.Error("Failed set thing(%s) property:(%s) value:(%s),err:(%s)", thingId, propName, value, e.Error())
+		logging.Error("Failed set thing(%s) property:(%s) value:(%s),err:(%s)", thingId, propName, value, e.Error())
 		return fiber.NewError(fiber.StatusGatewayTimeout, e.Error())
 	}
 
@@ -130,7 +130,7 @@ func (tc *ThingsController) handleGetProperty(c *fiber.Ctx) error {
 	v, err := AddonManager.GetPropertyValue(id, propName)
 	var result = make(map[string]interface{})
 	if err != nil {
-		log.Info("get property err: %s", err.Error())
+		logging.Info("get property err: %s", err.Error())
 	}
 	result[propName] = v
 	return c.Status(fiber.StatusOK).JSON(result)
@@ -146,7 +146,7 @@ func (tc *ThingsController) handleGetProperties(c *fiber.Ctx) error {
 	for propName := range th.Properties {
 		v, err := AddonManager.GetPropertyValue(id, propName)
 		if err != nil {
-			log.Info("get property err: %s", err.Error())
+			logging.Info("get property err: %s", err.Error())
 		}
 		result[propName] = v
 	}

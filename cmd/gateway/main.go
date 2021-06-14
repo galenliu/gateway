@@ -3,10 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/galenliu/gateway"
 	"github.com/galenliu/gateway/configs"
 	"github.com/galenliu/gateway/homekit"
-	"github.com/galenliu/gateway/pkg/log"
-	"github.com/galenliu/gateway/pkg/util"
+	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/controllers"
 	"os"
@@ -58,14 +58,14 @@ func main() {
 
 	//if version command then print version
 	if showVersion {
-		fmt.Print(util.Version)
+		fmt.Print(gateway.Version)
 		return
 	}
 
 	//init config
 	conf := configs.NewConfig(proFile)
 	if conf == nil {
-		log.Info("config is bad")
+		logging.Info("config is bad")
 		return
 	}
 
@@ -75,7 +75,7 @@ func main() {
 
 	//handle signal
 	var systemCall = func(sig os.Signal) {
-		log.Info("exited system call %v", sig.String())
+		logging.Info("exited system call %v", sig.String())
 		runner.Stop()
 		os.Exit(0)
 	}
@@ -110,14 +110,14 @@ func NewGateway() (gateway *HomeGateway, err error) {
 }
 
 func (gateway *HomeGateway) Start() error {
-	log.Info("gateway start .....")
+	logging.Info("gateway start .....")
 	for _, task := range gateway.Tasks {
 		task := task
 		go func() {
 			err := task.Start()
 			if err != nil {
 
-				log.Error(err.Error())
+				logging.Error(err.Error())
 			}
 		}()
 

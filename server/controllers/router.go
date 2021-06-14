@@ -39,7 +39,7 @@ func NewWebAPP(opts ...WebOption) *Web {
 		o(&options)
 	}
 	web := Web{}
-	web.things = models.NewThings()
+	web.things = models.NewThingsOnce()
 	web.config = options
 	web.App = CollectRoute(options)
 
@@ -165,7 +165,7 @@ func (web *Web) Start() error {
 	go func() {
 		err = web.Listen(httpPort)
 		if err != nil {
-			log.Error("web server err:%s", err.Error())
+			logging.Error("web server err:%s", err.Error())
 		}
 	}()
 	if err != nil {
@@ -177,7 +177,7 @@ func (web *Web) Start() error {
 func (web *Web) Stop() {
 	err := web.App.Shutdown()
 	if err != nil {
-		log.Error(err.Error())
+		logging.Error(err.Error())
 	}
 	bus.Publish(util.WebServerStopped)
 }

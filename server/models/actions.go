@@ -32,7 +32,7 @@ func NewActions() *Actions {
 		func() {
 			_actions = &Actions{}
 			_actions.actions = make(map[string]*Action)
-			_actions.things = NewThings()
+			_actions.things = NewThingsOnce()
 		},
 	)
 	return _actions

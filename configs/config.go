@@ -2,8 +2,10 @@ package configs
 
 import (
 	_ "embed"
+	"github.com/galenliu/gateway"
 	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	json "github.com/json-iterator/go"
 	"sync"
@@ -156,7 +158,7 @@ func NewConfig(config string) *Config {
 			rtc.UploadDir = rtc.ProfileDir + string(os.PathSeparator) + util.UploadDir
 		}
 		if rtc.GatewayVersion == "" {
-			rtc.GatewayVersion = util.Version
+			rtc.GatewayVersion = gateway.Version
 		}
 		err = util.EnsureDir(rtc.ProfileDir, rtc.AddonsDir, rtc.LogDir, rtc.DataDir, rtc.ConfigDir, rtc.MediaDir, rtc.UploadDir)
 		if err != nil {
@@ -175,7 +177,7 @@ func NewConfig(config string) *Config {
 		}
 
 		//init logger
-		log.InitLogger(rtc.LogDir, true, rtc.Log.LogRotateDays)
+		logging.InitLogger(rtc.LogDir, true, rtc.Log.LogRotateDays)
 
 		//init database
 		if rtc.Database.RemoveBeforeOpen {
@@ -183,7 +185,7 @@ func NewConfig(config string) *Config {
 		}
 		err = database.InitDB(rtc.ConfigDir)
 
-		log.Info("gateway loaded config on path: %s", rtc.ProfileDir)
+		logging.Info("gateway loaded config on path: %s", rtc.ProfileDir)
 
 		if err != nil {
 			return

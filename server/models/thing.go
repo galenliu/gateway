@@ -73,7 +73,7 @@ func NewThingFromString(description string) (thing *Thing) {
 		atType = append(atType, c.String())
 	}
 	if len(atType) < 1 {
-		log.Info("new thing err: @type")
+		logging.Info("new thing err: @type")
 		return nil
 	}
 
@@ -222,7 +222,7 @@ func (t *Thing) SetTitle(title string) string {
 		t.Title = title
 		err := t.save()
 		if err != nil {
-			log.Info(err.Error())
+			logging.Info(err.Error())
 		}
 		t.Publish(util.MODIFIED, t)
 	}
@@ -236,7 +236,7 @@ func (t *Thing) GetTitle() string {
 func (t *Thing) setConnected(connected bool) {
 	err := t.save()
 	if err != nil {
-		log.Info(err.Error())
+		logging.Info(err.Error())
 	}
 	t.Publish(util.CONNECTED, connected)
 	t.Connected = connected
@@ -288,7 +288,7 @@ func (t *Thing) Subscribe(typ string, f interface{}) {
 	go func() {
 		err := bus.Subscribe(t.GetID()+"."+typ, f)
 		if err != nil {
-			log.Error(err.Error())
+			logging.Error(err.Error())
 		}
 	}()
 }
@@ -297,7 +297,7 @@ func (t *Thing) Unsubscribe(typ string, f interface{}) {
 	go func() {
 		err := bus.Subscribe(t.GetID()+"."+typ, f)
 		if err != nil {
-			log.Error(err.Error())
+			logging.Error(err.Error())
 		}
 	}()
 }

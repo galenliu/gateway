@@ -8,13 +8,13 @@ import (
 
 type LightBulb struct {
 	*service.Lightbulb
-	*thing
+	*_thing
 }
 
-func NewLightBulb(s *thing) *LightBulb {
+func NewLightBulb(s *_thing) *LightBulb {
 	l := &LightBulb{}
 	l.Lightbulb = service.NewLightbulb()
-	l.thing.Service = l.Lightbulb.Service
+	l._thing.Service = l.Lightbulb.Service
 	for _, p := range l.Properties {
 		switch p.AtType {
 		case properties.TypeOnOffProperty:

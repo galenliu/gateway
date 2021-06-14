@@ -43,20 +43,20 @@ func NewAdapter(manager managerProxy, name, adapterId, pluginId, packageName str
 }
 
 func (adapter *Adapter) pairing(timeout float64) {
-	log.Info(fmt.Sprintf("adapter: %s start pairing", adapter.id))
+	logging.Info(fmt.Sprintf("adapter: %s start pairing", adapter.id))
 	data := make(map[string]interface{})
 	data["timeout"] = timeout
 	adapter.Send(internal.AdapterStartPairingCommand, data)
 }
 
 func (adapter *Adapter) cancelPairing() {
-	log.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.id))
+	logging.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.id))
 	data := make(map[string]interface{})
 	adapter.Send(internal.AdapterCancelPairingCommand, data)
 }
 
 func (adapter *Adapter) removeThing(device addon.IDevice) {
-	log.Info(fmt.Sprintf("adapter delete thing Id: %v", device.GetID()))
+	logging.Info(fmt.Sprintf("adapter delete thing Id: %v", device.GetID()))
 	data := make(map[string]interface{})
 	data["deviceId"] = device.GetID()
 	adapter.Send(internal.AdapterRemoveDeviceRequest, data)
@@ -64,7 +64,7 @@ func (adapter *Adapter) removeThing(device addon.IDevice) {
 }
 
 func (adapter *Adapter) cancelRemoveThing(deviceId string) {
-	log.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.id))
+	logging.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.id))
 	data := make(map[string]interface{})
 	data["deviceId"] = deviceId
 	adapter.Send(internal.AdapterCancelRemoveDeviceCommand, data)
