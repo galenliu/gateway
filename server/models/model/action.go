@@ -25,9 +25,9 @@ func NewActionFromString(data string) *Action {
 	var this = Action{}
 	aa := wot.NewActionAffordanceFromString(data)
 	if aa.Forms == nil {
-		aa.Forms = append(aa.Forms, wot.Form{
+		aa.Forms = append(aa.Forms, hypermedia_controls.Form{
 			Href: "",
-			Op:   []string{wot.InvokeAction},
+			Op:   []string{hypermedia_controls.InvokeAction},
 		})
 	}
 

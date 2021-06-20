@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	json "github.com/json-iterator/go"
 	uuid "github.com/satori/go.uuid"

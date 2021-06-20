@@ -49,13 +49,6 @@ func New(w io.Writer, level logrus.Level) Logger {
 	}
 }
 
-
-
-
-
-
-
-
 func (l *logger) NewEntry() *logrus.Entry {
 	return logrus.NewEntry(l.Logger)
 }

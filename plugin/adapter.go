@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/galenliu/gateway-addon"
-	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/plugin/internal"
 	"sync"
 )
@@ -70,7 +69,7 @@ func (adapter *Adapter) cancelRemoveThing(deviceId string) {
 	adapter.Send(internal.AdapterCancelRemoveDeviceCommand, data)
 }
 
-func (adapter *Adapter) getManager() *AddonManager {
+func (adapter *Adapter) getManager() *manager {
 	return adapter.plugin.pluginServer.manager
 }
 

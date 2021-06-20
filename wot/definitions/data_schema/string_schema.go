@@ -1,4 +1,4 @@
-package wot
+package data_schema
 
 import (
 	json "github.com/json-iterator/go"

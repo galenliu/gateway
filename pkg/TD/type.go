@@ -1,4 +1,4 @@
-package wot
+package TD
 
 const (
 	Number  = "number"

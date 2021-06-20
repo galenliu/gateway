@@ -2,8 +2,6 @@ package controllers
 
 import (
 	"github.com/galenliu/gateway/configs"
-	"github.com/galenliu/gateway/pkg/bus"
-	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
@@ -169,7 +167,7 @@ func (web *Web) Start() error {
 		}
 	}()
 	if err != nil {
-		bus.Publish(util.WebServerStarted)
+		event_bus.Publish(util.WebServerStarted)
 	}
 	return err
 }
@@ -179,7 +177,7 @@ func (web *Web) Stop() {
 	if err != nil {
 		logging.Error(err.Error())
 	}
-	bus.Publish(util.WebServerStopped)
+	event_bus.Publish(util.WebServerStopped)
 }
 
 func NewDefaultWebConfig() Config {

@@ -4,52 +4,22 @@ import (
 	"context"
 	"fmt"
 	"github.com/galenliu/gateway-addon"
-	"github.com/galenliu/gateway-addon/wot"
-	"github.com/galenliu/gateway/configs"
-	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/database"
-	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
 	"path"
-	"sync"
 	"time"
 )
 
 type Map = map[string]interface{}
 
-var instance *AddonManager
+var instance *manager
 
-func NewAddonsManager() *AddonManager {
-	am := &AddonManager{}
-	instance = am
-
-	am.AddonsDir = configs.GetAddonsDir()
-	am.DataDir = configs.GetAddonsDir()
-	am.verbose = configs.IsVerbose()
-	am.addonsLoaded = false
-	am.isPairing = false
-	am.running = false
-	am.devices = make(map[string]addon.IDevice, 50)
-	am.installAddons = make(map[string]*internal.AddonInfo, 50)
-	am.adapters = make(map[string]*Adapter, 20)
-	am.extensions = make(map[string]Extension)
-
-	//def addon action
-	action := wot.NewActionAffordance()
-	obj := wot.NewObjectSchema()
-	timeout := wot.NewIntegerSchema()
-	timeout.Minimum = 1000
-	timeout.Maximum = 10000
-	obj.Properties["timeout"] = timeout
-	action.Input = obj
-	am.actions = make(map[string]*wot.ActionAffordance)
-	am.actions["pair"] = action
-
-	am.locker = new(sync.Mutex)
-	am.loadAddons()
-	return am
+type Options struct {
+	AddonDirs []string
+	DataDir   string
 }
 
 // GetInstallAddons 获取已安装的add-on
@@ -99,13 +69,6 @@ func DisableAddon(addonId string) error {
 		return err
 	}
 	return nil
-}
-
-func GetDevices() (device []addon.IDevice) {
-	for _, dev := range instance.devices {
-		device = append(device, dev)
-	}
-	return
 }
 
 func GetDevice(deviceId string) addon.IDevice {
@@ -266,8 +229,11 @@ func UninstallAddon(addonId string, disable bool) error {
 	if err != nil {
 		return err
 	}
-	util.RemoveDir(path.Join(instance.DataDir, addonId))
-	util.RemoveDir(path.Join(instance.AddonsDir, addonId))
+	f, e := instance.findPlugin(addonId)
+	if e == nil {
+		util.RemoveDir(f)
+	}
+	util.RemoveDir(path.Join(path.Join(instance.options.DataDir, util.DataDirName), addonId))
 
 	if disable {
 		setting, err := database.GetSetting(key)
@@ -282,14 +248,14 @@ func UninstallAddon(addonId string, disable bool) error {
 	return nil
 }
 
-func Subscribe(typ string, f interface{}) {
-	_ = bus.Subscribe(typ, f)
-}
-
-func Unsubscribe(typ string, f interface{}) {
-	_ = bus.Unsubscribe(typ, f)
-}
-
-func Publish(typ string, args ...interface{}) {
-	bus.Publish(typ, args...)
-}
+//func Subscribe(typ string, f interface{}) {
+//	_ = event_bus.Subscribe(typ, f)
+//}
+//
+//func Unsubscribe(typ string, f interface{}) {
+//	_ = event_bus.Unsubscribe(typ, f)
+//}
+//
+//func Publish(typ string, args ...interface{}) {
+//	event_bus.Publish(typ, args...)
+//}

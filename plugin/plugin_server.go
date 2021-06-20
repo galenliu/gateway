@@ -3,7 +3,6 @@ package plugin
 //	plugin server
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
 	"sync"
@@ -12,13 +11,13 @@ import (
 type PluginsServer struct {
 	Plugins   map[string]*Plugin
 	locker    *sync.Mutex
-	manager   *AddonManager
+	manager   *manager
 	ipc       *IpcServer
 	closeChan chan struct{}
 	verbose   bool
 }
 
-func NewPluginServer(manager *AddonManager) *PluginsServer {
+func NewPluginServer(manager *manager) *PluginsServer {
 	server := &PluginsServer{}
 	server.closeChan = make(chan struct{})
 	server.Plugins = make(map[string]*Plugin, 30)

@@ -7,7 +7,6 @@ import (
 	"github.com/galenliu/gateway/configs"
 	"github.com/galenliu/gateway/homekit"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/controllers"
 	"os"
 	"os/signal"
@@ -101,9 +100,15 @@ type HomeGateway struct {
 
 func NewGateway() (gateway *HomeGateway, err error) {
 	gateway = &HomeGateway{}
-	gateway.Tasks = append(gateway.Tasks, plugin.NewAddonsManager())
 	gateway.Tasks = append(gateway.Tasks, controllers.NewWebAPP())
-	gateway.Tasks = append(gateway.Tasks, homekit.NewHomeKitBridge("gateway", "WebThings", "webThings", configs.GetConfigDir(), "12344321"))
+	gateway.Tasks = append(gateway.Tasks, homekit.NewHomeKitBridge(
+		homekit.Config{
+			Pin:          "12344321",
+			StoragePath:  configs.GetConfigDir(),
+			Model:        "WebThings",
+			Manufacturer: "WebThings",
+			Name:         "WebThings Gateway",
+		}))
 	gateway.closeChan = make(chan struct{})
 	//update the gateway preferences
 	return gateway, err

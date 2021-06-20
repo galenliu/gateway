@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/brutella/hc"
 	"github.com/brutella/hc/accessory"
-	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/models"
@@ -16,6 +16,14 @@ var stop func()
 
 // HService 不同的service实现此接口
 type HService interface {
+}
+
+type Config struct {
+	Pin          string
+	StoragePath  string
+	Model        string
+	Manufacturer string
+	Name         string
 }
 
 type BridgeProxy interface {
@@ -31,19 +39,19 @@ type bridge struct {
 	stopped     <-chan struct{}
 }
 
-func NewHomeKitBridge(name, manufacturer, model, storagePath, pin string) BridgeProxy {
+func NewHomeKitBridge(conf Config) BridgeProxy {
 
 	_bridge = &bridge{}
 	_bridge.info = accessory.Info{
-		Name:             name,
-		Manufacturer:     manufacturer,
-		Model:            model,
+		Name:             conf.Name,
+		Manufacturer:     conf.Manufacturer,
+		Model:            conf.Model,
 		FirmwareRevision: FirmwareRevision,
 	}
 	_bridge.config = hc.Config{
 		Port:        "22345",
-		StoragePath: storagePath,
-		Pin:         pin,
+		StoragePath: conf.StoragePath,
+		Pin:         conf.Pin,
 	}
 	_bridge.Bridge = accessory.NewBridge(_bridge.info)
 	_bridge.stopped = make(chan struct{})

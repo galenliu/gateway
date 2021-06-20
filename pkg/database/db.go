@@ -3,42 +3,33 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/wot"
 	_ "github.com/mattn/go-sqlite3"
 	"os"
-	"path"
 )
 
 const dbFileName = "database.sqlite3"
 
-var instance *sql.DB
+var instance *store
 
-var filePath string
-
-func InitDB(dir string) error {
-	var e error
-	filePath = path.Join(dir, dbFileName)
-	instance, e = sql.Open("sqlite3", filePath)
-	if e != nil {
-		return e
-	}
-	ee := createTable(instance)
-	if ee != nil {
-		return ee
-	}
-
-	logging.Debug("instance init succeed")
-	return nil
+type store struct {
+	file string
+	*sql.DB
 }
 
-func ResetDB(dir string) {
-	_, err := os.Stat(dir)
+type Store interface {
+	wot.ThingsStore
+}
+
+func (s *store) reset() {
+	_, err := os.Stat(s.file)
 	if err == nil {
-		_ = os.Remove(dir)
+		_ = os.Remove(s.file)
 	}
 }
 
-func createTable(db *sql.DB) error {
+func (s *store) createTable() error {
 
 	thingsTable := `
     CREATE TABLE IF NOT EXISTS things(
@@ -88,30 +79,30 @@ func createTable(db *sql.DB) error {
         subscription TEXT UNIQUE
     );
     `
-	_, err := db.Exec(thingsTable)
-	_, err = db.Exec(userTable)
-	_, err = db.Exec(jsonWebTokensTable)
-	_, err = db.Exec(settingsTable)
-	_, err = db.Exec(pushSubscriptionsTable)
+	_, err := s.Exec(thingsTable)
+	_, err = s.Exec(userTable)
+	_, err = s.Exec(jsonWebTokensTable)
+	_, err = s.Exec(settingsTable)
+	_, err = s.Exec(pushSubscriptionsTable)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func UpdateValue(k, v string) (err error) {
-	_, err = instance.Exec(`update data set value=@value where key=@key`, sql.Named("value", v), sql.Named("key", k))
+func (s *store) updateValue(k, v string) (err error) {
+	_, err = s.Exec(`update data set value=@value where key=@key`, sql.Named("value", v), sql.Named("key", k))
 	return
 }
 
-func QueryValue(k string) (value string, err error) {
-	err = instance.QueryRow("SELECT value FROM data where key = @key", sql.Named("key", k)).Scan(&value)
+func (s *store) queryValue(k string) (value string, err error) {
+	err = s.QueryRow("SELECT value FROM data where key = @key", sql.Named("key", k)).Scan(&value)
 	logging.Info(k, value)
 	return value, err
 }
 
-func DeleteValue(key string) error {
-	stmt, err := instance.Prepare(`delete from data where key = ?`)
+func (s *store) deleteValue(key string) error {
+	stmt, err := s.Prepare(`delete from data where key = ?`)
 	if err != nil {
 		return err
 	}

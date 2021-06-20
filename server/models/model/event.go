@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/galenliu/gateway-addon/wot"
+	"github.com/galenliu/gateway/wot/definitions/data_schema"
 	json "github.com/json-iterator/go"
 )
 
@@ -17,10 +18,10 @@ func NewEventFromString(data string) *Event {
 	var this = Event{}
 	aa := wot.NewEventAffordanceFromString(data)
 	if aa.Forms == nil {
-		aa.Forms = append(aa.Forms, wot.Form{
+		aa.Forms = append(aa.Forms, hypermedia_controls.Form{
 			Href:        "",
-			ContentType: wot.ApplicationJson,
-			Op:          []string{wot.SubscribeEvent},
+			ContentType: data_schema.ApplicationJson,
+			Op:          []string{hypermedia_controls.SubscribeEvent},
 		})
 	}
 	this.EventAffordance = aa

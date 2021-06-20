@@ -5,12 +5,14 @@ import (
 	"compress/gzip"
 	"context"
 	"fmt"
+	"github.com/galenliu/gateway"
 	"github.com/galenliu/gateway-addon"
 	"github.com/galenliu/gateway-addon/wot"
 	"github.com/galenliu/gateway/pkg/database"
-	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin/internal"
+	"github.com/galenliu/gateway/wot/definitions/data_schema"
 	json "github.com/json-iterator/go"
 
 	"io"
@@ -22,12 +24,18 @@ import (
 	"sync"
 )
 
+type AddonManager interface {
+	gateway.Program
+	GetDevices() []addon.IDevice
+}
+
 type Extension struct {
 	Extensions string
 	Resources  string
 }
 
-type AddonManager struct {
+type manager struct {
+	options      Options
 	configPath   string
 	pluginServer *PluginsServer
 
@@ -42,16 +50,50 @@ type AddonManager struct {
 
 	pluginCancel context.CancelFunc
 
-	AddonsDir string
-	DataDir   string
-	locker    *sync.Mutex
-	running   bool
-	verbose   bool
-
+	locker  *sync.Mutex
+	running bool
+	verbose bool
+	logger  logging.Logger
 	actions map[string]*wot.ActionAffordance
 }
 
-func (manager *AddonManager) handleDeviceAdded(device *addon.Device) {
+func NewAddonsManager(options Options, log logging.Logger) AddonManager {
+	am := &manager{}
+	instance = am
+	am.options = options
+	am.logger = log
+	am.addonsLoaded = false
+	am.isPairing = false
+	am.running = false
+	am.devices = make(map[string]addon.IDevice, 50)
+	am.installAddons = make(map[string]*internal.AddonInfo, 50)
+	am.adapters = make(map[string]*Adapter, 20)
+	am.extensions = make(map[string]Extension)
+
+	//def addon action
+	action := wot.NewActionAffordance()
+	obj := data_schema.NewObjectSchema()
+	timeout := data_schema.NewIntegerSchema()
+	timeout.Minimum = 1000
+	timeout.Maximum = 10000
+	obj.Properties["timeout"] = timeout
+	action.Input = obj
+	am.actions = make(map[string]*wot.ActionAffordance)
+	am.actions["pair"] = action
+
+	am.locker = new(sync.Mutex)
+	am.loadAddons()
+	return am
+}
+
+func (manager *manager) GetDevices() (device []addon.IDevice) {
+	for _, dev := range manager.devices {
+		device = append(device, dev)
+	}
+	return
+}
+
+func (manager *manager) handleDeviceAdded(device *addon.Device) {
 	manager.devices[device.GetID()] = device
 	//d, err := json.MarshalIndent(device, "", " ")
 	d := device.AsDict()
@@ -62,26 +104,26 @@ func (manager *AddonManager) handleDeviceAdded(device *addon.Device) {
 	Publish(util.ThingAdded, data)
 }
 
-func (manager *AddonManager) actionNotify(action *addon.Action) {
+func (manager *manager) actionNotify(action *addon.Action) {
 	Publish(util.ActionStatus, action.MarshalJson())
 }
 
-func (manager *AddonManager) eventNotify(event *addon.Event) {
+func (manager *manager) eventNotify(event *addon.Event) {
 	Publish(util.EVENT, event.MarshalJson())
 }
 
-func (manager *AddonManager) connectedNotify(device *addon.Device, connected bool) {
+func (manager *manager) connectedNotify(device *addon.Device, connected bool) {
 	Publish(util.CONNECTED, connected)
 }
 
-func (manager *AddonManager) addAdapter(adapter *Adapter) {
+func (manager *manager) addAdapter(adapter *Adapter) {
 	manager.locker.Lock()
 	defer manager.locker.Unlock()
 	manager.adapters[adapter.id] = adapter
 	logging.Debug(fmt.Sprintf("adapter：(%s) added", adapter.id))
 }
 
-func (manager *AddonManager) getAdapter(adapterId string) *Adapter {
+func (manager *manager) getAdapter(adapterId string) *Adapter {
 	adapter, ok := manager.adapters[adapterId]
 	if !ok {
 		return nil
@@ -89,7 +131,7 @@ func (manager *AddonManager) getAdapter(adapterId string) *Adapter {
 	return adapter
 }
 
-func (manager *AddonManager) handleSetProperty(deviceId, propName string, setValue interface{}) error {
+func (manager *manager) handleSetProperty(deviceId, propName string, setValue interface{}) error {
 	device := manager.getDevice(deviceId)
 	if device == nil {
 		return fmt.Errorf("device id err")
@@ -113,7 +155,7 @@ func (manager *AddonManager) handleSetProperty(deviceId, propName string, setVal
 	return nil
 }
 
-func (manager *AddonManager) getDevice(deviceId string) addon.IDevice {
+func (manager *manager) getDevice(deviceId string) addon.IDevice {
 	d, ok := manager.devices[deviceId]
 	if !ok {
 		return nil
@@ -122,7 +164,7 @@ func (manager *AddonManager) getDevice(deviceId string) addon.IDevice {
 }
 
 // get package from url, checksum
-func (manager *AddonManager) installAddonFromUrl(id, url, checksum string, enabled bool) error {
+func (manager *manager) installAddonFromUrl(id, url, checksum string, enabled bool) error {
 
 	destPath := path.Join(os.TempDir(), id+".tar.gz")
 
@@ -151,7 +193,7 @@ func (manager *AddonManager) installAddonFromUrl(id, url, checksum string, enabl
 }
 
 //tar package to addon from the temp dir,
-func (manager *AddonManager) installAddon(packageId, packagePath string, enabled bool) error {
+func (manager *manager) installAddon(packageId, packagePath string, enabled bool) error {
 
 	if !manager.addonsLoaded {
 		return fmt.Errorf(`Cannot install add-on before other add-ons have been loaded.`)
@@ -178,7 +220,8 @@ func (manager *AddonManager) installAddon(packageId, packagePath string, enabled
 		// 读取文件信息
 		fi := hdr.FileInfo()
 		p := strings.Replace(hdr.Name, "package", packageId, 1)
-		localPath := manager.AddonsDir + string(os.PathSeparator) + p
+
+		localPath := manager.options.AddonDirs[0] + string(os.PathSeparator) + p
 		if fi.IsDir() {
 			_ = os.MkdirAll(localPath, os.ModePerm)
 			continue
@@ -194,6 +237,7 @@ func (manager *AddonManager) installAddon(packageId, packagePath string, enabled
 		//TODO 给下载的文件增加可执行权限
 		_ = os.Chmod(fi.Name(), 777)
 		_ = fw.Close()
+
 	}
 	var key = "addons." + packageId
 	saved, err := database.GetSetting(key)
@@ -218,38 +262,43 @@ func (manager *AddonManager) installAddon(packageId, packagePath string, enabled
 	return nil
 }
 
-func (manager *AddonManager) loadAddons() {
+func (manager *manager) loadAddons() {
 	if manager.addonsLoaded {
 		return
 	}
 	manager.addonsLoaded = true
 
-	fs, err := os.ReadDir(manager.AddonsDir)
-	if err != nil {
-		logging.Error("load addon err: %s", err.Error())
-		return
-	}
-	manager.pluginServer = NewPluginServer(manager)
+	for _, d := range manager.options.AddonDirs {
+		fs, err := os.ReadDir(d)
+		if err != nil {
+			logging.Error("load addon err: %s", err.Error())
+			return
+		}
+		manager.pluginServer = NewPluginServer(manager)
 
-	for _, fi := range fs {
-		if fi.IsDir() {
-			addonId := fi.Name()
-			err = manager.loadAddon(addonId)
-			if err != nil {
-				logging.Error("load addon id:%s failed err:%s", addonId, err.Error())
+		for _, fi := range fs {
+			if fi.IsDir() {
+				addonId := fi.Name()
+				err = manager.loadAddon(addonId)
+				if err != nil {
+					manager.logger.Error("load addon id:%s failed err:%s", addonId, err.Error())
+				}
 			}
 		}
 	}
 	return
 }
 
-func (manager *AddonManager) loadAddon(packageId string) error {
+func (manager *manager) loadAddon(packageId string) error {
 
 	if !manager.addonsLoaded {
 		return nil
 	}
 
-	addonPath := path.Join(manager.AddonsDir, packageId)
+	addonPath, err := manager.findPlugin(packageId)
+	if err != nil {
+		return err
+	}
 
 	addonInfo, obj, err := internal.LoadManifest(addonPath, packageId)
 
@@ -302,7 +351,7 @@ func (manager *AddonManager) loadAddon(packageId string) error {
 		return nil
 	}
 
-	err = util.EnsureDir(path.Join(manager.DataDir, addonInfo.ID))
+	err = util.EnsureDir(path.Join(path.Join(manager.options.DataDir, "data"), addonInfo.ID))
 	if err != nil {
 		return err
 	}
@@ -312,7 +361,7 @@ func (manager *AddonManager) loadAddon(packageId string) error {
 	return nil
 }
 
-func (manager *AddonManager) unloadAddon(packageId string) error {
+func (manager *manager) unloadAddon(packageId string) error {
 	if !manager.addonsLoaded {
 		return nil
 	}
@@ -337,7 +386,18 @@ func (manager *AddonManager) unloadAddon(packageId string) error {
 	return nil
 }
 
-func (manager *AddonManager) Start() error {
+func (manager *manager) findPlugin(packageId string) (string, error) {
+	for _, dir := range manager.options.AddonDirs {
+		_, e := os.Stat(path.Join(dir, packageId))
+		if os.IsNotExist(e) {
+			continue
+		}
+		return path.Join(dir, packageId), nil
+	}
+	return "", fmt.Errorf("addon is not exist")
+}
+
+func (manager *manager) Start() error {
 	var err error
 	go func() {
 		err = manager.pluginServer.Start()
@@ -353,8 +413,9 @@ func (manager *AddonManager) Start() error {
 	return err
 }
 
-func (manager *AddonManager) Stop() {
+func (manager *manager) Stop() error {
 	manager.pluginServer.Stop()
 	Publish(util.PluginServerStopped)
 	manager.running = false
+	return nil
 }

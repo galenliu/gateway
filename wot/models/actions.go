@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	AddonManager "github.com/galenliu/gateway/plugin"
+	"github.com/galenliu/gateway/wot"
 	"github.com/xiam/to"
 	"sync"
 )
@@ -22,7 +23,7 @@ var one sync.Once
 var _actions *Actions
 
 type Actions struct {
-	things  *Things
+	things  *wot.Things
 	actions map[string]*Action
 }
 
@@ -31,7 +32,7 @@ func NewActions() *Actions {
 		func() {
 			_actions = &Actions{}
 			_actions.actions = make(map[string]*Action)
-			_actions.things = NewThingsOnce()
+			_actions.things = wot.NewThings()
 		},
 	)
 	return _actions

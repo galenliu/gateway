@@ -5,15 +5,15 @@
 package cmd
 
 import (
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 
 	"github.com/spf13/cobra"
 )
 
-func (c *command) initConfigurateOptionsCmd() (err error) {
+func (c *command) initConfiguratorOptionsCmd() (err error) {
 
 	cmd := &cobra.Command{
-		Use:   "printconfig",
+		Use:   "print config",
 		Short: "Print default or provided configuration in yaml format",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 

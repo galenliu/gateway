@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway-addon"
 	"github.com/galenliu/gateway/configs"
-	"github.com/galenliu/gateway/pkg/bus"
-	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
@@ -199,7 +197,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 	case internal.DeviceConnectedStateNotification:
 		var connected = json.Get(data, "data", "connected")
 		if connected.LastError() == nil {
-			bus.Publish(util.CONNECTED, device, connected.ToBool())
+			event_bus.Publish(util.CONNECTED, device, connected.ToBool())
 		}
 		return
 
@@ -217,7 +215,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 	}
 }
 
-func (plugin *Plugin) getManager() *AddonManager {
+func (plugin *Plugin) getManager() *manager {
 	return plugin.pluginServer.manager
 }
 

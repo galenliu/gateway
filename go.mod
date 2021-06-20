@@ -10,13 +10,12 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fasthttp/websocket v1.4.3 // indirect
 	github.com/galenliu/gateway-addon v1.0.0
-	github.com/gin-gonic/gin v1.7.1
 	github.com/go-oauth2/oauth2/v4 v4.3.0
 	github.com/go-openapi/swag v0.19.15 // indirect
-	github.com/gofiber/fiber/v2 v2.12.0
+	github.com/gofiber/fiber/v2 v2.13.0
 	github.com/gofiber/websocket/v2 v2.0.3
 	github.com/gorilla/websocket v1.4.2
-	github.com/json-iterator/go v1.1.10
+	github.com/json-iterator/go v1.1.11
 	github.com/mattn/go-sqlite3 v1.14.5
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/pkg/errors v0.9.1 // indirect

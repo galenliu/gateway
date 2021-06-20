@@ -1,4 +1,4 @@
-package wot
+package TD
 
 type Link struct {
 	Href   string      `json:"href,omitempty"`

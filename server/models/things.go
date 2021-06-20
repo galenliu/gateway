@@ -2,7 +2,6 @@ package models
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/util"
 	AddonManager "github.com/galenliu/gateway/plugin"
@@ -144,13 +143,13 @@ func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) 
 }
 
 func (ts *Things) Subscribe(typ string, f interface{}) {
-	_ = bus.Subscribe("Things."+typ, f)
+	_ = event_bus.Subscribe("Things."+typ, f)
 }
 
 func (ts *Things) Unsubscribe(typ string, f interface{}) {
-	_ = bus.Unsubscribe("Things."+typ, f)
+	_ = event_bus.Unsubscribe("Things."+typ, f)
 }
 
 func (ts *Things) Publish(typ string, args ...interface{}) {
-	bus.Publish("Things."+typ, args...)
+	event_bus.Publish("Things."+typ, args...)
 }

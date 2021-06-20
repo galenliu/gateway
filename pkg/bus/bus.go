@@ -2,71 +2,81 @@ package bus
 
 import (
 	"github.com/asaskevich/EventBus"
-	"github.com/galenliu/gateway/pkg/log"
-	"sync"
+	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/wot"
+	"github.com/galenliu/gateway/wot/models"
 )
 
-var instance EventBus.Bus
-var once sync.Once
-
-func initBus() {
-	once.Do(
-		func() {
-			instance = EventBus.New()
-		},
-	)
-
+type EventBusController interface {
+	wot.ThingsEventBus
 }
 
-func Subscribe(topic string, fn interface{}) error {
-
-	if instance == nil {
-		initBus()
-	}
-	return instance.Subscribe(topic, fn)
+type bus struct {
+	logger logging.Logger
+	EventBus.Bus
 }
 
-func Unsubscribe(topic string, fn interface{}) error {
-	if instance == nil {
-		initBus()
-	}
-	return instance.Unsubscribe(topic, fn)
+func (b *bus) ListenCreateThing(f func(data []byte) error) {
+	panic("implement me")
 }
 
-func Publish(topic string, args ...interface{}) {
-	logging.Info("publish topic: " + topic)
-	if instance == nil {
-		initBus()
+func (b *bus) ListenRemoveThing(f func(id string)) {
+	panic("implement me")
+}
+
+func (b *bus) FireThingAdded(thing *models.Thing) {
+	panic("implement me")
+}
+
+func (b *bus) FireThingRemoved(id string) {
+	panic("implement me")
+}
+
+func NewEventBus(log logging.Logger) (EventBusController, error) {
+	bus := &bus{}
+	bus.logger = log
+	bus.Bus = EventBus.New()
+	return bus, nil
+}
+
+func (bus *bus) subscribe(topic string, fn interface{}) {
+	err := bus.Subscribe(topic, fn)
+	if err != nil {
+		bus.logger.Error("topic:%s subscribe err :%s", topic, err.Error())
 	}
-	if !instance.HasCallback(topic) {
+}
+
+func (bus *bus) unsubscribe(topic string, fn interface{}) {
+	err := bus.Unsubscribe(topic, fn)
+	if err != nil {
+		bus.logger.Error("topic: %s unsubscribe err: %s", topic, err.Error())
+	}
+}
+
+func (bus *bus) publish(topic string, args ...interface{}) {
+	if !bus.HasCallback(topic) {
+		bus.logger.Info("topic has not callback")
 		return
 	}
-	instance.Publish(topic, args...)
+	bus.Publish(topic, args...)
 }
 
-func HasCallBack(topic string) bool {
-	return instance.HasCallback(topic)
-}
-
-func SubscribeOnce(topic string, fn interface{}) error {
-	if instance == nil {
-		initBus()
+func (bus *bus) subscribeOnce(topic string, fn interface{}) {
+	err := bus.SubscribeOnce(topic, fn)
+	if err != nil {
+		bus.logger.Error("topic: %s subscribe once err: %s", topic, err.Error())
 	}
-	return instance.SubscribeOnce(topic, fn)
 }
 
-func SubscribeAsync(topic string, fn interface{}) error {
-	if instance == nil {
-		initBus()
+func (bus *bus) subscribeAsync(topic string, fn interface{}) {
+	err := bus.SubscribeAsync(topic, fn, false)
+	if err != nil {
+		bus.logger.Error("topic: %s subscribe async err: %s", topic, err.Error())
 	}
-	return instance.SubscribeAsync(topic, fn, false)
 }
 
-func WaitAsync() {
-	if instance == nil {
-		initBus()
-	}
-	instance.WaitAsync()
+func (bus *bus) waitAsync() {
+	bus.WaitAsync()
 }
 
 //type OnPropertyChangeFunc = func(property *addon.Property)

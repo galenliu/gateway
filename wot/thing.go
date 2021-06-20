@@ -1,42 +1,20 @@
-package models
+package wot
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway-addon"
-	"github.com/galenliu/gateway/pkg/database"
-	"github.com/galenliu/gateway/wot/definitions/data_schema"
-
-	"github.com/galenliu/gateway/pkg/logging"
+	addon "github.com/galenliu/gateway-addon"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/server/models/model"
+	"github.com/galenliu/gateway/wot/definitions/core"
+	"github.com/galenliu/gateway/wot/definitions/data_schema"
+	"github.com/galenliu/gateway/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
 	"strings"
-	"time"
 )
 
 type Thing struct {
-	AtContext    []string `json:"@context"`
-	Title        string   `json:"title"`
-	Titles       []string `json:"titles,omitempty"`
-	ID           string   `json:"id"`
-	AtType       []string `json:"@type"`
-	Description  string   `json:"description,omitempty"`
-	Descriptions []string `json:"descriptions,omitempty"`
-
-	Properties map[string]*model.Property `json:"properties,omitempty"`
-	Actions    map[string]*model.Action   `json:"_actions,omitempty"`
-	Events     map[string]*model.Event    `json:"events,omitempty"`
-
-	Forms   []hypermedia_controls.Form `json:"forms,omitempty"`
-	Links   []hypermedia_controls.Link `json:"links,omitempty"`
-	Support interface{}                `json:"support,omitempty"`
-
-	Version  interface{} `json:"version,omitempty"`
-	Created  *time.Time  `json:"created,omitempty"`
-	Modified *time.Time  `json:"modified,omitempty"`
-
-	Security interface{} `json:"security,omitempty"`
+	*core.Thing
 	//The configuration  of the device
 	Pin                 *addon.PIN `json:"pin,omitempty"`
 	CredentialsRequired bool       `json:"credentialsRequired,omitempty"`
@@ -48,13 +26,13 @@ type Thing struct {
 }
 
 // NewThingFromString 把传入description组装成一个thing对象
-func NewThingFromString(description string) (thing *Thing) {
-
-	id := gjson.Get(description, "id").String()
+func NewThingFromString(description string) (thing *Thing, err error) {
+	bt := []byte(description)
+	id := json.Get(bt, "id").ToString()
 	if id == "" {
-		return nil
+		return nil, fmt.Errorf("invaild id")
 	}
-	title := gjson.Get(description, "title").String()
+	title := json.Get(bt, "title").ToString()
 	if title == "" {
 		title = id
 	}
@@ -73,16 +51,15 @@ func NewThingFromString(description string) (thing *Thing) {
 		atType = append(atType, c.String())
 	}
 	if len(atType) < 1 {
-		logging.Info("new thing err: @type")
-		return nil
+		return nil, fmt.Errorf("new thing err: @type")
 	}
 
-	t := &Thing{
+	t := &Thing{Thing: &core.Thing{
 		AtContext: atContext,
 		AtType:    atType,
 		Title:     title,
 		ID:        thingId,
-	}
+	}}
 
 	t.IconData = gjson.Get(description, "iconData").String()
 	t.Connected = gjson.Get(description, "connected").Bool()
@@ -118,9 +95,9 @@ func NewThingFromString(description string) (thing *Thing) {
 	if gjson.Get(description, "properties").Exists() {
 		var props = gjson.Get(description, "properties").Map()
 		if len(props) > 0 {
-			t.Properties = make(map[string]*model.Property)
+			t.Properties = make(map[string]core.PropertyAffordance)
 			for name, data := range props {
-				prop := model.NewPropertyFromString(data.String())
+				prop := core.NewPropertyFromString(data.String())
 				if prop != nil {
 					if prop.Forms == nil {
 						prop.Forms = append(prop.Forms, hypermedia_controls.Form{
@@ -187,120 +164,5 @@ func NewThingFromString(description string) (thing *Thing) {
 		t.Forms = append(t.Forms, hypermedia_controls.Form{Rel: "alternate", ContentType: "text/html", Href: t.ID})
 		t.Forms = append(t.Forms, hypermedia_controls.Form{Rel: "alternate", Href: fmt.Sprintf("wss://localhost/%s", thingId)})
 	}
-	return t
+	return t, nil
 }
-
-func (t *Thing) setSelectedCapability(s string) {
-	if t.SelectedCapability == s {
-		return
-	}
-	for _, typ := range t.AtType {
-		if s == typ {
-			t.SelectedCapability = s
-			err := t.save()
-			if err != nil {
-				return
-			}
-
-		}
-	}
-
-}
-
-func (t *Thing) GetSelectedCapability() string {
-	return t.SelectedCapability
-}
-
-func (t *Thing) GetID() string {
-	sl := strings.Split(t.ID, "/")
-	id := sl[len(sl)-1]
-	return id
-}
-
-func (t *Thing) SetTitle(title string) string {
-	if t.Title != title {
-		t.Title = title
-		err := t.save()
-		if err != nil {
-			logging.Info(err.Error())
-		}
-
-	}
-	return t.GetDescription()
-}
-
-func (t *Thing) GetTitle() string {
-	return t.Title
-}
-
-func (t *Thing) setConnected(connected bool) {
-	err := t.save()
-	if err != nil {
-		logging.Info(err.Error())
-	}
-	t.Connected = connected
-}
-
-func (t *Thing) isConnected() bool {
-	return t.Connected
-}
-
-func (t *Thing) AddAction(a *Action) bool {
-	_, ok := t.Actions[a.Name]
-	return ok
-}
-
-func (t *Thing) RemoveAction(a *Action) error {
-	_, ok := t.Actions[a.Name]
-	if !ok {
-		return fmt.Errorf("invalid action name :%s", a.Name)
-	}
-	return nil
-}
-
-func (t *Thing) GetDescription() string {
-	s, err := json.MarshalIndent(t, "", "  ")
-	if err != nil {
-		return ""
-	}
-	return string(s)
-}
-
-func (t *Thing) updateFromString(data string) {
-	thing := NewThingFromString(data)
-	t.SetTitle(thing.Title)
-	t.Description = thing.Description
-	if thing.SelectedCapability != "" {
-		t.setSelectedCapability(thing.SelectedCapability)
-	}
-}
-
-func (t *Thing) save() error {
-	err := database.UpdateThing(t.GetID(), t.GetDescription())
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-//func (t *Thing) Subscribe(typ string, f interface{}) {
-//	go func() {
-//		err := event_bus.Subscribe(t.GetID()+"."+typ, f)
-//		if err != nil {
-//			logging.Error(err.Error())
-//		}
-//	}()
-//}
-//
-//func (t *Thing) Unsubscribe(typ string, f interface{}) {
-//	go func() {
-//		err := event_bus.Subscribe(t.GetID()+"."+typ, f)
-//		if err != nil {
-//			logging.Error(err.Error())
-//		}
-//	}()
-//}
-//
-//func (t *Thing) Publish(typ string, args ...interface{}) {
-//	go event_bus.Publish(t.GetID()+"."+typ, args...)
-//}

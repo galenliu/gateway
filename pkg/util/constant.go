@@ -70,12 +70,12 @@ const (
 	READWRITE         = "readwrite"
 	READ              = "read"
 
-	AddonsDir = "addons"
-	DataDir   = "data"
-	ConfigDir = "config"
-	MediaDir  = "media"
-	UploadDir = "upload"
-	LogDir    = "logger"
+	AddonsDirName = "addons"
+	DataDirName   = "data"
+	ConfigDirName = "config"
+	MediaDirName  = "media"
+	UploadDirName = "upload"
+	LogDirName    = "logger"
 
 	DbPrefLang = "preferences.language"
 	PrefLangCn = "zh-CN"

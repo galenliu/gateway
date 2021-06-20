@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
 	AddonManager "github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/models"
@@ -388,7 +387,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 //	if id == "" {
 //		id = controller.thingId
 //	}
-//	device := AddonManager.GetDevice(id)
+//	device := manager.GetDevice(id)
 //	messageType := json.Get(bytes, "messageType").ToString()
 //	m := make(map[string]interface{})
 //
@@ -410,7 +409,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 //		var propertyMap map[string]interface{}
 //		json.Get(bytes, "data").ToVal(&propertyMap)
 //		for propName, value := range propertyMap {
-//			_, setErr := AddonManager.SetProperty(device.GetID(), propName, value)
+//			_, setErr := manager.SetProperty(device.GetID(), propName, value)
 //			if setErr != nil {
 //				m["messageType"] = util.ERROR
 //				m["bytes"] = map[string]interface{}{
@@ -439,7 +438,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 //			th := controller.Container.GetThing(id)
 //			action := models.NewAction(actionName, actionParams, th)
 //			controller.Container.Actions.Add(action)
-//			err := AddonManager.RequestAction(id, action.ID, actionName, actionParams)
+//			err := manager.RequestAction(id, action.ID, actionName, actionParams)
 //			if err != nil {
 //				sendError(400, "400 Bad Request", err.Error())
 //			}
@@ -459,7 +458,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 //	m := make(map[string]interface{})
 //	m["id"] = id
 //	for propName, _ := range thing.Properties {
-//		value, err := AddonManager.GetPropertyValue(id, propName)
+//		value, err := manager.GetPropertyValue(id, propName)
 //		if err != nil {
 //			m["messageType"] = util.PropertyStatus
 //			m["data"] = map[string]interface{}{"message": "property set err"}

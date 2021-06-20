@@ -1,4 +1,4 @@
-package wot
+package TD
 
 type Form struct {
 	Href                string               `json:"href,omitempty"`
@@ -19,7 +19,7 @@ type Response struct {
 type AdditionalResponses struct {
 	ContentType []string    `json:"contentType,omitempty"`
 	Success     bool        `json:"success,omitempty"`
-	Schema      interface{} `json:"schema,omitempty"` //TODO :IDataSchema
+	Schema      interface{} `json:"schema,omitempty"` //TODO :DataSchemaInterface
 }
 
 /*

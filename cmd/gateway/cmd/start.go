@@ -52,10 +52,19 @@ func (c *command) initStartCmd() (err error) {
 
 			logger.Infof("version: %v", gateway.Version)
 
-			g, err := gateway.NewGateway(logger, gateway.Options{
-				DataDir: c.config.GetString(optionNameDataDir),
+			g, err := gateway.NewGateway(gateway.Options{
+				DataDir:            c.config.GetString(optionNameDataDir),
+				AddonDirs:          c.config.GetStringSlice(optionNameAddonDirs),
 				DBRemoveBeforeOpen: c.config.GetBool(optionNameDBRemoveBeforeOpen),
-			})
+				Verbosity:          c.config.GetString(optionNameVerbosity),
+				AddonUrls:          c.config.GetStringSlice(optionNameAddonUrls),
+				IpcAddr:            c.config.GetString(optionNameIpcAddr),
+				HttpAddr:           c.config.GetString(optionNameHttpAddr),
+				HttpsAddr:          c.config.GetString(optionNameHttpsAddr),
+				LogRotateDays:      c.config.GetInt(optionLogRotateDays),
+				HomeKitPin:         c.config.GetString(optionHomeKitPin),
+				HomeKitEnable:      c.config.GetBool(optionHomeKitEnable),
+			}, logger)
 			if err != nil {
 				return err
 			}
@@ -69,7 +78,6 @@ func (c *command) initStartCmd() (err error) {
 				start: func() {
 					// Block main goroutine until it is interrupted
 					sig := <-interruptChannel
-
 					logger.Debugf("received signal: %v", sig)
 					logger.Info("shutting down")
 				},
@@ -100,13 +108,12 @@ func (c *command) initStartCmd() (err error) {
 			if isWindowsService {
 				s, err := service.New(p, &service.Config{
 					Name:        serviceName,
-					DisplayName: "Bee",
-					Description: "Bee, Swarm client.",
+					DisplayName: "Gateway",
+					Description: "WebThings, gateway service.",
 				})
 				if err != nil {
 					return err
 				}
-
 				if err = s.Run(); err != nil {
 					return err
 				}
@@ -115,7 +122,6 @@ func (c *command) initStartCmd() (err error) {
 				p.start()
 				p.stop()
 			}
-
 			return nil
 		},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
