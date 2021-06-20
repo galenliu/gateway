@@ -3,17 +3,17 @@ package data_schema
 import json "github.com/json-iterator/go"
 
 type NullSchema struct {
-	*DataSchema
+	*dataSchema
 }
 
 func NewNullSchemaFromString(data string) *NullSchema {
-	var ds DataSchema
+	var ds dataSchema
 	err := json.Unmarshal([]byte(data), &ds)
 	if err != nil {
 		return nil
 	}
 	var s = NullSchema{}
-	s.DataSchema = &ds
+	s.dataSchema = &ds
 	return &s
 }
 

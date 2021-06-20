@@ -35,7 +35,7 @@ type Thing struct {
 
 	Security []string `json:"security,omitempty"`
 
-	SchemaDefinitions []data_schema.DataSchemaInterface
+	SchemaDefinitions []data_schema.dataSchema
 }
 
 func (t *Thing) GetID() string {

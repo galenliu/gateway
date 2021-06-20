@@ -5,184 +5,154 @@ import (
 	"github.com/galenliu/gateway/wot/definitions/data_schema"
 	"github.com/galenliu/gateway/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
-	"github.com/tidwall/gjson"
 	"github.com/xiam/to"
 )
 
 type PropertyAffordance interface {
+	MarshalJSON() ([]byte, error)
 }
 
 type propertyAffordance struct {
 	*InteractionAffordance
-	data_schema.DataSchemaInterface
-	Observable bool        `json:"observable"`
+	data_schema.DataSchema
+	Observable bool        `json:"observable,omitempty"`
 	Value      interface{} `json:"value,omitempty"`
 }
 
 func NewPropertyAffordanceFromString(description string) PropertyAffordance {
+	data := []byte(description)
 	var p = propertyAffordance{}
 	p.InteractionAffordance = NewInteractionAffordanceFromString(description)
-	p.DataSchemaInterface = data_schema.NewDataSchemaFromString(description)
-	if gjson.Get(description, "observable").Exists() {
-		p.Observable = gjson.Get(description, "observable").Bool()
+	typ := json.Get(data, "type").ToString()
+	switch typ {
+	case hypermedia_controls.Boolean:
+		p.DataSchema = data_schema.NewBooleanSchemaFromString(description)
+	case hypermedia_controls.Integer:
+		p.DataSchema = data_schema.NewIntegerSchemaFromString(description)
+	case hypermedia_controls.Number:
+		p.DataSchema = data_schema.NewNumberSchemaFromString(description)
+	case hypermedia_controls.Array:
+		p.DataSchema = data_schema.NewArraySchemaFromString(description)
+	case hypermedia_controls.String:
+		p.DataSchema = data_schema.NewStringSchemaFromString(description)
+	case hypermedia_controls.Null:
+		p.DataSchema = data_schema.NewNullSchemaFromString(description)
+	case hypermedia_controls.Object:
+		p.DataSchema = data_schema.NewObjectSchemaFromString(description)
 	}
+	vt := json.Get(data, "observable").ValueType()
+	if vt == json.BoolValue {
+		p.Observable = json.Get(data, "observable").ToBool()
+	}
+	p.Value = json.Get(data, "value").GetInterface()
+
 	return p
 }
 
-// SetCachedValue 设置本地缓存的值
-func (p *propertyAffordance) SetCachedValue(value interface{}) {
-	value = p.convert(value)
-	p.Value = p.clamp(value)
-}
-
-func (p *propertyAffordance) ToValue(value interface{}) interface{} {
-	newValue := p.convert(value)
-	newValue = p.convert(newValue)
-	return newValue
-}
-
-//确保属性值相应的类型
-func (p *propertyAffordance) convert(v interface{}) interface{} {
-	switch p.GetType() {
-	case hypermedia_controls.Number:
-		return to.Float64(v)
-	case hypermedia_controls.Integer:
-		return int(to.Uint64(v))
-	case hypermedia_controls.Boolean:
-		return to.Bool(v)
-	default:
-		return v
-	}
-}
-
-//确保属性值在允许的范围
-func (p *propertyAffordance) clamp(v interface{}) interface{} {
-	switch p.DataSchemaInterface.(type) {
-	case *data_schema.NumberSchema:
-		d := p.DataSchemaInterface.(*data_schema.NumberSchema)
-		return d.ClampFloat(to.Float64(v))
-	case data_schema.NumberSchema:
-		d := p.DataSchemaInterface.(*data_schema.NumberSchema)
-		return d.ClampFloat(to.Float64(v))
-	case *data_schema.IntegerSchema:
-		d := p.DataSchemaInterface.(*data_schema.IntegerSchema)
-		return d.ClampInt(to.Int64(v))
-	case data_schema.IntegerSchema:
-		d := p.DataSchemaInterface.(*data_schema.IntegerSchema)
-		return d.ClampInt(to.Int64(v))
-	default:
-		return v
-	}
-
+func (p *propertyAffordance) GetDescription() string {
+	return p.InteractionAffordance.Description
 }
 
 func (p propertyAffordance) MarshalJSON() ([]byte, error) {
 
-	if p.DataSchemaInterface == nil {
-		return nil, fmt.Errorf("dataschema err")
+	if p.DataSchema == nil {
+		return nil, fmt.Errorf("dataschema nil")
 	}
-	switch p.DataSchemaInterface.(type) {
-	case *data_schema.ArraySchema:
-		d := p.DataSchemaInterface.(*data_schema.ArraySchema)
-		var pa = ArrayPropertyAffordance{p.InteractionAffordance, d, p.Observable, p.Value}
-		pa.AtType = d.AtType
-		return json.MarshalIndent(pa, "", "  ")
-	case data_schema.ArraySchema:
-		d := p.DataSchemaInterface.(data_schema.ArraySchema)
-		var pa = ArrayPropertyAffordance{p.InteractionAffordance, &d, p.Observable, p.Value}
-		pa.AtType = d.AtType
-		return json.MarshalIndent(pa, "", "  ")
-	case *data_schema.BooleanSchema:
-		d := p.DataSchemaInterface.(*data_schema.BooleanSchema)
-		var pa = BooleanPropertyAffordance{p.InteractionAffordance, d, p.Observable, to.Bool(p.Value)}
-		pa.AtType = d.AtType
-		return json.MarshalIndent(pa, "", "  ")
-	case data_schema.BooleanSchema:
-		d := p.DataSchemaInterface.(data_schema.BooleanSchema)
-		var pa = BooleanPropertyAffordance{p.InteractionAffordance, &d, p.Observable, to.Bool(p.Value)}
-		pa.AtType = d.AtType
-		return json.MarshalIndent(pa, "", "  ")
-	case *data_schema.NumberSchema:
-		d := p.DataSchemaInterface.(*data_schema.NumberSchema)
-		var pa = NumberPropertyAffordance{p.InteractionAffordance, d, p.Observable, to.Float64(p.Value)}
-		pa.AtType = d.AtType
-		return json.MarshalIndent(pa, "", "  ")
-	case data_schema.NumberSchema:
-		d := p.DataSchemaInterface.(data_schema.NumberSchema)
-		var pa = NumberPropertyAffordance{p.InteractionAffordance, &d, p.Observable, to.Float64(p.Value)}
-		pa.AtType = d.AtType
-		return json.MarshalIndent(pa, "", "  ")
-	case *data_schema.IntegerSchema:
-		d := p.DataSchemaInterface.(*data_schema.IntegerSchema)
-		var pa = IntegerPropertyAffordance{p.InteractionAffordance, d, p.Observable, to.Int64(p.Value)}
-		pa.AtType = d.AtType
-		return json.MarshalIndent(pa, "", "  ")
-	case data_schema.IntegerSchema:
-		d := p.DataSchemaInterface.(data_schema.IntegerSchema)
-		var pa = IntegerPropertyAffordance{p.InteractionAffordance, &d, p.Observable, to.Int64(p.Value)}
-		pa.AtType = d.AtType
-		return json.MarshalIndent(pa, "", "  ")
-	case *data_schema.ObjectSchema:
-		d := p.DataSchemaInterface.(*data_schema.ObjectSchema)
-		var pa = ObjectPropertyAffordance{p.InteractionAffordance, d, p.Observable, p.Value}
-		pa.AtType = d.AtType
-		return json.MarshalIndent(pa, "", "  ")
-	case data_schema.ObjectSchema:
-		d := p.DataSchemaInterface.(data_schema.ObjectSchema)
-		var pa = ObjectPropertyAffordance{p.InteractionAffordance, &d, p.Observable, p.Value}
-		pa.AtType = d.AtType
-		return json.MarshalIndent(pa, "", "  ")
-	case *data_schema.StringSchema:
-		d := p.DataSchemaInterface.(*data_schema.StringSchema)
-		var pa = StringPropertyAffordance{p.InteractionAffordance, d, p.Observable, to.String(p.Value)}
-		pa.AtType = d.AtType
-		return json.MarshalIndent(pa, "", "  ")
-	case data_schema.StringSchema:
-		d := p.DataSchemaInterface.(data_schema.StringSchema)
-		var pa = StringPropertyAffordance{p.InteractionAffordance, &d, p.Observable, to.String(p.Value)}
-		pa.AtType = d.AtType
-		return json.MarshalIndent(pa, "", "  ")
-	case *data_schema.NullSchema:
-		d := p.DataSchemaInterface.(*data_schema.NullSchema)
-		var pa = NullPropertyAffordance{p.InteractionAffordance, d, p.Observable, p.Value}
-		pa.AtType = d.AtType
-		return json.MarshalIndent(pa, "", "  ")
-	case data_schema.NullSchema:
-		d := p.DataSchemaInterface.(data_schema.NullSchema)
-		var pa = NullPropertyAffordance{p.InteractionAffordance, &d, p.Observable, p.Value}
-		pa.AtType = d.AtType
-		return json.MarshalIndent(pa, "", "  ")
-	default:
-		return nil, fmt.Errorf("property type err")
-	}
+	return json.MarshalIndent(&p, "", " ")
+
+	//switch p.DataSchema.(type) {
+	//case *data_schema.ArraySchema:
+	//	d := p.DataSchema.(*data_schema.ArraySchema)
+	//	var pa = ArrayPropertyAffordance{p.InteractionAffordance, d, p.Observable, p.Value}
+	//	pa.AtType = d.AtType
+	//	return json.MarshalIndent(pa, "", "  ")
+	//case data_schema.ArraySchema:
+	//	d := p.DataSchema.(data_schema.ArraySchema)
+	//	var pa = ArrayPropertyAffordance{p.InteractionAffordance, &d, p.Observable, p.Value}
+	//	pa.AtType = d.AtType
+	//	return json.MarshalIndent(pa, "", "  ")
+	//case *data_schema.BooleanSchema:
+	//	d := p.DataSchema.(*data_schema.BooleanSchema)
+	//	var pa = BooleanPropertyAffordance{p.InteractionAffordance, d, p.Observable, to.Bool(p.Value)}
+	//	pa.AtType = d.AtType
+	//	return json.MarshalIndent(pa, "", "  ")
+	//case data_schema.BooleanSchema:
+	//	d := p.DataSchema.(data_schema.BooleanSchema)
+	//	var pa = BooleanPropertyAffordance{p.InteractionAffordance, &d, p.Observable, to.Bool(p.Value)}
+	//	pa.AtType = d.AtType
+	//	return json.MarshalIndent(pa, "", "  ")
+	//case *data_schema.NumberSchema:
+	//	d := p.DataSchema.(*data_schema.NumberSchema)
+	//	var pa = NumberPropertyAffordance{p.InteractionAffordance, d, p.Observable, to.Float64(p.Value)}
+	//	pa.AtType = d.AtType
+	//	return json.MarshalIndent(pa, "", "  ")
+	//case data_schema.NumberSchema:
+	//	d := p.DataSchema.(data_schema.NumberSchema)
+	//	var pa = NumberPropertyAffordance{p.InteractionAffordance, &d, p.Observable, to.Float64(p.Value)}
+	//	pa.AtType = d.AtType
+	//	return json.MarshalIndent(pa, "", "  ")
+	//case *data_schema.IntegerSchema:
+	//	d := p.DataSchema.(*data_schema.IntegerSchema)
+	//	var pa = IntegerPropertyAffordance{p.InteractionAffordance, d, p.Observable, to.Int64(p.Value)}
+	//	pa.AtType = d.AtType
+	//	return json.MarshalIndent(pa, "", "  ")
+	//case data_schema.IntegerSchema:
+	//	d := p.DataSchema.(data_schema.IntegerSchema)
+	//	var pa = IntegerPropertyAffordance{p.InteractionAffordance, &d, p.Observable, to.Int64(p.Value)}
+	//	pa.AtType = d.AtType
+	//	return json.MarshalIndent(pa, "", "  ")
+	//case *data_schema.ObjectSchema:
+	//	d := p.DataSchema.(*data_schema.ObjectSchema)
+	//	var pa = ObjectPropertyAffordance{p.InteractionAffordance, d, p.Observable, p.Value}
+	//	pa.AtType = d.AtType
+	//	return json.MarshalIndent(pa, "", "  ")
+	//case data_schema.ObjectSchema:
+	//	d := p.DataSchema.(data_schema.ObjectSchema)
+	//	var pa = ObjectPropertyAffordance{p.InteractionAffordance, &d, p.Observable, p.Value}
+	//	pa.AtType = d.AtType
+	//	return json.MarshalIndent(pa, "", "  ")
+	//case *data_schema.StringSchema:
+	//	d := p.DataSchema.(*data_schema.StringSchema)
+	//	var pa = StringPropertyAffordance{p.InteractionAffordance, d, p.Observable, to.String(p.Value)}
+	//	pa.AtType = d.AtType
+	//	return json.MarshalIndent(pa, "", "  ")
+	//case data_schema.StringSchema:
+	//	d := p.DataSchema.(data_schema.StringSchema)
+	//	var pa = StringPropertyAffordance{p.InteractionAffordance, &d, p.Observable, to.String(p.Value)}
+	//	pa.AtType = d.AtType
+	//	return json.MarshalIndent(pa, "", "  ")
+	//case *data_schema.NullSchema:
+	//	d := p.DataSchema.(*data_schema.NullSchema)
+	//	var pa = NullPropertyAffordance{p.InteractionAffordance, d, p.Observable, p.Value}
+	//	pa.AtType = d.AtType
+	//	return json.MarshalIndent(pa, "", "  ")
+	//case data_schema.NullSchema:
+	//	d := p.DataSchema.(data_schema.NullSchema)
+	//	var pa = NullPropertyAffordance{p.InteractionAffordance, &d, p.Observable, p.Value}
+	//	pa.AtType = d.AtType
+	//	return json.MarshalIndent(pa, "", "  ")
+	//default:
+	//	return nil, fmt.Errorf("property type err")
+	//}
 }
 
 // GetDefaultValue 获取默认的值
 func (p *propertyAffordance) GetDefaultValue() interface{} {
-	switch p.DataSchemaInterface.(type) {
-	case *data_schema.NumberSchema:
-		d := p.DataSchemaInterface.(*data_schema.NumberSchema)
+	switch p.DataSchema.GetType() {
+	case hypermedia_controls.Number:
+		d := p.DataSchema.(*data_schema.NumberSchema)
 		return d.Minimum
-	case data_schema.NumberSchema:
-		d := p.DataSchemaInterface.(data_schema.NumberSchema)
+	case hypermedia_controls.Integer:
+		d := p.DataSchema.(*data_schema.IntegerSchema)
 		return d.Minimum
-	case *data_schema.IntegerSchema:
-		d := p.DataSchemaInterface.(*data_schema.IntegerSchema)
-		return d.Minimum
-	case data_schema.IntegerSchema:
-		d := p.DataSchemaInterface.(data_schema.IntegerSchema)
-		return d.Minimum
-
-	case *data_schema.BooleanSchema:
+	case hypermedia_controls.Boolean:
 		return false
-	case data_schema.BooleanSchema:
-		return false
-
-	case *data_schema.StringSchema:
+	case hypermedia_controls.String:
 		return ""
-	case data_schema.StringSchema:
-		return ""
-
+	case hypermedia_controls.Array:
+		return []interface{}{}
+	case hypermedia_controls.Null:
+		return nil
 	default:
 		return nil
 	}
@@ -190,18 +160,18 @@ func (p *propertyAffordance) GetDefaultValue() interface{} {
 
 // SetMaxValue 设置最大值
 func (p *propertyAffordance) SetMaxValue(v interface{}) {
-	switch p.DataSchemaInterface.(type) {
+	switch p.DataSchema.(type) {
 	case *data_schema.NumberSchema:
-		d := p.DataSchemaInterface.(*data_schema.NumberSchema)
+		d := p.DataSchema.(*data_schema.NumberSchema)
 		d.Maximum = to.Float64(v)
 	case data_schema.NumberSchema:
-		d := p.DataSchemaInterface.(*data_schema.NumberSchema)
+		d := p.DataSchema.(*data_schema.NumberSchema)
 		d.Maximum = to.Float64(v)
 	case *data_schema.IntegerSchema:
-		d := p.DataSchemaInterface.(*data_schema.IntegerSchema)
+		d := p.DataSchema.(*data_schema.IntegerSchema)
 		d.Maximum = to.Int64(v)
 	case data_schema.IntegerSchema:
-		d := p.DataSchemaInterface.(*data_schema.IntegerSchema)
+		d := p.DataSchema.(*data_schema.IntegerSchema)
 		d.Maximum = to.Int64(v)
 	default:
 		fmt.Print("property type err")
@@ -211,18 +181,18 @@ func (p *propertyAffordance) SetMaxValue(v interface{}) {
 
 // SetMinValue 设置最小值
 func (p *propertyAffordance) SetMinValue(v interface{}) {
-	switch p.DataSchemaInterface.(type) {
+	switch p.DataSchema.(type) {
 	case *data_schema.NumberSchema:
-		d := p.DataSchemaInterface.(*data_schema.NumberSchema)
+		d := p.DataSchema.(*data_schema.NumberSchema)
 		d.Minimum = to.Float64(v)
 	case data_schema.NumberSchema:
-		d := p.DataSchemaInterface.(*data_schema.NumberSchema)
+		d := p.DataSchema.(*data_schema.NumberSchema)
 		d.Minimum = to.Float64(v)
 	case *data_schema.IntegerSchema:
-		d := p.DataSchemaInterface.(*data_schema.IntegerSchema)
+		d := p.DataSchema.(*data_schema.IntegerSchema)
 		d.Minimum = to.Int64(v)
 	case data_schema.IntegerSchema:
-		d := p.DataSchemaInterface.(*data_schema.IntegerSchema)
+		d := p.DataSchema.(*data_schema.IntegerSchema)
 		d.Minimum = to.Int64(v)
 
 	default:

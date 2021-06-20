@@ -1,11 +1,12 @@
 package data_schema
 
 import (
+	"github.com/galenliu/gateway/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
 )
 
 type BooleanSchema struct {
-	*DataSchema
+	*dataSchema
 }
 
 func NewBooleanSchema() *BooleanSchema {
@@ -15,13 +16,13 @@ func NewBooleanSchema() *BooleanSchema {
 }
 
 func NewBooleanSchemaFromString(data string) *BooleanSchema {
-	var ds DataSchema
+	var ds dataSchema
 	err := json.Unmarshal([]byte(data), &ds)
 	if err != nil {
 		return nil
 	}
 	var s = BooleanSchema{}
-	s.DataSchema = &ds
+	s.dataSchema = &ds
 	return &s
 }
 

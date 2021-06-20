@@ -14,10 +14,10 @@ type ActionAffordance interface {
 type actionAffordance struct {
 	*InteractionAffordance
 
-	Input      data_schema.DataSchemaInterface `json:"input,omitempty"`
-	Output     data_schema.DataSchemaInterface `json:"output,omitempty"`
-	Safe       bool                            `json:"safe,omitempty"`
-	Idempotent bool                            `json:"idempotent,omitempty"`
+	Input      data_schema.dataSchema `json:"input,omitempty"`
+	Output     data_schema.dataSchema `json:"output,omitempty"`
+	Safe       bool                   `json:"safe,omitempty"`
+	Idempotent bool                   `json:"idempotent,omitempty"`
 }
 
 func NewActionAffordanceFromString(data string) ActionAffordance {

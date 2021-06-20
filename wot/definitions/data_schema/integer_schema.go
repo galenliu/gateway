@@ -6,7 +6,7 @@ import (
 )
 
 type IntegerSchema struct {
-	*DataSchema
+	*dataSchema
 	Minimum          int64 `json:"minimum"`
 	ExclusiveMinimum int64 `json:"exclusiveMinimum,omitempty"`
 	Maximum          int64 `json:"maximum,omitempty"`
@@ -15,7 +15,7 @@ type IntegerSchema struct {
 }
 
 func NewIntegerSchemaFromString(data string) *IntegerSchema {
-	var ds DataSchema
+	var ds dataSchema
 	err := json.Unmarshal([]byte(data), &ds)
 	if err != nil {
 		return nil
@@ -26,7 +26,7 @@ func NewIntegerSchemaFromString(data string) *IntegerSchema {
 	s.Maximum = gjson.Get(data, "maximum").Int()
 	s.ExclusiveMaximum = gjson.Get(data, "exclusiveMaximum").Int()
 	s.MultipleOf = gjson.Get(data, "multipleOf").Int()
-	s.DataSchema = &ds
+	s.dataSchema = &ds
 	return s
 }
 

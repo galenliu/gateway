@@ -7,22 +7,22 @@ import (
 )
 
 type ObjectSchema struct {
-	*DataSchema
-	Properties map[string]DataSchemaInterface `json:"properties,omitempty"`
-	Required   []string                       `json:"required,omitempty"`
+	*dataSchema
+	Properties map[string]dataSchema `json:"properties,omitempty"`
+	Required   []string              `json:"required,omitempty"`
 }
 
 func NewObjectSchema() *ObjectSchema {
 	obj := &ObjectSchema{}
-	obj.Properties = make(map[string]DataSchemaInterface)
-	obj.DataSchema = &DataSchema{
+	obj.Properties = make(map[string]dataSchema)
+	obj.dataSchema = &dataSchema{
 		Type: hypermedia_controls.Object,
 	}
 	return obj
 }
 
 func NewObjectSchemaFromString(data string) *ObjectSchema {
-	var ds DataSchema
+	var ds dataSchema
 	err := json.Unmarshal([]byte(data), &ds)
 	if err != nil {
 		fmt.Print(err.Error())
@@ -31,7 +31,7 @@ func NewObjectSchemaFromString(data string) *ObjectSchema {
 	var s = NewObjectSchema()
 	m := gjson.Get(data, "properties").Map()
 	if len(m) > 0 {
-		s.Properties = make(map[string]DataSchemaInterface)
+		s.Properties = make(map[string]dataSchema)
 		for k, v := range m {
 			s.Properties[k] = NewDataSchemaFromString(v.String())
 		}
@@ -42,7 +42,7 @@ func NewObjectSchemaFromString(data string) *ObjectSchema {
 			s.Required = append(s.Required, d.String())
 		}
 	}
-	s.DataSchema = &ds
+	s.dataSchema = &ds
 	return s
 }
 

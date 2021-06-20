@@ -6,7 +6,7 @@ import (
 )
 
 type NumberSchema struct {
-	*DataSchema
+	*dataSchema
 	Minimum          float64 `json:"minimum"`
 	ExclusiveMinimum float64 `json:"exclusiveMinimum,omitempty"`
 	Maximum          float64 `json:"maximum,omitempty"`
@@ -15,7 +15,7 @@ type NumberSchema struct {
 }
 
 func NewNumberSchemaFromString(data string) *NumberSchema {
-	var ds DataSchema
+	var ds dataSchema
 	err := json.Unmarshal([]byte(data), &ds)
 	if err != nil {
 		return nil
@@ -26,7 +26,7 @@ func NewNumberSchemaFromString(data string) *NumberSchema {
 	s.Maximum = gjson.Get(data, "maximum").Float()
 	s.ExclusiveMaximum = gjson.Get(data, "exclusiveMaximum").Float()
 	s.MultipleOf = gjson.Get(data, "multipleOf").Float()
-	s.DataSchema = &ds
+	s.dataSchema = &ds
 	return s
 }
 

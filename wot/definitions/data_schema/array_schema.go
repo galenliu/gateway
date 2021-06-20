@@ -7,14 +7,14 @@ import (
 )
 
 type ArraySchema struct {
-	*DataSchema
-	Items    []DataSchemaInterface `json:"items,omitempty"`
-	MinItems int                   `json:"minItems,omitempty"`
-	MaxItems int                   `json:"maxItems,omitempty"`
+	*dataSchema
+	Items    []dataSchema `json:"items,omitempty"`
+	MinItems int          `json:"minItems,omitempty"`
+	MaxItems int          `json:"maxItems,omitempty"`
 }
 
 func NewArraySchemaFromString(data string) *ArraySchema {
-	var ds DataSchema
+	var ds dataSchema
 	err := json.Unmarshal([]byte(data), &ds)
 	if err != nil {
 		return nil
@@ -28,7 +28,7 @@ func NewArraySchemaFromString(data string) *ArraySchema {
 	}
 	s.MinItems = int(gjson.Get(data, "minItems").Int())
 	s.MaxItems = int(gjson.Get(data, "maxItems").Int())
-	s.DataSchema = &ds
+	s.dataSchema = &ds
 	return &s
 }
 

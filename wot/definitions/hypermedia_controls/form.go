@@ -19,7 +19,7 @@ type Response struct {
 type AdditionalResponses struct {
 	ContentType []string    `json:"contentType,omitempty"`
 	Success     bool        `json:"success,omitempty"`
-	Schema      interface{} `json:"schema,omitempty"` //TODO :DataSchemaInterface
+	Schema      interface{} `json:"schema,omitempty"` //TODO :dataSchema
 }
 
 /*

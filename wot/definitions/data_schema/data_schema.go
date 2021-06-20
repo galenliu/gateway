@@ -17,86 +17,7 @@ const (
 	EXI      = "application/exi"
 )
 
-type DataSchema struct {
-	AtType           string        `json:"@type,omitempty"`
-	Title            string        `json:"title"`
-	Titles           []string      `json:"titles,omitempty"`
-	Description      string        `json:"description,omitempty"`
-	Descriptions     []string      `json:"descriptions,omitempty"`
-	Unit             string        `json:"unit,omitempty"`
-	Const            interface{}   `json:"const,omitempty"`
-	OneOf            []DataSchema  `json:"oneOf,,omitempty"`
-	Enum             []interface{} `json:"enum,omitempty"`
-	ReadOnly         bool          `json:"readOnly,omitempty"`
-	WriteOnly        bool          `json:"writeOnly,omitempty"`
-	Format           string        `json:"format,omitempty"`
-	ContentEncoding  string        `json:"contentEncoding,,omitempty"`
-	ContentMediaType string        `json:"contentMediaType,,omitempty"`
-
-	Type string `json:"type"`
-}
-
-func NewDataSchemaFromString(data string) DataSchemaInterface {
-	typ := json.Get([]byte(data), "type").ToString()
-	switch typ {
-	case hypermedia_controls.Array:
-		return NewArraySchemaFromString(data)
-	case hypermedia_controls.Boolean:
-		return NewBooleanSchemaFromString(data)
-	case hypermedia_controls.Number:
-		return NewNumberSchemaFromString(data)
-	case hypermedia_controls.Integer:
-		return NewIntegerSchemaFromString(data)
-	case hypermedia_controls.Object:
-		return NewObjectSchemaFromString(data)
-	case hypermedia_controls.String:
-		return NewStringSchemaFromString(data)
-	case hypermedia_controls.Null:
-		return NewNullSchemaFromString(data)
-	default:
-		return nil
-	}
-}
-
-func (d *DataSchema) GetType() string {
-	return d.Type
-}
-
-func (d *DataSchema) GetAtType() string {
-	return d.AtType
-}
-
-func (d *DataSchema) SetAtType(s string) {
-	if s != "" {
-		d.AtType = s
-	}
-}
-
-func (d *DataSchema) SetType(s string) {
-	if s != "" {
-		if s == hypermedia_controls.Number || s == hypermedia_controls.Integer || s == hypermedia_controls.Object || s == hypermedia_controls.Array || s == hypermedia_controls.String || s == hypermedia_controls.Boolean || s == hypermedia_controls.Null {
-			d.Type = s
-		}
-	}
-}
-
-func (d *DataSchema) SetTitle(s string) {
-	d.Title = s
-}
-
-func (d *DataSchema) IsReadOnly() bool {
-	return d.ReadOnly
-}
-
-func (d *DataSchema) SetUnit(string2 string) {
-	d.Unit = string2
-}
-
-func (d *DataSchema) SetEnum(e []interface{}) {
-	d.Enum = e
-}
-
-type DataSchemaInterface interface {
+type DataSchema interface {
 	GetType() string
 	GetAtType() string
 	SetAtType(string)
@@ -106,6 +27,112 @@ type DataSchemaInterface interface {
 	SetTitle(s string)
 	SetEnum([]interface{})
 
+	MarshalJSON() ([]byte, error)
+
 	//MarshalJSON() ([]byte, error)
 	//UnmarshalJSON(data []byte) error
+}
+
+type dataSchema struct {
+	AtType           string        `json:"@type,omitempty"`
+	Title            string        `json:"title"`
+	Titles           []string      `json:"titles,omitempty"`
+	Description      string        `json:"description,omitempty"`
+	Descriptions     []string      `json:"descriptions,omitempty"`
+	Unit             string        `json:"unit,omitempty"`
+	Const            interface{}   `json:"const,omitempty"`
+	OneOf            []dataSchema  `json:"oneOf,,omitempty"`
+	Enum             []interface{} `json:"enum,omitempty"`
+	ReadOnly         bool          `json:"readOnly,omitempty"`
+	WriteOnly        bool          `json:"writeOnly,omitempty"`
+	Format           string        `json:"format,omitempty"`
+	ContentEncoding  string        `json:"contentEncoding,,omitempty"`
+	ContentMediaType string        `json:"contentMediaType,,omitempty"`
+	Type             string        `json:"type"`
+}
+
+func newDataSchemaFromString(description string) dataSchema {
+	data := []byte(description)
+	schema := dataSchema{}
+	schema.AtType = json.Get(data, "@type").ToString()
+	schema.Title = json.Get(data, "title").ToString()
+	schema.Titles = json.Get(data, "@type").Keys()
+
+	schema.Description = json.Get(data, "description").ToString()
+	schema.Descriptions = json.Get(data, "descriptions").Keys()
+
+	schema.Unit = json.Get(data, "unit").ToString()
+
+	schema.Const = json.Get(data, "const").GetInterface()
+
+	var oneOf []dataSchema
+	json.Get(data, "oneOff").ToVal(&oneOf)
+	if len(oneOf) > 0 {
+		schema.OneOf = oneOf
+	}
+
+	var enum []interface{}
+	json.Get(data, "enum").ToVal(&enum)
+	if len(oneOf) > 0 {
+		schema.Enum = enum
+	}
+
+	schema.ReadOnly = json.Get(data, "readOnly").ToBool()
+	schema.WriteOnly = json.Get(data, "writeOnly").ToBool()
+
+	schema.Format = json.Get(data, "format").ToString()
+
+	schema.ContentEncoding = json.Get(data, "contentEncoding").ToString()
+
+	schema.ContentMediaType = json.Get(data, "contentMediaType").ToString()
+
+	schema.Type = json.Get(data, "type").ToString()
+
+	return schema
+}
+
+func (d *dataSchema) MarshalJSON() ([]byte, error) {
+	return json.MarshalIndent(&d, "", "  ")
+}
+
+func (d *dataSchema) GetType() string {
+	return d.Type
+}
+
+func (d *dataSchema) GetAtType() string {
+	return d.AtType
+}
+
+func (d *dataSchema) SetAtType(s string) {
+	if s != "" {
+		d.AtType = s
+	}
+}
+
+func (d *dataSchema) SetType(s string) {
+	if s != "" {
+		if s == hypermedia_controls.Number || s == hypermedia_controls.Integer || s == hypermedia_controls.Object || s == hypermedia_controls.Array || s == hypermedia_controls.String || s == hypermedia_controls.Boolean || s == hypermedia_controls.Null {
+			d.Type = s
+		}
+	}
+}
+
+func (d *dataSchema) GetDescription() string {
+	return d.Description
+}
+
+func (d *dataSchema) SetTitle(s string) {
+	d.Title = s
+}
+
+func (d *dataSchema) IsReadOnly() bool {
+	return d.ReadOnly
+}
+
+func (d *dataSchema) SetUnit(string2 string) {
+	d.Unit = string2
+}
+
+func (d *dataSchema) SetEnum(e []interface{}) {
+	d.Enum = e
 }

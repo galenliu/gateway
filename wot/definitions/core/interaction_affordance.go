@@ -9,13 +9,13 @@ import (
 )
 
 type InteractionAffordance struct {
-	AtType       string                                     `json:"@type"`
-	Title        string                                     `json:"title,omitempty"`
-	Titles       map[string]string                          `json:"titles,omitempty"`
-	Description  string                                     `json:"description,omitempty"`
-	Descriptions map[string]string                          `json:"descriptions,omitempty"`
-	Forms        []hypermedia_controls.Form                 `json:"forms,omitempty"`
-	UriVariables map[string]data_schema.DataSchemaInterface `json:"uriVariables,omitempty"`
+	AtType       string                            `json:"@type"`
+	Title        string                            `json:"title,omitempty"`
+	Titles       map[string]string                 `json:"titles,omitempty"`
+	Description  string                            `json:"description,omitempty"`
+	Descriptions map[string]string                 `json:"descriptions,omitempty"`
+	Forms        []hypermedia_controls.Form        `json:"forms,omitempty"`
+	UriVariables map[string]data_schema.DataSchema `json:"uriVariables,omitempty"`
 }
 
 func NewInteractionAffordanceFromString(description string) *InteractionAffordance {
@@ -24,7 +24,7 @@ func NewInteractionAffordanceFromString(description string) *InteractionAffordan
 	if gjson.Get(description, "uriVariables").Exists() {
 		m := gjson.Get(description, "uriVariables").Map()
 		if len(m) > 0 {
-			i.UriVariables = make(map[string]data_schema.DataSchemaInterface)
+			i.UriVariables = make(map[string]data_schema.DataSchema)
 			for k, v := range m {
 				i.UriVariables[k] = data_schema.NewDataSchemaFromString(v.String())
 			}

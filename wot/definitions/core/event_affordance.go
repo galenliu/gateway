@@ -12,9 +12,9 @@ type EventAffordance interface {
 
 type eventAffordance struct {
 	*InteractionAffordance
-	Subscription data_schema.DataSchemaInterface `json:"subscription,omitempty"`
-	Data         data_schema.DataSchemaInterface `json:"data,omitempty"`
-	Cancellation data_schema.DataSchemaInterface `json:"cancellation,omitempty"`
+	Subscription data_schema.dataSchema `json:"subscription,omitempty"`
+	Data         data_schema.dataSchema `json:"data,omitempty"`
+	Cancellation data_schema.dataSchema `json:"cancellation,omitempty"`
 }
 
 func NewEventAffordanceFromString(data string) EventAffordance {

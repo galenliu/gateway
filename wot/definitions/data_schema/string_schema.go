@@ -6,13 +6,13 @@ import (
 )
 
 type StringSchema struct {
-	*DataSchema
+	*dataSchema
 	MinLength int64 `json:"minLength,omitempty"`
 	MaxLength int64 `json:"maxLength,omitempty"`
 }
 
 func NewStringSchemaFromString(data string) *StringSchema {
-	var ds DataSchema
+	var ds dataSchema
 	err := json.Unmarshal([]byte(data), &ds)
 	if err != nil {
 		return nil
@@ -21,7 +21,7 @@ func NewStringSchemaFromString(data string) *StringSchema {
 	s.MinLength = gjson.Get(data, "minLength").Int()
 	s.MaxLength = gjson.Get(data, "maxLength").Int()
 
-	s.DataSchema = &ds
+	s.dataSchema = &ds
 	return s
 }
 
