@@ -3,12 +3,12 @@ package bus
 import (
 	"github.com/asaskevich/EventBus"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/wot"
-	"github.com/galenliu/gateway/wot/models"
+	models2 "github.com/galenliu/gateway/pkg/wot/models"
+	"github.com/galenliu/gateway/things"
 )
 
 type EventBusController interface {
-	wot.ThingsEventBus
+	things.ThingsEventBus
 }
 
 type bus struct {
@@ -24,7 +24,7 @@ func (b *bus) ListenRemoveThing(f func(id string)) {
 	panic("implement me")
 }
 
-func (b *bus) FireThingAdded(thing *models.Thing) {
+func (b *bus) FireThingAdded(thing *models2.Thing) {
 	panic("implement me")
 }
 

@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway-addon"
 	"github.com/galenliu/gateway/pkg/database"
-	"github.com/galenliu/gateway/wot/definitions/data_schema"
-
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
+	data_schema2 "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	"github.com/galenliu/gateway/server/models/model"
 	json "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
@@ -125,7 +124,7 @@ func NewThingFromString(description string) (thing *Thing) {
 					if prop.Forms == nil {
 						prop.Forms = append(prop.Forms, hypermedia_controls.Form{
 							Href:        fmt.Sprintf("%s%s/%s", thingId, util.PropertiesPath, name),
-							ContentType: data_schema.ApplicationJson,
+							ContentType: data_schema2.ApplicationJson,
 							Op:          []string{hypermedia_controls.ReadProperty, hypermedia_controls.WriteProperty},
 						})
 					}
@@ -133,7 +132,7 @@ func NewThingFromString(description string) (thing *Thing) {
 				}
 			}
 		}
-		t.Forms = append(t.Forms, hypermedia_controls.Form{Op: []string{hypermedia_controls.ReadallProperties, hypermedia_controls.WriteAllProperties}, Href: thingId + util.PropertiesPath, ContentType: data_schema.ApplicationJson})
+		t.Forms = append(t.Forms, hypermedia_controls.Form{Op: []string{hypermedia_controls.ReadallProperties, hypermedia_controls.WriteAllProperties}, Href: thingId + util.PropertiesPath, ContentType: data_schema2.ApplicationJson})
 	}
 
 	if gjson.Get(description, "_actions").Exists() {

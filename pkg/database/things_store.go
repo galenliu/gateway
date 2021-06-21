@@ -1,12 +1,14 @@
 package database
 
-import "github.com/galenliu/gateway/wot/models"
+import (
+	models2 "github.com/galenliu/gateway/pkg/wot/models"
+)
 
 func (s *store) RemoveThing(id string) error {
 	panic("implement me")
 }
 
-func (s *store) SaveThing(t *models.Thing) error {
+func (s *store) SaveThing(t *models2.Thing) error {
 	panic("implement me")
 }
 

@@ -6,8 +6,9 @@ import (
 	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
+	models2 "github.com/galenliu/gateway/pkg/wot/models"
 	"github.com/galenliu/gateway/plugin"
-	"github.com/galenliu/gateway/wot"
+	"github.com/galenliu/gateway/things"
 	"github.com/galenliu/gateway/wot/models"
 	"path"
 	"time"
@@ -39,7 +40,7 @@ type Gateway struct {
 	eventBus        bus.EventBusController
 	logger          logging.Logger
 	addonManager    plugin.AddonManager
-	thingsContainer wot.ThingsContainer
+	thingsContainer things.ThingsContainer
 }
 
 func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {
@@ -73,12 +74,12 @@ func (g *Gateway) Start() error {
 		return err
 	}
 
-	g.thingsContainer = wot.NewThingsContainer(wot.Options{}, g.store, g.eventBus, g.logger)
+	g.thingsContainer = things.NewThingsContainer(things.Options{}, g.store, g.eventBus, g.logger)
 
 	return nil
 }
 
-func (g *Gateway) FindNewThings() (ts []*models.Thing) {
+func (g *Gateway) FindNewThings() (ts []*models2.Thing) {
 	storedThings := g.thingsContainer.GetThings()
 	connectedDevices := g.addonManager.GetDevices()
 	for _, dev := range connectedDevices {

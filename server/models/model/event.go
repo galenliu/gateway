@@ -2,7 +2,7 @@ package model
 
 import (
 	"github.com/galenliu/gateway-addon/wot"
-	"github.com/galenliu/gateway/wot/definitions/data_schema"
+	data_schema2 "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	json "github.com/json-iterator/go"
 )
 
@@ -20,7 +20,7 @@ func NewEventFromString(data string) *Event {
 	if aa.Forms == nil {
 		aa.Forms = append(aa.Forms, hypermedia_controls.Form{
 			Href:        "",
-			ContentType: data_schema.ApplicationJson,
+			ContentType: data_schema2.ApplicationJson,
 			Op:          []string{hypermedia_controls.SubscribeEvent},
 		})
 	}

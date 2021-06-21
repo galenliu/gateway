@@ -11,8 +11,8 @@ import (
 	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
+	data_schema2 "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	"github.com/galenliu/gateway/plugin/internal"
-	"github.com/galenliu/gateway/wot/definitions/data_schema"
 	json "github.com/json-iterator/go"
 
 	"io"
@@ -72,8 +72,8 @@ func NewAddonsManager(options Options, log logging.Logger) AddonManager {
 
 	//def addon action
 	action := wot.NewActionAffordance()
-	obj := data_schema.NewObjectSchema()
-	timeout := data_schema.NewIntegerSchema()
+	obj := data_schema2.NewObjectSchema()
+	timeout := data_schema2.NewIntegerSchema()
 	timeout.Minimum = 1000
 	timeout.Maximum = 10000
 	obj.Properties["timeout"] = timeout
