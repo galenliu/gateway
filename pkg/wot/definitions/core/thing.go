@@ -1,6 +1,7 @@
 package core
 
 import (
+	"debug/elf"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/util"
 	dataSchema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
@@ -48,10 +49,10 @@ func NewThingFromString(description string) (thing *Thing, err error) {
 
 	data := []byte(description)
 	t := &Thing{}
+
 	t.ID = controls.URI(json.Get(data, "id").ToString())
 
-	title := json.Get(data, "title").ToString()
-	if title == "" {
+	if title := json.Get(data, "title").ToString(); title == "" {
 		title = string(t.ID)
 	}
 
@@ -77,7 +78,11 @@ func NewThingFromString(description string) (thing *Thing, err error) {
 
 	t.Description = json.Get(data, "description").ToString()
 
-	if gjson.Get(description, "properties").Exists() {
+	m := make(map[string]securityScheme.SecurityScheme)
+	json.Get(data,"securityDefinitions").ToVal(&m)
+	t.SecurityDefinitions = m
+
+	if props := json.Get(data, "properties").ToVal {
 		var props = gjson.Get(description, "properties").Map()
 		if len(props) > 0 {
 			t.Properties = make(map[string]core2.PropertyAffordance)
