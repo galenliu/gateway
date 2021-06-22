@@ -1,9 +1,9 @@
 package core
 
 import (
-	data_schema2 "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
-	hypermedia_controls2 "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
-	"github.com/galenliu/gateway/wot/definitions/data_schema"
+	"github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
+	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
+
 	json "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
 )
@@ -13,12 +13,12 @@ type EventAffordance interface {
 
 type eventAffordance struct {
 	*InteractionAffordance
-	Subscription data_schema.dataSchema `json:"subscription,omitempty"`
-	Data         data_schema.dataSchema `json:"data,omitempty"`
-	Cancellation data_schema.dataSchema `json:"cancellation,omitempty"`
+	Subscription data_schema.DataSchema `json:"subscription,omitempty"`
+	Data         data_schema.DataSchema `json:"data,omitempty"`
+	Cancellation data_schema.DataSchema `json:"cancellation,omitempty"`
 }
 
-func NewEventAffordanceFromString(data string) EventAffordance {
+func NewEventAffordanceFromString(data string) *eventAffordance {
 	var ia = InteractionAffordance{}
 	err := json.Unmarshal([]byte(data), &ia)
 	if err != nil {
@@ -50,12 +50,12 @@ func NewEventAffordanceFromString(data string) EventAffordance {
 		}
 	}
 	if e.Forms == nil {
-		e.Forms = append(e.Forms, hypermedia_controls2.Form{
+		e.Forms = append(e.Forms, controls.Form{
 			Href:        "",
-			ContentType: data_schema2.ApplicationJson,
-			Op:          []string{hypermedia_controls2.SubscribeEvent},
+			ContentType: data_schema.ApplicationJson,
+			Op:          []string{controls.SubscribeEvent},
 		})
 	}
 	e.InteractionAffordance = &ia
-	return e
+	return &e
 }

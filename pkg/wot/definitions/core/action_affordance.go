@@ -3,7 +3,7 @@ package core
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
-	hypermedia_controls2 "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
+	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 
 	json "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
@@ -21,7 +21,7 @@ type actionAffordance struct {
 	Idempotent bool                   `json:"idempotent,omitempty"`
 }
 
-func NewActionAffordanceFromString(data string) ActionAffordance {
+func NewActionAffordanceFromString(data string) *actionAffordance {
 	var ia = InteractionAffordance{}
 	err := json.Unmarshal([]byte(data), &ia)
 	if err != nil {
@@ -57,9 +57,9 @@ func NewActionAffordanceFromString(data string) ActionAffordance {
 	}
 
 	if a.Forms == nil {
-		a.Forms = append(a.Forms, hypermedia_controls2.Form{
+		a.Forms = append(a.Forms, controls.Form{
 			Href: "",
-			Op:   []string{hypermedia_controls2.InvokeAction},
+			Op:   []string{controls.InvokeAction},
 		})
 	}
 	return &a

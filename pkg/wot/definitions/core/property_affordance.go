@@ -2,10 +2,9 @@ package core
 
 import (
 	"fmt"
-	data_schema2 "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
-	hypermedia_controls2 "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
+	schema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
+	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
-	"github.com/xiam/to"
 )
 
 type PropertyAffordance interface {
@@ -14,39 +13,38 @@ type PropertyAffordance interface {
 
 type propertyAffordance struct {
 	*InteractionAffordance
-	data_schema2.DataSchema
+	schema.DataSchema
 	Observable bool        `json:"observable,omitempty"`
 	Value      interface{} `json:"value,omitempty"`
 }
 
-func NewPropertyAffordanceFromString(description string) PropertyAffordance {
+func NewPropertyAffordanceFromString(description string) *propertyAffordance {
 	data := []byte(description)
 	var p = propertyAffordance{}
 	p.InteractionAffordance = NewInteractionAffordanceFromString(description)
 	typ := json.Get(data, "type").ToString()
 	switch typ {
-	case hypermedia_controls2.TypeBoolean:
-		p.DataSchema = data_schema2.NewBooleanSchemaFromString(description)
-	case hypermedia_controls2.TypeInteger:
-		p.DataSchema = data_schema2.NewIntegerSchemaFromString(description)
-	case hypermedia_controls2.TypeNumber:
-		p.DataSchema = data_schema2.NewNumberSchemaFromString(description)
-	case hypermedia_controls2.TypeArray:
-		p.DataSchema = data_schema2.NewArraySchemaFromString(description)
-	case hypermedia_controls2.TypeString:
-		p.DataSchema = data_schema2.NewStringSchemaFromString(description)
-	case hypermedia_controls2.TypeNull:
-		p.DataSchema = data_schema2.NewNullSchemaFromString(description)
-	case hypermedia_controls2.TypeObject:
-		p.DataSchema = data_schema2.NewObjectSchemaFromString(description)
+	case controls.TypeBoolean:
+		p.DataSchema = schema.NewBooleanSchemaFromString(description)
+	case controls.TypeInteger:
+		p.DataSchema = schema.NewIntegerSchemaFromString(description)
+	case controls.TypeNumber:
+		p.DataSchema = schema.NewNumberSchemaFromString(description)
+	case controls.TypeArray:
+		p.DataSchema = schema.NewArraySchemaFromString(description)
+	case controls.TypeString:
+		p.DataSchema = schema.NewStringSchemaFromString(description)
+	case controls.TypeNull:
+		p.DataSchema = schema.NewNullSchemaFromString(description)
+	case controls.TypeObject:
+		p.DataSchema = schema.NewObjectSchemaFromString(description)
 	}
 	vt := json.Get(data, "observable").ValueType()
 	if vt == json.BoolValue {
 		p.Observable = json.Get(data, "observable").ToBool()
 	}
 	p.Value = json.Get(data, "value").GetInterface()
-
-	return p
+	return &p
 }
 
 func (p *propertyAffordance) GetDescription() string {
@@ -139,19 +137,19 @@ func (p propertyAffordance) MarshalJSON() ([]byte, error) {
 // GetDefaultValue 获取默认的值
 func (p *propertyAffordance) GetDefaultValue() interface{} {
 	switch p.DataSchema.GetType() {
-	case hypermedia_controls2.TypeNumber:
-		d := p.DataSchema.(*data_schema2.NumberSchema)
+	case controls.TypeNumber:
+		d := p.DataSchema.(*schema.NumberSchema)
 		return d.Minimum
-	case hypermedia_controls2.TypeInteger:
-		d := p.DataSchema.(*data_schema2.IntegerSchema)
+	case controls.TypeInteger:
+		d := p.DataSchema.(*schema.IntegerSchema)
 		return d.Minimum
-	case hypermedia_controls2.TypeBoolean:
+	case controls.TypeBoolean:
 		return false
-	case hypermedia_controls2.TypeString:
+	case controls.TypeString:
 		return ""
-	case hypermedia_controls2.TypeArray:
+	case controls.TypeArray:
 		return []interface{}{}
-	case hypermedia_controls2.TypeNull:
+	case controls.TypeNull:
 		return nil
 	default:
 		return nil
@@ -159,93 +157,93 @@ func (p *propertyAffordance) GetDefaultValue() interface{} {
 }
 
 // SetMaxValue 设置最大值
-func (p *propertyAffordance) SetMaxValue(v interface{}) {
-	switch p.DataSchema.(type) {
-	case *data_schema2.NumberSchema:
-		d := p.DataSchema.(*data_schema2.NumberSchema)
-		d.Maximum = to.Float64(v)
-	case data_schema2.NumberSchema:
-		d := p.DataSchema.(*data_schema2.NumberSchema)
-		d.Maximum = to.Float64(v)
-	case *data_schema2.IntegerSchema:
-		d := p.DataSchema.(*data_schema2.IntegerSchema)
-		d.Maximum = to.Int64(v)
-	case data_schema2.IntegerSchema:
-		d := p.DataSchema.(*data_schema2.IntegerSchema)
-		d.Maximum = to.Int64(v)
-	default:
-		fmt.Print("property type err")
-		return
-	}
-}
+//func (p *propertyAffordance) SetMaxValue(v interface{}) {
+//	switch p.DataSchema.(type) {
+//	case *schema.NumberSchema:
+//		d := p.DataSchema.(*schema.NumberSchema)
+//		d.Maximum = to.Float64(v)
+//	case schema.NumberSchema:
+//		d := p.DataSchema.(*schema.NumberSchema)
+//		d.Maximum = to.Float64(v)
+//	case *schema.IntegerSchema:
+//		d := p.DataSchema.(*schema.IntegerSchema)
+//		d.Maximum = to.Int64(v)
+//	case schema.IntegerSchema:
+//		d := p.DataSchema.(*schema.IntegerSchema)
+//		d.Maximum = to.Int64(v)
+//	default:
+//		fmt.Print("property type err")
+//		return
+//	}
+//}
 
-// SetMinValue 设置最小值
-func (p *propertyAffordance) SetMinValue(v interface{}) {
-	switch p.DataSchema.(type) {
-	case *data_schema2.NumberSchema:
-		d := p.DataSchema.(*data_schema2.NumberSchema)
-		d.Minimum = to.Float64(v)
-	case data_schema2.NumberSchema:
-		d := p.DataSchema.(*data_schema2.NumberSchema)
-		d.Minimum = to.Float64(v)
-	case *data_schema2.IntegerSchema:
-		d := p.DataSchema.(*data_schema2.IntegerSchema)
-		d.Minimum = to.Int64(v)
-	case data_schema2.IntegerSchema:
-		d := p.DataSchema.(*data_schema2.IntegerSchema)
-		d.Minimum = to.Int64(v)
-
-	default:
-		fmt.Print("property type err")
-		return
-	}
-}
+//// SetMinValue 设置最小值
+//func (p *propertyAffordance) SetMinValue(v interface{}) {
+//	switch p.DataSchema.(type) {
+//	case *schema.NumberSchema:
+//		d := p.DataSchema.(*schema.NumberSchema)
+//		d.Minimum = to.Float64(v)
+//	case schema.NumberSchema:
+//		d := p.DataSchema.(*schema.NumberSchema)
+//		d.Minimum = to.Float64(v)
+//	case *schema.IntegerSchema:
+//		d := p.DataSchema.(*schema.IntegerSchema)
+//		d.Minimum = to.Int64(v)
+//	case schema.IntegerSchema:
+//		d := p.DataSchema.(*schema.IntegerSchema)
+//		d.Minimum = to.Int64(v)
+//
+//	default:
+//		fmt.Print("property type err")
+//		return
+//	}
+//}
 
 type ArrayPropertyAffordance struct {
 	*InteractionAffordance
-	*data_schema2.ArraySchema
+	*schema.ArraySchema
 	Observable bool        `json:"observable"`
 	Value      interface{} `json:"value"`
 }
 
 type BooleanPropertyAffordance struct {
 	*InteractionAffordance
-	*data_schema2.BooleanSchema
+	*schema.BooleanSchema
 	Observable bool `json:"observable"`
 	Value      bool `json:"value"`
 }
 
 type NumberPropertyAffordance struct {
 	*InteractionAffordance
-	*data_schema2.NumberSchema
+	*schema.NumberSchema
 	Observable bool    `json:"observable"`
 	Value      float64 `json:"value"`
 }
 
 type IntegerPropertyAffordance struct {
 	*InteractionAffordance
-	*data_schema2.IntegerSchema
+	*schema.IntegerSchema
 	Observable bool  `json:"observable"`
 	Value      int64 `json:"value"`
 }
 
 type ObjectPropertyAffordance struct {
 	*InteractionAffordance
-	*data_schema2.ObjectSchema
+	*schema.ObjectSchema
 	Observable bool        `json:"observable"`
 	Value      interface{} `json:"value"`
 }
 
 type StringPropertyAffordance struct {
 	*InteractionAffordance
-	*data_schema2.StringSchema
+	*schema.StringSchema
 	Observable bool   `json:"observable"`
 	Value      string `json:"value"`
 }
 
 type NullPropertyAffordance struct {
 	*InteractionAffordance
-	*data_schema2.NullSchema
+	*schema.NullSchema
 	Observable bool        `json:"observable"`
 	Value      interface{} `json:"value"`
 }

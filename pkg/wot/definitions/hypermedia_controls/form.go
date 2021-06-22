@@ -2,11 +2,10 @@ package hypermedia_controls
 
 type Form struct {
 	Href                string               `json:"href,omitempty"`
-	Rel                 string               `json:"rel,omitempty"` //w3c定义中无这个，解决和wot兼容
 	ContentType         string               `json:"contentType,omitempty"`
 	ContentCoding       string               `json:"contentCoding,omitempty"`
-	Security            interface{}          `json:"security,omitempty"`
-	Scopes              string               `json:"scopes,omitempty"`
+	Security            []string             `json:"security,omitempty"`
+	Scopes              []string             `json:"scopes,omitempty"`
 	Response            *Response            `json:"response,omitempty"`
 	AdditionalResponses *AdditionalResponses `json:"additionalResponses,omitempty"`
 	Subprotocol         string               `json:"subprotocol,omitempty"`
@@ -20,6 +19,10 @@ type AdditionalResponses struct {
 	ContentType []string    `json:"contentType,omitempty"`
 	Success     bool        `json:"success,omitempty"`
 	Schema      interface{} `json:"schema,omitempty"` //TODO :dataSchema
+}
+
+func NewFormFormString(description string) *Form {
+	return &Form{}
 }
 
 /*
