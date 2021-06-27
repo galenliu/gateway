@@ -8,6 +8,11 @@ import (
 	"github.com/galenliu/gateway/wot/models"
 )
 
+type Container interface {
+	GetThing(id string) *models2.Thing
+	GetThings() []*models2.Thing
+}
+
 //ThingsEventBus Things和bus通讯的接口
 type ThingsEventBus interface {
 	ListenController
@@ -30,12 +35,6 @@ type ThingsStore interface {
 	GetThings() []string
 }
 
-type ThingsContainer interface {
-	GetThing(id string) *models2.Thing
-	GetThings() []*models2.Thing
-	CreateThing(data []byte) error
-}
-
 type Options struct {
 }
 
@@ -48,7 +47,7 @@ type container struct {
 	bus     ThingsEventBus
 }
 
-func NewThingsContainer(option Options, store ThingsStore, bus ThingsEventBus, log logging.Logger) ThingsContainer {
+func NewThingsContainer(option Options, store ThingsStore, bus ThingsEventBus, log logging.Logger) Container {
 
 	instance := &container{}
 	instance.options = option

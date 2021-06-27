@@ -47,7 +47,6 @@ func NewThingFromString(description string) (thing *Thing, err error) {
 	t := &Thing{}
 
 	t.ID = controls.URI(json.Get(data, "id").ToString())
-
 	if title := json.Get(data, "title").ToString(); title == "" {
 		title = string(t.ID)
 	}
@@ -115,4 +114,12 @@ func NewThingFromString(description string) (thing *Thing, err error) {
 		t.Forms = append(t.Forms, controls.Form{Href: fmt.Sprintf("wss://localhost/%s", t.ID)})
 	}
 	return t, nil
+}
+
+func (t *Thing) GetID() string {
+	return t.ID.GetID()
+}
+
+func (t *Thing) GetURI() string {
+	return t.ID.GetURI()
 }

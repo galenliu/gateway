@@ -3,29 +3,23 @@ package models
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/database"
+	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	AddonManager "github.com/galenliu/gateway/plugin"
 	json "github.com/json-iterator/go"
-	"sync"
 )
-
-var once sync.Once
-var instance *Things
 
 type Things struct {
 	things  map[string]*Thing
+	logger  logging.Logger
 	Actions *Actions
 }
 
-func NewThingsOnce() *Things {
-	once.Do(
-		func() {
-			instance = &Things{}
-			instance.things = make(map[string]*Thing)
-			instance.GetMapOfThings()
-			AddonManager.Subscribe(util.ThingAdded, instance.handleNewThing)
-		},
-	)
+func NewThings(log logging.Logger) *Things {
+	instance := &Things{}
+	instance.logger = log
+	instance.things = make(map[string]*Thing)
+	instance.GetMapOfThings()
 	return instance
 }
 
@@ -43,7 +37,7 @@ func (ts *Things) GetMapOfThings() map[string]*Thing {
 		return ts.things
 	}
 	for _, t := range ts.GetThingsFormDataBase() {
-		ts.things[t.GetID()] = t
+		ts.things[t.ID.GetID()] = t
 	}
 	return ts.things
 }
@@ -140,16 +134,4 @@ func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) 
 	}
 	return AddonManager.SetProperty(thingId, propName, value)
 
-}
-
-func (ts *Things) Subscribe(typ string, f interface{}) {
-	_ = event_bus.Subscribe("Things."+typ, f)
-}
-
-func (ts *Things) Unsubscribe(typ string, f interface{}) {
-	_ = event_bus.Unsubscribe("Things."+typ, f)
-}
-
-func (ts *Things) Publish(typ string, args ...interface{}) {
-	event_bus.Publish("Things."+typ, args...)
 }

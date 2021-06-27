@@ -1,5 +1,7 @@
 package hypermedia_controls
 
+import "strings"
+
 type UnsignedInt uint
 type Integer uint
 type Number float64
@@ -43,4 +45,13 @@ func (i UnsignedInt) Compare(value UnsignedInt) int {
 		return 0
 	}
 	return -1
+}
+
+func (u URI) GetID() string {
+	l := strings.Split(string(u), "/")
+	return l[len(l)-1]
+}
+
+func (u URI) GetURI() string {
+	return string(u)
 }

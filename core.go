@@ -40,7 +40,7 @@ type Gateway struct {
 	eventBus        bus.EventBusController
 	logger          logging.Logger
 	addonManager    plugin.AddonManager
-	thingsContainer things.ThingsContainer
+	thingsContainer things.Container
 }
 
 func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {

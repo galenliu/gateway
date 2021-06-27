@@ -6,7 +6,6 @@ require (
 	github.com/arsmn/fiber-swagger/v2 v2.6.0
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/brutella/hc v1.2.4
-	github.com/kardianos/service latest
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fasthttp/websocket v1.4.3 // indirect
 	github.com/galenliu/gateway-addon v1.0.0
@@ -16,6 +15,7 @@ require (
 	github.com/gofiber/websocket/v2 v2.0.3
 	github.com/gorilla/websocket v1.4.2
 	github.com/json-iterator/go v1.1.11
+	github.com/kardianos/service v1.2.0
 	github.com/mattn/go-sqlite3 v1.14.5
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/pkg/errors v0.9.1 // indirect
@@ -26,6 +26,7 @@ require (
 	github.com/tidwall/gjson v1.7.4
 	github.com/xiam/to v0.0.0-20200126224905-d60d31e03561
 	go.uber.org/zap v1.16.0
+	golang.org/dl v0.0.0-20210610154546-0cc6883720ee // indirect
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
