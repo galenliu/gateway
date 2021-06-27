@@ -1,13 +1,18 @@
 package models
 
-import "github.com/galenliu/gateway/pkg/database"
+import (
+	"github.com/galenliu/gateway/pkg/database"
+	"github.com/galenliu/gateway/pkg/logging"
+)
 
 type Users struct {
-	users []*User
+	users  []*User
+	logger logging.Logger
 }
 
-func NewUsers() *Users {
+func NewUsersModel(logger logging.Logger) *Users {
 	users := &Users{}
+	users.logger = logger
 	return users
 }
 

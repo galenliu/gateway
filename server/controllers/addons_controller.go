@@ -91,10 +91,10 @@ func (addon *AddonController) handlerUpdateAddon(c *fiber.Ctx) error {
 
 }
 
-//GET /addon/:addonId/config
+//GET /addon/:addonId/options
 func (addon *AddonController) handlerGetAddonConfig(c *fiber.Ctx) error {
 	var addonId = c.Params("addonId")
-	var key = "addons.config." + addonId
+	var key = "addons.options." + addonId
 	if addonId == "" {
 		return fiber.NewError(fiber.StatusInternalServerError, "addonId failed")
 	}
@@ -109,18 +109,18 @@ func (addon *AddonController) handlerGetAddonConfig(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).SendString(config)
 }
 
-//Put /:addonId/config
+//Put /:addonId/options
 func (addon *AddonController) handlerSetAddonConfig(c *fiber.Ctx) error {
 	var addonId = c.Params("addonId")
-	var key = "addons.config." + addonId
-	config := json.Get(c.Body(), "config").ToString()
+	var key = "addons.options." + addonId
+	config := json.Get(c.Body(), "options").ToString()
 	if config == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "config empty")
+		return fiber.NewError(fiber.StatusBadRequest, "options empty")
 	}
 	err := database.SetSetting(key, config)
 	if err != nil {
 		logging.Error(err.Error())
-		return fiber.NewError(fiber.StatusInternalServerError, "Failed to set config for add-on: "+addonId)
+		return fiber.NewError(fiber.StatusInternalServerError, "Failed to set options for add-on: "+addonId)
 	}
 	err = plugin.UnloadAddon(addonId)
 	if plugin.AddonEnabled(addonId) {

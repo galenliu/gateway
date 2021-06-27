@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	AddonManager "github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/models"
@@ -9,7 +9,7 @@ import (
 	"sync"
 )
 
-type NewThingsController struct {
+type NewThingsController1 struct {
 	locker     *sync.Mutex
 	container  *models.Things
 	ws         *websocket.Conn
@@ -17,17 +17,16 @@ type NewThingsController struct {
 	closeChan  chan struct{}
 }
 
-func NewNewThingsController(ws *websocket.Conn) *NewThingsController {
-	controller := &NewThingsController{}
+func NewNewThingsController(ws *websocket.Conn) *NewThingsController1 {
+	controller := &NewThingsController1{}
 	controller.locker = new(sync.Mutex)
 	controller.closeChan = make(chan struct{})
 	controller.foundThing = make(chan string)
-	controller.container = models.NewThingsOnce()
 	controller.ws = ws
 	return controller
 }
 
-func (controller *NewThingsController) handlerConnection() {
+func (controller *NewThingsController1) handlerConnection() {
 
 	newThings := controller.container.GetNewThings()
 	for _, t := range newThings {
@@ -75,7 +74,7 @@ func (controller *NewThingsController) handlerConnection() {
 	}
 }
 
-func (controller *NewThingsController) handleNewThing(data []byte) {
+func (controller *NewThingsController1) handleNewThing(data []byte) {
 	controller.foundThing <- string(data)
 }
 

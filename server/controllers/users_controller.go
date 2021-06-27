@@ -1,29 +1,32 @@
 package controllers
 
 import (
-	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
 	json "github.com/json-iterator/go"
 	"strconv"
 	"strings"
 )
 
-type UserController struct {
-	Users *models.Users
+type usesModel interface {
+	GetUsersCount() int
 }
 
-func NewUsersController() *UserController {
-	uc := &UserController{}
-	uc.Users = models.NewUsers()
+type userController struct {
+	model usesModel
+}
+
+func NewUsersController(model usesModel) *userController {
+	uc := &userController{}
+	uc.model = model
 	return uc
 }
 
-func (u *UserController) getCount(c *fiber.Ctx) error {
-	count := u.Users.GetUsersCount()
+func (u *userController) getCount(c *fiber.Ctx) error {
+	count := u.model.GetUsersCount()
 	return c.SendString(strconv.Itoa(count))
 }
 
-func (u *UserController) createUser(c *fiber.Ctx) error {
+func (u *userController) createUser(c *fiber.Ctx) error {
 	email := strings.ToLower(json.Get(c.Body(), "email").ToString())
 	pw := json.Get(c.Body(), "password").ToString()
 	name := json.Get(c.Body(), "password").ToString()
@@ -31,7 +34,7 @@ func (u *UserController) createUser(c *fiber.Ctx) error {
 	if email == "" && pw == "" {
 		return c.Status(fiber.StatusBadRequest).SendString("User requires email and password.")
 	}
-	exit := u.Users.GetUser(email)
+	exit := u.model.GetUser(email)
 	if exit != nil {
 		return c.Status(fiber.StatusBadRequest).SendString("User already exists.")
 	}

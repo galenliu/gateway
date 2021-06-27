@@ -100,7 +100,7 @@ type HomeGateway struct {
 
 func NewGateway() (gateway *HomeGateway, err error) {
 	gateway = &HomeGateway{}
-	gateway.Tasks = append(gateway.Tasks, controllers.NewWebAPP())
+	gateway.Tasks = append(gateway.Tasks, controllers.NewWebServe())
 	gateway.Tasks = append(gateway.Tasks, homekit.NewHomeKitBridge(
 		homekit.Config{
 			Pin:          "12344321",

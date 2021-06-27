@@ -19,7 +19,7 @@ type store struct {
 }
 
 type Store interface {
-	things.ThingsStore
+	things.Store
 }
 
 func (s *store) reset() {

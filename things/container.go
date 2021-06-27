@@ -3,14 +3,13 @@ package things
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/logging"
-	models2 "github.com/galenliu/gateway/pkg/wot/models"
-	AddonManager "github.com/galenliu/gateway/plugin"
-	"github.com/galenliu/gateway/wot/models"
+	json "github.com/json-iterator/go"
 )
 
 type Container interface {
-	GetThing(id string) *models2.Thing
-	GetThings() []*models2.Thing
+	GetThing(id string) *Thing
+	GetThings() []*Thing
+	CreateThing(data []byte) (*Thing, error)
 }
 
 //ThingsEventBus Things和bus通讯的接口
@@ -20,8 +19,8 @@ type ThingsEventBus interface {
 }
 
 type ListenController interface {
-	ListenCreateThing(func(data []byte) error)
-	ListenRemoveThing(func(id string))
+	ListenCreateThing(func(data []byte) (*Thing, error))
+	ListenRemoveThing(func(id string) error)
 }
 
 type FireController interface {
@@ -29,9 +28,10 @@ type FireController interface {
 	FireThingRemoved(id string)
 }
 
-type ThingsStore interface {
+type Store interface {
 	RemoveThing(id string) error
 	SaveThing(t *Thing) error
+	UpdateThing(t *Thing) error
 	GetThings() []string
 }
 
@@ -40,14 +40,13 @@ type Options struct {
 
 type container struct {
 	things  map[string]*Thing
-	Actions *models2.Actions
 	options Options
-	store   ThingsStore
+	store   Store
 	logger  logging.Logger
 	bus     ThingsEventBus
 }
 
-func NewThingsContainer(option Options, store ThingsStore, bus ThingsEventBus, log logging.Logger) Container {
+func NewThingsContainer(option Options, store Store, bus ThingsEventBus, log logging.Logger) Container {
 
 	instance := &container{}
 	instance.options = option
@@ -76,6 +75,58 @@ func (c *container) GetThings() (ts []*Thing) {
 	return
 }
 
+func (c *container) CreateThing(data []byte) (*Thing, error) {
+	t, err := c.handleCreateThing(data)
+	if err != nil {
+		return nil, err
+	}
+	c.bus.FireThingAdded(t)
+	return t, nil
+}
+
+func (c *container) RemoveThing(thingId string) error {
+	err := c.handleRemoveThing(thingId)
+	if err != nil {
+		return err
+	}
+	c.bus.FireThingRemoved(thingId)
+	return nil
+}
+
+func (c *container) UpdateThing(data []byte) error {
+	return c.handleUpdateThing(data)
+}
+
+func (c *container) handleCreateThing(data []byte) (*Thing, error) {
+	th, err := NewThingFromString(string(data))
+	if err != nil {
+		return nil, err
+	}
+	_, ok := c.things[th.GetID()]
+	if ok {
+		return nil, fmt.Errorf("thing id: %s is exited", th.GetID())
+	}
+	c.things[th.GetID()] = th
+	err = c.store.SaveThing(th)
+	if err != nil {
+		return nil, err
+	}
+	return c.things[th.GetID()], nil
+}
+
+func (c *container) handleRemoveThing(thingId string) error {
+	err := c.store.RemoveThing(thingId)
+	if err != nil {
+		c.logger.Error("remove thing id: %s from store err: %s", thingId, err.Error())
+	}
+	_, ok := c.things[thingId]
+	if ok {
+		return fmt.Errorf("container has not thing id: %s", thingId)
+	}
+	delete(c.things, thingId)
+	return nil
+}
+
 func (c *container) updateThings() {
 	if len(c.things) < 1 {
 		for _, s := range c.store.GetThings() {
@@ -89,49 +140,22 @@ func (c *container) updateThings() {
 	}
 }
 
-func (c *container) CreateThing(data []byte) error {
-	return c.handleCreateThing(data)
-}
-
-func (c *container) handleCreateThing(data []byte) error {
-	th, err := models.NewThingFromString(string(data))
-	if err != nil {
-		return err
+func (c *container) handleUpdateThing(data []byte) error {
+	thingId := json.Get(data, "id").ToString()
+	if _, ok := c.things[thingId]; ok {
+		newThing, err := NewThingFromString(string(data))
+		if err != nil {
+			return err
+		}
+		if newThing != nil {
+			c.things[newThing.ID.GetID()] = newThing
+			err := c.store.UpdateThing(newThing)
+			if err != nil {
+				return err
+			}
+		}
 	}
-	_, ok := c.things[th.GetID()]
-	if ok {
-		return fmt.Errorf("thing id: %s is exited", th.GetID())
-	}
-	c.things[th.GetID()] = th
-	err = c.store.SaveThing(th)
-	if err != nil {
-		return err
-	}
-	c.bus.FireThingAdded(th)
 	return nil
-}
-
-func (c *container) handleRemoveThing(thingId string) {
-	err := c.store.RemoveThing(thingId)
-	if err != nil {
-		c.logger.Error("remove thing id: %s from store err: %s", thingId, err.Error())
-	}
-	_, ok := c.things[thingId]
-	if ok {
-		c.logger.Error("container has not thing id: %s", thingId)
-		return
-	}
-	delete(c.things, thingId)
-	c.bus.FireThingRemoved(thingId)
-}
-
-func (c *container) SetThingProperty(thingId, propName string, value interface{}) (interface{}, error) {
-	var th = c.GetThing(thingId)
-	if th == nil {
-		return nil, fmt.Errorf("thing(%s) can not found", thingId)
-	}
-	return AddonManager.SetProperty(thingId, propName, value)
-
 }
 
 //func (ts *container) Subscribe(typ string, f interface{}) {

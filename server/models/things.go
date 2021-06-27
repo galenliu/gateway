@@ -4,100 +4,52 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/util"
 	AddonManager "github.com/galenliu/gateway/plugin"
+	"github.com/galenliu/gateway/things"
 	json "github.com/json-iterator/go"
 )
 
 type Things struct {
-	things  map[string]*Thing
-	logger  logging.Logger
-	Actions *Actions
+	things.Container
+	logger logging.Logger
 }
 
-func NewThings(log logging.Logger) *Things {
+func NewThingsModel(log logging.Logger) *Things {
 	instance := &Things{}
 	instance.logger = log
-	instance.things = make(map[string]*Thing)
-	instance.GetMapOfThings()
+	instance.Container = things.NewThingsContainer(things.Options{}, nil, nil, log)
 	return instance
 }
 
-func (ts *Things) GetThing(id string) *Thing {
-	t, ok := ts.things[id]
-	if !ok {
-		return nil
-	}
-	return t
+func (ts *Things) SetPropertyValue(thingId, propName string, value interface{}) (interface{}, error) {
+	return nil, nil
 }
 
-// GetMapOfThings if models instance is null,read new instance from the database
-func (ts *Things) GetMapOfThings() map[string]*Thing {
-	if len(ts.things) > 0 {
-		return ts.things
-	}
-	for _, t := range ts.GetThingsFormDataBase() {
-		ts.things[t.ID.GetID()] = t
-	}
-	return ts.things
+func (ts *Things) GetPropertyValue(thingId, propName string) (interface{}, error) {
+	return nil, nil
 }
 
-func (ts *Things) GetListThings() (lt []*Thing) {
-	for key, t := range ts.GetMapOfThings() {
-		t.ID = key
-		lt = append(lt, t)
-	}
-	return
+func (ts *Things) GetPropertiesValue(id string) (map[string]interface{}, error) {
+	return nil, nil
 }
 
-func (ts *Things) GetThingsFormDataBase() []*Thing {
-	var things = database.GetThings()
-	var list []*Thing
-	if ts == nil {
-		return nil
-	}
-	for _, des := range things {
-		t := NewThingFromString(des)
-		if t != nil {
-			t.Connected = false
-			list = append(list, t)
-		}
-	}
-	return list
-}
-
-func (ts *Things) GetNewThings() []*Thing {
-	connectedDevices := AddonManager.GetDevices()
-	storedThings := ts.GetMapOfThings()
-	var things []*Thing
-	for _, connected := range connectedDevices {
-		for _, storedThing := range storedThings {
-			if connected.GetID() != storedThing.GetID() {
-				data, err := json.MarshalIndent(connected, "", "  ")
-				if err != nil {
-					continue
-				}
-				things = append(things, NewThingFromString(string(data)))
-			}
-		}
-	}
-	return things
-}
-
-func (ts *Things) CreateThing(id string, description string) (string, error) {
-
-	th := NewThingFromString(description)
-	if &th == nil {
-		return "", fmt.Errorf("thing description invaild")
-	}
-	err := database.CreateThing(th.GetID(), th.GetDescription())
-	if err != nil {
-		return "", err
-	}
-	ts.things[th.GetID()] = th
-	go ts.Publish(util.ThingAdded, th)
-	return th.GetDescription(), err
-}
+//func (ts *Things) GetNewThings() []*Thing {
+//	connectedDevices := AddonManager.GetDevices()
+//	storedThings := ts.GetMapOfThings()
+//	var things []*Thing
+//	for _, connected := range connectedDevices {
+//		for _, storedThing := range storedThings {
+//			if connected.GetID() != storedThing.GetID() {
+//				data, err := json.MarshalIndent(connected, "", "  ")
+//				if err != nil {
+//					continue
+//				}
+//				things = append(things, NewThingFromString(string(data)))
+//			}
+//		}
+//	}
+//	return things
+//}
 
 //Addon Manager New Device Added
 func (ts *Things) handleNewThing(data []byte) {
