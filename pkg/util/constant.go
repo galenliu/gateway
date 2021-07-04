@@ -4,8 +4,25 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// Events
 const (
-	// Web server routes
+	GatewayStarted = "gatewayStarted"
+	GatewayStopped = "gatewayStopped"
+
+	ThingAdded    = "thingAdded"
+	ThingModified = "thingModified"
+	ThingRemoved  = "thingRemoved"
+	ThingCreated  = "thingCreated"
+
+	// DeviceAdded Addon Manager Event
+	DeviceAdded         = "deviceAdded"
+	DeviceRemoved       = "deviceRemoved"
+	AddonManagerStarted = "addonManagerStarted"
+	AddonManagerStopped = "addonManagerStopped"
+)
+
+// Web server routes
+const (
 	UsersPath        = "/users"
 	ThingsPath       = "/things"
 	PropertiesPath   = "/properties"
@@ -32,7 +49,6 @@ const (
 	ProxyPath        = "/proxy"
 	ExtensionsPath   = "/extensions"
 
-	// Plugin and REST/websocket API things
 	ActionStatus         = "actionStatus"
 	AdapterAdded         = "adapterAdded"
 	AddEventSubscription = "addEventSubscription"
@@ -50,20 +66,12 @@ const (
 	PairingTimeout  = "pairingTimeout"
 	PropertyChanged = "propertyChanged"
 	PropertyStatus  = "propertyStatus"
-	REMOVED         = "removed"
 	RequestAction   = "requestAction"
 	SetProperty     = "setProperty"
-	//ThingAdded event args: []byte
-	ThingAdded    = "thingAdded"
-	ThingModified = "thingModified"
-	ThingRemoved  = "thingRemoved"
 
-	WebServerStarted    = "webServerStarted"
-	PluginServerStarted = "pluginServerStarted"
-	WebServerStopped    = "webServerStopped"
-	PluginServerStopped = "pluginServerStopped"
-
-	// OAuth things
+	// WebServerStarted Web server event
+	WebServerStarted  = "webServerStarted"
+	WebServerStopped  = "webServerStopped"
 	AccessToken       = "access_token"
 	AuthorizationCode = "authorization_code"
 	UserToken         = "user_token"

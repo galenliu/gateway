@@ -1,4 +1,4 @@
-package models
+package wot_models
 
 import (
 	"fmt"

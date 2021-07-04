@@ -3,31 +3,46 @@ package plugin
 import (
 	"context"
 	"fmt"
+	"github.com/galenliu/gateway"
 	"github.com/galenliu/gateway-addon"
 	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/logging"
+
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
+	"io/ioutil"
+	"net/http"
+	"os"
 	"path"
 	"time"
 )
 
-type Map = map[string]interface{}
+type AddonManager interface {
+	gateway.Component
+	GetDevices() []addon.IDevice
+	GetDevice(id string) addon.IDevice
 
-var instance *manager
+	SetPIN(thingId string, pin interface{}) error
 
-type Options struct {
-	AddonDirs []string
-	DataDir   string
+	AddNewThing(timeOut float64) error
+	CancelAddNewThing()
+
+	GetPropertyValue(deviceId string, propertyName string) (value interface{}, err error)
+	SetPropertyValue(deviceId string, propertyName string, newValue interface{}) (value interface{}, err error)
+
+	InstallAddonFromUrl(id, url, checksum string, enabled bool) error
+	GetInstallAddons() ([]byte, error)
+	EnableAddon(id string) error
+	DisableAddon(id string) error
 }
 
 // GetInstallAddons 获取已安装的add-on
-func GetInstallAddons() ([]byte, error) {
-	instance.locker.Lock()
-	defer instance.locker.Unlock()
+func (m *manager) GetInstallAddons() ([]byte, error) {
+	m.locker.Lock()
+	defer m.locker.Unlock()
 	var addons []*internal.AddonInfo
-	for _, v := range instance.installAddons {
+	for _, v := range m.installAddons {
 		addons = append(addons, v)
 	}
 	data, err := json.Marshal(addons)
@@ -37,26 +52,26 @@ func GetInstallAddons() ([]byte, error) {
 	return data, nil
 }
 
-func EnableAddon(addonId string) error {
-	instance.locker.Lock()
-	defer instance.locker.Unlock()
-	addonInfo := instance.installAddons[addonId]
+func (m *manager) EnableAddon(addonId string) error {
+	m.locker.Lock()
+	defer m.locker.Unlock()
+	addonInfo := m.installAddons[addonId]
 	if addonInfo == nil {
 		return fmt.Errorf("addon not exit")
 	}
 
 	err := addonInfo.UpdateAddonInfoToDB(true)
-	err = instance.loadAddon(addonId)
+	err = m.loadAddon(addonId)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func DisableAddon(addonId string) error {
-	instance.locker.Lock()
-	defer instance.locker.Unlock()
-	addonInfo := instance.installAddons[addonId]
+func (m *manager) DisableAddon(addonId string) error {
+	m.locker.Lock()
+	defer m.locker.Unlock()
+	addonInfo := m.installAddons[addonId]
 	if addonInfo == nil {
 		return fmt.Errorf("addon not installed")
 	}
@@ -64,27 +79,19 @@ func DisableAddon(addonId string) error {
 	if err != nil {
 		return err
 	}
-	err = instance.unloadAddon(addonId)
+	err = m.unloadAddon(addonId)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func GetDevice(deviceId string) addon.IDevice {
-	device, ok := instance.devices[deviceId]
-	if !ok {
-		return nil
-	}
-	return device
-}
-
-func SetProperty(deviceId, propName string, newValue interface{}) (interface{}, error) {
+func (m *manager) SetPropertyValue(deviceId, propName string, newValue interface{}) (interface{}, error) {
 
 	go func() {
-		err := instance.handleSetProperty(deviceId, propName, newValue)
+		err := m.handleSetProperty(deviceId, propName, newValue)
 		if err != nil {
-			logging.Error(err.Error())
+			m.logger.Error(err.Error())
 		}
 	}()
 	closeChan := make(chan struct{})
@@ -100,23 +107,38 @@ func SetProperty(deviceId, propName string, newValue interface{}) (interface{}, 
 			propChan <- value
 		}
 	}
-	go Subscribe(util.PropertyChanged, changed)
-	defer Unsubscribe(util.PropertyChanged, changed)
+	go m.bus.Subscribe(util.PropertyChanged, changed)
+	defer m.bus.Unsubscribe(util.PropertyChanged, changed)
 	for {
 		select {
 		case v := <-propChan:
 			return v, nil
 		case <-closeChan:
-			logging.Error("set property(name: %s value: %s) timeout", propName, newValue)
+			m.logger.Error("set property(name: %s value: %s) timeout", propName, newValue)
 			return nil, fmt.Errorf("timeout")
 		}
 	}
 }
 
-func RemoveDevice(deviceId string) error {
+func (m *manager) GetDevice(deviceId string) addon.IDevice {
+	device, ok := m.devices[deviceId]
+	if !ok {
+		return nil
+	}
+	return device
+}
 
-	device := instance.getDevice(deviceId)
-	adapter := instance.getAdapter(device.GetAdapterId())
+func (m *manager) GetDevices() (device []addon.IDevice) {
+	for _, dev := range m.devices {
+		device = append(device, dev)
+	}
+	return
+}
+
+func (m *manager) RemoveDevice(deviceId string) error {
+
+	device := m.getDevice(deviceId)
+	adapter := m.getAdapter(device.GetAdapterId())
 	if adapter != nil {
 		adapter.removeThing(device)
 		return nil
@@ -124,8 +146,8 @@ func RemoveDevice(deviceId string) error {
 	return fmt.Errorf("can not find thing")
 }
 
-func GetPropertyValue(deviceId, propName string) (interface{}, error) {
-	device, ok := instance.devices[deviceId]
+func (m *manager) GetPropertyValue(deviceId, propName string) (interface{}, error) {
+	device, ok := m.devices[deviceId]
 	if !ok {
 		return nil, fmt.Errorf("deviceId (%s)invaild", deviceId)
 	}
@@ -136,25 +158,49 @@ func GetPropertyValue(deviceId, propName string) (interface{}, error) {
 	return prop.GetValue(), nil
 }
 
-func InstallAddonFromUrl(id, url, checksum string, enabled bool) error {
-	return instance.installAddonFromUrl(id, url, checksum, enabled)
+func (m *manager) InstallAddonFromUrl(id, url, checksum string, enabled bool) error {
+
+	destPath := path.Join(os.TempDir(), id+".tar.gz")
+	m.logger.Info("fetching add-on %s as %s", url, destPath)
+	resp, err := http.Get(url)
+	if err != nil {
+		return fmt.Errorf(fmt.Sprintf("Download addon err,pakage id:%s err:%s", id, err.Error()))
+	}
+	defer func() {
+		_ = resp.Body.Close()
+		err := os.Remove(destPath)
+		if err != nil {
+			logging.Info("remove temp file failed ,err:%s", err.Error())
+		}
+	}()
+	data, _ := ioutil.ReadAll(resp.Body)
+	_ = ioutil.WriteFile(destPath, data, 777)
+	if !util.CheckSum(destPath, checksum) {
+		return fmt.Errorf(fmt.Sprintf("checksum err,pakage id:%s", id))
+	}
+	err = m.installAddon(id, destPath, enabled)
+	if err != nil {
+		return err
+	}
+	return nil
+
 }
 
-func AddNewThing(pairingTimeout float64) error {
-	if instance.isPairing {
+func (m *manager) AddNewThing(pairingTimeout float64) error {
+	if m.isPairing {
 		return fmt.Errorf("add already in progress")
 	}
-	for _, adapter := range instance.adapters {
+	for _, adapter := range m.adapters {
 		adapter.pairing(pairingTimeout)
 	}
-	instance.isPairing = true
+	m.isPairing = true
 	ctx, cancelFn := context.WithTimeout(context.Background(), time.Duration(pairingTimeout)*time.Millisecond)
 	var handlePairingTimeout = func() {
 		for {
 			select {
 			case <-ctx.Done():
 				cancelFn()
-				CancelAddNewThing()
+				m.CancelAddNewThing()
 				//bus.Publish(util.PairingTimeout)
 				return
 			}
@@ -164,30 +210,30 @@ func AddNewThing(pairingTimeout float64) error {
 	return nil
 }
 
-func CancelAddNewThing() {
-	if !instance.isPairing {
+func (m *manager) CancelAddNewThing() {
+	if !m.isPairing {
 		return
 	}
-	for _, adapter := range instance.adapters {
+	for _, adapter := range m.adapters {
 		adapter.cancelPairing()
 	}
-	instance.isPairing = false
+	m.isPairing = false
 	return
 }
 
-func CancelRemoveThing(deviceId string) {
-	device := instance.getDevice(deviceId)
+func (m *manager) CancelRemoveThing(deviceId string) {
+	device := m.getDevice(deviceId)
 	if device == nil {
 		return
 	}
-	adapter := instance.getAdapter(device.GetAdapterId())
+	adapter := m.getAdapter(device.GetAdapterId())
 	if adapter != nil {
 		adapter.cancelRemoveThing(deviceId)
 	}
 }
 
-func SetThingPin(thingId string, pin interface{}) error {
-	device := instance.getDevice(thingId)
+func (m *manager) SetPIN(thingId string, pin interface{}) error {
+	device := m.getDevice(thingId)
 	if device == nil {
 		return fmt.Errorf("con not finid device:" + thingId)
 	}
@@ -208,32 +254,17 @@ func RequestAction(thingId, actionId, actionName string, actionParams map[string
 	return nil
 }
 
-func UnloadAddon(addonId string) error {
-	return instance.unloadAddon(addonId)
-}
-func LoadAddon(addonId string) error {
-	return instance.loadAddon(addonId)
-}
-
-func AddonEnabled(addonId string) bool {
-	a, ok := instance.installAddons[addonId]
-	if !ok {
-		return false
-	}
-	return a.Enabled
-}
-
-func UninstallAddon(addonId string, disable bool) error {
+func (m *manager) UninstallAddon(addonId string, disable bool) error {
 	var key = "addons." + addonId
-	err := instance.unloadAddon(addonId)
+	err := m.unloadAddon(addonId)
 	if err != nil {
 		return err
 	}
-	f, e := instance.findPlugin(addonId)
+	f, e := m.findPlugin(addonId)
 	if e == nil {
 		util.RemoveDir(f)
 	}
-	util.RemoveDir(path.Join(path.Join(instance.options.DataDir, util.DataDirName), addonId))
+	util.RemoveDir(path.Join(path.Join(m.options.DataDir, util.DataDirName), addonId))
 
 	if disable {
 		setting, err := database.GetSetting(key)
@@ -244,7 +275,7 @@ func UninstallAddon(addonId string, disable bool) error {
 		err = json.UnmarshalFromString(setting, &addonInfo)
 		_ = addonInfo.UpdateAddonInfoToDB(false)
 	}
-	delete(instance.installAddons, addonId)
+	delete(m.installAddons, addonId)
 	return nil
 }
 

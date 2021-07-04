@@ -1,4 +1,4 @@
-package models
+package wot_models
 
 import (
 	"github.com/galenliu/gateway/pkg/database"

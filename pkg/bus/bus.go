@@ -1,119 +1,58 @@
 package bus
 
 import (
-	"github.com/asaskevich/EventBus"
+	bus "github.com/asaskevich/EventBus"
 	"github.com/galenliu/gateway/pkg/logging"
-	models2 "github.com/galenliu/gateway/pkg/wot/models"
-	"github.com/galenliu/gateway/things"
 )
 
-type EventBusController interface {
-	things.ThingsEventBus
-}
-
-type bus struct {
+type eventBus struct {
+	bus    bus.Bus
 	logger logging.Logger
-	EventBus.Bus
 }
 
-func (b *bus) ListenCreateThing(f func(data []byte) error) {
-	panic("implement me")
+func NewEventBus(log logging.Logger) (eventBus, error) {
+	b := eventBus{}
+	b.logger = log
+	b.bus = bus.New()
+	return b, nil
 }
 
-func (b *bus) ListenRemoveThing(f func(id string)) {
-	panic("implement me")
-}
-
-func (b *bus) FireThingAdded(thing *models2.Thing) {
-	panic("implement me")
-}
-
-func (b *bus) FireThingRemoved(id string) {
-	panic("implement me")
-}
-
-func NewEventBus(log logging.Logger) (EventBusController, error) {
-	bus := &bus{}
-	bus.logger = log
-	bus.Bus = EventBus.New()
-	return bus, nil
-}
-
-func (bus *bus) subscribe(topic string, fn interface{}) {
-	err := bus.Subscribe(topic, fn)
+func (eventBus eventBus) Subscribe(topic string, fn interface{}) {
+	err := eventBus.bus.Subscribe(topic, fn)
 	if err != nil {
-		bus.logger.Error("topic:%s subscribe err :%s", topic, err.Error())
+		eventBus.logger.Error("topic:%s subscribe err :%s", topic, err.Error())
 	}
 }
 
-func (bus *bus) unsubscribe(topic string, fn interface{}) {
-	err := bus.Unsubscribe(topic, fn)
+func (eventBus eventBus) Unsubscribe(topic string, fn interface{}) {
+	err := eventBus.bus.Unsubscribe(topic, fn)
 	if err != nil {
-		bus.logger.Error("topic: %s unsubscribe err: %s", topic, err.Error())
+		eventBus.logger.Error("topic: %s unsubscribe err: %s", topic, err.Error())
 	}
 }
 
-func (bus *bus) publish(topic string, args ...interface{}) {
-	if !bus.HasCallback(topic) {
-		bus.logger.Info("topic has not callback")
+func (eventBus eventBus) Publish(topic string, args ...interface{}) {
+	if !eventBus.bus.HasCallback(topic) {
+		eventBus.logger.Info("topic has not callback")
 		return
 	}
-	bus.Publish(topic, args...)
+	eventBus.bus.Publish(topic, args...)
 }
 
-func (bus *bus) subscribeOnce(topic string, fn interface{}) {
-	err := bus.SubscribeOnce(topic, fn)
+func (eventBus eventBus) SubscribeOnce(topic string, fn interface{}) {
+	err := eventBus.bus.SubscribeOnce(topic, fn)
 	if err != nil {
-		bus.logger.Error("topic: %s subscribe once err: %s", topic, err.Error())
+		eventBus.logger.Error("topic: %s subscribe once err: %s", topic, err.Error())
 	}
 }
 
-func (bus *bus) subscribeAsync(topic string, fn interface{}) {
-	err := bus.SubscribeAsync(topic, fn, false)
+func (eventBus eventBus) SubscribeAsync(topic string, fn interface{}) {
+	err := eventBus.bus.SubscribeAsync(topic, fn, false)
 	if err != nil {
-		bus.logger.Error("topic: %s subscribe async err: %s", topic, err.Error())
+		eventBus.logger.Error("topic: %s subscribe async err: %s", topic, err.Error())
 	}
 }
 
-func (bus *bus) waitAsync() {
-	bus.WaitAsync()
+func (eventBus eventBus) WaitAsync() {
+	eventBus.bus.WaitAsync()
 }
-
-//type OnPropertyChangeFunc = func(property *addon.Property)
-//
-//func SubscribePropertyChanged(thingId, propName string, fn OnPropertyChangeFunc) error {
-//	topic := fmt.Sprintf("%s.%s.%s", util.PropertyChanged, thingId, propName)
-//	if instance == nil {
-//		initBus()
-//	}
-//	return instance.Subscribe(topic, fn)
-//}
-//
-//func SubscribeOncePropertyChanged(thingId, propName string, fn OnPropertyChangeFunc) error {
-//	topic := fmt.Sprintf("%s.%s.%s", util.PropertyChanged, thingId, propName)
-//
-//	if instance == nil {
-//		initBus()
-//	}
-//	return instance.SubscribeOnce(topic, fn)
-//}
-//
-//func UnsubscribePropertyChanged(thingId, propName string, fn OnPropertyChangeFunc) error {
-//	topic := fmt.Sprintf("%s.%s.%s", util.PropertyChanged, thingId, propName)
-//	if instance == nil {
-//		initBus()
-//	}
-//	return instance.Unsubscribe(topic, fn)
-//}
-//
-//func PublishPropertyChanged(prop *addon.Property) {
-//	topic := fmt.Sprintf("%s.%s.%s", util.PropertyChanged, prop.DeviceId, prop.name)
-//	if instance == nil {
-//		initBus()
-//	}
-//	log.Info(fmt.Sprintf(topic+" has callback %v", instance.HasCallback(topic)))
-//	if !instance.HasCallback(topic) {
-//		return
-//	}
-//	instance.Publish(topic, prop)
-//}

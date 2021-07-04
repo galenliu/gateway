@@ -1,36 +1,45 @@
 package controllers
 
 import (
-	"github.com/galenliu/gateway/configs"
+	"fmt"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
-	"github.com/galenliu/gateway/server"
 	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/websocket/v2"
 	"net/http"
-	"strconv"
+	"time"
 )
+
+type Options struct {
+	HttpAddr  string
+	HttpsAddr string
+}
 
 type Router struct {
 	*fiber.App
 	logger           logging.Logger
 	thingsController *thingsController
 	userController   userController
+	options          Options
+	HttpRunning      bool
+	HttpsRunning     bool
 }
 
-func NewAPP(thingsModel thingsModel, log logging.Logger) *Router {
+func NewAPP(options Options, thingsModel thingsModel, log logging.Logger) *Router {
 
 	//init
 	app := Router{}
 
 	app.logger = log
-
+	app.options = options
 	app.App = fiber.New()
 	app.Use(recover.New())
 	app.thingsController = NewThingsController(thingsModel, log)
+	app.HttpRunning = false
+	app.HttpsRunning = false
 
 	//app.Use("/", filesystem.New(filesystem.Options{
 	//	Root: http.FS(server.File),
@@ -51,7 +60,7 @@ func NewAPP(thingsModel thingsModel, log logging.Logger) *Router {
 	app.Static("/index.htm", "")
 
 	actionsController := NewActionsController()
-	thingsController := NewThingsController()
+	thingsController := NewThingsController(models.NewThingsModel(), log)
 	usersController := NewUsersController()
 	addonController := NewAddonController()
 
@@ -136,40 +145,45 @@ func NewAPP(thingsModel thingsModel, log logging.Logger) *Router {
 		actionsGroup.Delete("/:actionName/:actionId", actionsController.handleDeleteAction)
 	}
 
-	return app
+	return &app
 }
 
-func (web *server.WebServe) Start() error {
-	httpPort := ":" + strconv.Itoa(web.options.HttpPort)
-	var err error
+func (web *Router) Stop() error {
+	return web.App.Shutdown()
+}
+
+func (web *Router) Start() error {
+
+	var errs []error
 	go func() {
-		err = web.Listen(httpPort)
+		web.HttpRunning = true
+		err := web.Listen(web.options.HttpAddr)
 		if err != nil {
-			logging.Error("web server err:%s", err.Error())
+			errs[0] = fmt.Errorf("http server err:%s", err.Error())
+			web.HttpRunning = false
+			return
 		}
 	}()
-	if err != nil {
-		event_bus.Publish(util.WebServerStarted)
-	}
-	return err
-}
 
-func (web *server.WebServe) Stop() {
-	err := web.App.Shutdown()
-	if err != nil {
-		logging.Error(err.Error())
-	}
-	event_bus.Publish(util.WebServerStopped)
-}
+	go func() {
+		web.HttpRunning = true
+		err1 := web.Listen(web.options.HttpsAddr)
+		if err1 != nil {
+			errs[1] = fmt.Errorf("https server err:%s", err1.Error())
+			web.HttpsRunning = false
+			return
+		}
+	}()
+	time.Sleep(1 * time.Second)
 
-func NewDefaultWebConfig() server.Options {
-	conf := server.Options{
-		HttpPort:    configs.GetPorts().HTTP,
-		HttpsPort:   configs.GetPorts().HTTPS,
-		StaticDir:   "./dist",
-		TemplateDir: "./dist",
-		UploadDir:   configs.GetUploadDir(),
-		LogDir:      configs.GetLogDir(),
+	if errs[0] != nil && errs[1] != nil {
+		return fmt.Errorf("http serve err:%s ,https serve err:%s", errs[0].Error(), errs[1].Error())
 	}
-	return conf
+	if errs[0] != nil {
+		return fmt.Errorf("http serve err:%s ", errs[0].Error())
+	}
+	if errs[1] != nil {
+		return fmt.Errorf("https serve err:%s ", errs[1].Error())
+	}
+	return nil
 }

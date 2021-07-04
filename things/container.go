@@ -3,19 +3,22 @@ package things
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/util"
 	json "github.com/json-iterator/go"
 )
 
+type eventBus interface {
+	Publish(string, ...interface{})
+	Subscribe(topic string, fn interface{})
+}
+
+// Container Things CRUD
 type Container interface {
 	GetThing(id string) *Thing
 	GetThings() []*Thing
 	CreateThing(data []byte) (*Thing, error)
-}
-
-//ThingsEventBus Things和bus通讯的接口
-type ThingsEventBus interface {
-	ListenController
-	FireController
+	RemoveThing(id string) error
+	UpdateThing(data []byte) error
 }
 
 type ListenController interface {
@@ -43,10 +46,10 @@ type container struct {
 	options Options
 	store   Store
 	logger  logging.Logger
-	bus     ThingsEventBus
+	bus     eventBus
 }
 
-func NewThingsContainer(option Options, store Store, bus ThingsEventBus, log logging.Logger) Container {
+func NewThingsContainer(option Options, store Store, bus eventBus, log logging.Logger) Container {
 
 	instance := &container{}
 	instance.options = option
@@ -54,8 +57,6 @@ func NewThingsContainer(option Options, store Store, bus ThingsEventBus, log log
 	instance.bus = bus
 	instance.logger = log
 	instance.things = make(map[string]*Thing)
-	instance.bus.ListenCreateThing(instance.handleCreateThing)
-	instance.bus.ListenRemoveThing(instance.handleRemoveThing)
 	return instance
 }
 
@@ -80,7 +81,7 @@ func (c *container) CreateThing(data []byte) (*Thing, error) {
 	if err != nil {
 		return nil, err
 	}
-	c.bus.FireThingAdded(t)
+	c.bus.Publish(util.ThingCreated, t)
 	return t, nil
 }
 
@@ -89,12 +90,21 @@ func (c *container) RemoveThing(thingId string) error {
 	if err != nil {
 		return err
 	}
-	c.bus.FireThingRemoved(thingId)
+	c.bus.Publish(util.ThingRemoved, thingId)
 	return nil
 }
 
 func (c *container) UpdateThing(data []byte) error {
-	return c.handleUpdateThing(data)
+	id := json.Get(data, "id")
+	if id.ValueType() != json.StringValue {
+		return fmt.Errorf("thing id invaild")
+	}
+	err := c.handleUpdateThing(data)
+	if err != nil {
+		return err
+	}
+	c.bus.Publish(util.ThingModified, id.ToString())
+	return nil
 }
 
 func (c *container) handleCreateThing(data []byte) (*Thing, error) {
