@@ -14,21 +14,25 @@ import (
 )
 
 type Options struct {
-	HttpAddr  string
-	HttpsAddr string
+	HttpAddr     string
+	HttpsAddr    string
+	ThingsModel  *models.Things
+	UsersModel   *models.Users
+	SettingModel *models.SettingsModel
 }
 
 type Router struct {
 	*fiber.App
-	logger           logging.Logger
-	thingsController *thingsController
-	userController   userController
-	options          Options
-	HttpRunning      bool
-	HttpsRunning     bool
+	logger             logging.Logger
+	thingsController   *thingsController
+	userController     *userController
+	settingsController *SettingsController
+	options            Options
+	HttpRunning        bool
+	HttpsRunning       bool
 }
 
-func NewAPP(options Options, thingsModel thingsModel, log logging.Logger) *Router {
+func Setup(options Options, log logging.Logger) *Router {
 
 	//init
 	app := Router{}
@@ -37,7 +41,9 @@ func NewAPP(options Options, thingsModel thingsModel, log logging.Logger) *Route
 	app.options = options
 	app.App = fiber.New()
 	app.Use(recover.New())
-	app.thingsController = NewThingsController(thingsModel, log)
+	app.thingsController = NewThingsController(options.ThingsModel, log)
+	app.userController = NewUsersController(options.UsersModel, log)
+	app.settingsController = NewSettingController()
 	app.HttpRunning = false
 	app.HttpsRunning = false
 
@@ -133,8 +139,7 @@ func NewAPP(options Options, thingsModel thingsModel, log logging.Logger) *Route
 
 	{ //settings Controller
 		debugGroup := app.Group(util.SettingsPath)
-		settingsController := NewSettingController()
-		debugGroup.Get("/addonsInfo", settingsController.handleGetAddonsInfo)
+		debugGroup.Get("/addonsInfo", app.settingsController.handleGetAddonsInfo)
 	}
 
 	{ //actions Controller

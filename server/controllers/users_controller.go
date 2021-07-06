@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/gofiber/fiber/v2"
 	json "github.com/json-iterator/go"
 	"strconv"
@@ -12,12 +13,14 @@ type usesModel interface {
 }
 
 type userController struct {
-	model usesModel
+	model  usesModel
+	logger logging.Logger
 }
 
-func NewUsersController(model usesModel) *userController {
+func NewUsersController(model usesModel, log logging.Logger) *userController {
 	uc := &userController{}
 	uc.model = model
+	uc.logger = log
 	return uc
 }
 

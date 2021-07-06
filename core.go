@@ -70,7 +70,7 @@ func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {
 		return nil, e
 	}
 
-	g.sever = server.NewWebServe(server.Options{
+	g.sever = server.Setup(server.Options{
 		HttpAddr:    g.options.HttpAddr,
 		HttpsAddr:   g.options.HttpsAddr,
 		StaticDir:   path.Join(g.options.DataDir, "static"),

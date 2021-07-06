@@ -25,24 +25,22 @@ type WebServe struct {
 	*controllers.Router
 	logger  logging.Logger
 	options Options
-	things  *models.Things
-	users   *models.Users
 
 	bus eventBus
 }
 
-func NewWebServe(options Options, bus eventBus, log logging.Logger) *WebServe {
+func Setup(options Options, bus eventBus, log logging.Logger) *WebServe {
 	sev := WebServe{}
 	sev.options = options
 	sev.logger = log
 	sev.bus = bus
-	sev.things = models.NewThingsModel(log)
-	sev.users = models.NewUsersModel(log)
 
-	sev.Router = controllers.NewAPP(controllers.Options{
-		HttpAddr:  sev.options.HttpAddr,
-		HttpsAddr: sev.options.HttpsAddr,
-	}, sev.things, log)
+	sev.Router = controllers.Setup(controllers.Options{
+		HttpAddr:    sev.options.HttpAddr,
+		HttpsAddr:   sev.options.HttpsAddr,
+		ThingsModel: models.NewThingsModel(log),
+		UsersModel:  models.NewUsersModel(log),
+	}, log)
 
 	sev.bus.Subscribe(util.GatewayStarted, sev.start)
 	return &sev
