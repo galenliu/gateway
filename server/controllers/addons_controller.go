@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/galenliu/gateway/pkg/database"
-	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/plugin"
 	"github.com/gofiber/fiber/v2"
 	json "github.com/json-iterator/go"
@@ -10,10 +10,13 @@ import (
 )
 
 type AddonController struct {
+	logger logging.Logger
 }
 
-func NewAddonController() *AddonController {
-	return &AddonController{}
+func NewAddonController(log logging.Logger) *AddonController {
+	c := &AddonController{}
+	c.logger = log
+	return c
 }
 
 //  GET /addons

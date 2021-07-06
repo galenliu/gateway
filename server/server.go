@@ -36,10 +36,12 @@ func Setup(options Options, bus eventBus, log logging.Logger) *WebServe {
 	sev.bus = bus
 
 	sev.Router = controllers.Setup(controllers.Options{
-		HttpAddr:    sev.options.HttpAddr,
-		HttpsAddr:   sev.options.HttpsAddr,
-		ThingsModel: models.NewThingsModel(log),
-		UsersModel:  models.NewUsersModel(log),
+		HttpAddr:  sev.options.HttpAddr,
+		HttpsAddr: sev.options.HttpsAddr,
+	}, controllers.Models{
+		ThingsModel:  models.NewThingsModel(log),
+		UsersModel:   models.NewUsersModel(log),
+		SettingModel: models.NewSettingsModel(log),
 	}, log)
 
 	sev.bus.Subscribe(util.GatewayStarted, sev.start)

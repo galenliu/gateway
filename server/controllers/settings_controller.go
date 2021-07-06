@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/galenliu/gateway"
 	"github.com/galenliu/gateway/configs"
+	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/gofiber/fiber/v2"
 )
@@ -18,7 +19,7 @@ type addonInfo struct {
 type SettingsController struct {
 }
 
-func NewSettingController() *SettingsController {
+func NewSettingController(log logging.Logger) *SettingsController {
 	return &SettingsController{}
 }
 

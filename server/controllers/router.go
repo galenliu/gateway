@@ -14,42 +14,43 @@ import (
 )
 
 type Options struct {
-	HttpAddr     string
-	HttpsAddr    string
+	HttpAddr  string
+	HttpsAddr string
+}
+type Models struct {
 	ThingsModel  *models.Things
 	UsersModel   *models.Users
-	SettingModel *models.SettingsModel
+	SettingModel *models.Settings
 }
 
 type Router struct {
 	*fiber.App
 	logger             logging.Logger
-	thingsController   *thingsController
-	userController     *userController
-	settingsController *SettingsController
 	options            Options
 	HttpRunning        bool
 	HttpsRunning       bool
+	thingsController   *thingsController
+	usersController    *userController
+	settingsController *SettingsController
+	addonController    *AddonController
 }
 
-func Setup(options Options, log logging.Logger) *Router {
+func Setup(options Options, models Models, log logging.Logger) *Router {
 
-	//init
+	//router init
 	app := Router{}
-
 	app.logger = log
 	app.options = options
 	app.App = fiber.New()
 	app.Use(recover.New())
-	app.thingsController = NewThingsController(options.ThingsModel, log)
-	app.userController = NewUsersController(options.UsersModel, log)
-	app.settingsController = NewSettingController()
 	app.HttpRunning = false
 	app.HttpsRunning = false
 
-	//app.Use("/", filesystem.New(filesystem.Options{
-	//	Root: http.FS(server.File),
-	//}))
+	//controller init
+	app.thingsController = NewThingsController(models.ThingsModel, log)
+	app.usersController = NewUsersController(models.UsersModel, log)
+	app.settingsController = NewSettingController(log)
+	app.addonController = NewAddonController(log)
 
 	//logger
 	app.Use(logger.New())
@@ -66,41 +67,38 @@ func Setup(options Options, log logging.Logger) *Router {
 	app.Static("/index.htm", "")
 
 	actionsController := NewActionsController()
-	thingsController := NewThingsController(models.NewThingsModel(), log)
-	usersController := NewUsersController()
-	addonController := NewAddonController()
 
-	Tid := "/:thingId"
+	thingId := "/:thingId"
 
 	//Things Controller
 	{
 		thingsGroup := app.Group(util.ThingsPath)
 		//set a properties of a thing.
-		thingsGroup.Put("/:thingId/properties/*", thingsController.handleSetProperty)
-		thingsGroup.Get("/:thingId/properties/*", thingsController.handleGetPropertyValue)
+		thingsGroup.Put("/:thingId/properties/*", app.thingsController.handleSetProperty)
+		thingsGroup.Get("/:thingId/properties/*", app.thingsController.handleGetPropertyValue)
 
 		//Handle creating a new thing.
-		thingsGroup.Post("/", thingsController.handleCreateThing)
+		thingsGroup.Post("/", app.thingsController.handleCreateThing)
 
-		thingsGroup.Get("/:thingId", thingsController.handleGetThing)
-		thingsGroup.Get("/", thingsController.handleGetThings)
+		thingsGroup.Get("/:thingId", app.thingsController.handleGetThing)
+		thingsGroup.Get("/", app.thingsController.handleGetThings)
 
 		thingsGroup.Get("/:thingId", websocket.New(handleWebsocket))
 		thingsGroup.Get("/", websocket.New(handleWebsocket))
 
 		//Get the properties of a thing
-		thingsGroup.Get(Tid+util.PropertiesPath, thingsController.handleGetProperties)
+		thingsGroup.Get(thingId+util.PropertiesPath, app.thingsController.handleGetProperties)
 
-		thingsGroup.Get(Tid+util.ActionsPath, actionsController.handleGetActions)
-		thingsGroup.Post(Tid+util.ActionsPath, actionsController.handleAction)
+		thingsGroup.Get(thingId+util.ActionsPath, actionsController.handleGetActions)
+		thingsGroup.Post(thingId+util.ActionsPath, actionsController.handleAction)
 
 		// Modify a ThingInfo.
-		thingsGroup.Put("/:thingId", thingsController.handleSetThing)
+		thingsGroup.Put("/:thingId", app.thingsController.handleSetThing)
 
-		thingsGroup.Patch("/", thingsController.handlePatchThings)
-		thingsGroup.Patch("/:thingId", thingsController.handlePatchThing)
+		thingsGroup.Patch("/", app.thingsController.handlePatchThings)
+		thingsGroup.Patch("/:thingId", app.thingsController.handlePatchThing)
 
-		thingsGroup.Delete("/:thingId", thingsController.handleDeleteThing)
+		thingsGroup.Delete("/:thingId", app.thingsController.handleDeleteThing)
 
 	}
 
@@ -120,41 +118,40 @@ func Setup(options Options, log logging.Logger) *Router {
 		}))
 	}
 
+	// Users Controller
 	{
 		usersGroup := app.Group(util.UsersPath)
 
-		usersGroup.Get("/count", usersController.getCount)
-		usersGroup.Post("/", usersController.createUser)
+		usersGroup.Get("/count", app.usersController.getCount)
+		usersGroup.Post("/", app.usersController.createUser)
 	}
 
-	{ //Addons Controller
+	//Addons Controller
+	{
 		addonGroup := app.Group(util.AddonsPath)
-		addonGroup.Get("/", addonController.handlerGetAddons)
-		addonGroup.Post("/", addonController.handlerInstallAddon)
-		addonGroup.Put("/:addonId", addonController.handlerSetAddon)
-		addonGroup.Patch("/:addonId", addonController.handlerUpdateAddon)
-		addonGroup.Get("/:addonId/options", addonController.handlerGetAddonConfig)
-		addonGroup.Put("/:addonId/options", addonController.handlerSetAddonConfig)
+		addonGroup.Get("/", app.addonController.handlerGetAddons)
+		addonGroup.Post("/", app.addonController.handlerInstallAddon)
+		addonGroup.Put("/:addonId", app.addonController.handlerSetAddon)
+		addonGroup.Patch("/:addonId", app.addonController.handlerUpdateAddon)
+		addonGroup.Get("/:addonId/options", app.addonController.handlerGetAddonConfig)
+		addonGroup.Put("/:addonId/options", app.addonController.handlerSetAddonConfig)
 	}
 
-	{ //settings Controller
+	//settings Controller
+	{
 		debugGroup := app.Group(util.SettingsPath)
 		debugGroup.Get("/addonsInfo", app.settingsController.handleGetAddonsInfo)
 	}
 
-	{ //actions Controller
+	//Actions Controller
+	{
 		actionsGroup := app.Group(util.ActionsPath)
-
 		actionsGroup.Post("/", actionsController.handleAction)
 		actionsGroup.Get("/", actionsController.handleGetActions)
 		actionsGroup.Delete("/:actionName/:actionId", actionsController.handleDeleteAction)
 	}
 
 	return &app
-}
-
-func (web *Router) Stop() error {
-	return web.App.Shutdown()
 }
 
 func (web *Router) Start() error {
@@ -191,4 +188,8 @@ func (web *Router) Start() error {
 		return fmt.Errorf("https serve err:%s ", errs[1].Error())
 	}
 	return nil
+}
+
+func (web *Router) Stop() error {
+	return web.App.Shutdown()
 }

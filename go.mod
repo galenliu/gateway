@@ -11,7 +11,7 @@ require (
 	github.com/galenliu/gateway-addon v1.0.0
 	github.com/go-oauth2/oauth2/v4 v4.3.0
 	github.com/go-openapi/swag v0.19.15 // indirect
-	github.com/gofiber/fiber/v2 v2.13.0
+	github.com/gofiber/fiber/v2 v2.14.0
 	github.com/gofiber/websocket/v2 v2.0.3
 	github.com/gorilla/websocket v1.4.2
 	github.com/json-iterator/go v1.1.11
@@ -26,7 +26,6 @@ require (
 	github.com/tidwall/gjson v1.7.4
 	github.com/xiam/to v0.0.0-20200126224905-d60d31e03561
 	go.uber.org/zap v1.16.0
-	golang.org/dl v0.0.0-20210610154546-0cc6883720ee // indirect
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
