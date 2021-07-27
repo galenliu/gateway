@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/galenliu/gateway-addon/wot"
+	"github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
 	"strconv"
 )

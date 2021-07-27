@@ -5,6 +5,7 @@ import (
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/server/models"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -18,24 +19,20 @@ type Options struct {
 	HttpsAddr string
 }
 type Models struct {
-	ThingsModel  *models.Things
+	ThingsModel  *models.ThingsModel
 	UsersModel   *models.Users
 	SettingModel *models.Settings
 }
 
 type Router struct {
 	*fiber.App
-	logger             logging.Logger
-	options            Options
-	HttpRunning        bool
-	HttpsRunning       bool
-	thingsController   *thingsController
-	usersController    *userController
-	settingsController *SettingsController
-	addonController    *AddonController
+	logger       logging.Logger
+	options      Options
+	HttpRunning  bool
+	HttpsRunning bool
 }
 
-func Setup(options Options, models Models, log logging.Logger) *Router {
+func Setup(options Options, thingsStore models.UsersStore, userStore models.UsersStore, log logging.Logger) *Router {
 
 	//router init
 	app := Router{}
@@ -47,10 +44,6 @@ func Setup(options Options, models Models, log logging.Logger) *Router {
 	app.HttpsRunning = false
 
 	//controller init
-	app.thingsController = NewThingsController(models.ThingsModel, log)
-	app.usersController = NewUsersController(models.UsersModel, log)
-	app.settingsController = NewSettingController(log)
-	app.addonController = NewAddonController(log)
 
 	//logger
 	app.Use(logger.New())
@@ -66,40 +59,37 @@ func Setup(options Options, models Models, log logging.Logger) *Router {
 	//app.Get("/", controllers.RootHandle())
 	app.Static("/index.htm", "")
 
-	actionsController := NewActionsController()
-
 	thingId := "/:thingId"
 
-	//Things Controller
+	//ThingsModel Controller
 	{
+		thingsController := NewThingsController(models.NewThingsModel(), nil, log)
 		thingsGroup := app.Group(util.ThingsPath)
 		//set a properties of a thing.
-		thingsGroup.Put("/:thingId/properties/*", app.thingsController.handleSetProperty)
-		thingsGroup.Get("/:thingId/properties/*", app.thingsController.handleGetPropertyValue)
+		thingsGroup.Put("/:thingId/properties/*", thingsController.handleSetProperty)
+		thingsGroup.Get("/:thingId/properties/*", thingsController.handleGetPropertyValue)
 
 		//Handle creating a new thing.
-		thingsGroup.Post("/", app.thingsController.handleCreateThing)
+		thingsGroup.Post("/", thingsController.handleCreateThing)
 
-		thingsGroup.Get("/:thingId", app.thingsController.handleGetThing)
-		thingsGroup.Get("/", app.thingsController.handleGetThings)
+		thingsGroup.Get("/:thingId", thingsController.handleGetThing)
+		thingsGroup.Get("/", thingsController.handleGetThings)
 
 		thingsGroup.Get("/:thingId", websocket.New(handleWebsocket))
 		thingsGroup.Get("/", websocket.New(handleWebsocket))
 
 		//Get the properties of a thing
-		thingsGroup.Get(thingId+util.PropertiesPath, app.thingsController.handleGetProperties)
-
-		thingsGroup.Get(thingId+util.ActionsPath, actionsController.handleGetActions)
-		thingsGroup.Post(thingId+util.ActionsPath, actionsController.handleAction)
+		thingsGroup.Get(thingId+util.PropertiesPath, thingsController.handleGetProperties)
 
 		// Modify a ThingInfo.
-		thingsGroup.Put("/:thingId", app.thingsController.handleSetThing)
+		thingsGroup.Put("/:thingId", thingsController.handleSetThing)
+		thingsGroup.Patch("/", thingsController.handlePatchThings)
+		thingsGroup.Patch("/:thingId", thingsController.handlePatchThing)
+		thingsGroup.Delete("/:thingId", thingsController.handleDeleteThing)
 
-		thingsGroup.Patch("/", app.thingsController.handlePatchThings)
-		thingsGroup.Patch("/:thingId", app.thingsController.handlePatchThing)
-
-		thingsGroup.Delete("/:thingId", app.thingsController.handleDeleteThing)
-
+		actionsController := NewActionsController(log)
+		thingsGroup.Get(thingId+util.ActionsPath, actionsController.handleGetActions)
+		thingsGroup.Post(thingId+util.ActionsPath, actionsController.handleAction)
 	}
 
 	//NewThingFromString Controller
@@ -120,31 +110,34 @@ func Setup(options Options, models Models, log logging.Logger) *Router {
 
 	// Users Controller
 	{
+		usersController := NewUsersController(m.UsersModel, log)
 		usersGroup := app.Group(util.UsersPath)
-
-		usersGroup.Get("/count", app.usersController.getCount)
-		usersGroup.Post("/", app.usersController.createUser)
+		usersGroup.Get("/count", usersController.getCount)
+		usersGroup.Post("/", usersController.createUser)
 	}
 
 	//Addons Controller
 	{
+		addonController := NewAddonController(log)
 		addonGroup := app.Group(util.AddonsPath)
-		addonGroup.Get("/", app.addonController.handlerGetAddons)
-		addonGroup.Post("/", app.addonController.handlerInstallAddon)
-		addonGroup.Put("/:addonId", app.addonController.handlerSetAddon)
-		addonGroup.Patch("/:addonId", app.addonController.handlerUpdateAddon)
-		addonGroup.Get("/:addonId/options", app.addonController.handlerGetAddonConfig)
-		addonGroup.Put("/:addonId/options", app.addonController.handlerSetAddonConfig)
+		addonGroup.Get("/", addonController.handlerGetAddons)
+		addonGroup.Post("/", addonController.handlerInstallAddon)
+		addonGroup.Put("/:addonId", addonController.handlerSetAddon)
+		addonGroup.Patch("/:addonId", addonController.handlerUpdateAddon)
+		addonGroup.Get("/:addonId/options", addonController.handlerGetAddonConfig)
+		addonGroup.Put("/:addonId/options", addonController.handlerSetAddonConfig)
 	}
 
 	//settings Controller
 	{
+		settingsController := NewSettingController(log)
 		debugGroup := app.Group(util.SettingsPath)
-		debugGroup.Get("/addonsInfo", app.settingsController.handleGetAddonsInfo)
+		debugGroup.Get("/addonsInfo", settingsController.handleGetAddonsInfo)
 	}
 
 	//Actions Controller
 	{
+		actionsController := NewActionsController(log)
 		actionsGroup := app.Group(util.ActionsPath)
 		actionsGroup.Post("/", actionsController.handleAction)
 		actionsGroup.Get("/", actionsController.handleGetActions)

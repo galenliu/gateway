@@ -2,24 +2,23 @@ package controllers
 
 import (
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
 	json "github.com/json-iterator/go"
 	"strconv"
 	"strings"
 )
 
-type usesModel interface {
-	GetUsersCount() int
-}
+
 
 type userController struct {
-	model  usesModel
+	model  *models.Users
 	logger logging.Logger
 }
 
-func NewUsersController(model usesModel, log logging.Logger) *userController {
+func NewUsersController(m *models.Users, log logging.Logger) *userController {
 	uc := &userController{}
-	uc.model = model
+	uc.model = m
 	uc.logger = log
 	return uc
 }
@@ -41,7 +40,7 @@ func (u *userController) createUser(c *fiber.Ctx) error {
 	if exit != nil {
 		return c.Status(fiber.StatusBadRequest).SendString("User already exists.")
 	}
-	err, jwt := u.Users.CreateUser(email, pw, name)
+	err, jwt := u.model.CreateUser(email, pw, name)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}

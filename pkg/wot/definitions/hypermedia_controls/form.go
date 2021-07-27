@@ -1,14 +1,16 @@
 package hypermedia_controls
 
+import json "github.com/json-iterator/go"
+
 type Form struct {
-	Href                string               `json:"href,omitempty"`
+	Href                URI                  `json:"href,omitempty"`
 	ContentType         string               `json:"contentType,omitempty"`
 	ContentCoding       string               `json:"contentCoding,omitempty"`
 	Security            []string             `json:"security,omitempty"`
 	Scopes              []string             `json:"scopes,omitempty"`
 	Response            *Response            `json:"response,omitempty"`
 	AdditionalResponses *AdditionalResponses `json:"additionalResponses,omitempty"`
-	Subprotocol         string               `json:"subprotocol,omitempty"`
+	SubProtocol         string               `json:"subprotocol,omitempty"`
 	Op                  []string             `json:"op,omitempty"`
 }
 
@@ -22,7 +24,33 @@ type AdditionalResponses struct {
 }
 
 func NewFormFormString(description string) *Form {
-	return &Form{}
+	data := []byte(description)
+	f := &Form{}
+	if f.Href = URI(JSONGetString(data, "href", "")); f.Href == "" {
+		return nil
+	}
+	f.ContentType = JSONGetString(data, "contentType", "")
+	f.ContentCoding = JSONGetString(data, "contentType", "")
+
+	f.Security = JSONGetArray(data, "security")
+	f.Scopes = JSONGetArray(data, "scopes")
+	f.SubProtocol = JSONGetString(data, "subprotocol", "")
+
+	var r Response
+	json.Get(data, "response").ToVal(&r)
+	if &r != nil {
+		f.Response = &r
+	}
+
+	var ar AdditionalResponses
+	json.Get(data, "additionalResponses").ToVal(&r)
+	if &ar != nil {
+		f.AdditionalResponses = &ar
+	}
+
+	f.Op = JSONGetArray(data, "op")
+
+	return f
 }
 
 /*

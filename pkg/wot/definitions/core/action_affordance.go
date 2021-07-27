@@ -1,10 +1,8 @@
 package core
 
 import (
-	"fmt"
 	"github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
-
 	json "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
 )
@@ -21,38 +19,24 @@ type actionAffordance struct {
 	Idempotent bool                   `json:"idempotent,omitempty"`
 }
 
-func NewActionAffordanceFromString(data string) *actionAffordance {
-	var ia = InteractionAffordance{}
-	err := json.Unmarshal([]byte(data), &ia)
-	if err != nil {
-		fmt.Print(err.Error())
-		return nil
-	}
+func NewActionAffordanceFromString(description string) *actionAffordance {
+	data := []byte(description)
 	var a = actionAffordance{}
 
-	if gjson.Get(data, "input").Exists() {
-		s := gjson.Get(data, "input").String()
-		d := data_schema.NewDataSchemaFromString(s)
-		if d != nil {
-			a.Input = d
-		}
+	if a.InteractionAffordance = NewInteractionAffordanceFromString(description); a.InteractionAffordance == nil {
+		return nil
 	}
 
-	if gjson.Get(data, "output").Exists() {
-		s := gjson.Get(data, "output").String()
-		d := data_schema.NewDataSchemaFromString(s)
-		if d != nil {
-			a.Output = d
-		}
-	}
+	a.Input = data_schema.NewDataSchemaFromString(json.Get(data, "input").ToString())
+	a.Input = data_schema.NewDataSchemaFromString(json.Get(data, "output").ToString())
 
-	if gjson.Get(data, "safe").Exists() {
-		s := gjson.Get(data, "safe").Bool()
+	if gjson.Get(description, "safe").Exists() {
+		s := gjson.Get(description, "safe").Bool()
 		a.Safe = s
 	}
 
-	if gjson.Get(data, "idempotent").Exists() {
-		s := gjson.Get(data, "idempotent").Bool()
+	if gjson.Get(description, "idempotent").Exists() {
+		s := gjson.Get(description, "idempotent").Bool()
 		a.Idempotent = s
 	}
 
@@ -63,9 +47,4 @@ func NewActionAffordanceFromString(data string) *actionAffordance {
 		})
 	}
 	return &a
-}
-
-func NewActionAffordance() *actionAffordance {
-	aa := &actionAffordance{InteractionAffordance: NewInteractionAffordance()}
-	return aa
 }

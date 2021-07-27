@@ -1,75 +1,51 @@
 package core
 
 import (
-	data_schema2 "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
-	hypermedia_controls2 "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
-	"github.com/galenliu/gateway/wot/definitions/data_schema"
+	schema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
+	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
-	"log"
 )
 
 type InteractionAffordance struct {
-	AtType       string                             `json:"@type"`
-	Title        string                             `json:"title,omitempty"`
-	Titles       map[string]string                  `json:"titles,omitempty"`
-	Description  string                             `json:"description,omitempty"`
-	Descriptions map[string]string                  `json:"descriptions,omitempty"`
-	Forms        []hypermedia_controls2.Form        `json:"forms,omitempty"`
-	UriVariables map[string]data_schema2.DataSchema `json:"uriVariables,omitempty"`
+	AtType       string                       `json:"@type"`
+	Title        string                       `json:"title,omitempty"`
+	Titles       map[string]string            `json:"titles,omitempty"`
+	Description  string                       `json:"description,omitempty"`
+	Descriptions map[string]string            `json:"descriptions,omitempty"`
+	Forms        []controls.Form              `json:"forms,omitempty"`
+	UriVariables map[string]schema.DataSchema `json:"uriVariables,omitempty"`
 }
 
 func NewInteractionAffordanceFromString(description string) *InteractionAffordance {
 	var i = InteractionAffordance{}
-
+	data := []byte(description)
 	if gjson.Get(description, "uriVariables").Exists() {
 		m := gjson.Get(description, "uriVariables").Map()
 		if len(m) > 0 {
-			i.UriVariables = make(map[string]data_schema2.DataSchema)
+			i.UriVariables = make(map[string]schema.DataSchema)
 			for k, v := range m {
-				i.UriVariables[k] = data_schema.NewDataSchemaFromString(v.String())
+				i.UriVariables[k] = schema.NewDataSchemaFromString(v.String())
 			}
 		}
 	}
-	if gjson.Get(description, "title").Exists() {
-		i.Title = gjson.Get(description, "title").String()
-	}
-	if gjson.Get(description, "@type").Exists() {
-		i.AtType = gjson.Get(description, "@type").String()
-	}
+	i.AtType = controls.JSONGetString(data, "@type", "")
+	i.Title = controls.JSONGetString(data, "title", "")
+	i.Titles = controls.JSONGetMap(data, "titles")
+	i.Description = controls.JSONGetString(data, "description", "")
+	i.Descriptions = controls.JSONGetMap(data, "descriptions")
 
-	if gjson.Get(description, "titles").Exists() {
-		for k, v := range gjson.Get(description, "title").Map() {
-			i.Titles[k] = v.String()
-		}
+	var forms []controls.Form
+	json.Get(data, "forms").ToVal(&forms)
+	if len(forms) > 0 {
+		i.Forms = forms
+	} else {
+		return nil
 	}
-
-	if gjson.Get(description, "descriptions").Exists() {
-		for k, v := range gjson.Get(description, "descriptions").Map() {
-			i.Descriptions[k] = v.String()
-		}
+	var uris map[string]schema.DataSchema
+	json.Get(data, "uriVariables").ToVal(&uris)
+	if len(uris) > 0 {
+		i.UriVariables = uris
 	}
-
-	if gjson.Get(description, "forms").Exists() {
-		for _, v := range gjson.Get(description, "forms").Array() {
-			var f hypermedia_controls2.Form
-			err := json.Unmarshal([]byte(v.String()), &f)
-			if err != nil {
-				log.Println(err.Error())
-				continue
-			}
-			i.Forms = append(i.Forms, f)
-		}
-	}
-
 	return &i
-}
-
-func NewInteractionAffordance() *InteractionAffordance {
-	ia := &InteractionAffordance{}
-	return ia
-}
-
-func (i *InteractionAffordance) MarshalJSON() ([]byte, error) {
-	return json.Marshal(i)
 }

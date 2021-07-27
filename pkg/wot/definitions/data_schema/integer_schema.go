@@ -29,6 +29,24 @@ func NewIntegerSchemaFromString(description string) *IntegerSchema {
 	return &schema
 }
 
-func (n IntegerSchema) MarshalJSON() ([]byte, error) {
-	return json.Marshal(n)
+func (i *IntegerSchema) Convert(v interface{}) interface{} {
+	return i.clamp(controls.ToInteger(v))
 }
+
+func (i *IntegerSchema) clamp(value controls.Integer) controls.Integer {
+	if i.Maximum != 0 {
+		if value > i.Maximum {
+			return i.Maximum
+		}
+	}
+	if value < i.Minimum {
+		return i.Minimum
+	}
+	return value
+}
+
+func (i IntegerSchema) MarshalJSON() ([]byte, error) {
+	return json.Marshal(i)
+}
+
+

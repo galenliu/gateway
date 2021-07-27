@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	AddonManager "github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/models"
@@ -15,7 +16,7 @@ type Map = map[string]interface{}
 
 //type WsHandler struct {
 //	thingId              string
-//	Container            *models.Things
+//	Container            *models.ThingsModel
 //	ws                   *websocket.Conn
 //	locker               *sync.Mutex
 //	done                 chan struct{}

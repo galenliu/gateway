@@ -5,13 +5,19 @@ import (
 	"github.com/galenliu/gateway/pkg/logging"
 )
 
+type UsersStore interface {
+	CreateUser(email, hash, name string) (string, error)
+}
+
 type Users struct {
 	users  []*User
 	logger logging.Logger
+	store  UsersStore
 }
 
-func NewUsersModel(logger logging.Logger) *Users {
+func NewUsersModel(store UsersStore, logger logging.Logger) *Users {
 	users := &Users{}
+	users.store = store
 	users.logger = logger
 	return users
 }
@@ -37,7 +43,7 @@ func (u *Users) CreateUser(email, password, name string) (error, string) {
 	return nil, ""
 }
 
-func (u *Users) getUsersCount() []*User {
+func (u *Users) getUsersCount() []User {
 	database.GetUsersCount()
 	return nil
 }

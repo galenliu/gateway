@@ -1,7 +1,7 @@
 package things
 
 import (
-	core2 "github.com/galenliu/gateway/pkg/wot/definitions/core"
+	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	"strconv"
 )
 
@@ -13,7 +13,7 @@ func generateActionId() string {
 }
 
 type Action struct {
-	core2.ActionAffordance
+	wot.ActionAffordance
 	ID      string `json:"id"`
 	Href    string `json:"href,omitempty"`
 	Name    string `json:"name,omitempty"`
@@ -22,7 +22,7 @@ type Action struct {
 
 func NewActionFromString(data string) *Action {
 	var action = Action{}
-	a := core2.NewActionAffordanceFromString(data)
+	a := wot.NewActionAffordanceFromString(data)
 	action.ActionAffordance = a
 	return &action
 }

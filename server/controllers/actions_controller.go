@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/log"
+	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
@@ -12,11 +12,13 @@ import (
 
 type ActionsController struct {
 	Actions *models.Actions
+	logger  logging.Logger
 }
 
-func NewActionsController() *ActionsController {
+func NewActionsController(log logging.Logger) *ActionsController {
 	return &ActionsController{
 		Actions: models.NewActions(),
+		logger:  log,
 	}
 }
 

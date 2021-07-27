@@ -8,10 +8,6 @@ import (
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server"
-	"github.com/galenliu/gateway/server/models"
-
-	"github.com/galenliu/gateway/things"
-
 	"path"
 	"time"
 )
@@ -50,7 +46,6 @@ type Gateway struct {
 	bus             eventBus
 	logger          logging.Logger
 	addonManager    plugin.AddonManager
-	thingsContainer things.Container
 	sever           *server.WebServe
 }
 
@@ -77,30 +72,30 @@ func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {
 		TemplateDir: path.Join(g.options.DataDir, "template"),
 		UploadDir:   path.Join(g.options.DataDir, "upload"),
 		LogDir:      path.Join(g.options.DataDir, "log"),
-	}, g.bus, g.logger)
+	}, g.store, g.bus, g.logger)
 
 	return g, nil
 }
 
-func (g *Gateway) FindNewThings() (ts []*models.Thing) {
-	storedThings := g.thingsContainer.GetThings()
-	connectedDevices := g.addonManager.GetDevices()
-	for _, dev := range connectedDevices {
-		var isExit = false
-		for _, th := range storedThings {
-			if dev.GetID() == th.GetID() {
-				isExit = true
-			}
-		}
-		if !isExit {
-			t, err := models.NewThingFromString(dev.ToJson())
-			if err != nil {
-				ts = append(ts, t)
-			}
-		}
-	}
-	return
-}
+//func (g *Gateway) FindNewThings() (ts []*models.Thing) {
+//	storedThings := g.thingsContainer.GetThings()
+//	connectedDevices := g.addonManager.GetDevices()
+//	for _, dev := range connectedDevices {
+//		var isExit = false
+//		for _, th := range storedThings {
+//			if dev.GetID() == th.GetID() {
+//				isExit = true
+//			}
+//		}
+//		if !isExit {
+//			t, err := models.NewThingFromString(dev.ToJson())
+//			if err != nil {
+//				ts = append(ts, t)
+//			}
+//		}
+//	}
+//	return
+//}
 
 func (g *Gateway) Start() error {
 
@@ -114,8 +109,6 @@ func (g *Gateway) Start() error {
 		return err
 	}
 
-	g.thingsContainer = things.NewThingsContainer(things.Options{}, g.store, g.bus, g.logger)
-
 	g.bus.Publish(util.GatewayStarted)
 	return nil
 }
@@ -123,14 +116,15 @@ func (g *Gateway) Start() error {
 func (g *Gateway) Stop() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
-	err := g.shutdown(ctx)
+	err := g.Shutdown(ctx)
 	if err != nil {
 		return err
 	}
-	g.bus.Publish(util.GatewayStopped)
 	return nil
 }
 
-func (g *Gateway) shutdown(ctx context.Context) error {
+func (g *Gateway) Shutdown(ctx context.Context) error {
+	g.bus.Publish(util.GatewayStopped)
+	<-ctx.Done()
 	return nil
 }

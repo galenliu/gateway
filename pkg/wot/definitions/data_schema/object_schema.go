@@ -15,7 +15,7 @@ func NewObjectSchemaFromString(description string) *ObjectSchema {
 	data := []byte(description)
 	var schema = ObjectSchema{}
 	schema.dataSchema = newDataSchemaFromString(description)
-	if schema.dataSchema == nil ||  schema.dataSchema.GetType() != hypermedia_controls.TypeObject {
+	if schema.dataSchema == nil || schema.dataSchema.GetType() != hypermedia_controls.TypeObject {
 		return nil
 	}
 	var properties map[string]string
@@ -37,6 +37,14 @@ func NewObjectSchemaFromString(description string) *ObjectSchema {
 	return &schema
 }
 
-func (n *ObjectSchema) MarshalJSON() ([]byte, error) {
-	return json.Marshal(n)
+func (o *ObjectSchema) MarshalJSON() ([]byte, error) {
+	return json.Marshal(o)
+}
+
+func (o *ObjectSchema) Convert(v interface{}) interface{} {
+	return v
+}
+
+func (o *ObjectSchema) GetDefaultValue() interface{} {
+	return nil
 }

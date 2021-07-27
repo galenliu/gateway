@@ -3,7 +3,6 @@ package things
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/util"
 	json "github.com/json-iterator/go"
 )
 
@@ -38,23 +37,17 @@ type Store interface {
 	GetThings() []string
 }
 
-type Options struct {
-}
-
 type container struct {
-	things  map[string]*Thing
-	options Options
-	store   Store
-	logger  logging.Logger
-	bus     eventBus
+	things map[string]*Thing
+
+	store  Store
+	logger logging.Logger
 }
 
-func NewThingsContainer(option Options, store Store, bus eventBus, log logging.Logger) Container {
+func NewThingsContainer(store Store, log logging.Logger) Container {
 
 	instance := &container{}
-	instance.options = option
 	instance.store = store
-	instance.bus = bus
 	instance.logger = log
 	instance.things = make(map[string]*Thing)
 	return instance
@@ -81,7 +74,6 @@ func (c *container) CreateThing(data []byte) (*Thing, error) {
 	if err != nil {
 		return nil, err
 	}
-	c.bus.Publish(util.ThingCreated, t)
 	return t, nil
 }
 
@@ -90,7 +82,6 @@ func (c *container) RemoveThing(thingId string) error {
 	if err != nil {
 		return err
 	}
-	c.bus.Publish(util.ThingRemoved, thingId)
 	return nil
 }
 
@@ -103,7 +94,7 @@ func (c *container) UpdateThing(data []byte) error {
 	if err != nil {
 		return err
 	}
-	c.bus.Publish(util.ThingModified, id.ToString())
+
 	return nil
 }
 
@@ -130,24 +121,11 @@ func (c *container) handleRemoveThing(thingId string) error {
 		c.logger.Error("remove thing id: %s from store err: %s", thingId, err.Error())
 	}
 	_, ok := c.things[thingId]
-	if ok {
-		return fmt.Errorf("container has not thing id: %s", thingId)
+	if !ok {
+		c.logger.Info("container has not thing id: %s", thingId)
 	}
 	delete(c.things, thingId)
 	return nil
-}
-
-func (c *container) updateThings() {
-	if len(c.things) < 1 {
-		for _, s := range c.store.GetThings() {
-			t, err := NewThingFromString(s)
-			if err != nil {
-				c.logger.Errorf("new thing for database err: %s", err.Error())
-				continue
-			}
-			c.things[t.GetID()] = t
-		}
-	}
 }
 
 func (c *container) handleUpdateThing(data []byte) error {
@@ -168,14 +146,15 @@ func (c *container) handleUpdateThing(data []byte) error {
 	return nil
 }
 
-//func (ts *container) Subscribe(typ string, f interface{}) {
-//	_ = event_bus.Subscribe("Things."+typ, f)
-//}
-//
-//func (ts *container) Unsubscribe(typ string, f interface{}) {
-//	_ = event_bus.Unsubscribe("Things."+typ, f)
-//}
-//
-//func (ts *container) Publish(typ string, args ...interface{}) {
-//	event_bus.Publish("Things."+typ, args...)
-//}
+func (c *container) updateThings() {
+	if len(c.things) < 1 {
+		for _, s := range c.store.GetThings() {
+			t, err := NewThingFromString(s)
+			if err != nil {
+				c.logger.Errorf("new thing for database err: %s", err.Error())
+				continue
+			}
+			c.things[t.GetID()] = t
+		}
+	}
+}

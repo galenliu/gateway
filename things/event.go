@@ -1,19 +1,19 @@
 package things
 
 import (
-	core2 "github.com/galenliu/gateway/pkg/wot/definitions/core"
+	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	json "github.com/json-iterator/go"
 )
 
 type Event struct {
-	core2.EventAffordance
+	wot.EventAffordance
 	Name    string `json:"name"`
 	ThingId string `json:"thingId"`
 }
 
 func NewEventFromString(data string) *Event {
 	var this = Event{}
-	aa := core2.NewEventAffordanceFromString(data)
+	aa := wot.NewEventAffordanceFromString(data)
 	this.EventAffordance = aa
 	return &this
 }

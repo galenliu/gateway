@@ -7,30 +7,29 @@ import (
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	securityScheme "github.com/galenliu/gateway/pkg/wot/definitions/security_scheme"
 	json "github.com/json-iterator/go"
-	"time"
 )
 
 type ThingInterface interface {
 }
 
 type Thing struct {
-	AtContext    []string     `json:"@context"`
-	Title        string       `json:"title"`
-	Titles       []string     `json:"titles,omitempty"`
-	ID           controls.URI `json:"id"`
-	AtType       []string     `json:"@type"`
-	Description  string       `json:"description,omitempty"`
-	Descriptions []string     `json:"descriptions,omitempty"`
+	AtContext    []string          `json:"@context"`
+	Title        string            `json:"title"`
+	Titles       map[string]string `json:"titles,omitempty"`
+	ID           controls.URI      `json:"id"`
+	AtType       []string          `json:"@type"`
+	Description  string            `json:"description,omitempty"`
+	Descriptions map[string]string `json:"descriptions,omitempty"`
 
 	Forms []controls.Form `json:"forms,omitempty"`
 	Links []controls.Link `json:"links,omitempty"`
 
-	Support interface{} `json:"support,omitempty"`
-	Base    interface{} `json:"base"`
+	Support controls.URI `json:"support,omitempty"`
+	Base    controls.URI `json:"base"`
 
-	Version  VersionInfo `json:"version,omitempty"`
-	Created  *time.Time  `json:"created,omitempty"`
-	Modified *time.Time  `json:"modified,omitempty"`
+	Version  VersionInfo       `json:"version,omitempty"`
+	Created  controls.DataTime `json:"created,omitempty"`
+	Modified controls.DataTime `json:"modified,omitempty"`
 
 	Properties map[string]PropertyAffordance `json:"properties,omitempty"`
 	Actions    map[string]ActionAffordance   `json:"actions,omitempty"`
@@ -46,72 +45,51 @@ func NewThingFromString(description string) (thing *Thing, err error) {
 	data := []byte(description)
 	t := &Thing{}
 
-	t.ID = controls.URI(json.Get(data, "id").ToString())
-	if title := json.Get(data, "title").ToString(); title == "" {
-		title = string(t.ID)
+	t.ID = controls.URI(controls.JSONGetString(data, "id", ""))
+	t.Title = controls.JSONGetString(data, "title", "")
+	if t.ID == "" {
+		t.ID = controls.URI(t.Title)
 	}
+	t.AtContext = controls.JSONGetArray(data, "@context")
+	t.Security = controls.JSONGetArray(data, "security")
+	t.Description = controls.JSONGetString(data, "description", "")
 
-	if c := json.Get(data, "@context"); c.ValueType() == json.StringValue {
-		t.AtContext = []string{c.ToString()}
-	} else {
-		var l []string
-		json.Get(data, "@context").ToVal(&l)
-		t.AtContext = l
-	}
-
-	if len(t.AtContext) < 1 {
-		return nil, fmt.Errorf("@context is mandatory")
-	}
-
-	if c := json.Get(data, "security"); c.ValueType() == json.StringValue {
-		t.Security = []string{c.ToString()}
-	} else {
-		var l []string
-		json.Get(data, "security").ToVal(&l)
-		t.Security = l
-	}
-
-	t.Description = json.Get(data, "description").ToString()
-
-	m := make(map[string]securityScheme.SecurityScheme)
+	var m map[string]securityScheme.SecurityScheme
 	json.Get(data, "securityDefinitions").ToVal(&m)
-	t.SecurityDefinitions = m
+	if &m != nil {
+		t.SecurityDefinitions = m
+	}
 
-	var propMap map[string]string
-	if json.Get(data, "properties").ToVal(&propMap); len(propMap) > 0 {
+	if propMap := controls.JSONGetMap(data, "properties"); len(propMap) > 0 {
 		t.Properties = make(map[string]PropertyAffordance)
-		for name, data := range propMap {
-			prop := NewPropertyAffordanceFromString(data)
+		for name, d := range propMap {
+			prop := NewPropertyAffordanceFromString(d)
 			t.Properties[name] = prop
 		}
-		t.Forms = append(t.Forms, controls.Form{Op: []string{controls.ReadallProperties, controls.WriteAllProperties}, Href: string(t.ID + util.PropertiesPath), ContentType: dataSchema.ApplicationJson})
+		t.Forms = append(t.Forms, controls.Form{Op: []string{controls.ReadallProperties, controls.WriteAllProperties}, Href: controls.URI(string(t.ID + util.PropertiesPath)), ContentType: dataSchema.ApplicationJson})
 	}
 
-	var actionMap map[string]string
-	if json.Get(data, "properties").ToVal(&actionMap); len(propMap) > 0 {
-
+	if actionMap := controls.JSONGetMap(data, "properties"); len(actionMap) > 0 {
 		t.Actions = make(map[string]ActionAffordance)
 		for name, data := range actionMap {
 			action := NewActionAffordanceFromString(data)
 			t.Actions[name] = action
 		}
-		t.Forms = append(t.Forms, controls.Form{Href: string(t.ID + util.ActionsPath)})
+		t.Forms = append(t.Forms, controls.Form{Href: controls.URI(string(t.ID + util.ActionsPath))})
 	}
 
-	var eventMap map[string]string
-	if json.Get(data, "properties").ToVal(&eventMap); len(eventMap) > 0 {
-
+	if eventMap := controls.JSONGetMap(data, "events"); len(eventMap) > 0 {
 		t.Events = make(map[string]EventAffordance)
 		for name, data := range eventMap {
 			event := NewEventAffordanceFromString(data)
 			t.Events[name] = event
 		}
-		t.Forms = append(t.Forms, controls.Form{Href: string(t.ID + util.ActionsPath)})
+		t.Forms = append(t.Forms, controls.Form{Href: controls.URI(string(t.ID + util.ActionsPath))})
 	}
 
 	if t.Forms == nil {
-		t.Forms = append(t.Forms, controls.Form{ContentType: "text/html", Href: string(t.ID)})
-		t.Forms = append(t.Forms, controls.Form{Href: fmt.Sprintf("wss://localhost/%s", t.ID)})
+		t.Forms = append(t.Forms, controls.Form{ContentType: "text/html", Href: controls.URI(string(t.ID))})
+		t.Forms = append(t.Forms, controls.Form{Href: controls.URI(fmt.Sprintf("wss://localhost/%s", t.ID))})
 	}
 	return t, nil
 }

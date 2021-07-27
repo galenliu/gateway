@@ -1,39 +1,24 @@
 package models
 
 import (
-	"fmt"
-	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/logging"
-	AddonManager "github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/things"
 	json "github.com/json-iterator/go"
 )
 
-type Things struct {
+type ThingsModel struct {
 	things.Container
 	logger logging.Logger
 }
 
-func NewThingsModel(log logging.Logger) *Things {
-	instance := &Things{}
+func NewThingsModel(things things.Container, log logging.Logger) *ThingsModel {
+	instance := &ThingsModel{}
 	instance.logger = log
-	instance.Container = things.NewThingsContainer(things.Options{}, nil, nil, log)
+	instance.Container = things
 	return instance
 }
 
-func (ts *Things) SetPropertyValue(thingId, propName string, value interface{}) (interface{}, error) {
-	return nil, nil
-}
-
-func (ts *Things) GetPropertyValue(thingId, propName string) (interface{}, error) {
-	return nil, nil
-}
-
-func (ts *Things) GetPropertiesValue(id string) (map[string]interface{}, error) {
-	return nil, nil
-}
-
-//func (ts *Things) GetNewThings() []*Thing {
+//func (ts *ThingsModel) GetNewThings() []*Thing {
 //	connectedDevices := AddonManager.GetDevices()
 //	storedThings := ts.GetMapOfThings()
 //	var things []*Thing
@@ -52,38 +37,24 @@ func (ts *Things) GetPropertiesValue(id string) (map[string]interface{}, error) 
 //}
 
 //Addon Manager New Device Added
-func (ts *Things) handleNewThing(data []byte) {
+func (ts *ThingsModel) handleNewThing(data []byte) {
 	id := json.Get(data, "id").ToString()
 	t := ts.GetThing(id)
 	if t == nil {
 		return
 	}
-	t.updateFromString(string(data))
-	if !t.Connected {
-		t.setConnected(true)
+	err := ts.UpdateThing(data)
+	if err != nil {
+		ts.logger.Error("new thing err : &s", err.Error())
+		return
 	}
 }
 
-func (ts *Things) RemoveThing(thingId string) error {
-	//TODO: Delete Thing from database
-	//t := ts.GetThing(thingId)
-	//if t == nil {
-	//	return fmt.Errorf("thing not found")
-	//}
-
-	err := database.RemoveThing(thingId)
+func (ts *ThingsModel) handleRemoveThing(thingId string) error {
+	err := ts.RemoveThing(thingId)
 	if err != nil {
+		ts.logger.Error("remove thing err: %s", err.Error())
 		return err
 	}
-	delete(ts.things, thingId)
 	return nil
-}
-
-func (ts *Things) SetThingProperty(thingId, propName string, value interface{}) (interface{}, error) {
-	var th = ts.GetThing(thingId)
-	if th == nil {
-		return nil, fmt.Errorf("thing(%s) can not found", thingId)
-	}
-	return AddonManager.SetProperty(thingId, propName, value)
-
 }

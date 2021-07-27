@@ -11,7 +11,7 @@ import (
 
 type NewThingsController1 struct {
 	locker     *sync.Mutex
-	container  *models.Things
+	container  *models.ThingsModel
 	ws         *websocket.Conn
 	foundThing chan string
 	closeChan  chan struct{}

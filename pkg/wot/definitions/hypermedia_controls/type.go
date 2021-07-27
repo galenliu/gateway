@@ -1,6 +1,9 @@
 package hypermedia_controls
 
-import "strings"
+import (
+	"github.com/xiam/to"
+	"strings"
+)
 
 type UnsignedInt uint
 type Integer uint
@@ -16,6 +19,26 @@ const (
 	TypeArray   = "array"
 	TypeBoolean = "boolean"
 )
+
+func ToInteger(v interface{}) Integer {
+	return Integer(to.Uint64(v))
+}
+
+func ToString(v interface{}) string {
+	return to.String(v)
+}
+
+func ToBool(v interface{}) bool {
+	return to.Bool(v)
+}
+
+func ToNumber(v interface{}) Number {
+	return Number(to.Float64(v))
+}
+
+func ToUnsignedInt(v interface{}) UnsignedInt {
+	return UnsignedInt(to.Uint64(v))
+}
 
 func (i Integer) Compare(value Integer) int {
 	if i < value {

@@ -11,7 +11,7 @@ require (
 	github.com/galenliu/gateway-addon v1.0.0
 	github.com/go-oauth2/oauth2/v4 v4.3.0
 	github.com/go-openapi/swag v0.19.15 // indirect
-	github.com/gofiber/fiber/v2 v2.14.0
+	github.com/gofiber/fiber/v2 v2.15.0
 	github.com/gofiber/websocket/v2 v2.0.3
 	github.com/gorilla/websocket v1.4.2
 	github.com/json-iterator/go v1.1.11

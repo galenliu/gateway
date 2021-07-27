@@ -41,3 +41,23 @@ func NewStringSchemaFromString(description string) *StringSchema {
 func (s *StringSchema) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s)
 }
+
+func (s *StringSchema) Convert(v interface{}) interface{} {
+	return s.clamp(controls.ToString(v))
+}
+
+func (s *StringSchema) GetDefaultValue() interface{} {
+	if s.dataSchema.Default != nil {
+		return s.Convert(s.dataSchema.Default)
+	}
+	return ""
+}
+
+func (s *StringSchema) clamp(value string) string {
+	if s.MaxLength != 0 {
+		if s.MaxLength < controls.ToUnsignedInt(len(value)) {
+			return string([]rune(value)[:s.MaxLength])
+		}
+	}
+	return value
+}

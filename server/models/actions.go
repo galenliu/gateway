@@ -22,7 +22,7 @@ var one sync.Once
 var _actions *Actions
 
 type Actions struct {
-	things  *Things
+	things  *ThingsModel
 	actions map[string]*Action
 }
 

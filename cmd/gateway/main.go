@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway"
 	"github.com/galenliu/gateway/configs"
-	"github.com/galenliu/gateway/homekit"
 	"github.com/galenliu/gateway/pkg/logging"
+	homekit2 "github.com/galenliu/gateway/pkg/services/homekit"
 	"github.com/galenliu/gateway/server/controllers"
 	"os"
 	"os/signal"
@@ -101,8 +101,8 @@ type HomeGateway struct {
 func NewGateway() (gateway *HomeGateway, err error) {
 	gateway = &HomeGateway{}
 	gateway.Tasks = append(gateway.Tasks, controllers.NewWebServe())
-	gateway.Tasks = append(gateway.Tasks, homekit.NewHomeKitBridge(
-		homekit.Config{
+	gateway.Tasks = append(gateway.Tasks, homekit2.NewHomeKitBridge(
+		homekit2.Config{
 			Pin:          "12344321",
 			StoragePath:  configs.GetConfigDir(),
 			Model:        "WebThings",

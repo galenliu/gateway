@@ -5,6 +5,7 @@ import (
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/server/controllers"
 	"github.com/galenliu/gateway/server/models"
+	"github.com/galenliu/gateway/things"
 )
 
 type eventBus interface {
@@ -25,11 +26,11 @@ type WebServe struct {
 	*controllers.Router
 	logger  logging.Logger
 	options Options
-
-	bus eventBus
+	store   things.Store
+	bus     eventBus
 }
 
-func Setup(options Options, bus eventBus, log logging.Logger) *WebServe {
+func Setup(options Options, thingsStore things.Store, usersStore models.UsersStore, bus eventBus, log logging.Logger) *WebServe {
 	sev := WebServe{}
 	sev.options = options
 	sev.logger = log
@@ -38,12 +39,7 @@ func Setup(options Options, bus eventBus, log logging.Logger) *WebServe {
 	sev.Router = controllers.Setup(controllers.Options{
 		HttpAddr:  sev.options.HttpAddr,
 		HttpsAddr: sev.options.HttpsAddr,
-	}, controllers.Models{
-		ThingsModel:  models.NewThingsModel(log),
-		UsersModel:   models.NewUsersModel(log),
-		SettingModel: models.NewSettingsModel(log),
-	}, log)
-
+	}, thingsStore, thingsStore, log)
 	sev.bus.Subscribe(util.GatewayStarted, sev.start)
 	return &sev
 }
