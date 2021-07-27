@@ -11,13 +11,13 @@ import (
 type PluginsServer struct {
 	Plugins   map[string]*Plugin
 	locker    *sync.Mutex
-	manager   *manager
+	manager   *Manager
 	ipc       *IpcServer
 	closeChan chan struct{}
 	verbose   bool
 }
 
-func NewPluginServer(manager *manager) *PluginsServer {
+func NewPluginServer(manager *Manager) *PluginsServer {
 	server := &PluginsServer{}
 	server.closeChan = make(chan struct{})
 	server.Plugins = make(map[string]*Plugin, 30)
@@ -96,7 +96,7 @@ func (s *PluginsServer) registerPlugin(packageId string) *Plugin {
 func (s *PluginsServer) Start() error {
 	go s.ipc.Serve()
 	if !s.manager.running {
-		return fmt.Errorf("addon manager stoped")
+		return fmt.Errorf("addon Manager stoped")
 	}
 	go func() {
 		for {

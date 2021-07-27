@@ -69,7 +69,7 @@ func (adapter *Adapter) cancelRemoveThing(deviceId string) {
 	adapter.Send(internal.AdapterCancelRemoveDeviceCommand, data)
 }
 
-func (adapter *Adapter) getManager() *manager {
+func (adapter *Adapter) getManager() *Manager {
 	return adapter.plugin.pluginServer.manager
 }
 

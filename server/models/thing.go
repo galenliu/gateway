@@ -1,4 +1,4 @@
-package things
+package models
 
 import (
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"

@@ -65,6 +65,11 @@ func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {
 		return nil, e
 	}
 
+	g.addonManager = plugin.NewAddonsManager(plugin.Options{
+		DataDir:   g.options.DataDir,
+		AddonDirs: g.options.AddonDirs,
+	}, g.bus, g.logger)
+
 	g.sever = server.Setup(server.Options{
 		HttpAddr:    g.options.HttpAddr,
 		HttpsAddr:   g.options.HttpsAddr,
@@ -72,7 +77,7 @@ func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {
 		TemplateDir: path.Join(g.options.DataDir, "template"),
 		UploadDir:   path.Join(g.options.DataDir, "upload"),
 		LogDir:      path.Join(g.options.DataDir, "log"),
-	}, g.store, g.bus, g.logger)
+	},g.addonManager, g.store, g.bus, g.logger)
 
 	return g, nil
 }
@@ -100,10 +105,7 @@ func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {
 func (g *Gateway) Start() error {
 
 	// 首先启动plugin
-	g.addonManager = plugin.NewAddonsManager(plugin.Options{
-		DataDir:   g.options.DataDir,
-		AddonDirs: g.options.AddonDirs,
-	}, g.bus, g.logger)
+
 	err := g.addonManager.Start()
 	if err != nil {
 		return err

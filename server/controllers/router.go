@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
+	"github.com/galenliu/gateway/server"
 	"github.com/galenliu/gateway/server/models"
 
 	"github.com/gofiber/fiber/v2"
@@ -19,7 +20,7 @@ type Options struct {
 	HttpsAddr string
 }
 type Models struct {
-	ThingsModel  *models.ThingsModel
+	ThingsModel  *models.Container
 	UsersModel   *models.Users
 	SettingModel *models.Settings
 }
@@ -32,7 +33,7 @@ type Router struct {
 	HttpsRunning bool
 }
 
-func Setup(options Options, thingsStore models.UsersStore, userStore models.UsersStore, log logging.Logger) *Router {
+func Setup(options Options,addonManager server.AddonManager, store server.Store, log logging.Logger) *Router {
 
 	//router init
 	app := Router{}
@@ -61,9 +62,9 @@ func Setup(options Options, thingsStore models.UsersStore, userStore models.User
 
 	thingId := "/:thingId"
 
-	//ThingsModel Controller
+	//Things Controller
 	{
-		thingsController := NewThingsController(models.NewThingsModel(), nil, log)
+		thingsController := NewThingsController(models.NewThingsContainer(store,log), nil, log)
 		thingsGroup := app.Group(util.ThingsPath)
 		//set a properties of a thing.
 		thingsGroup.Put("/:thingId/properties/*", thingsController.handleSetProperty)
@@ -110,7 +111,7 @@ func Setup(options Options, thingsStore models.UsersStore, userStore models.User
 
 	// Users Controller
 	{
-		usersController := NewUsersController(m.UsersModel, log)
+		usersController := NewUsersController(models.NewUsersModel(store,log), log)
 		usersGroup := app.Group(util.UsersPath)
 		usersGroup.Get("/count", usersController.getCount)
 		usersGroup.Post("/", usersController.createUser)
@@ -118,7 +119,7 @@ func Setup(options Options, thingsStore models.UsersStore, userStore models.User
 
 	//Addons Controller
 	{
-		addonController := NewAddonController(log)
+		addonController := NewAddonController(addonManager,log)
 		addonGroup := app.Group(util.AddonsPath)
 		addonGroup.Get("/", addonController.handlerGetAddons)
 		addonGroup.Post("/", addonController.handlerInstallAddon)

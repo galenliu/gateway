@@ -12,6 +12,7 @@ import (
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
+	"time"
 
 	"io"
 	"os"
@@ -36,7 +37,7 @@ type Extension struct {
 	Resources  string
 }
 
-type manager struct {
+type Manager struct {
 	options      Options
 	configPath   string
 	pluginServer *PluginsServer
@@ -61,8 +62,8 @@ type manager struct {
 	actions map[string]*wot.ActionAffordance
 }
 
-func NewAddonsManager(options Options, bus eventBus, log logging.Logger) AddonManager {
-	am := &manager{}
+func NewAddonsManager(options Options, bus eventBus, log logging.Logger) *Manager {
+	am := &Manager{}
 	am.options = options
 	am.logger = log
 	am.addonsLoaded = false
@@ -90,7 +91,42 @@ func NewAddonsManager(options Options, bus eventBus, log logging.Logger) AddonMa
 	return am
 }
 
-func (m *manager) handleDeviceAdded(device *addon.Device) {
+func (m *Manager) AddNewThing(pairingTimeout float64) error {
+	if m.isPairing {
+		return fmt.Errorf("add already in progress")
+	}
+	for _, adapter := range m.adapters {
+		adapter.pairing(pairingTimeout)
+	}
+	m.isPairing = true
+	ctx, cancelFn := context.WithTimeout(context.Background(), time.Duration(pairingTimeout)*time.Millisecond)
+	var handlePairingTimeout = func() {
+		for {
+			select {
+			case <-ctx.Done():
+				cancelFn()
+				m.CancelAddNewThing()
+				//bus.Publish(util.PairingTimeout)
+				return
+			}
+		}
+	}
+	go handlePairingTimeout()
+	return nil
+}
+
+func (m *Manager) CancelAddNewThing() {
+	if !m.isPairing {
+		return
+	}
+	for _, adapter := range m.adapters {
+		adapter.cancelPairing()
+	}
+	m.isPairing = false
+	return
+}
+
+func (m *Manager) handleDeviceAdded(device *addon.Device) {
 	m.devices[device.GetID()] = device
 	//d, err := json.MarshalIndent(device, "", " ")
 	d := device.AsDict()
@@ -101,26 +137,26 @@ func (m *manager) handleDeviceAdded(device *addon.Device) {
 	m.bus.Publish(util.DeviceAdded, data)
 }
 
-func (m *manager) actionNotify(action *addon.Action) {
+func (m *Manager) actionNotify(action *addon.Action) {
 	m.bus.Publish(util.ActionStatus, action.MarshalJson())
 }
 
-func (m *manager) eventNotify(event *addon.Event) {
+func (m *Manager) eventNotify(event *addon.Event) {
 	m.bus.Publish(util.EVENT, event.MarshalJson())
 }
 
-func (m *manager) connectedNotify(device *addon.Device, connected bool) {
+func (m *Manager) connectedNotify(device *addon.Device, connected bool) {
 	m.bus.Publish(util.CONNECTED, connected)
 }
 
-func (m *manager) addAdapter(adapter *Adapter) {
+func (m *Manager) addAdapter(adapter *Adapter) {
 	m.locker.Lock()
 	defer m.locker.Unlock()
 	m.adapters[adapter.id] = adapter
 	logging.Debug(fmt.Sprintf("adapter：(%s) added", adapter.id))
 }
 
-func (m *manager) getAdapter(adapterId string) *Adapter {
+func (m *Manager) getAdapter(adapterId string) *Adapter {
 	adapter, ok := m.adapters[adapterId]
 	if !ok {
 		return nil
@@ -128,7 +164,7 @@ func (m *manager) getAdapter(adapterId string) *Adapter {
 	return adapter
 }
 
-func (m *manager) handleSetProperty(deviceId, propName string, setValue interface{}) error {
+func (m *Manager) handleSetProperty(deviceId, propName string, setValue interface{}) error {
 	device := m.getDevice(deviceId)
 	if device == nil {
 		return fmt.Errorf("device id err")
@@ -152,7 +188,7 @@ func (m *manager) handleSetProperty(deviceId, propName string, setValue interfac
 	return nil
 }
 
-func (m *manager) getDevice(deviceId string) addon.IDevice {
+func (m *Manager) getDevice(deviceId string) addon.IDevice {
 	d, ok := m.devices[deviceId]
 	if !ok {
 		return nil
@@ -161,7 +197,7 @@ func (m *manager) getDevice(deviceId string) addon.IDevice {
 }
 
 //tar package to addon from the temp dir,
-func (m *manager) installAddon(packageId, packagePath string, enabled bool) error {
+func (m *Manager) installAddon(packageId, packagePath string, enabled bool) error {
 
 	if !m.addonsLoaded {
 		return fmt.Errorf(`Cannot install add-on before other add-ons have been loaded.`)
@@ -230,7 +266,7 @@ func (m *manager) installAddon(packageId, packagePath string, enabled bool) erro
 	return nil
 }
 
-func (m *manager) loadAddons() {
+func (m *Manager) loadAddons() {
 	if m.addonsLoaded {
 		return
 	}
@@ -257,7 +293,7 @@ func (m *manager) loadAddons() {
 	return
 }
 
-func (m *manager) loadAddon(packageId string) error {
+func (m *Manager) loadAddon(packageId string) error {
 
 	if !m.addonsLoaded {
 		return nil
@@ -329,7 +365,7 @@ func (m *manager) loadAddon(packageId string) error {
 	return nil
 }
 
-func (m *manager) unloadAddon(packageId string) error {
+func (m *Manager) unloadAddon(packageId string) error {
 	if !m.addonsLoaded {
 		return nil
 	}
@@ -354,7 +390,7 @@ func (m *manager) unloadAddon(packageId string) error {
 	return nil
 }
 
-func (m *manager) findPlugin(packageId string) (string, error) {
+func (m *Manager) findPlugin(packageId string) (string, error) {
 	for _, dir := range m.options.AddonDirs {
 		_, e := os.Stat(path.Join(dir, packageId))
 		if os.IsNotExist(e) {
@@ -365,7 +401,7 @@ func (m *manager) findPlugin(packageId string) (string, error) {
 	return "", fmt.Errorf("addon is not exist")
 }
 
-func (m *manager) Start() error {
+func (m *Manager) Start() error {
 	var err error
 	go func() {
 		err = m.pluginServer.Start()
@@ -381,7 +417,7 @@ func (m *manager) Start() error {
 	return err
 }
 
-func (m *manager) Stop() error {
+func (m *Manager) Stop() error {
 	m.pluginServer.Stop()
 	m.bus.Publish(util.AddonManagerStopped)
 	m.running = false

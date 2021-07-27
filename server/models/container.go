@@ -1,4 +1,4 @@
-package things
+package models
 
 import (
 	"fmt"
@@ -30,7 +30,7 @@ type FireController interface {
 	FireThingRemoved(id string)
 }
 
-type Store interface {
+type ThingsStore interface {
 	RemoveThing(id string) error
 	SaveThing(t *Thing) error
 	UpdateThing(t *Thing) error
@@ -40,11 +40,11 @@ type Store interface {
 type container struct {
 	things map[string]*Thing
 
-	store  Store
+	store  ThingsStore
 	logger logging.Logger
 }
 
-func NewThingsContainer(store Store, log logging.Logger) Container {
+func NewThingsContainer(store ThingsStore, log logging.Logger) Container {
 
 	instance := &container{}
 	instance.store = store

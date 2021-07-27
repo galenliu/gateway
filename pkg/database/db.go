@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/things"
+	"github.com/galenliu/gateway/server/models"
 	_ "github.com/mattn/go-sqlite3"
 	"os"
 )
@@ -19,7 +19,7 @@ type store struct {
 }
 
 type Store interface {
-	things.Store
+	models.Store
 }
 
 func (s *store) reset() {

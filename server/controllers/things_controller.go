@@ -18,12 +18,12 @@ type ThingsHandler interface {
 }
 
 type thingsController struct {
-	model   *models.ThingsModel
+	model   models.Container
 	handler ThingsHandler
 	logger  logging.Logger
 }
 
-func NewThingsController(model *models.ThingsModel, handler ThingsHandler, log logging.Logger) *thingsController {
+func NewThingsController(model models.Container, handler ThingsHandler, log logging.Logger) *thingsController {
 	tc := &thingsController{}
 	tc.handler = handler
 	tc.model = model

@@ -215,7 +215,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 	}
 }
 
-func (plugin *Plugin) getManager() *manager {
+func (plugin *Plugin) getManager() *Manager {
 	return plugin.pluginServer.manager
 }
 
