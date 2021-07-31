@@ -1,8 +1,8 @@
 package controllers
 
 import (
+	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/util"
 	AddonManager "github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/websocket/v2"
@@ -36,13 +36,13 @@ func (controller *NewThingsController1) handlerConnection() {
 			return
 		}
 	}
-	AddonManager.Subscribe(util.ThingAdded, controller.handleNewThing)
+	AddonManager.Subscribe(constant.ThingAdded, controller.handleNewThing)
 	defer func() {
 		err := controller.ws.Close()
 		if err != nil {
 			logging.Error(err.Error())
 		}
-		AddonManager.Unsubscribe(util.ThingAdded, controller.handleNewThing)
+		AddonManager.Unsubscribe(constant.ThingAdded, controller.handleNewThing)
 	}()
 
 	go func() {

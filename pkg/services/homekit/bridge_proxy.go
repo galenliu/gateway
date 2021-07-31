@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/brutella/hc"
 	"github.com/brutella/hc/accessory"
+	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/models"
 	json "github.com/json-iterator/go"
@@ -84,9 +84,9 @@ func (br *bridge) Start() error {
 	}
 	br.stopped = t.Stop()
 	logging.Info("homekit bridge start")
-	models.NewThingsOnce().Subscribe(util.ThingAdded, _bridge.onThingAdded)
-	plugin.Subscribe(util.PropertyChanged, _bridge.onPropertyChanged)
-	models.NewThingsOnce().Subscribe(util.ThingModified, _bridge.onThingsModified)
+	models.NewThingsOnce().Subscribe(constant.ThingAdded, _bridge.onThingAdded)
+	plugin.Subscribe(constant.PropertyChanged, _bridge.onPropertyChanged)
+	models.NewThingsOnce().Subscribe(constant.ThingModified, _bridge.onThingsModified)
 	go t.Start()
 	return nil
 }
@@ -96,9 +96,9 @@ func (br *bridge) Stop() {
 	case <-br.stopped:
 		logging.Info("HomeKit Bridge Stop")
 	}
-	models.NewThingsOnce().Unsubscribe(util.ThingAdded, _bridge.onThingAdded)
-	plugin.Unsubscribe(util.PropertyChanged, _bridge.onPropertyChanged)
-	models.NewThingsOnce().Unsubscribe(util.ThingModified, _bridge.onThingsModified)
+	models.NewThingsOnce().Unsubscribe(constant.ThingAdded, _bridge.onThingAdded)
+	plugin.Unsubscribe(constant.PropertyChanged, _bridge.onPropertyChanged)
+	models.NewThingsOnce().Unsubscribe(constant.ThingModified, _bridge.onThingsModified)
 }
 
 func (br *bridge) onThingAdded(thing *models.Thing) {

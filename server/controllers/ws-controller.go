@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	AddonManager "github.com/galenliu/gateway/plugin"
@@ -66,7 +67,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 		}
 		m := make(map[string]interface{})
 		m["id"] = event.ThingId
-		m["messageType"] = util.EVENT
+		m["messageType"] = constant.EVENT
 		m["data"] = map[string]interface{}{
 			event.Name: event.GetDescription(),
 		}
@@ -78,7 +79,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 			return
 		}
 		m := make(map[string]interface{})
-		m["messageType"] = util.ActionStatus
+		m["messageType"] = constant.ActionStatus
 		if action.ThingId != "" {
 			m["id"] = action.ThingId
 		}
@@ -94,7 +95,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 		onConnected := func(connected bool) {
 			m := make(map[string]interface{})
 			m["id"] = thing.GetID()
-			m["messageType"] = util.CONNECTED
+			m["messageType"] = constant.CONNECTED
 			m["data"] = connected
 			sendMessage(m)
 		}
@@ -106,7 +107,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 				delete(thingCleanups, thing.GetID())
 			}
 			m := make(map[string]interface{})
-			m["messageType"] = util.ThingRemoved
+			m["messageType"] = constant.ThingRemoved
 			m["id"] = thing.GetID()
 			m["data"] = struct{}{}
 			sendMessage(m)
@@ -115,29 +116,29 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 		onModified := func() {
 			m := make(map[string]interface{})
 			m["id"] = thing.GetID()
-			m["messageType"] = util.ThingModified
+			m["messageType"] = constant.ThingModified
 			m["data"] = struct{}{}
 			sendMessage(m)
 
 		}
 
-		thing.Subscribe(util.CONNECTED, onConnected)
-		thing.Subscribe(util.ThingRemoved, onRemoved)
-		thing.Subscribe(util.ThingModified, onModified)
-		thing.Subscribe(util.EVENT, onEvent)
+		thing.Subscribe(constant.CONNECTED, onConnected)
+		thing.Subscribe(constant.ThingRemoved, onRemoved)
+		thing.Subscribe(constant.ThingModified, onModified)
+		thing.Subscribe(constant.EVENT, onEvent)
 
 		thingCleanup := func() {
-			thing.Unsubscribe(util.CONNECTED, onConnected)
-			thing.Unsubscribe(util.ThingRemoved, onRemoved)
-			thing.Unsubscribe(util.ThingModified, onModified)
-			thing.Unsubscribe(util.EVENT, onEvent)
+			thing.Unsubscribe(constant.CONNECTED, onConnected)
+			thing.Unsubscribe(constant.ThingRemoved, onRemoved)
+			thing.Unsubscribe(constant.ThingModified, onModified)
+			thing.Unsubscribe(constant.EVENT, onEvent)
 		}
 
 		thingCleanups[thing.GetID()] = thingCleanup
 
 		m := make(map[string]interface{})
 		m["id"] = thing.GetID()
-		m["messageType"] = util.PropertyStatus
+		m["messageType"] = constant.PropertyStatus
 		propertyValues := make(map[string]interface{})
 		for propName, prop := range thing.Properties {
 			value, err := AddonManager.GetPropertyValue(thing.GetID(), propName)
@@ -155,7 +156,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 	onThingAdded := func(thing *models.Thing) {
 		m := make(map[string]interface{})
 		m["id"] = thing.GetID()
-		m["messageType"] = util.ThingAdded
+		m["messageType"] = constant.ThingAdded
 		m["data"] = struct{}{}
 		sendMessage(m)
 		addThing(thing)
@@ -173,7 +174,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 		}
 		m := make(Map)
 		m["id"] = deviceId
-		m["messageType"] = util.PropertyStatus
+		m["messageType"] = constant.PropertyStatus
 		m["data"] = map[string]interface{}{
 			name: v,
 		}
@@ -184,7 +185,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 		m := make(map[string]interface{})
 		t := Things.GetThing(thingId)
 		if t == nil {
-			m["messageType"] = util.ERROR
+			m["messageType"] = constant.ERROR
 			m["data"] = map[string]interface{}{
 				"code":    http.StatusBadRequest,
 				"status":  "400 Bed Request",
@@ -200,14 +201,14 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 		}
 	}
 
-	AddonManager.Subscribe(util.PropertyChanged, onPropertyChanged)
-	Things.Subscribe(util.ThingAdded, onThingAdded)
-	Actions.Subscribe(util.ActionStatus, onActionStatus)
+	AddonManager.Subscribe(constant.PropertyChanged, onPropertyChanged)
+	Things.Subscribe(constant.ThingAdded, onThingAdded)
+	Actions.Subscribe(constant.ActionStatus, onActionStatus)
 
 	clearFunc := func() {
-		Things.Unsubscribe(util.ThingAdded, onThingAdded)
-		Actions.Unsubscribe(util.ActionStatus, onActionStatus)
-		AddonManager.Unsubscribe(util.PropertyChanged, onPropertyChanged)
+		Things.Unsubscribe(constant.ThingAdded, onThingAdded)
+		Actions.Unsubscribe(constant.ActionStatus, onActionStatus)
+		AddonManager.Unsubscribe(constant.PropertyChanged, onPropertyChanged)
 	}
 
 	defer clearFunc()
@@ -215,7 +216,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 	handleMessage := func(bytes []byte) {
 		var sendError = func(code int, status string, message string) {
 			m := make(map[string]interface{})
-			m["messageType"] = util.ERROR
+			m["messageType"] = constant.ERROR
 			m["data"] = map[string]interface{}{
 				"code":    code,
 				"status":  status,
@@ -245,13 +246,13 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 
 		m := make(map[string]interface{})
 		switch messageType {
-		case util.SetProperty:
+		case constant.SetProperty:
 			var propertyMap map[string]interface{}
 			json.Get(bytes, "data").ToVal(&propertyMap)
 			for propName, value := range propertyMap {
 				_, setErr := AddonManager.SetProperty(device.GetID(), propName, value)
 				if setErr != nil {
-					m["messageType"] = util.ERROR
+					m["messageType"] = constant.ERROR
 					m["bytes"] = map[string]interface{}{
 						"code":    http.StatusBadRequest,
 						"status":  "400 Bed Request",
@@ -261,7 +262,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 				}
 			}
 			return
-		case util.AddEventSubscription:
+		case constant.AddEventSubscription:
 			var eventsName []string
 			json.Get(bytes, "data").ToVal(&eventsName)
 			for _, eventName := range eventsName {
@@ -269,7 +270,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 			}
 			return
 
-		case util.RequestAction:
+		case constant.RequestAction:
 			var actionNames map[string]interface{}
 			json.Get(bytes, "data").ToVal(&actionNames)
 			for actionName := range actionNames {

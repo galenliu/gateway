@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/server"
 	"github.com/galenliu/gateway/server/models"
 
@@ -60,12 +60,17 @@ func Setup(options Options,addonManager server.AddonManager, store server.Store,
 	//app.Get("/", controllers.RootHandle())
 	app.Static("/index.htm", "")
 
-	thingId := "/:thingId"
+	{
+		loginController := NewLoginController()
+		app.Post(constant.LoginPath, loginController.handleLogin)
+
+	}
 
 	//Things Controller
 	{
-		thingsController := NewThingsController(models.NewThingsContainer(store,log), nil, log)
-		thingsGroup := app.Group(util.ThingsPath)
+		thingsController := NewThingsController(models.NewThingsContainer(store, log), nil, log)
+		thingsGroup := app.Group(constant.ThingsPath)
+
 		//set a properties of a thing.
 		thingsGroup.Put("/:thingId/properties/*", thingsController.handleSetProperty)
 		thingsGroup.Get("/:thingId/properties/*", thingsController.handleGetPropertyValue)
@@ -80,7 +85,7 @@ func Setup(options Options,addonManager server.AddonManager, store server.Store,
 		thingsGroup.Get("/", websocket.New(handleWebsocket))
 
 		//Get the properties of a thing
-		thingsGroup.Get(thingId+util.PropertiesPath, thingsController.handleGetProperties)
+		thingsGroup.Get(constant.ThingIdParam+constant.PropertiesPath, thingsController.handleGetProperties)
 
 		// Modify a ThingInfo.
 		thingsGroup.Put("/:thingId", thingsController.handleSetThing)
@@ -89,13 +94,13 @@ func Setup(options Options,addonManager server.AddonManager, store server.Store,
 		thingsGroup.Delete("/:thingId", thingsController.handleDeleteThing)
 
 		actionsController := NewActionsController(log)
-		thingsGroup.Get(thingId+util.ActionsPath, actionsController.handleGetActions)
-		thingsGroup.Post(thingId+util.ActionsPath, actionsController.handleAction)
+		thingsGroup.Get(constant.ThingIdParam+constant.ActionsPath, actionsController.handleGetActions)
+		thingsGroup.Post(constant.ThingIdParam+constant.ActionsPath, actionsController.handleAction)
 	}
 
 	//NewThingFromString Controller
 	{
-		newThingsGroup := app.Group(util.NewThingsPath)
+		newThingsGroup := app.Group(constant.NewThingsPath)
 		newThingsGroup.Use("/", func(c *fiber.Ctx) error {
 			if websocket.IsWebSocketUpgrade(c) {
 				c.Locals("websocket", true)
@@ -111,16 +116,16 @@ func Setup(options Options,addonManager server.AddonManager, store server.Store,
 
 	// Users Controller
 	{
-		usersController := NewUsersController(models.NewUsersModel(store,log), log)
-		usersGroup := app.Group(util.UsersPath)
+		usersController := NewUsersController(models.NewUsersModel(store, log), log)
+		usersGroup := app.Group(constant.UsersPath)
 		usersGroup.Get("/count", usersController.getCount)
 		usersGroup.Post("/", usersController.createUser)
 	}
 
 	//Addons Controller
 	{
-		addonController := NewAddonController(addonManager,log)
-		addonGroup := app.Group(util.AddonsPath)
+		addonController := NewAddonController(addonManager, log)
+		addonGroup := app.Group(constant.AddonsPath)
 		addonGroup.Get("/", addonController.handlerGetAddons)
 		addonGroup.Post("/", addonController.handlerInstallAddon)
 		addonGroup.Put("/:addonId", addonController.handlerSetAddon)
@@ -132,14 +137,14 @@ func Setup(options Options,addonManager server.AddonManager, store server.Store,
 	//settings Controller
 	{
 		settingsController := NewSettingController(log)
-		debugGroup := app.Group(util.SettingsPath)
+		debugGroup := app.Group(constant.SettingsPath)
 		debugGroup.Get("/addonsInfo", settingsController.handleGetAddonsInfo)
 	}
 
 	//Actions Controller
 	{
 		actionsController := NewActionsController(log)
-		actionsGroup := app.Group(util.ActionsPath)
+		actionsGroup := app.Group(constant.ActionsPath)
 		actionsGroup.Post("/", actionsController.handleAction)
 		actionsGroup.Get("/", actionsController.handleGetActions)
 		actionsGroup.Delete("/:actionName/:actionId", actionsController.handleDeleteAction)

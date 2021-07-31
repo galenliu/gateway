@@ -3,6 +3,7 @@ package configs
 import (
 	_ "embed"
 	"github.com/galenliu/gateway"
+	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
@@ -138,23 +139,23 @@ func NewConfig(config string) *Config {
 			rtc.ProfileDir = util.GetDefaultConfigDir()
 		}
 		if rtc.AddonsDir == "" {
-			rtc.AddonsDir = rtc.ProfileDir + string(os.PathSeparator) + util.AddonsDirName
+			rtc.AddonsDir = rtc.ProfileDir + string(os.PathSeparator) + constant.AddonsDirName
 		}
 		if rtc.LogDir == "" {
-			rtc.LogDir = rtc.ProfileDir + string(os.PathSeparator) + util.LogDirName
+			rtc.LogDir = rtc.ProfileDir + string(os.PathSeparator) + constant.LogDirName
 
 		}
 		if rtc.DataDir == "" {
-			rtc.DataDir = rtc.ProfileDir + string(os.PathSeparator) + util.DataDirName
+			rtc.DataDir = rtc.ProfileDir + string(os.PathSeparator) + constant.DataDirName
 		}
 		if rtc.ConfigDir == "" {
-			rtc.ConfigDir = rtc.ProfileDir + string(os.PathSeparator) + util.ConfigDirName
+			rtc.ConfigDir = rtc.ProfileDir + string(os.PathSeparator) + constant.ConfigDirName
 		}
 		if rtc.MediaDir == "" {
-			rtc.MediaDir = rtc.ProfileDir + string(os.PathSeparator) + util.MediaDirName
+			rtc.MediaDir = rtc.ProfileDir + string(os.PathSeparator) + constant.MediaDirName
 		}
 		if rtc.UploadDir == "" {
-			rtc.UploadDir = rtc.ProfileDir + string(os.PathSeparator) + util.UploadDirName
+			rtc.UploadDir = rtc.ProfileDir + string(os.PathSeparator) + constant.UploadDirName
 		}
 		if rtc.GatewayVersion == "" {
 			rtc.GatewayVersion = gateway.Version

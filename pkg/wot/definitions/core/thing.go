@@ -2,7 +2,7 @@ package core
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/util"
+	"github.com/galenliu/gateway/pkg/constant"
 	dataSchema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	securityScheme "github.com/galenliu/gateway/pkg/wot/definitions/security_scheme"
@@ -66,7 +66,7 @@ func NewThingFromString(description string) (thing *Thing, err error) {
 			prop := NewPropertyAffordanceFromString(d)
 			t.Properties[name] = prop
 		}
-		t.Forms = append(t.Forms, controls.Form{Op: []string{controls.ReadallProperties, controls.WriteAllProperties}, Href: controls.URI(string(t.ID + util.PropertiesPath)), ContentType: dataSchema.ApplicationJson})
+		t.Forms = append(t.Forms, controls.Form{Op: []string{controls.ReadallProperties, controls.WriteAllProperties}, Href: controls.URI(string(t.ID + constant.PropertiesPath)), ContentType: dataSchema.ApplicationJson})
 	}
 
 	if actionMap := controls.JSONGetMap(data, "properties"); len(actionMap) > 0 {
@@ -75,7 +75,7 @@ func NewThingFromString(description string) (thing *Thing, err error) {
 			action := NewActionAffordanceFromString(data)
 			t.Actions[name] = action
 		}
-		t.Forms = append(t.Forms, controls.Form{Href: controls.URI(string(t.ID + util.ActionsPath))})
+		t.Forms = append(t.Forms, controls.Form{Href: controls.URI(string(t.ID + constant.ActionsPath))})
 	}
 
 	if eventMap := controls.JSONGetMap(data, "events"); len(eventMap) > 0 {
@@ -84,7 +84,7 @@ func NewThingFromString(description string) (thing *Thing, err error) {
 			event := NewEventAffordanceFromString(data)
 			t.Events[name] = event
 		}
-		t.Forms = append(t.Forms, controls.Form{Href: controls.URI(string(t.ID + util.ActionsPath))})
+		t.Forms = append(t.Forms, controls.Form{Href: controls.URI(string(t.ID + constant.ActionsPath))})
 	}
 
 	if t.Forms == nil {

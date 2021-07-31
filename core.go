@@ -3,9 +3,9 @@ package gateway
 import (
 	"context"
 	"github.com/galenliu/gateway/pkg/bus"
+	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server"
 	"path"
@@ -41,12 +41,12 @@ type Options struct {
 }
 
 type Gateway struct {
-	options         Options
-	store           database.Store
-	bus             eventBus
-	logger          logging.Logger
-	addonManager    plugin.AddonManager
-	sever           *server.WebServe
+	options      Options
+	store        database.Store
+	bus          eventBus
+	logger       logging.Logger
+	addonManager *plugin.Manager
+	sever        *server.WebServe
 }
 
 func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {
@@ -55,7 +55,7 @@ func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {
 	g.options = o
 
 	var e error = nil
-	g.store, e = database.NewStore(path.Join(g.options.DataDir, util.ConfigDirName), g.options.DBRemoveBeforeOpen)
+	g.store, e = database.NewStore(path.Join(g.options.DataDir, constant.ConfigDirName), g.options.DBRemoveBeforeOpen)
 	if e != nil {
 		return nil, e
 	}
@@ -111,7 +111,7 @@ func (g *Gateway) Start() error {
 		return err
 	}
 
-	g.bus.Publish(util.GatewayStarted)
+	g.bus.Publish(constant.GatewayStarted)
 	return nil
 }
 
@@ -126,7 +126,7 @@ func (g *Gateway) Stop() error {
 }
 
 func (g *Gateway) Shutdown(ctx context.Context) error {
-	g.bus.Publish(util.GatewayStopped)
+	g.bus.Publish(constant.GatewayStopped)
 	<-ctx.Done()
 	return nil
 }

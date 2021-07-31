@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway-addon"
 	"github.com/galenliu/gateway/configs"
+	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
@@ -182,7 +183,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 			return
 		}
 		property.DoPropertyChanged(prop)
-		Publish(util.PropertyChanged, property.AsDict())
+		Publish(constant.PropertyChanged, property.AsDict())
 		return
 
 	case internal.DeviceActionStatusNotification:
@@ -197,7 +198,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 	case internal.DeviceConnectedStateNotification:
 		var connected = json.Get(data, "data", "connected")
 		if connected.LastError() == nil {
-			event_bus.Publish(util.CONNECTED, device, connected.ToBool())
+			event_bus.Publish(constant.CONNECTED, device, connected.ToBool())
 		}
 		return
 

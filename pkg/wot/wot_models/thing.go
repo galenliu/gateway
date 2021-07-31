@@ -3,9 +3,9 @@ package wot_models
 import (
 	"fmt"
 	"github.com/galenliu/gateway-addon"
+	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/util"
 	hypermedia_controls2 "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	"github.com/galenliu/gateway/server/models/model"
 	json "github.com/json-iterator/go"
@@ -56,7 +56,7 @@ func (t *Thing) setSelectedCapability(s string) {
 			if err != nil {
 				return
 			}
-			t.Publish(util.MODIFIED, t)
+			t.Publish(constant.MODIFIED, t)
 		}
 	}
 
@@ -79,7 +79,7 @@ func (t *Thing) SetTitle(title string) string {
 		if err != nil {
 			logging.Info(err.Error())
 		}
-		t.Publish(util.MODIFIED, t)
+		t.Publish(constant.MODIFIED, t)
 	}
 	return t.GetDescription()
 }
@@ -93,7 +93,7 @@ func (t *Thing) setConnected(connected bool) {
 	if err != nil {
 		logging.Info(err.Error())
 	}
-	t.Publish(util.CONNECTED, connected)
+	t.Publish(constant.CONNECTED, connected)
 	t.Connected = connected
 }
 

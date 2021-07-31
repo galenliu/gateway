@@ -1,4 +1,4 @@
-package util
+package constant
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -48,6 +48,7 @@ const (
 	PingPath         = "/ping"
 	ProxyPath        = "/proxy"
 	ExtensionsPath   = "/extensions"
+	ThingIdParam     = "/:thingId"
 
 	ActionStatus         = "actionStatus"
 	AdapterAdded         = "adapterAdded"

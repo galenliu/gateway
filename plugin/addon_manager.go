@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"fmt"
+	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/logging"
 
@@ -17,7 +18,7 @@ import (
 
 
 // GetInstallAddons 获取已安装的add-on
-func (m *Manager) GetInstallAddons() ([]byte, error) {
+func (m *Manager) GetInstallAddons() []byte {
 	m.locker.Lock()
 	defer m.locker.Unlock()
 	var addons []*internal.AddonInfo
@@ -26,9 +27,9 @@ func (m *Manager) GetInstallAddons() ([]byte, error) {
 	}
 	data, err := json.Marshal(addons)
 	if err != nil {
-		return nil, err
+		return nil
 	}
-	return data, nil
+	return data
 }
 
 func (m *Manager) EnableAddon(addonId string) error {
@@ -38,7 +39,6 @@ func (m *Manager) EnableAddon(addonId string) error {
 	if addonInfo == nil {
 		return fmt.Errorf("addon not exit")
 	}
-
 	err := addonInfo.UpdateAddonInfoToDB(true)
 	err = m.loadAddon(addonId)
 	if err != nil {
@@ -94,9 +94,30 @@ func (m *Manager) InstallAddonFromUrl(id, url, checksum string, enabled bool) er
 
 }
 
+func (m *Manager) UninstallAddon(addonId string, disable bool) error {
+	var key = "addons." + addonId
+	err := m.unloadAddon(addonId)
+	if err != nil {
+		return err
+	}
+	f, e := m.findPlugin(addonId)
+	if e == nil {
+		util.RemoveDir(f)
+	}
+	util.RemoveDir(path.Join(path.Join(m.options.DataDir, constant.DataDirName), addonId))
 
-
-
+	if disable {
+		setting, err := database.GetSetting(key)
+		if err != nil {
+			logging.Error(err.Error())
+		}
+		var addonInfo internal.AddonInfo
+		err = json.UnmarshalFromString(setting, &addonInfo)
+		_ = addonInfo.UpdateAddonInfoToDB(false)
+	}
+	delete(m.installAddons, addonId)
+	return nil
+}
 
 func (m *Manager) CancelRemoveThing(deviceId string) {
 	device := m.getDevice(deviceId)
@@ -131,30 +152,6 @@ func RequestAction(thingId, actionId, actionName string, actionParams map[string
 	return nil
 }
 
-func (m *Manager) UninstallAddon(addonId string, disable bool) error {
-	var key = "addons." + addonId
-	err := m.unloadAddon(addonId)
-	if err != nil {
-		return err
-	}
-	f, e := m.findPlugin(addonId)
-	if e == nil {
-		util.RemoveDir(f)
-	}
-	util.RemoveDir(path.Join(path.Join(m.options.DataDir, util.DataDirName), addonId))
-
-	if disable {
-		setting, err := database.GetSetting(key)
-		if err != nil {
-			logging.Error(err.Error())
-		}
-		var addonInfo internal.AddonInfo
-		err = json.UnmarshalFromString(setting, &addonInfo)
-		_ = addonInfo.UpdateAddonInfoToDB(false)
-	}
-	delete(m.installAddons, addonId)
-	return nil
-}
 
 //func Subscribe(typ string, f interface{}) {
 //	_ = event_bus.Subscribe(typ, f)

@@ -2,8 +2,8 @@ package wot_models
 
 import (
 	"fmt"
+	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/util"
 	json "github.com/json-iterator/go"
 	uuid "github.com/satori/go.uuid"
 	"time"
@@ -49,9 +49,9 @@ func NewAction(data []byte, thingId string) *Action {
 	}
 	a.TimeRequested = time.Now().Format("2006-01-02 15:04:05")
 	a.ID = GetUUID()
-	a.Href = fmt.Sprintf("%s/%s/%s", util.ActionsPath, a.Name, a.ID)
+	a.Href = fmt.Sprintf("%s/%s/%s", constant.ActionsPath, a.Name, a.ID)
 	if a.ThingId != "" {
-		a.Href = fmt.Sprintf("%s/%s%s", util.ThingsPath, a.ThingId, a.Href)
+		a.Href = fmt.Sprintf("%s/%s%s", constant.ThingsPath, a.ThingId, a.Href)
 	}
 	a.Status = ActionCreated
 	return a
@@ -65,7 +65,7 @@ func (action *Action) UpdateStatus(newStatus string) {
 		action.TimeCompleted = time.Now().Format("2006-01-02 15:04:05")
 	}
 	action.Status = newStatus
-	event_bus.Publish(util.ActionStatus, action)
+	event_bus.Publish(constant.ActionStatus, action)
 }
 
 func (action *Action) SetError(msg string) {

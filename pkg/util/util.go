@@ -7,6 +7,7 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"fmt"
+	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
 	"io"
 	"io/ioutil"
@@ -93,7 +94,7 @@ func GetNodeVersion() string {
 
 func GetDefaultConfigDir() string {
 	dir, _ := os.UserHomeDir()
-	dirPath := path.Join(dir, ConfDirName)
+	dirPath := path.Join(dir, constant.ConfDirName)
 	return dirPath
 }
 

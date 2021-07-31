@@ -3,7 +3,7 @@ package plugin
 import (
 	"fmt"
 	addon "github.com/galenliu/gateway-addon"
-	"github.com/galenliu/gateway/pkg/util"
+	"github.com/galenliu/gateway/pkg/constant"
 	json "github.com/json-iterator/go"
 	"time"
 )
@@ -29,8 +29,8 @@ func (m *Manager) SetPropertyValue(deviceId, propName string, newValue interface
 			propChan <- value
 		}
 	}
-	go m.bus.Subscribe(util.PropertyChanged, changed)
-	defer m.bus.Unsubscribe(util.PropertyChanged, changed)
+	go m.bus.Subscribe(constant.PropertyChanged, changed)
+	defer m.bus.Unsubscribe(constant.PropertyChanged, changed)
 	for {
 		select {
 		case v := <-propChan:

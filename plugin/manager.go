@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/galenliu/gateway-addon"
+	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
@@ -134,19 +135,19 @@ func (m *Manager) handleDeviceAdded(device *addon.Device) {
 	if err != nil {
 		logging.Info("device marshal err")
 	}
-	m.bus.Publish(util.DeviceAdded, data)
+	m.bus.Publish(constant.DeviceAdded, data)
 }
 
 func (m *Manager) actionNotify(action *addon.Action) {
-	m.bus.Publish(util.ActionStatus, action.MarshalJson())
+	m.bus.Publish(constant.ActionStatus, action.MarshalJson())
 }
 
 func (m *Manager) eventNotify(event *addon.Event) {
-	m.bus.Publish(util.EVENT, event.MarshalJson())
+	m.bus.Publish(constant.EVENT, event.MarshalJson())
 }
 
 func (m *Manager) connectedNotify(device *addon.Device, connected bool) {
-	m.bus.Publish(util.CONNECTED, connected)
+	m.bus.Publish(constant.CONNECTED, connected)
 }
 
 func (m *Manager) addAdapter(adapter *Adapter) {
@@ -412,14 +413,14 @@ func (m *Manager) Start() error {
 	}()
 	m.running = true
 	if err == nil {
-		m.bus.Publish(util.AddonManagerStarted)
+		m.bus.Publish(constant.AddonManagerStarted)
 	}
 	return err
 }
 
 func (m *Manager) Stop() error {
 	m.pluginServer.Stop()
-	m.bus.Publish(util.AddonManagerStopped)
+	m.bus.Publish(constant.AddonManagerStopped)
 	m.running = false
 	return nil
 }

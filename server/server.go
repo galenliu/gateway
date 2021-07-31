@@ -1,8 +1,8 @@
 package server
 
 import (
+	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/server/controllers"
 	"github.com/galenliu/gateway/server/models"
 )
@@ -46,8 +46,8 @@ func Setup(options Options,addonManager AddonManager, store Store, bus EventBus,
 	sev.Router = controllers.Setup(controllers.Options{
 		HttpAddr:  sev.options.HttpAddr,
 		HttpsAddr: sev.options.HttpsAddr,
-	},addonManager, store, log)
-	sev.bus.Subscribe(util.GatewayStarted, sev.start)
+	}, addonManager, store, log)
+	sev.bus.Subscribe(constant.GatewayStarted, sev.start)
 	return &sev
 }
 
@@ -58,7 +58,7 @@ func (serve *WebServe) start() error {
 		serve.logger.Error("Web server err: %s", err.Error())
 		return err
 	}
-	serve.bus.Publish(util.WebServerStarted)
+	serve.bus.Publish(constant.WebServerStarted)
 	return nil
 }
 
