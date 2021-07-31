@@ -1,38 +1,36 @@
 package controllers
 
 import (
+	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
-	json "github.com/json-iterator/go"
-	"golang.org/x/crypto/bcrypt"
-	"strings"
 )
 
 type LoginController struct {
-	store UsersStore
+	users  *models.Users
+	logger logging.Logger
 }
 
-func NewLoginController(store UsersStore) *LoginController {
+func NewLoginController(users *models.Users, logger logging.Logger) *LoginController {
 	c := LoginController{}
-	c.store = store
+	c.logger = logger
+	c.users = users
 	return &c
 }
 
 func (c LoginController) handleLogin(ctx *fiber.Ctx) error {
-	email := strings.ToLower(json.Get(ctx.Body(), "email").ToString())
-	password := strings.ToLower(json.Get(ctx.Body(), "email").ToString())
+	password := ctx.FormValue("password")
+	email := ctx.FormValue("email")
 
-	if email == "" {
+	if email == "" || password == "" {
 		return ctx.SendStatus(fiber.StatusBadRequest)
 	}
-	user := c.store.GetUserByEmail(email)
+	user := c.users.GetUser(email)
 	if user == nil {
 		return ctx.SendStatus(fiber.StatusUnauthorized)
 	}
-	pwHash, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	err := bcrypt.CompareHashAndPassword([]byte(user.Hash), pwHash)
-	if err != nil {
+	if !user.ComparePassword(password) {
 		return ctx.SendStatus(fiber.StatusUnauthorized)
 	}
-
 	return nil
 }

@@ -1,16 +1,17 @@
 package models
 
 import (
-	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/logging"
 )
 
 type UsersStore interface {
-	CreateUser(email, hash, name string) (string, error)
+	CreateUser(user *User) (int64, error)
+	DeleteUser(id int64) error
+	GetUsers() []*User
+	UpdateUser(user *User) error
 }
 
 type Users struct {
-	users  []*User
 	logger logging.Logger
 	store  UsersStore
 }
@@ -23,27 +24,20 @@ func NewUsersModel(store UsersStore, logger logging.Logger) *Users {
 }
 
 func (u *Users) GetUsersCount() int {
-	if u.users != nil {
-		return 0
-	}
-	return len(u.getUsersCount())
+	return len(u.store.GetUsers())
 }
 
 func (u *Users) GetUser(email string) *User {
-	return nil
-}
-
-func (u *Users) CreateUser(email, password, name string) (error, string) {
-	user := NewUser(email, password, name)
-	err := user.Save()
-	if err != nil {
-		return err, ""
+	users := u.store.GetUsers()
+	for _, user := range users {
+		if user.Email == email {
+			return user
+		}
 	}
-	u.users = append(u.users, user)
-	return nil, ""
+	return nil
 }
 
-func (u *Users) getUsersCount() []User {
-	database.GetUsersCount()
-	return nil
+func (u *Users) CreateUser(email, password, name string) (int64, error) {
+	user := newUser(email, password, name)
+	return u.store.CreateUser(user)
 }

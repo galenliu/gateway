@@ -60,10 +60,20 @@ func Setup(options Options,addonManager server.AddonManager, store server.Store,
 	//app.Get("/", controllers.RootHandle())
 	app.Static("/index.htm", "")
 
+
+	usersModel := models.NewUsersModel(store,log)
 	{
-		loginController := NewLoginController()
+		loginController := NewLoginController(usersModel,log)
 		app.Post(constant.LoginPath, loginController.handleLogin)
 
+	}
+
+	// Users Controller
+	{
+		usersController := NewUsersController(usersModel, log)
+		usersGroup := app.Group(constant.UsersPath)
+		usersGroup.Get("/count", usersController.getCount)
+		usersGroup.Post("/", usersController.createUser)
 	}
 
 	//Things Controller
@@ -114,13 +124,7 @@ func Setup(options Options,addonManager server.AddonManager, store server.Store,
 		}))
 	}
 
-	// Users Controller
-	{
-		usersController := NewUsersController(models.NewUsersModel(store, log), log)
-		usersGroup := app.Group(constant.UsersPath)
-		usersGroup.Get("/count", usersController.getCount)
-		usersGroup.Post("/", usersController.createUser)
-	}
+
 
 	//Addons Controller
 	{

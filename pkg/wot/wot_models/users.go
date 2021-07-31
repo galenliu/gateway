@@ -33,6 +33,6 @@ func (u *Users) CreateUser(email, password, name string) (error, string) {
 }
 
 func (u *Users) getUsersCount() []*User {
-	database.GetUsersCount()
+	db.GetUsersCount()
 	return nil
 }

@@ -9,9 +9,6 @@ import (
 	"strings"
 )
 
-type UsersStore interface {
-	GetUserByEmail(email string) *models.User
-}
 
 
 type userController struct {

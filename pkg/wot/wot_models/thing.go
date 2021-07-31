@@ -132,7 +132,7 @@ func (t *Thing) updateFromString(data string) {
 }
 
 func (t *Thing) save() error {
-	err := database.UpdateThing(t.GetID(), t.GetDescription())
+	err := db.UpdateThing(t.GetID(), t.GetDescription())
 	if err != nil {
 		return err
 	}

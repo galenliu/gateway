@@ -61,17 +61,17 @@ func preferencesDefault() *Preferences {
 }
 
 func UpdateOrCreatePreferences() error {
-	p, err := database.GetSetting(preferencesKey)
+	p, err := db.GetSetting(preferencesKey)
 	if err != nil {
 		s, ee := json.MarshalToString(preferencesDefault())
 		if ee != nil {
 			return ee
 		}
-		eee := database.SetSetting(preferencesKey, s)
+		eee := db.SetSetting(preferencesKey, s)
 		if eee != nil {
 			return eee
 		}
-		p, _ = database.GetSetting(preferencesKey)
+		p, _ = db.GetSetting(preferencesKey)
 	}
 	_ = json.UnmarshalFromString(p, &preferences)
 	return nil
@@ -181,9 +181,9 @@ func NewConfig(config string) *Config {
 
 		//init database
 		if rtc.Database.RemoveBeforeOpen {
-			database.ResetDB(rtc.ConfigDir)
+			db.ResetDB(rtc.ConfigDir)
 		}
-		err = database.NewStore(rtc.ConfigDir)
+		err = db.NewStore(rtc.ConfigDir)
 
 		logging.Info("gateway loaded config on path: %s", rtc.ProfileDir)
 

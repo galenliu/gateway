@@ -1,19 +1,21 @@
 package models
 
 import (
-	"github.com/galenliu/gateway/pkg/database"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 )
 
 type User struct {
-	ID    int64
-	Name  string
-	Email string
-	Hash  string
+	ID              int64
+	Name            string
+	Email           string
+	Hash            string
+	MfaSharedSecret string
+	MfaEnrolled     bool
+	MfaBackupCodes  string
 }
 
-func NewUser(email, password, name string) *User {
+func newUser(email, password, name string) *User {
 	u := &User{}
 	hash := hashAndSalt(password)
 	u.Hash = hash
@@ -22,18 +24,16 @@ func NewUser(email, password, name string) *User {
 	return nil
 }
 
-// Save user保存到数据库中
-func (u *User) Save() error {
-	id, err := database.CreateUser(u.Email, u.Hash, u.Name)
+func (u *User) ComparePassword(password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(u.Hash), []byte(password))
 	if err != nil {
-		return err
+		return false
 	}
-	u.ID = id
-	return nil
+	return true
 }
 
 func hashAndSalt(pwd string) string {
-	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.MinCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
 	if err != nil {
 		log.Println(err)
 	}

@@ -69,7 +69,7 @@ func (addon *AddonController) handlerInstallAddon(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": e.Error()})
 	}
 	key := "addons." + id
-	setting, ee := database.GetSetting(key)
+	setting, ee := db.GetSetting(key)
 	if ee != nil {
 		logging.Error("install add-on err : %s", ee.Error())
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": ee.Error()})
@@ -91,7 +91,7 @@ func (addon *AddonController) handlerUpdateAddon(c *fiber.Ctx) error {
 
 	}
 	key := "addons." + id
-	setting, ee := database.GetSetting(key)
+	setting, ee := db.GetSetting(key)
 	if ee != nil {
 		logging.Error(ee.Error())
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": ee.Error()})
@@ -108,7 +108,7 @@ func (addon *AddonController) handlerGetAddonConfig(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, "addonId failed")
 	}
 
-	config, err := database.GetSetting(key)
+	config, err := db.GetSetting(key)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
@@ -126,7 +126,7 @@ func (addon *AddonController) handlerSetAddonConfig(c *fiber.Ctx) error {
 	if config == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "options empty")
 	}
-	err := database.SetSetting(key, config)
+	err := db.SetSetting(key, config)
 	if err != nil {
 		logging.Error(err.Error())
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to set options for add-on: "+addonId)

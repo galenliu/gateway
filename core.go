@@ -41,9 +41,9 @@ type Options struct {
 }
 
 type Gateway struct {
-	options      Options
-	store        database.Store
-	bus          eventBus
+	options Options
+	store   db.Store
+	bus     eventBus
 	logger       logging.Logger
 	addonManager *plugin.Manager
 	sever        *server.WebServe
@@ -55,7 +55,7 @@ func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {
 	g.options = o
 
 	var e error = nil
-	g.store, e = database.NewStore(path.Join(g.options.DataDir, constant.ConfigDirName), g.options.DBRemoveBeforeOpen)
+	g.store, e = db.NewStore(path.Join(g.options.DataDir, constant.ConfigDirName), g.options.DBRemoveBeforeOpen)
 	if e != nil {
 		return nil, e
 	}

@@ -76,7 +76,7 @@ func (addonInfo *AddonInfo) UpdateFromDB() error {
 	if err != nil {
 		return err
 	}
-	err = database.SetSetting(GetAddonKey(addonInfo.ID), d)
+	err = db.SetSetting(GetAddonKey(addonInfo.ID), d)
 	return nil
 }
 
@@ -86,12 +86,12 @@ func (addonInfo *AddonInfo) UpdateAddonInfoToDB(enable bool) error {
 	if err != nil {
 		return err
 	}
-	return database.SetSetting(GetAddonKey(addonInfo.ID), s)
+	return db.SetSetting(GetAddonKey(addonInfo.ID), s)
 
 }
 
 func GetAddonInfoFromDB(id string) *AddonInfo {
-	value, err := database.GetSetting(GetAddonKey(id))
+	value, err := db.GetSetting(GetAddonKey(id))
 	if err != nil {
 		return nil
 	}

@@ -24,7 +24,7 @@ func NewUser(email, password, name string) *User {
 
 // Save user保存到数据库中
 func (u *User) Save() error {
-	id, err := database.CreateUser(u.Email, u.Hash, u.Name)
+	id, err := db.CreateUser(u.Email, u.Hash, u.Name)
 	if err != nil {
 		return err
 	}

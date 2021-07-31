@@ -245,7 +245,7 @@ func (m *Manager) installAddon(packageId, packagePath string, enabled bool) erro
 
 	}
 	var key = "addons." + packageId
-	saved, err := database.GetSetting(key)
+	saved, err := db.GetSetting(key)
 	if err == nil && saved != "" {
 		var old internal.AddonInfo
 		ee := json.UnmarshalFromString(saved, &old)
@@ -253,7 +253,7 @@ func (m *Manager) installAddon(packageId, packagePath string, enabled bool) erro
 			old.Enabled = enabled
 			newAddonInfo, err := json.MarshalToString(old)
 			if err != nil {
-				ee := database.SetSetting(key, newAddonInfo)
+				ee := db.SetSetting(key, newAddonInfo)
 				if ee != nil {
 					logging.Error(ee.Error())
 				}
@@ -326,17 +326,17 @@ func (m *Manager) loadAddon(packageId string) error {
 		return err
 	}
 
-	savedConfig, e := database.GetSetting(configKey)
+	savedConfig, e := db.GetSetting(configKey)
 	if e != nil && savedConfig == "" {
 		if cfg != "" {
-			eee := database.SetSetting(configKey, cfg)
+			eee := db.SetSetting(configKey, cfg)
 			if eee != nil {
 				logging.Error(eee.Error())
 			}
 		}
 	}
 	if savedConfig == "" && cfg != "" {
-		eee := database.SetSetting(configKey, cfg)
+		eee := db.SetSetting(configKey, cfg)
 		if eee != nil {
 			return eee
 		}

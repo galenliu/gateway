@@ -107,7 +107,7 @@ func (m *Manager) UninstallAddon(addonId string, disable bool) error {
 	util.RemoveDir(path.Join(path.Join(m.options.DataDir, constant.DataDirName), addonId))
 
 	if disable {
-		setting, err := database.GetSetting(key)
+		setting, err := db.GetSetting(key)
 		if err != nil {
 			logging.Error(err.Error())
 		}
