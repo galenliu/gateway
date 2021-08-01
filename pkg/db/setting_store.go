@@ -5,20 +5,20 @@ import (
 	"github.com/galenliu/gateway/pkg/logging"
 )
 
-func (s *store) GetSetting(key string) (value string, err error) {
-	err = s.QueryRow("SELECT value FROM settings where key = @key", sql.Named("key", key), sql.Named("key", key)).Scan(&value)
+func (s *Store) GetSetting(key string) (value string, err error) {
+	err = s.db.QueryRow("SELECT value FROM settings where key = @key", sql.Named("key", key), sql.Named("key", key)).Scan(&value)
 	return value, err
 }
 
-func (s *store) SetSetting(key, value string) error {
+func (s *Store) SetSetting(key, value string) error {
 
 	logging.Info("set setting key:%s value:%s \t\n", key, value)
 	_, err := s.GetSetting(key)
 	if err == nil {
-		_, e := s.Exec(`update settings set value=@value where key=@key`, sql.Named("value", value), sql.Named("key", key))
+		_, e := s.db.Exec(`update settings set value=@value where key=@key`, sql.Named("value", value), sql.Named("key", key))
 		return e
 	}
-	stmt, err := s.Prepare("INSERT INTO settings(key, value) values(?,?)")
+	stmt, err := s.db.Prepare("INSERT INTO settings(key, value) values(?,?)")
 	if err != nil {
 		return err
 	}

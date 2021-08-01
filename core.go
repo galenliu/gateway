@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/constant"
-	"github.com/galenliu/gateway/pkg/database"
+	"github.com/galenliu/gateway/pkg/db"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server"
@@ -35,15 +35,14 @@ type Options struct {
 	HttpAddr           string
 	HttpsAddr          string
 	LogRotateDays      int
-
 	HomeKitPin    string
 	HomeKitEnable bool
 }
 
 type Gateway struct {
-	options Options
-	store   db.Store
-	bus     eventBus
+	options      Options
+	store        *db.Store
+	bus          eventBus
 	logger       logging.Logger
 	addonManager *plugin.Manager
 	sever        *server.WebServe
@@ -55,7 +54,7 @@ func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {
 	g.options = o
 
 	var e error = nil
-	g.store, e = db.NewStore(path.Join(g.options.DataDir, constant.ConfigDirName), g.options.DBRemoveBeforeOpen)
+	g.store, e = db.NewStore(path.Join(g.options.DataDir, constant.ConfigDirName), g.options.DBRemoveBeforeOpen, logger)
 	if e != nil {
 		return nil, e
 	}

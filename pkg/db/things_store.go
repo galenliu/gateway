@@ -4,25 +4,29 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/galenliu/gateway/server/models"
+	json "github.com/json-iterator/go"
 )
 
-
-
-func (s *store) SaveThing(t *models.Thing) error {
+func (s *Store) SaveThing(t *models.Thing) error {
 	panic("implement me")
 }
 
-
-func (s *store)  CreateThing(id, description string) error {
-	if id == "" && description == "" {
+func (s *Store) CreateThing(t *models.Thing) error {
+	if t.ID == "" {
 		return fmt.Errorf("description is emtry")
 	}
-	stmt, err := s.Prepare("INSERT INTO things(id, description) values(?,?)")
+	description, _ := json.MarshalToString(t)
+	stmt, err := s.db.Prepare("INSERT INTO things(id, description) values(?,?)")
 	if err != nil {
 		return err
 	}
-	defer stmt.Close()
-	res, ee := stmt.Exec(id, description)
+	defer func(stmt *sql.Stmt) {
+		err := stmt.Close()
+		if err != nil {
+			s.logger.Error("stmt close err: %s", err.Error())
+		}
+	}(stmt)
+	res, ee := stmt.Exec(t.GetID(), description)
 	if ee != nil {
 		return ee
 	}
@@ -30,13 +34,12 @@ func (s *store)  CreateThing(id, description string) error {
 	if eee != nil {
 		return eee
 	}
-	fmt.Printf("insert data,id:%s , value: %s \t\n", id, description)
+	fmt.Printf("insert data,id:%s , value: %s \t\n", t.GetID(), description)
 	return nil
 }
 
-func (s *store)  GetThings() map[string]string {
-	var things = make(map[string]string)
-	rows, err := s.Query("SELECT id, description FROM things")
+func (s *Store) GetThings() (things []*models.Thing) {
+	rows, err := s.db.Query("SELECT id, description FROM things")
 	if err != nil {
 		return nil
 	}
@@ -45,29 +48,38 @@ func (s *store)  GetThings() map[string]string {
 		var description string
 		err = rows.Scan(&id, &description)
 		if err == nil {
-			things[id] = description
+			continue
 		}
+		t, er := models.NewThingFromString(description)
+		if er != nil {
+			s.logger.Error("thing err: %s", er.Error())
+			continue
+		}
+		things = append(things, t)
 	}
 	return things
 }
 
-func (s *store)  RemoveThing(id string) error {
-	stmt, err := s.Prepare(`delete from things where id = ?`)
+func (s *Store) RemoveThing(id string) error {
+	stmt, err := s.db.Prepare(`delete from things where id = ?`)
 	if err != nil {
 		return err
 	}
-	defer stmt.Close()
+	defer func(stmt *sql.Stmt) {
+		err := stmt.Close()
+		if err != nil {
+			s.logger.Error("stmt close err: %s", err.Error())
+		}
+	}(stmt)
 	_, err = stmt.Exec(id)
 	if err != nil {
 		return err
 	}
 	return nil
-
 }
 
-func (s *store) UpdateThing(id string, description string) (err error) {
-	_, err = s.Exec(`update things set id=@id where description=@description`, sql.Named("id", id), sql.Named("description", description))
+func (s *Store) UpdateThing(t *models.Thing) (err error) {
+	d, _ := json.MarshalToString(t)
+	_, err = s.db.Exec(`update things set id=@id where description=@description`, sql.Named("id", t.GetID()), sql.Named("description", d))
 	return
 }
-
-

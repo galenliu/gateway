@@ -3,15 +3,14 @@ module github.com/galenliu/gateway
 go 1.16
 
 require (
-	github.com/arsmn/fiber-swagger/v2 v2.6.0
+	"github.com/golang-jwt/jwt" latest
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/brutella/hc v1.2.4
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fasthttp/websocket v1.4.3 // indirect
 	github.com/galenliu/gateway-addon v1.0.0
 	github.com/go-oauth2/oauth2/v4 v4.3.0
 	github.com/go-openapi/swag v0.19.15 // indirect
-	github.com/gofiber/fiber/v2 v2.15.0
+	github.com/gofiber/fiber/v2 v2.16.0
 	github.com/gofiber/websocket/v2 v2.0.3
 	github.com/gorilla/websocket v1.4.2
 	github.com/json-iterator/go v1.1.11

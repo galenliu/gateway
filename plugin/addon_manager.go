@@ -2,12 +2,9 @@ package plugin
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/constant"
-	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/logging"
 
 	"github.com/galenliu/gateway/pkg/util"
-	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
 	"io/ioutil"
 	"net/http"
@@ -15,21 +12,15 @@ import (
 	"path"
 )
 
-
-
 // GetInstallAddons 获取已安装的add-on
-func (m *Manager) GetInstallAddons() []byte {
+func (m *Manager) GetInstallAddons() []*AddonInfo {
 	m.locker.Lock()
 	defer m.locker.Unlock()
-	var addons []*internal.AddonInfo
+	var addons []*AddonInfo
 	for _, v := range m.installAddons {
 		addons = append(addons, v)
 	}
-	data, err := json.Marshal(addons)
-	if err != nil {
-		return nil
-	}
-	return data
+	return addons
 }
 
 func (m *Manager) EnableAddon(addonId string) error {
@@ -39,7 +30,15 @@ func (m *Manager) EnableAddon(addonId string) error {
 	if addonInfo == nil {
 		return fmt.Errorf("addon not exit")
 	}
-	err := addonInfo.UpdateAddonInfoToDB(true)
+	addonInfo.Enabled = true
+	s, err := json.MarshalToString(addonInfo)
+	if err != nil {
+		return err
+	}
+	err = m.settingsStore.SetSetting(GetAddonKey(addonInfo.ID), s)
+	if err != nil {
+		return err
+	}
 	err = m.loadAddon(addonId)
 	if err != nil {
 		return err
@@ -54,17 +53,25 @@ func (m *Manager) DisableAddon(addonId string) error {
 	if addonInfo == nil {
 		return fmt.Errorf("addon not installed")
 	}
-	err := addonInfo.UpdateAddonInfoToDB(false)
+	addonInfo.Enabled = false
+	err := m.unloadAddon(addonId)
 	if err != nil {
 		return err
 	}
-	err = m.unloadAddon(addonId)
+	s, err := json.MarshalToString(addonInfo)
+	if err != nil {
+		return err
+	}
+	err = m.settingsStore.SetSetting(GetAddonKey(addonInfo.ID), s)
+	if err != nil {
+		return err
+	}
+	err = m.loadAddon(addonId)
 	if err != nil {
 		return err
 	}
 	return nil
 }
-
 
 func (m *Manager) InstallAddonFromUrl(id, url, checksum string, enabled bool) error {
 
@@ -95,25 +102,28 @@ func (m *Manager) InstallAddonFromUrl(id, url, checksum string, enabled bool) er
 }
 
 func (m *Manager) UninstallAddon(addonId string, disable bool) error {
-	var key = "addons." + addonId
+
 	err := m.unloadAddon(addonId)
 	if err != nil {
 		return err
 	}
-	f, e := m.findPlugin(addonId)
-	if e == nil {
-		util.RemoveDir(f)
-	}
-	util.RemoveDir(path.Join(path.Join(m.options.DataDir, constant.DataDirName), addonId))
-
-	if disable {
-		setting, err := db.GetSetting(key)
+	f := m.findPluginPath(addonId)
+	if f != "" {
+		err := util.RemoveDir(f)
 		if err != nil {
-			logging.Error(err.Error())
+			m.logger.Error("remove dir from: %s err :%s", f, err)
 		}
-		var addonInfo internal.AddonInfo
-		err = json.UnmarshalFromString(setting, &addonInfo)
-		_ = addonInfo.UpdateAddonInfoToDB(false)
+	}
+	if disable {
+		info, err := m.settingsStore.GetSetting(GetAddonKey(addonId))
+		if err == nil {
+			addonInfo := NewAddonInfoFromString(info)
+			addonInfo.Enabled = false
+			s, err := json.MarshalToString(addonInfo)
+			if err == nil {
+				err = m.settingsStore.SetSetting(addonInfo.ID, s)
+			}
+		}
 	}
 	delete(m.installAddons, addonId)
 	return nil
@@ -142,16 +152,9 @@ func (m *Manager) SetPIN(thingId string, pin interface{}) error {
 	return nil
 }
 
-func RemoveAction(thingId, actionId, actionName string) error {
-	//TODO
-	return nil
+func (m *Manager) GetAddonLicense(addonId string) string {
+	return ""
 }
-
-func RequestAction(thingId, actionId, actionName string, actionParams map[string]interface{}) error {
-	//TODO
-	return nil
-}
-
 
 //func Subscribe(typ string, f interface{}) {
 //	_ = event_bus.Subscribe(typ, f)

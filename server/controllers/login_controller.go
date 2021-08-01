@@ -6,19 +6,26 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type LoginController struct {
-	users  *models.Users
-	logger logging.Logger
+type Users interface {
+	GetUser(email string) *models.User
 }
 
-func NewLoginController(users *models.Users, logger logging.Logger) *LoginController {
+type LoginController struct {
+	users        *models.Users
+	jsonwebtoken *models.Jsonwebtoken
+	logger       logging.Logger
+}
+
+func NewLoginController(users *models.Users, jsonwebtoken *models.Jsonwebtoken, logger logging.Logger) *LoginController {
 	c := LoginController{}
+	c.users = users
+	c.jsonwebtoken = jsonwebtoken
 	c.logger = logger
 	c.users = users
 	return &c
 }
 
-func (c LoginController) handleLogin(ctx *fiber.Ctx) error {
+func (c *LoginController) handleLogin(ctx *fiber.Ctx) error {
 	password := ctx.FormValue("password")
 	email := ctx.FormValue("email")
 
@@ -32,5 +39,6 @@ func (c LoginController) handleLogin(ctx *fiber.Ctx) error {
 	if !user.ComparePassword(password) {
 		return ctx.SendStatus(fiber.StatusUnauthorized)
 	}
-	return nil
+	jwt := c.jsonwebtoken.IssueToken(user.ID)
+	return ctx.JSON(jwt)
 }

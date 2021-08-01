@@ -1,31 +1,37 @@
 package controllers
 
 import (
-	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/plugin"
+	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
 	json "github.com/json-iterator/go"
 	"net/http"
 )
 
 type AddonHandler interface {
-	GetInstallAddons() []byte
+	GetInstallAddons() []*plugin.AddonInfo
 	EnableAddon(addonId string) error
 	DisableAddon(addonId string) error
+
 	InstallAddonFromUrl(id, url, checksum string, enabled bool) error
 	UnloadAddon(id string) error
 	UninstallAddon(id string, disabled bool) error
-	AddonEnabled(id string) bool
+
+	GetAddonLicense(addonId string) string
+
 	LoadAddon(id string) error
 }
 
 type AddonController struct {
-	handler AddonHandler
-	logger  logging.Logger
+	handler       AddonHandler
+	settingsStore models.SettingsStore
+	logger        logging.Logger
 }
 
-func NewAddonController(addonHandler AddonHandler, log logging.Logger) *AddonController {
+func NewAddonController(addonHandler AddonHandler, settingsStore models.SettingsStore, log logging.Logger) *AddonController {
 	a := &AddonController{}
+	a.settingsStore = settingsStore
 	a.handler = addonHandler
 	a.logger = log
 	return a
@@ -69,7 +75,7 @@ func (addon *AddonController) handlerInstallAddon(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": e.Error()})
 	}
 	key := "addons." + id
-	setting, ee := db.GetSetting(key)
+	setting, ee := addon.settingsStore.GetSetting(key)
 	if ee != nil {
 		logging.Error("install add-on err : %s", ee.Error())
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": ee.Error()})
@@ -91,7 +97,7 @@ func (addon *AddonController) handlerUpdateAddon(c *fiber.Ctx) error {
 
 	}
 	key := "addons." + id
-	setting, ee := db.GetSetting(key)
+	setting, ee := addon.settingsStore.GetSetting(key)
 	if ee != nil {
 		logging.Error(ee.Error())
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": ee.Error()})
@@ -108,7 +114,7 @@ func (addon *AddonController) handlerGetAddonConfig(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, "addonId failed")
 	}
 
-	config, err := db.GetSetting(key)
+	config, err := addon.settingsStore.GetSetting(key)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
@@ -118,7 +124,7 @@ func (addon *AddonController) handlerGetAddonConfig(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).SendString(config)
 }
 
-//Put /:addonId/options
+//Put /:addonId/config
 func (addon *AddonController) handlerSetAddonConfig(c *fiber.Ctx) error {
 	var addonId = c.Params("addonId")
 	var key = "addons.options." + addonId
@@ -126,13 +132,13 @@ func (addon *AddonController) handlerSetAddonConfig(c *fiber.Ctx) error {
 	if config == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "options empty")
 	}
-	err := db.SetSetting(key, config)
+	err := addon.settingsStore.SetSetting(key, config)
 	if err != nil {
 		logging.Error(err.Error())
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to set options for add-on: "+addonId)
 	}
 	err = addon.handler.UnloadAddon(addonId)
-	if addon.handler.AddonEnabled(addonId) {
+	if addon.AddonEnabled(addonId) {
 		err := addon.handler.LoadAddon(addonId)
 		if err != nil {
 			logging.Error(err.Error())
@@ -151,3 +157,11 @@ func (addon *AddonController) handlerDeleteAddon(c *fiber.Ctx) error {
 	}
 	return c.SendStatus(fiber.StatusNoContent)
 }
+
+func (addon *AddonController) handlerGetLicense(c *fiber.Ctx) error {
+	addonId := c.Params("addonId")
+
+	addon.handler
+	return nil
+}
+

@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/constant"
-	"github.com/galenliu/gateway/pkg/logging"
 	"io"
 	"io/ioutil"
 	"math"
@@ -38,18 +37,19 @@ func EnsureDir(baseDir string, dirs ...string) error {
 	return nil
 }
 
-func RemoveDir(dir string) {
+func RemoveDir(dir string) error {
 	ff, err := os.Stat(dir)
 	if err != nil {
-		logging.Error(err.Error())
+		return err
 	} else {
 		if ff.IsDir() {
-			err := os.RemoveAll(dir)
+			err = os.RemoveAll(dir)
 			if err != nil {
-				logging.Error(err.Error())
+				return err
 			}
 		}
 	}
+	return nil
 }
 
 func CheckSum(file string, checksum string) bool {

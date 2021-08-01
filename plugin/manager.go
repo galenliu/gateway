@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway-addon"
 	"github.com/galenliu/gateway/pkg/constant"
-	"github.com/galenliu/gateway/pkg/database"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	"github.com/galenliu/gateway/plugin/internal"
+	"github.com/galenliu/gateway/server/models"
 	json "github.com/json-iterator/go"
 	"time"
 
@@ -45,7 +45,7 @@ type Manager struct {
 
 	devices       map[string]addon.IDevice
 	adapters      map[string]*Adapter
-	installAddons map[string]*internal.AddonInfo
+	installAddons map[string]*AddonInfo
 
 	extensions map[string]Extension
 
@@ -61,9 +61,11 @@ type Manager struct {
 	verbose bool
 	logger  logging.Logger
 	actions map[string]*wot.ActionAffordance
+
+	settingsStore models.SettingsStore
 }
 
-func NewAddonsManager(options Options, bus eventBus, log logging.Logger) *Manager {
+func NewAddonsManager(options Options, settingStore models.SettingsStore, bus eventBus, log logging.Logger) *Manager {
 	am := &Manager{}
 	am.options = options
 	am.logger = log
@@ -71,10 +73,11 @@ func NewAddonsManager(options Options, bus eventBus, log logging.Logger) *Manage
 	am.isPairing = false
 	am.running = false
 	am.devices = make(map[string]addon.IDevice, 50)
-	am.installAddons = make(map[string]*internal.AddonInfo, 50)
+	am.installAddons = make(map[string]*AddonInfo, 50)
 	am.adapters = make(map[string]*Adapter, 20)
 	am.extensions = make(map[string]Extension)
 	am.bus = bus
+	am.settingsStore = settingStore
 
 	//def addon action
 	//action := wot.NewActionAffordance()
@@ -245,15 +248,15 @@ func (m *Manager) installAddon(packageId, packagePath string, enabled bool) erro
 
 	}
 	var key = "addons." + packageId
-	saved, err := db.GetSetting(key)
+	saved, err := m.settingsStore.GetSetting(key)
 	if err == nil && saved != "" {
-		var old internal.AddonInfo
+		var old AddonInfo
 		ee := json.UnmarshalFromString(saved, &old)
 		if ee != nil {
 			old.Enabled = enabled
 			newAddonInfo, err := json.MarshalToString(old)
 			if err != nil {
-				ee := db.SetSetting(key, newAddonInfo)
+				ee := m.settingsStore.SetSetting(key, newAddonInfo)
 				if ee != nil {
 					logging.Error(ee.Error())
 				}
@@ -305,7 +308,7 @@ func (m *Manager) loadAddon(packageId string) error {
 		return err
 	}
 
-	addonInfo, obj, err := internal.LoadManifest(addonPath, packageId)
+	addonInfo, obj, err := LoadManifest(addonPath, packageId)
 
 	if err != nil {
 		return err
@@ -326,17 +329,17 @@ func (m *Manager) loadAddon(packageId string) error {
 		return err
 	}
 
-	savedConfig, e := db.GetSetting(configKey)
+	savedConfig, e := m.settingsStore.GetSetting(configKey)
 	if e != nil && savedConfig == "" {
 		if cfg != "" {
-			eee := db.SetSetting(configKey, cfg)
+			eee := m.settingsStore.SetSetting(configKey, cfg)
 			if eee != nil {
 				logging.Error(eee.Error())
 			}
 		}
 	}
 	if savedConfig == "" && cfg != "" {
-		eee := db.SetSetting(configKey, cfg)
+		eee := m.settingsStore.SetSetting(configKey, cfg)
 		if eee != nil {
 			return eee
 		}
@@ -391,15 +394,15 @@ func (m *Manager) unloadAddon(packageId string) error {
 	return nil
 }
 
-func (m *Manager) findPlugin(packageId string) (string, error) {
+func (m *Manager) findPluginPath(packageId string) string {
 	for _, dir := range m.options.AddonDirs {
 		_, e := os.Stat(path.Join(dir, packageId))
 		if os.IsNotExist(e) {
 			continue
 		}
-		return path.Join(dir, packageId), nil
+		return path.Join(dir, packageId)
 	}
-	return "", fmt.Errorf("addon is not exist")
+	return ""
 }
 
 func (m *Manager) Start() error {

@@ -32,14 +32,13 @@ type FireController interface {
 
 type ThingsStore interface {
 	RemoveThing(id string) error
-	SaveThing(t *Thing) error
+	CreateThing(t *Thing) error
 	UpdateThing(t *Thing) error
-	GetThings() []string
+	GetThings() []*Thing
 }
 
 type container struct {
 	things map[string]*Thing
-
 	store  ThingsStore
 	logger logging.Logger
 }
@@ -108,7 +107,7 @@ func (c *container) handleCreateThing(data []byte) (*Thing, error) {
 		return nil, fmt.Errorf("thing id: %s is exited", th.GetID())
 	}
 	c.things[th.GetID()] = th
-	err = c.store.SaveThing(th)
+	err = c.store.CreateThing(th)
 	if err != nil {
 		return nil, err
 	}
@@ -148,12 +147,7 @@ func (c *container) handleUpdateThing(data []byte) error {
 
 func (c *container) updateThings() {
 	if len(c.things) < 1 {
-		for _, s := range c.store.GetThings() {
-			t, err := NewThingFromString(s)
-			if err != nil {
-				c.logger.Errorf("new thing for database err: %s", err.Error())
-				continue
-			}
+		for _, t := range c.store.GetThings() {
 			c.things[t.GetID()] = t
 		}
 	}

@@ -60,7 +60,6 @@ func (tc *thingsController) handleGetThing(c *fiber.Ctx) error {
 		c.Locals("thingId", thingId)
 		return c.Next()
 	}
-
 	t := tc.model.GetThing(thingId)
 	if t == nil {
 		return fiber.NewError(http.StatusBadRequest, "thing not found")

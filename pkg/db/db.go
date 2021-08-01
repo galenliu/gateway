@@ -10,15 +10,15 @@ import (
 
 const dbFileName = "database.sqlite3"
 
-type store struct {
-	file string
-	db *sql.DB
+type Store struct {
+	file   string
+	db     *sql.DB
 	logger logging.Logger
 }
 
-func NewStore(filePath string, reset bool,log logging.Logger) (*store, error) {
-	s := &store{}
-	s.logger=log
+func NewStore(filePath string, reset bool, log logging.Logger) (*Store, error) {
+	s := &Store{}
+	s.logger = log
 	f := path.Join(filePath, dbFileName)
 	s.file = f
 	if reset {
@@ -37,14 +37,14 @@ func NewStore(filePath string, reset bool,log logging.Logger) (*store, error) {
 	return s, nil
 }
 
-func (s *store) reset() {
+func (s *Store) reset() {
 	_, err := os.Stat(s.file)
 	if err == nil {
 		_ = os.Remove(s.file)
 	}
 }
 
-func (s *store) createTable() error {
+func (s *Store) createTable() error {
 
 	thingsTable := `
     CREATE TABLE IF NOT EXISTS things(
@@ -66,7 +66,7 @@ func (s *store) createTable() error {
     `
 
 	jsonWebTokensTable := `
-    CREATE TABLE IF NOT EXISTS jsonwebtokens(
+    CREATE TABLE IF NOT EXISTS jsonwebtoken(
     	id INTEGER PRIMARY KEY ASC,
     	keyId TEXT UNIQUE,
     	user INTEGER,
@@ -105,18 +105,18 @@ func (s *store) createTable() error {
 	return nil
 }
 
-func (s *store) updateValue(k, v string) (err error) {
+func (s *Store) updateValue(k, v string) (err error) {
 	_, err = s.db.Exec(`update data set value=@value where key=@key`, sql.Named("value", v), sql.Named("key", k))
 	return
 }
 
-func (s *store) queryValue(k string) (value string, err error) {
+func (s *Store) queryValue(k string) (value string, err error) {
 	err = s.db.QueryRow("SELECT value FROM data where key = @key", sql.Named("key", k)).Scan(&value)
 	logging.Info(k, value)
 	return value, err
 }
 
-func (s *store) deleteValue(key string) error {
+func (s *Store) deleteValue(key string) error {
 	stmt, err := s.db.Prepare(`delete from data where key = ?`)
 	if err != nil {
 		return err

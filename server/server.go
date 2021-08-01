@@ -15,10 +15,14 @@ type EventBus interface {
 type Store interface {
 	models.UsersStore
 	models.ThingsStore
+	models.SettingsStore
+	models.JsonwebtokenStore
 }
+
 
 type AddonManager interface {
 	controllers.AddonHandler
+	controllers.ThingsHandler
 }
 
 type Options struct {

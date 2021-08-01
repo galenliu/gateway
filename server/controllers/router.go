@@ -33,7 +33,7 @@ type Router struct {
 	HttpsRunning bool
 }
 
-func Setup(options Options,addonManager server.AddonManager, store server.Store, log logging.Logger) *Router {
+func Setup(options Options, addonManager server.AddonManager, store server.Store, log logging.Logger) *Router {
 
 	//router init
 	app := Router{}
@@ -60,10 +60,11 @@ func Setup(options Options,addonManager server.AddonManager, store server.Store,
 	//app.Get("/", controllers.RootHandle())
 	app.Static("/index.htm", "")
 
-
-	usersModel := models.NewUsersModel(store,log)
+	settingModel := models.NewSettingsModel(store, log)
+	usersModel := models.NewUsersModel(store, log)
+	jsonwebtokenModel := models.NewJsonwebtokenModel(settingModel, store, log)
 	{
-		loginController := NewLoginController(usersModel,log)
+		loginController := NewLoginController(usersModel, jsonwebtokenModel, log)
 		app.Post(constant.LoginPath, loginController.handleLogin)
 
 	}
@@ -124,13 +125,12 @@ func Setup(options Options,addonManager server.AddonManager, store server.Store,
 		}))
 	}
 
-
-
 	//Addons Controller
 	{
 		addonController := NewAddonController(addonManager, log)
 		addonGroup := app.Group(constant.AddonsPath)
 		addonGroup.Get("/", addonController.handlerGetAddons)
+		addonGroup.Get("/:addonId/license", addonController.handlerGetLicense)
 		addonGroup.Post("/", addonController.handlerInstallAddon)
 		addonGroup.Put("/:addonId", addonController.handlerSetAddon)
 		addonGroup.Patch("/:addonId", addonController.handlerUpdateAddon)
