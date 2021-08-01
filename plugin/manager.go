@@ -42,8 +42,7 @@ type Manager struct {
 	options      Options
 	configPath   string
 	pluginServer *PluginsServer
-
-	devices       map[string]addon.IDevice
+	devices       map[string]*internal.Device
 	adapters      map[string]*Adapter
 	installAddons map[string]*AddonInfo
 
@@ -72,24 +71,12 @@ func NewAddonsManager(options Options, settingStore models.SettingsStore, bus ev
 	am.addonsLoaded = false
 	am.isPairing = false
 	am.running = false
-	am.devices = make(map[string]addon.IDevice, 50)
+	am.devices = make(map[string]*internal.Device, 50)
 	am.installAddons = make(map[string]*AddonInfo, 50)
 	am.adapters = make(map[string]*Adapter, 20)
 	am.extensions = make(map[string]Extension)
 	am.bus = bus
 	am.settingsStore = settingStore
-
-	//def addon action
-	//action := wot.NewActionAffordance()
-	//obj := schema.NewObjectSchema()
-	//timeout := schema.NewIntegerSchema()
-	//timeout.Minimum = 1000
-	//timeout.Maximum = 10000
-	//obj.Properties["timeout"] = timeout
-	//action.Input = obj
-	//am.actions = make(map[string]*wot.ActionAffordance)
-	//am.actions["pair"] = action
-
 	am.locker = new(sync.Mutex)
 	am.loadAddons()
 	return am
@@ -130,8 +117,8 @@ func (m *Manager) CancelAddNewThing() {
 	return
 }
 
-func (m *Manager) handleDeviceAdded(device *addon.Device) {
-	m.devices[device.GetID()] = device
+func (m *Manager) handleDeviceAdded(device *internal.Device) {
+	m.devices[device.GetId()] = device
 	//d, err := json.MarshalIndent(device, "", " ")
 	d := device.AsDict()
 	data, err := json.MarshalIndent(d, "", "  ")
@@ -202,7 +189,6 @@ func (m *Manager) getDevice(deviceId string) addon.IDevice {
 
 //tar package to addon from the temp dir,
 func (m *Manager) installAddon(packageId, packagePath string, enabled bool) error {
-
 	if !m.addonsLoaded {
 		return fmt.Errorf(`Cannot install add-on before other add-ons have been loaded.`)
 	}
@@ -217,7 +203,6 @@ func (m *Manager) installAddon(packageId, packagePath string, enabled bool) erro
 			logging.Error(e.Error())
 		}
 	}()
-
 	zp, _ := gzip.NewReader(f)
 	tr := tar.NewReader(zp)
 
@@ -303,10 +288,7 @@ func (m *Manager) loadAddon(packageId string) error {
 		return nil
 	}
 
-	addonPath, err := m.findPlugin(packageId)
-	if err != nil {
-		return err
-	}
+	addonPath := m.findPluginPath(packageId)
 
 	addonInfo, obj, err := LoadManifest(addonPath, packageId)
 
@@ -323,12 +305,11 @@ func (m *Manager) loadAddon(packageId string) error {
 			return err
 		}
 	}
-
-	err = addonInfo.UpdateFromDB()
+	info, err := json.MarshalToString(addonInfo)
+	err = m.settingsStore.SetSetting(GetAddonKey(addonInfo.ID), info)
 	if err != nil {
 		return err
 	}
-
 	savedConfig, e := m.settingsStore.GetSetting(configKey)
 	if e != nil && savedConfig == "" {
 		if cfg != "" {

@@ -42,6 +42,26 @@ func (m *Manager) SetPropertyValue(deviceId, propName string, newValue interface
 	}
 }
 
+func (m *Manager) GetPropertyValue(deviceId, propName string) (interface{}, error) {
+	device, ok := m.devices[deviceId]
+	if !ok {
+		return nil, fmt.Errorf("deviceId (%s)invaild", deviceId)
+	}
+	prop := device.GetProperty(propName)
+	if prop == nil {
+		return nil, fmt.Errorf("propName(%s)invaild", propName)
+	}
+	return prop.GetValue(), nil
+}
+
+func (m *Manager)GetPropertiesValue(deviceId string)(map[string]interface{},error){
+	device, ok := m.devices[deviceId]
+	if !ok {
+		return nil, fmt.Errorf("deviceId (%s)invaild", deviceId)
+	}
+
+}
+
 func (m *Manager) GetDevice(deviceId string) addon.IDevice {
 	device, ok := m.devices[deviceId]
 	if !ok {
@@ -68,14 +88,25 @@ func (m *Manager) RemoveDevice(deviceId string) error {
 	return fmt.Errorf("can not find thing")
 }
 
-func (m *Manager) GetPropertyValue(deviceId, propName string) (interface{}, error) {
-	device, ok := m.devices[deviceId]
-	if !ok {
-		return nil, fmt.Errorf("deviceId (%s)invaild", deviceId)
+func (m *Manager) CancelRemoveThing(deviceId string) {
+	device := m.getDevice(deviceId)
+	if device == nil {
+		return
 	}
-	prop := device.GetProperty(propName)
-	if prop == nil {
-		return nil, fmt.Errorf("propName(%s)invaild", propName)
+	adapter := m.getAdapter(device.GetAdapterId())
+	if adapter != nil {
+		adapter.cancelRemoveThing(deviceId)
 	}
-	return prop.GetValue(), nil
+}
+
+func (m *Manager) SetPIN(thingId string, pin interface{}) error {
+	device := m.getDevice(thingId)
+	if device == nil {
+		return fmt.Errorf("con not finid device:" + thingId)
+	}
+	err := device.SetPin(pin)
+	if err != nil {
+		return err
+	}
+	return nil
 }

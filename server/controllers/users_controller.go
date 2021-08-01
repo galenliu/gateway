@@ -11,24 +11,24 @@ import (
 
 
 
-type userController struct {
+type UserController struct {
 	model  *models.Users
 	logger logging.Logger
 }
 
-func NewUsersController(m *models.Users, log logging.Logger) *userController {
-	uc := &userController{}
+func NewUsersController(m *models.Users, log logging.Logger) *UserController {
+	uc := &UserController{}
 	uc.model = m
 	uc.logger = log
 	return uc
 }
 
-func (u *userController) getCount(c *fiber.Ctx) error {
+func (u *UserController) getCount(c *fiber.Ctx) error {
 	count := u.model.GetUsersCount()
 	return c.SendString(strconv.Itoa(count))
 }
 
-func (u *userController) createUser(c *fiber.Ctx) error {
+func (u *UserController) createUser(c *fiber.Ctx) error {
 	email := strings.ToLower(json.Get(c.Body(), "email").ToString())
 	pw := json.Get(c.Body(), "password").ToString()
 	name := json.Get(c.Body(), "password").ToString()
@@ -40,7 +40,7 @@ func (u *userController) createUser(c *fiber.Ctx) error {
 	if exit != nil {
 		return c.Status(fiber.StatusBadRequest).SendString("User already exists.")
 	}
-	err, jwt := u.model.CreateUser(email, pw, name)
+	jwt, err := u.model.CreateUser(email, pw, name)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}

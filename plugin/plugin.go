@@ -7,6 +7,7 @@ import (
 	"github.com/galenliu/gateway-addon"
 	"github.com/galenliu/gateway/configs"
 	"github.com/galenliu/gateway/pkg/constant"
+	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
@@ -36,10 +37,13 @@ type Plugin struct {
 	closeChan     chan struct{}
 	closeExecChan chan struct{}
 	pluginServer  *PluginsServer
+
+	logger logging.Logger
 }
 
-func NewPlugin(s *PluginsServer, pluginId string) (plugin *Plugin) {
+func NewPlugin(s *PluginsServer, pluginId string,log logging.Logger) (plugin *Plugin) {
 	plugin = &Plugin{}
+	plugin.logger = log
 	plugin.locker = new(sync.Mutex)
 	plugin.closeChan = make(chan struct{})
 	plugin.closeExecChan = make(chan struct{})
@@ -90,7 +94,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 		if packageName == "" {
 			return
 		}
-		adapter := NewAdapter(plugin.getManager(), name, adapterId, plugin.pluginId, packageName)
+		adapter := NewAdapter(plugin.getManager(), name, adapterId, plugin.pluginId, packageName,plugin.logger)
 		adapter.plugin = plugin
 		plugin.pluginServer.addAdapter(adapter)
 		return
@@ -225,7 +229,6 @@ func (plugin *Plugin) addAdapter(adapter *Adapter) {
 }
 
 func (plugin *Plugin) execute() {
-
 	plugin.exec = strings.Replace(plugin.exec, "\\", string(os.PathSeparator), -1)
 	plugin.exec = strings.Replace(plugin.exec, "/", string(os.PathSeparator), -1)
 	command := strings.Replace(plugin.exec, "{path}", plugin.execPath, 1)

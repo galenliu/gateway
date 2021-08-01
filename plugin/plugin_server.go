@@ -3,6 +3,7 @@ package plugin
 //	plugin server
 import (
 	"fmt"
+	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
 	"sync"
@@ -14,11 +15,13 @@ type PluginsServer struct {
 	manager   *Manager
 	ipc       *IpcServer
 	closeChan chan struct{}
+	logger    logging.Logger
 	verbose   bool
 }
 
-func NewPluginServer(manager *Manager) *PluginsServer {
+func NewPluginServer(manager *Manager, log logging.Logger) *PluginsServer {
 	server := &PluginsServer{}
+	server.logger = log
 	server.closeChan = make(chan struct{})
 	server.Plugins = make(map[string]*Plugin, 30)
 	server.locker = new(sync.Mutex)
@@ -37,7 +40,7 @@ func (s *PluginsServer) messageHandler(data []byte, c *Connection) {
 		return
 	}
 	messageType := m.ToInt()
-	logging.Debug("%s: \t\n %s", internal.MessageTypeToString(messageType), string(data))
+	s.logger.Debug("%s: \t\n %s", internal.MessageTypeToString(messageType), string(data))
 
 	if messageType == internal.PluginRegisterRequest {
 		s.registerHandler(data, c)
@@ -86,7 +89,7 @@ func (s *PluginsServer) uninstallPlugin(packageId string) {
 func (s *PluginsServer) registerPlugin(packageId string) *Plugin {
 	plugin, ok := s.Plugins[packageId]
 	if !ok {
-		plugin = NewPlugin(s, packageId)
+		plugin = NewPlugin(s, packageId, s.logger)
 		s.Plugins[packageId] = plugin
 	}
 	return plugin

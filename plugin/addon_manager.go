@@ -129,28 +129,7 @@ func (m *Manager) UninstallAddon(addonId string, disable bool) error {
 	return nil
 }
 
-func (m *Manager) CancelRemoveThing(deviceId string) {
-	device := m.getDevice(deviceId)
-	if device == nil {
-		return
-	}
-	adapter := m.getAdapter(device.GetAdapterId())
-	if adapter != nil {
-		adapter.cancelRemoveThing(deviceId)
-	}
-}
 
-func (m *Manager) SetPIN(thingId string, pin interface{}) error {
-	device := m.getDevice(thingId)
-	if device == nil {
-		return fmt.Errorf("con not finid device:" + thingId)
-	}
-	err := device.SetPin(pin)
-	if err != nil {
-		return err
-	}
-	return nil
-}
 
 func (m *Manager) GetAddonLicense(addonId string) string {
 	return ""

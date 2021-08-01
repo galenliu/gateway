@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/galenliu/gateway-addon"
+	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/plugin/internal"
 	"sync"
 )
@@ -21,28 +22,29 @@ type Adapter struct {
 	plugin         *Plugin
 	looker         *sync.Mutex
 	isPairing      bool
-	onPairingFunc  pairingFunc
-	devices        map[string]addon.IDevice
+	devices        map[string]*internal.Device
 	pairingContext context.Context
 	manifest       interface{}
 	packageName    string
 	manager        managerProxy
+	logger         logging.Logger
 }
 
-func NewAdapter(manager managerProxy, name, adapterId, pluginId, packageName string) *Adapter {
+func NewAdapter(manager managerProxy, name, adapterId, pluginId, packageName string, log logging.Logger) *Adapter {
 	proxy := &Adapter{}
+	proxy.logger = log
 	proxy.id = adapterId
 	proxy.name = name
 	proxy.packageName = packageName
 	proxy.pluginId = pluginId
-	proxy.devices = make(map[string]addon.IDevice)
+	proxy.devices = make(map[string]*internal.Device)
 	proxy.looker = new(sync.Mutex)
 	proxy.manager = manager
 	return proxy
 }
 
 func (adapter *Adapter) pairing(timeout float64) {
-	logging.Info(fmt.Sprintf("adapter: %s start pairing", adapter.id))
+	adapter.logger.Info(fmt.Sprintf("adapter: %s start pairing", adapter.id))
 	data := make(map[string]interface{})
 	data["timeout"] = timeout
 	adapter.Send(internal.AdapterStartPairingCommand, data)
@@ -78,7 +80,7 @@ func (adapter *Adapter) Send(messageType int, data map[string]interface{}) {
 	adapter.plugin.send(messageType, data)
 }
 
-func (adapter *Adapter) getDevice(deviceId string) addon.IDevice {
+func (adapter *Adapter) getDevice(deviceId string)*internal.Device {
 	device, ok := adapter.devices[deviceId]
 	if ok {
 		return device
@@ -91,7 +93,7 @@ func (adapter *Adapter) handleDeviceRemoved(device addon.IDevice) {
 
 }
 
-func (adapter *Adapter) handleDeviceAdded(device *addon.Device) {
-	adapter.devices[device.GetID()] = device
+func (adapter *Adapter) handleDeviceAdded(device *internal.Device) {
+	adapter.devices[device.GetId()] = device
 	adapter.manager.handleDeviceAdded(device)
 }
