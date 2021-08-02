@@ -1,5 +1,8 @@
 package internal
 
+type DeviceProxy interface {
+}
+
 type Device struct {
 	ID string
 

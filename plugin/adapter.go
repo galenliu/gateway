@@ -12,7 +12,7 @@ import (
 type pairingFunc func(ctx context.Context, cancelFunc func())
 
 type managerProxy interface {
-	handleDeviceAdded(device *addon.Device)
+	handleDeviceAdded(device *internal.Device)
 }
 
 type Adapter struct {
