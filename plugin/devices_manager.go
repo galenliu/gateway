@@ -2,8 +2,8 @@ package plugin
 
 import (
 	"fmt"
-	addon "github.com/galenliu/gateway-addon"
 	"github.com/galenliu/gateway/pkg/constant"
+	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
 	"time"
 )
@@ -54,15 +54,16 @@ func (m *Manager) GetPropertyValue(deviceId, propName string) (interface{}, erro
 	return prop.GetValue(), nil
 }
 
-func (m *Manager)GetPropertiesValue(deviceId string)(map[string]interface{},error){
-	device, ok := m.devices[deviceId]
-	if !ok {
-		return nil, fmt.Errorf("deviceId (%s)invaild", deviceId)
-	}
+//func (m *Manager)GetPropertiesValue(deviceId string)(map[string]interface{},error){
+//	device, ok := m.devices[deviceId]
+//	if !ok {
+//		return nil, fmt.Errorf("deviceId (%s)invaild", deviceId)
+//	}
+//	device.GetPropertyValue()
+//
+//}
 
-}
-
-func (m *Manager) GetDevice(deviceId string) addon.IDevice {
+func (m *Manager) GetDevice(deviceId string) *internal.Device {
 	device, ok := m.devices[deviceId]
 	if !ok {
 		return nil
@@ -70,7 +71,7 @@ func (m *Manager) GetDevice(deviceId string) addon.IDevice {
 	return device
 }
 
-func (m *Manager) GetDevices() (device []addon.IDevice) {
+func (m *Manager) GetDevices() (device []*internal.Device) {
 	for _, dev := range m.devices {
 		device = append(device, dev)
 	}
