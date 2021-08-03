@@ -3,7 +3,6 @@ package plugin
 import (
 	"context"
 	"fmt"
-	"github.com/galenliu/gateway-addon"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/plugin/internal"
 	"sync"
@@ -26,20 +25,20 @@ type Adapter struct {
 	pairingContext context.Context
 	manifest       interface{}
 	packageName    string
-	manager        managerProxy
+
 	logger         logging.Logger
 }
 
-func NewAdapter(manager managerProxy, name, adapterId, pluginId, packageName string, log logging.Logger) *Adapter {
+func NewAdapter(p *Plugin, name, adapterId, packageName string, log logging.Logger) *Adapter {
 	proxy := &Adapter{}
 	proxy.logger = log
 	proxy.id = adapterId
 	proxy.name = name
 	proxy.packageName = packageName
-	proxy.pluginId = pluginId
+	proxy.plugin = p
 	proxy.devices = make(map[string]*internal.Device)
 	proxy.looker = new(sync.Mutex)
-	proxy.manager = manager
+
 	return proxy
 }
 
@@ -88,7 +87,7 @@ func (adapter *Adapter) getDevice(deviceId string)*internal.Device {
 	return nil
 }
 
-func (adapter *Adapter) handleDeviceRemoved(device addon.IDevice) {
+func (adapter *Adapter) handleDeviceRemoved(*internal.Device) {
 	delete(adapter.devices, device.GetID())
 
 }

@@ -19,3 +19,5 @@ func isWindowsService() (bool, error) {
 func createWindowsEventLogger(svcName string, logger logging.Logger) (logging.Logger, error) {
 	return nil, errors.New("cannot create Windows event logger")
 }
+
+

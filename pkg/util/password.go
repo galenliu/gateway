@@ -16,7 +16,7 @@ func Hash(password string) {
 
 func GenerateEccKey() (publicKeyStr, privateKeyStr string, err error) {
 
-	privateKey, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
+	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	priBytes, err := x509.MarshalECPrivateKey(privateKey)
 	if err != nil {
 		return

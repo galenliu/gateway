@@ -4,11 +4,10 @@ package plugin
 import (
 	"context"
 	"fmt"
-	"github.com/galenliu/gateway-addon"
+	addon "github.com/galenliu/gateway-addon"
 	"github.com/galenliu/gateway/configs"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
@@ -24,24 +23,20 @@ import (
 const ExecNode = "{nodeLoader}"
 const ExecPython3 = "{python}"
 
-type OnConnect = func(device addon.Device, bool2 bool)
-
 type Plugin struct {
-	locker   *sync.Mutex
-	pluginId string
-	exec     string
-	execPath string
-
+	locker        *sync.Mutex
+	pluginId      string
+	exec          string
+	execPath      string
 	registered    bool
 	conn          *Connection
 	closeChan     chan struct{}
 	closeExecChan chan struct{}
 	pluginServer  *PluginsServer
-
-	logger logging.Logger
+	logger        logging.Logger
 }
 
-func NewPlugin(s *PluginsServer, pluginId string,log logging.Logger) (plugin *Plugin) {
+func NewPlugin(s *PluginsServer, pluginId string, log logging.Logger) (plugin *Plugin) {
 	plugin = &Plugin{}
 	plugin.logger = log
 	plugin.locker = new(sync.Mutex)
@@ -50,21 +45,47 @@ func NewPlugin(s *PluginsServer, pluginId string,log logging.Logger) (plugin *Pl
 	plugin.pluginId = pluginId
 	plugin.registered = false
 	plugin.pluginServer = s
-
-	plugin.execPath = path.Join(plugin.getManager().AddonsDir, pluginId)
+	plugin.execPath = path.Join(plugin.pluginServer.manager.options.DataDir, pluginId)
 	return
+}
+
+//当一个plugin建立连接后，则回复网关数据。
+func (plugin *Plugin) handleConnection(c *Connection, d []byte) {
+	if d != nil {
+		plugin.handleMessage(d)
+	}
+	for {
+		select {
+		case <-plugin.closeChan:
+			data := make(map[string]interface{})
+			plugin.send(internal.PluginUnloadResponse, data)
+			return
+		default:
+			_, data, err := c.ws.ReadMessage()
+			if err != nil {
+				plugin.logger.Error("plugin read err :%s", err.Error())
+				plugin.registered = false
+				return
+			}
+			plugin.handleMessage(data)
+
+		}
+	}
 }
 
 //传入的data=序列化后的 Message.Data
 func (plugin *Plugin) handleMessage(data []byte) {
 
-	var messageType = gjson.GetBytes(data, "messageType").Uint()
-	if configs.IsVerbose() {
-		logging.Info("Read messageType: %s \t\n %s", internal.MessageTypeToString(int(messageType)), util.JsonIndent(gjson.GetBytes(data, "data").String()))
+	var messageType int
+	if tp := json.Get(data, "messageType"); tp.ValueType() == json.NumberValue {
+		messageType = tp.ToInt()
+	} else {
+		return
 	}
+
 	//如果为0，则消息不合法(如：缺少 messageType字段)
 	if messageType == 0 {
-		logging.Info("messageType err")
+		plugin.logger.Info("messageType err")
 		return
 	}
 	var adapterId = json.Get(data, "data", "adapterId").ToString()
@@ -94,15 +115,14 @@ func (plugin *Plugin) handleMessage(data []byte) {
 		if packageName == "" {
 			return
 		}
-		adapter := NewAdapter(plugin.getManager(), name, adapterId, plugin.pluginId, packageName,plugin.logger)
-		adapter.plugin = plugin
-		plugin.pluginServer.addAdapter(adapter)
+		adapter := NewAdapter(plugin, name, adapterId, packageName, plugin.logger)
+		plugin.pluginServer.manager.addAdapter(adapter)
 		return
 	}
 
-	adapter := plugin.getManager().getAdapter(adapterId)
+	adapter := plugin.pluginServer.manager.getAdapter(adapterId)
 	if adapter == nil {
-		logging.Info("(%s)adapter not found", internal.MessageTypeToString(int(messageType)))
+		plugin.logger.Info("(%s)adapter not found", internal.MessageTypeToString(int(messageType)))
 		return
 	}
 
@@ -123,13 +143,13 @@ func (plugin *Plugin) handleMessage(data []byte) {
 
 		data := gjson.GetBytes(data, "data").Get("device").String()
 		if data == "" {
-			logging.Info("marshal device err")
+			plugin.logger.Info("marshal device err")
 			return
 		}
-		var newDevice = addon.NewDeviceFormString(data, adapter)
+		var newDevice = internal.NewDeviceFormString(data)
 
 		if newDevice == nil {
-			logging.Error("device add err:")
+			plugin.logger.Error("device add err:")
 			return
 		}
 		newDevice.AdapterId = adapterId
@@ -141,7 +161,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 	deviceId := json.Get(data, "data", "deviceId").ToString()
 	device := adapter.getDevice(deviceId)
 	if device == nil {
-		logging.Info("device cannot found: %s", deviceId)
+		plugin.logger.Info("device cannot found: %s", deviceId)
 		return
 	}
 
@@ -165,12 +185,12 @@ func (plugin *Plugin) handleMessage(data []byte) {
 		var pin addon.PIN
 		err := json.UnmarshalFromString(s, &pin)
 		if err != nil {
-			logging.Info("pin error")
+			plugin.logger.Info("pin error")
 			return
 		}
 		ee := device.SetPin(pin)
 		if ee != nil {
-			logging.Info(ee.Error())
+			plugin.logger.Info(ee.Error())
 		}
 
 	case internal.DevicePropertyChangedNotification:
@@ -191,12 +211,12 @@ func (plugin *Plugin) handleMessage(data []byte) {
 		return
 
 	case internal.DeviceActionStatusNotification:
-		var action addon.Action
+
 		json.Get(data, "data", "action").ToVal(&action)
 		return
 
 	case internal.DeviceEventNotification:
-		var event addon.Event
+
 		json.Get(data, "data", "event").ToVal(&event)
 
 	case internal.DeviceConnectedStateNotification:
@@ -220,21 +240,13 @@ func (plugin *Plugin) handleMessage(data []byte) {
 	}
 }
 
-func (plugin *Plugin) getManager() *Manager {
-	return plugin.pluginServer.manager
-}
-
-func (plugin *Plugin) addAdapter(adapter *Adapter) {
-	plugin.getManager().addAdapter(adapter)
-}
-
 func (plugin *Plugin) execute() {
 	plugin.exec = strings.Replace(plugin.exec, "\\", string(os.PathSeparator), -1)
 	plugin.exec = strings.Replace(plugin.exec, "/", string(os.PathSeparator), -1)
 	command := strings.Replace(plugin.exec, "{path}", plugin.execPath, 1)
 	command = strings.Replace(command, "{nodeLoader}", configs.GetNodeLoader(), 1)
 	if !strings.HasPrefix(command, "python") {
-		logging.Error("Now only support plugin with python lang")
+		plugin.logger.Error("Now only support plugin with python lang")
 		return
 	}
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -254,7 +266,7 @@ func (plugin *Plugin) execute() {
 					strNum, err := reader.Read(buf)
 					if strNum > 0 {
 						outputByte := buf[:strNum]
-						logging.Info(fmt.Sprintf("plugin(%s) out: %s \t\n", plugin.pluginId, string(outputByte)))
+						plugin.logger.Info(fmt.Sprintf("plugin(%s) out: %s \t\n", plugin.pluginId, string(outputByte)))
 					}
 					if err != nil {
 						//读到结尾
@@ -282,12 +294,12 @@ func (plugin *Plugin) execute() {
 	go func() {
 		err := cmd.Start()
 		if err != nil {
-			logging.Info("plugin(%s) run err: %s", plugin.pluginId, err.Error())
+			plugin.logger.Info("plugin(%s) run err: %s", plugin.pluginId, err.Error())
 			return
 		}
 	}()
 
-	logging.Debug(fmt.Sprintf("plugin(%s) execute \t\n", plugin.pluginId))
+	plugin.logger.Debug(fmt.Sprintf("plugin(%s) execute \t\n", plugin.pluginId))
 	go syncLog(stdout)
 	go syncLog(stderr)
 
@@ -310,33 +322,9 @@ func (plugin *Plugin) unload() {
 	plugin.closeExecChan <- struct{}{}
 }
 
-//当一个plugin建立连接后，则回复网关数据。
-func (plugin *Plugin) handleConnection(c *Connection, d []byte) {
-	if d != nil {
-		plugin.handleMessage(d)
-	}
-	for {
-		select {
-		case <-plugin.closeChan:
-			data := make(map[string]interface{})
-			plugin.send(internal.PluginUnloadResponse, data)
-			return
-		default:
-			_, data, err := c.ws.ReadMessage()
-			if err != nil {
-				logging.Error("plugin read err :%s", err.Error())
-				plugin.registered = false
-				return
-			}
-			plugin.handleMessage(data)
-
-		}
-	}
-}
-
 func (plugin *Plugin) registerAndHandleConnection(c *Connection) {
 	if plugin.registered == true {
-		logging.Error("plugin is registered")
+		plugin.logger.Error("plugin is registered")
 		return
 	}
 	plugin.conn = c
@@ -346,7 +334,7 @@ func (plugin *Plugin) registerAndHandleConnection(c *Connection) {
 	data["preferences"] = configs.GetPreferences()
 	plugin.send(internal.PluginRegisterResponse, data)
 	plugin.registered = true
-	logging.Info("plugin: %s registered", plugin.pluginId)
+	plugin.logger.Info("plugin: %s registered", plugin.pluginId)
 	go plugin.handleConnection(c, nil)
 }
 
@@ -361,11 +349,11 @@ func (plugin *Plugin) send(mt int, data map[string]interface{}) {
 	}
 	bt, err := json.MarshalIndent(message, "", " ")
 	if configs.IsVerbose() {
-		logging.Debug("Send-- %s : \t\n %s", internal.MessageTypeToString(mt), bt)
+		plugin.logger.Debug("Send-- %s : \t\n %s", internal.MessageTypeToString(mt), bt)
 	}
 
 	if err != nil {
-		logging.Error(err.Error())
+		plugin.logger.Error(err.Error())
 		return
 	}
 	plugin.conn.send(bt)
