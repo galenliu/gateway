@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	jwtware "github.com/gofiber/jwt/v2"
 	"github.com/gofiber/websocket/v2"
 	"net/http"
 	"time"
@@ -27,10 +28,8 @@ type Models struct {
 
 type Router struct {
 	*fiber.App
-	logger       logging.Logger
-	options      Options
-	HttpRunning  bool
-	HttpsRunning bool
+	logger  logging.Logger
+	options Options
 }
 
 func Setup(options Options, addonManager server.AddonManager, store server.Store, log logging.Logger) *Router {
@@ -41,13 +40,43 @@ func Setup(options Options, addonManager server.AddonManager, store server.Store
 	app.options = options
 	app.App = fiber.New()
 	app.Use(recover.New())
-	app.HttpRunning = false
-	app.HttpsRunning = false
 
 	//controller init
 
 	//logger
 	app.Use(logger.New())
+
+	auth := jwtware.New(jwtware.Config{
+		SigningMethod:  "ES256",
+		SigningKey: nil,
+	})
+
+	app.Use(func(c *fiber.Ctx) error {
+		if c.Protocol() == "https" {
+			c.Response().Header.Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+		}
+		c.Response().Header.Set("Content-Security-Policy", "")
+		return c.Next()
+	})
+
+	staticHandler := func(c *fiber.Ctx) error {
+		return nil
+	}
+	app.Use(func(c *fiber.Ctx) error {
+		if c.Path() == "/" && c.Accepts("html") == "" {
+			return c.Next()
+		}
+		return staticHandler(c)
+	})
+
+	app.Use(func(c *fiber.Ctx) error {
+		c.Response().Header.Set("Vary", "Accept")
+		c.Response().Header.Set("Access-Control-Allow-Origin", "*")
+		c.Response().Header.Set("Access-Control-Allow-Headers",
+			"Origin, X-Requested-With, Content-Type, Accept, Authorization")
+		c.Response().Header.Set("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE")
+		return nil
+	})
 
 	//ping controller
 	app.Get("/ping", func(c *fiber.Ctx) error {
@@ -87,7 +116,7 @@ func Setup(options Options, addonManager server.AddonManager, store server.Store
 		thingsGroup.Get("/:thingId/properties/*", thingsController.handleGetPropertyValue)
 
 		//Handle creating a new thing.
-		thingsGroup.Post("/", thingsController.handleCreateThing)
+		thingsGroup.Post("/",auth, thingsController.handleCreateThing)
 
 		thingsGroup.Get("/:thingId", thingsController.handleGetThing)
 		thingsGroup.Get("/", thingsController.handleGetThings)

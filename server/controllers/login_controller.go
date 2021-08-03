@@ -40,5 +40,5 @@ func (c *LoginController) handleLogin(ctx *fiber.Ctx) error {
 		return ctx.SendStatus(fiber.StatusUnauthorized)
 	}
 	jwt := c.jsonwebtoken.IssueToken(user.ID)
-	return ctx.JSON(jwt)
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"token": jwt})
 }
