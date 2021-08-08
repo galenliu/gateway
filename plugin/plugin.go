@@ -7,6 +7,8 @@ import (
 	addon "github.com/galenliu/gateway-addon"
 	"github.com/galenliu/gateway/configs"
 	"github.com/galenliu/gateway/pkg/constant"
+	"github.com/galenliu/gateway/pkg/ipc"
+	"github.com/galenliu/gateway/pkg/ipc_server"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
@@ -29,7 +31,7 @@ type Plugin struct {
 	exec          string
 	execPath      string
 	registered    bool
-	conn          *Connection
+	conn          *ipc_server.Connection
 	closeChan     chan struct{}
 	closeExecChan chan struct{}
 	pluginServer  *PluginsServer
@@ -45,12 +47,12 @@ func NewPlugin(s *PluginsServer, pluginId string, log logging.Logger) (plugin *P
 	plugin.pluginId = pluginId
 	plugin.registered = false
 	plugin.pluginServer = s
-	plugin.execPath = path.Join(plugin.pluginServer.manager.options.DataDir, pluginId)
+	plugin.execPath = path.Join(plugin.pluginServer.manager.options.BaseDir, pluginId)
 	return
 }
 
 //当一个plugin建立连接后，则回复网关数据。
-func (plugin *Plugin) handleConnection(c *Connection, d []byte) {
+func (plugin *Plugin) handleConnection(c *ipc_server.Connection, d []byte) {
 	if d != nil {
 		plugin.handleMessage(d)
 	}
@@ -61,7 +63,7 @@ func (plugin *Plugin) handleConnection(c *Connection, d []byte) {
 			plugin.send(internal.PluginUnloadResponse, data)
 			return
 		default:
-			_, data, err := c.ws.ReadMessage()
+			_, data, err := c.ReadMessage()
 			if err != nil {
 				plugin.logger.Error("plugin read err :%s", err.Error())
 				plugin.registered = false
@@ -71,6 +73,22 @@ func (plugin *Plugin) handleConnection(c *Connection, d []byte) {
 
 		}
 	}
+}
+
+func (plugin *Plugin) registerAndHandleConnection(c *ipc_server.Connection) {
+	if plugin.registered == true {
+		plugin.logger.Error("plugin is registered")
+		return
+	}
+	plugin.conn = c
+	data := make(map[string]interface{})
+	data["gatewayVersion"] = plugin.pluginServer.manager.options.GatewayVersion
+	data["userProfile"] = plugin.pluginServer.manager.options.UserProfile
+	data["preferences"] = plugin.pluginServer.manager.options.Preferences
+	plugin.send(constant.PluginRegisterResponse, data)
+	plugin.registered = true
+	plugin.logger.Info("plugin registered. pluginId: %s", plugin.pluginId)
+	plugin.handleConnection(c, nil)
 }
 
 //传入的data=序列化后的 Message.Data
@@ -322,21 +340,7 @@ func (plugin *Plugin) unload() {
 	plugin.closeExecChan <- struct{}{}
 }
 
-func (plugin *Plugin) registerAndHandleConnection(c *Connection) {
-	if plugin.registered == true {
-		plugin.logger.Error("plugin is registered")
-		return
-	}
-	plugin.conn = c
-	data := make(map[string]interface{})
-	data["gatewayVersion"] = configs.GetGatewayVersion()
-	data["userProfile"] = configs.GetUserProfile()
-	data["preferences"] = configs.GetPreferences()
-	plugin.send(internal.PluginRegisterResponse, data)
-	plugin.registered = true
-	plugin.logger.Info("plugin: %s registered", plugin.pluginId)
-	go plugin.handleConnection(c, nil)
-}
+
 
 func (plugin *Plugin) send(mt int, data map[string]interface{}) {
 	data["pluginId"] = plugin.pluginId
@@ -356,5 +360,5 @@ func (plugin *Plugin) send(mt int, data map[string]interface{}) {
 		plugin.logger.Error(err.Error())
 		return
 	}
-	plugin.conn.send(bt)
+	plugin.conn.Send(bt)
 }

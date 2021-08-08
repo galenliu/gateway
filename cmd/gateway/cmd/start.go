@@ -53,12 +53,13 @@ func (c *command) initStartCmd() (err error) {
 			logger.Infof("version: %v", gateway.Version)
 
 			g, err := gateway.NewGateway(gateway.Options{
-				DataDir:            c.config.GetString(optionNameDataDir),
+				BaseDir:            c.config.GetString(optionNameDataDir),
 				AddonDirs:          c.config.GetStringSlice(optionNameAddonDirs),
+
 				DBRemoveBeforeOpen: c.config.GetBool(optionNameDBRemoveBeforeOpen),
 				Verbosity:          c.config.GetString(optionNameVerbosity),
 				AddonUrls:          c.config.GetStringSlice(optionNameAddonUrls),
-				IpcAddr:            c.config.GetString(optionNameIpcAddr),
+				IPCPort:            c.config.GetString(optionNameIpcAddr),
 				HttpAddr:           c.config.GetString(optionNameHttpAddr),
 				HttpsAddr:          c.config.GetString(optionNameHttpsAddr),
 				LogRotateDays:      c.config.GetInt(optionLogRotateDays),

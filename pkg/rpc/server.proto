@@ -1,0 +1,21 @@
+syntax= "proto3";
+
+option go_package  = "github/galenliu/gateway.git";
+
+
+service Server {
+  rpc RegisterPlugin(PluginRegisterRequestMessage) returns (PluginRegisterResponseMessage);
+
+}
+
+
+message PluginRegisterRequestMessage{
+     string pluginId = 1;
+}
+
+message PluginRegisterResponseMessage{
+   string gatewayVersion = 1;
+   string userProfile = 2;
+   string preferences =3;
+}
+

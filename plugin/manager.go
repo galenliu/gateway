@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"context"
 	"fmt"
+	addon "github.com/galenliu/gateway-addon"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
@@ -28,8 +29,25 @@ type eventBus interface {
 }
 
 type Options struct {
-	AddonDirs []string
-	DataDir   string
+	AddonDirs      []string
+	IPCPort        string
+	UserProfile
+	Preferences
+}
+
+type Preferences struct {
+
+}
+
+type UserProfile struct {
+	BaseDir        string
+	DataDir        string
+	AddonsDir      string
+	ConfigDir      string
+	UploadDir      string
+	MediaDir       string
+	LogDir         string
+	GatewayVersion string
 }
 
 type Extension struct {
@@ -38,9 +56,9 @@ type Extension struct {
 }
 
 type Manager struct {
-	options      Options
-	configPath   string
-	pluginServer *PluginsServer
+	options       Options
+	configPath    string
+	pluginServer  *PluginsServer
 	devices       map[string]*internal.Device
 	adapters      map[string]*Adapter
 	installAddons map[string]*AddonInfo
@@ -48,12 +66,9 @@ type Manager struct {
 	extensions map[string]Extension
 
 	bus eventBus
-
 	addonsLoaded bool
 	isPairing    bool
-
 	pluginCancel context.CancelFunc
-
 	locker  *sync.Mutex
 	running bool
 	verbose bool
@@ -115,6 +130,7 @@ func (m *Manager) CancelAddNewThing() {
 	m.isPairing = false
 	return
 }
+
 
 func (m *Manager) handleDeviceAdded(device *internal.Device) {
 	m.devices[device.GetId()] = device
@@ -191,7 +207,7 @@ func (m *Manager) installAddon(packageId, packagePath string, enabled bool) erro
 	if !m.addonsLoaded {
 		return fmt.Errorf(`Cannot install add-on before other add-ons have been loaded.`)
 	}
-	logging.Info("execute install package id: %s ", packageId)
+	m.logger.Info("execute install package id: %s ", packageId)
 	f, err := os.Open(packagePath)
 	if err != nil {
 		return err
@@ -199,7 +215,7 @@ func (m *Manager) installAddon(packageId, packagePath string, enabled bool) erro
 	defer func() {
 		e := f.Close()
 		if e != nil {
-			logging.Error(e.Error())
+			m.logger.Error(e.Error())
 		}
 	}()
 	zp, _ := gzip.NewReader(f)
@@ -242,7 +258,7 @@ func (m *Manager) installAddon(packageId, packagePath string, enabled bool) erro
 			if err != nil {
 				ee := m.settingsStore.SetSetting(key, newAddonInfo)
 				if ee != nil {
-					logging.Error(ee.Error())
+					m.logger.Error(ee.Error())
 				}
 			}
 
@@ -259,14 +275,19 @@ func (m *Manager) loadAddons() {
 		return
 	}
 	m.addonsLoaded = true
+	m.pluginServer = NewPluginServer(m)
+	err := m.pluginServer.Start()
+	if err != nil {
+		m.logger.Error("Plugin Server Start Failed. Err: %s", err.Error())
+		return
+	}
 
 	for _, d := range m.options.AddonDirs {
 		fs, err := os.ReadDir(d)
 		if err != nil {
-			logging.Error("load addon err: %s", err.Error())
-			return
+			m.logger.Warning("load addon form path: %s ,err: %s", d, err.Error())
+			continue
 		}
-		m.pluginServer = NewPluginServer(m)
 
 		for _, fi := range fs {
 			if fi.IsDir() {
@@ -314,7 +335,7 @@ func (m *Manager) loadAddon(packageId string) error {
 		if cfg != "" {
 			eee := m.settingsStore.SetSetting(configKey, cfg)
 			if eee != nil {
-				logging.Error(eee.Error())
+				m.logger.Error(eee.Error())
 			}
 		}
 	}
@@ -339,7 +360,7 @@ func (m *Manager) loadAddon(packageId string) error {
 		return nil
 	}
 
-	err = util.EnsureDir(path.Join(path.Join(m.options.DataDir, "data"), addonInfo.ID))
+	err = util.EnsureDir(path.Join(path.Join(m.options.BaseDir, "data"), addonInfo.ID))
 	if err != nil {
 		return err
 	}
@@ -391,7 +412,7 @@ func (m *Manager) Start() error {
 		err = m.pluginServer.Start()
 		if err != nil {
 			m.running = false
-			logging.Error(err.Error())
+			m.logger.Error(err.Error())
 		}
 	}()
 	m.running = true

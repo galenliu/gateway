@@ -19,6 +19,8 @@ import (
 
 const (
 	optionNameDataDir            = "data-dir"
+	optionNameMediaDir           = "media-dir"
+	optionNameLogDir           = "log-dir"
 	optionNameAddonDirs          = "addon-dirs"
 	optionNameVerbosity          = "verbosity"
 	optionNameDBRemoveBeforeOpen = "db-remove-before-open"
@@ -151,6 +153,13 @@ func (c *command) setHomeDir() (err error) {
 
 func (c *command) setAllFlags(cmd *cobra.Command) {
 	cmd.Flags().String(optionNameDataDir, filepath.Join(c.homeDir, ".gateway"), "data directory")
+
+	dataDir, _ := cmd.Flags().GetString(optionNameDataDir)
+	cmd.Flags().String(optionNameMediaDir, filepath.Join(dataDir, "media"), "media directory")
+
+	cmd.Flags().String(optionNameLogDir, filepath.Join(dataDir, "log"), "media directory")
+
+
 	cmd.Flags().String(optionNameAddonDirs, func() string {
 		p, err := cmd.Flags().GetString(optionNameDataDir)
 		if err != nil {
