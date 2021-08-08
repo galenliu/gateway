@@ -21,3 +21,7 @@ func (s *Store) CreateJSONWebToken(t *models.TokenData) error {
 	_, err = stmt.Exec(t.KeyId, t.User, t.IssuedAt, t.PublicKey, p)
 	return err
 }
+
+func (s *Store) GetJSONWebTokenByKeyId(keyId string) *models.TokenData {
+	panic("implement me")
+}

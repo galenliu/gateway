@@ -7,12 +7,7 @@ import (
 	"crypto/rand"
 	"crypto/x509"
 	"encoding/pem"
-	"golang.org/x/crypto/bcrypt"
 )
-
-func Hash(password string) {
-	bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-}
 
 func GenerateEccKey() (publicKeyStr, privateKeyStr string, err error) {
 

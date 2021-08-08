@@ -117,7 +117,7 @@ func (c *container) handleCreateThing(data []byte) (*Thing, error) {
 func (c *container) handleRemoveThing(thingId string) error {
 	err := c.store.RemoveThing(thingId)
 	if err != nil {
-		c.logger.Error("remove thing id: %s from store err: %s", thingId, err.Error())
+		c.logger.Error("remove thing id: %s from Store err: %s", thingId, err.Error())
 	}
 	_, ok := c.things[thingId]
 	if !ok {

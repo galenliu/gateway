@@ -112,7 +112,6 @@ func (s *Store) updateValue(k, v string) (err error) {
 
 func (s *Store) queryValue(k string) (value string, err error) {
 	err = s.db.QueryRow("SELECT value FROM data where key = @key", sql.Named("key", k)).Scan(&value)
-	logging.Info(k, value)
 	return value, err
 }
 

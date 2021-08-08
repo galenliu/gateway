@@ -33,36 +33,29 @@ type TokenData struct {
 
 type JsonwebtokenStore interface {
 	CreateJSONWebToken(data *TokenData) error
+	GetJSONWebTokenByKeyId(keyId string) *TokenData
 }
 
 type Jsonwebtoken struct {
 	settingsModel *Settings
-	store         JsonwebtokenStore
+	Store         JsonwebtokenStore
 	logger        logging.Logger
 }
 
 func NewJsonwebtokenModel(settingsModel *Settings, store JsonwebtokenStore, logger logging.Logger) *Jsonwebtoken {
 	m := &Jsonwebtoken{}
 	m.logger = logger
-	m.store = store
+	m.Store = store
 	m.settingsModel = settingsModel
 	return m
 }
 
 func (j *Jsonwebtoken) IssueToken(user int64) string {
 	sig, token, _ := j.crateUser(user, Payload{Role: RoleUserToken})
-	err := j.store.CreateJSONWebToken(token)
+	err := j.Store.CreateJSONWebToken(token)
 	if err != nil {
-		j.logger.Warningf("CreateJSONWebToken Err: %s" , err.Error())
+		j.logger.Info("Issue token err : %s", err.Error())
 		return ""
-	}
-	if err != nil {
-		j.logger.Info("Issue token err : %s", err.Error())
-	}
-	err = j.store.CreateJSONWebToken(token)
-	if err != nil {
-		j.logger.Info("Issue token err : %s", err.Error())
-
 	}
 	return sig
 }
@@ -83,7 +76,8 @@ func (j *Jsonwebtoken) crateUser(userId int64, payload Payload) (string, *TokenD
 	}
 	claims.Payload = payload
 	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
-	t, err := token.SignedString(privateKeyStr)
+
+	sig, err := token.SignedString(privateKeyStr)
 	if err != nil {
 		return "", nil, err
 	}
@@ -94,5 +88,5 @@ func (j *Jsonwebtoken) crateUser(userId int64, payload Payload) (string, *TokenD
 		KeyId:     keyId.String(),
 		Payload:   payload,
 	}
-	return t, tokenData, nil
+	return sig, tokenData, nil
 }

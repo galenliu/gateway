@@ -67,7 +67,7 @@ func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {
 	g.addonManager = plugin.NewAddonsManager(plugin.Options{
 		DataDir:   g.options.DataDir,
 		AddonDirs: g.options.AddonDirs,
-	}, g.bus, g.logger)
+	}, g.store, g.bus, g.logger)
 
 	g.sever = server.Setup(server.Options{
 		HttpAddr:    g.options.HttpAddr,

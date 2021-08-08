@@ -40,7 +40,7 @@ func NewAddonController(addonHandler AddonHandler, settingsStore models.Settings
 //  GET /addons
 func (addon *AddonController) handlerGetAddons(c *fiber.Ctx) error {
 	data := addon.handler.GetInstallAddons()
-	return c.Status(fiber.StatusOK).Send(data)
+	return c.Status(fiber.StatusOK).JSON(data)
 }
 
 // PUT /addon/:id
@@ -54,7 +54,6 @@ func (addon *AddonController) handlerSetAddon(c *fiber.Ctx) error {
 		err = addon.handler.DisableAddon(addonId)
 	}
 	if err != nil {
-		logging.Error(err.Error())
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 	return c.Status(fiber.StatusOK).JSON(enabled)
@@ -71,13 +70,13 @@ func (addon *AddonController) handlerInstallAddon(c *fiber.Ctx) error {
 	}
 	e := addon.handler.InstallAddonFromUrl(id, url, checksum, true)
 	if e != nil {
-		logging.Error(e.Error())
+
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": e.Error()})
 	}
 	key := "addons." + id
 	setting, ee := addon.settingsStore.GetSetting(key)
 	if ee != nil {
-		logging.Error("install add-on err : %s", ee.Error())
+
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": ee.Error()})
 	}
 	return c.Status(fiber.StatusOK).SendString(setting)
@@ -99,7 +98,7 @@ func (addon *AddonController) handlerUpdateAddon(c *fiber.Ctx) error {
 	key := "addons." + id
 	setting, ee := addon.settingsStore.GetSetting(key)
 	if ee != nil {
-		logging.Error(ee.Error())
+
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": ee.Error()})
 	}
 	return c.Status(fiber.StatusOK).SendString(setting)
@@ -127,24 +126,23 @@ func (addon *AddonController) handlerGetAddonConfig(c *fiber.Ctx) error {
 //Put /:addonId/config
 func (addon *AddonController) handlerSetAddonConfig(c *fiber.Ctx) error {
 	var addonId = c.Params("addonId")
-	var key = "addons.options." + addonId
-	config := json.Get(c.Body(), "options").ToString()
+	var key = "addons.config." + addonId
+	config := json.Get(c.Body(), "config").ToString()
 	if config == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "options empty")
+		return fiber.NewError(fiber.StatusBadRequest, "config empty")
 	}
 	err := addon.settingsStore.SetSetting(key, config)
 	if err != nil {
-		logging.Error(err.Error())
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to set options for add-on: "+addonId)
 	}
 	err = addon.handler.UnloadAddon(addonId)
-	if addon.AddonEnabled(addonId) {
-		err := addon.handler.LoadAddon(addonId)
-		if err != nil {
-			logging.Error(err.Error())
-			return fiber.NewError(fiber.StatusInternalServerError, "Failed to restart add-on: "+addonId)
-		}
+
+	err = addon.handler.LoadAddon(addonId)
+	if err != nil {
+
+		return fiber.NewError(fiber.StatusInternalServerError, "Failed to restart add-on: "+addonId)
 	}
+
 	return c.Status(fiber.StatusOK).SendString(config)
 }
 
@@ -159,9 +157,8 @@ func (addon *AddonController) handlerDeleteAddon(c *fiber.Ctx) error {
 }
 
 func (addon *AddonController) handlerGetLicense(c *fiber.Ctx) error {
-	addonId := c.Params("addonId")
-
-	addon.handler
+	//addonId := c.Params("addonId")
+	//
+	//addon.handler
 	return nil
 }
-

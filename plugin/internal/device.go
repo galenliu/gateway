@@ -1,11 +1,7 @@
 package internal
 
-type DeviceHandler interface {
-	
-}
-
 type Device struct {
-	ID string `json:"id"`
+	ID    string `json:"id"`
 	Title string `json:"title"`
 
 	Properties map[string]*Property

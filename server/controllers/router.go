@@ -5,12 +5,12 @@ import (
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/server"
+	"github.com/galenliu/gateway/server/middleware"
 	"github.com/galenliu/gateway/server/models"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-	jwtware "github.com/gofiber/jwt/v2"
 	"github.com/gofiber/websocket/v2"
 	"net/http"
 	"time"
@@ -41,15 +41,15 @@ func Setup(options Options, addonManager server.AddonManager, store server.Store
 	app.App = fiber.New()
 	app.Use(recover.New())
 
-	//controller init
+	//models init
+	settingModel := models.NewSettingsModel(store, log)
+	usersModel := models.NewUsersModel(store, log)
+	jsonwebtokenModel := models.NewJsonwebtokenModel(settingModel, store, log)
 
 	//logger
 	app.Use(logger.New())
 
-	auth := jwtware.New(jwtware.Config{
-		SigningMethod:  "ES256",
-		SigningKey: nil,
-	})
+	auth := middleware.NewJWTWare(store)
 
 	app.Use(func(c *fiber.Ctx) error {
 		if c.Protocol() == "https" {
@@ -89,9 +89,6 @@ func Setup(options Options, addonManager server.AddonManager, store server.Store
 	//app.Get("/", controllers.RootHandle())
 	app.Static("/index.htm", "")
 
-	settingModel := models.NewSettingsModel(store, log)
-	usersModel := models.NewUsersModel(store, log)
-	jsonwebtokenModel := models.NewJsonwebtokenModel(settingModel, store, log)
 	{
 		loginController := NewLoginController(usersModel, jsonwebtokenModel, log)
 		app.Post(constant.LoginPath, loginController.handleLogin)
@@ -116,7 +113,7 @@ func Setup(options Options, addonManager server.AddonManager, store server.Store
 		thingsGroup.Get("/:thingId/properties/*", thingsController.handleGetPropertyValue)
 
 		//Handle creating a new thing.
-		thingsGroup.Post("/",auth, thingsController.handleCreateThing)
+		thingsGroup.Post("/", auth, thingsController.handleCreateThing)
 
 		thingsGroup.Get("/:thingId", thingsController.handleGetThing)
 		thingsGroup.Get("/", thingsController.handleGetThings)
@@ -156,7 +153,7 @@ func Setup(options Options, addonManager server.AddonManager, store server.Store
 
 	//Addons Controller
 	{
-		addonController := NewAddonController(addonManager, log)
+		addonController := NewAddonController(addonManager, store, log)
 		addonGroup := app.Group(constant.AddonsPath)
 		addonGroup.Get("/", addonController.handlerGetAddons)
 		addonGroup.Get("/:addonId/license", addonController.handlerGetLicense)
@@ -186,25 +183,25 @@ func Setup(options Options, addonManager server.AddonManager, store server.Store
 	return &app
 }
 
-func (web *Router) Start() error {
+func (app *Router) Start() error {
 
 	var errs []error
 	go func() {
-		web.HttpRunning = true
-		err := web.Listen(web.options.HttpAddr)
+
+		err := app.Listen(app.options.HttpAddr)
 		if err != nil {
 			errs[0] = fmt.Errorf("http server err:%s", err.Error())
-			web.HttpRunning = false
+
 			return
 		}
 	}()
 
 	go func() {
-		web.HttpRunning = true
-		err1 := web.Listen(web.options.HttpsAddr)
+
+		err1 := app.Listen(app.options.HttpsAddr)
 		if err1 != nil {
 			errs[1] = fmt.Errorf("https server err:%s", err1.Error())
-			web.HttpsRunning = false
+
 			return
 		}
 	}()
@@ -222,6 +219,6 @@ func (web *Router) Start() error {
 	return nil
 }
 
-func (web *Router) Stop() error {
-	return web.App.Shutdown()
+func (app *Router) Stop() error {
+	return app.App.Shutdown()
 }

@@ -2,44 +2,52 @@ package plugin
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/plugin/internal"
-	json "github.com/json-iterator/go"
-	"time"
 )
 
 func (m *Manager) SetPropertyValue(deviceId, propName string, newValue interface{}) (interface{}, error) {
 
-	go func() {
-		err := m.handleSetProperty(deviceId, propName, newValue)
-		if err != nil {
-			m.logger.Error(err.Error())
-		}
-	}()
-	closeChan := make(chan struct{})
-	propChan := make(chan interface{})
-	time.AfterFunc(3*time.Second, func() {
-		closeChan <- struct{}{}
-	})
-	changed := func(data []byte) {
-		id := json.Get(data, "deviceId").ToString()
-		name := json.Get(data, "name").ToString()
-		value := json.Get(data, "value").GetInterface()
-		if id == deviceId && name == propName {
-			propChan <- value
-		}
+	device, ok := m.devices[deviceId]
+	if !ok {
+		return nil, fmt.Errorf("device not found")
 	}
-	go m.bus.Subscribe(constant.PropertyChanged, changed)
-	defer m.bus.Unsubscribe(constant.PropertyChanged, changed)
-	for {
-		select {
-		case v := <-propChan:
-			return v, nil
-		case <-closeChan:
-			m.logger.Error("set property(name: %s value: %s) timeout", propName, newValue)
-			return nil, fmt.Errorf("timeout")
-		}
+	prop := device.GetProperty(propName)
+	if prop == nil {
+		return nil, fmt.Errorf("property not found")
 	}
+
+	return prop.SetValue(newValue)
+
+	//go func() {
+	//	err := m.handleSetProperty(deviceId, propName, newValue)
+	//	if err != nil {
+	//		m.logger.Error(err.Error())
+	//	}
+	//}()
+	//closeChan := make(chan struct{})
+	//propChan := make(chan interface{})
+	//time.AfterFunc(3*time.Second, func() {
+	//	closeChan <- struct{}{}
+	//})
+	//changed := func(data []byte) {
+	//	id := json.Get(data, "deviceId").ToString()
+	//	name := json.Get(data, "name").ToString()
+	//	value := json.Get(data, "value").GetInterface()
+	//	if id == deviceId && name == propName {
+	//		propChan <- value
+	//	}
+	//}
+	//go m.bus.Subscribe(constant.PropertyChanged, changed)
+	//defer m.bus.Unsubscribe(constant.PropertyChanged, changed)
+	//for {
+	//	select {
+	//	case v := <-propChan:
+	//		return v, nil
+	//	case <-closeChan:
+	//		m.logger.Error("set property(name: %s value: %s) timeout", propName, newValue)
+	//		return nil, fmt.Errorf("timeout")
+	//	}
+	//}
 }
 
 func (m *Manager) GetPropertyValue(deviceId, propName string) (interface{}, error) {
