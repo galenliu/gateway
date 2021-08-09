@@ -89,7 +89,7 @@ func (m *Manager) GetDevices() (device []*internal.Device) {
 func (m *Manager) RemoveDevice(deviceId string) error {
 
 	device := m.getDevice(deviceId)
-	adapter := m.getAdapter(device.GetAdapterId())
+	adapter := m.getAdapter(device.AdapterId)
 	if adapter != nil {
 		adapter.removeThing(device)
 		return nil
@@ -102,7 +102,7 @@ func (m *Manager) CancelRemoveThing(deviceId string) {
 	if device == nil {
 		return
 	}
-	adapter := m.getAdapter(device.GetAdapterId())
+	adapter := m.getAdapter(device.AdapterId)
 	if adapter != nil {
 		adapter.cancelRemoveThing(deviceId)
 	}
@@ -113,9 +113,9 @@ func (m *Manager) SetPIN(thingId string, pin interface{}) error {
 	if device == nil {
 		return fmt.Errorf("con not finid device:" + thingId)
 	}
-	err := device.SetPin(pin)
-	if err != nil {
-		return err
-	}
+	//err := device.SetPin(pin)
+	//if err != nil {
+	//	return err
+	//}
 	return nil
 }

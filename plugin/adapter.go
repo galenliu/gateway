@@ -26,7 +26,7 @@ type Adapter struct {
 	manifest       interface{}
 	packageName    string
 
-	logger         logging.Logger
+	logger logging.Logger
 }
 
 func NewAdapter(p *Plugin, name, adapterId, packageName string, log logging.Logger) *Adapter {
@@ -50,21 +50,21 @@ func (adapter *Adapter) pairing(timeout float64) {
 }
 
 func (adapter *Adapter) cancelPairing() {
-	logging.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.id))
+	adapter.logger.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.id))
 	data := make(map[string]interface{})
 	adapter.Send(internal.AdapterCancelPairingCommand, data)
 }
 
-func (adapter *Adapter) removeThing(device addon.IDevice) {
-	logging.Info(fmt.Sprintf("adapter delete thing Id: %v", device.GetID()))
+func (adapter *Adapter) removeThing(device *internal.Device) {
+	adapter.logger.Info("adapter delete thing Id: %v", device.ID)
 	data := make(map[string]interface{})
-	data["deviceId"] = device.GetID()
+	data["deviceId"] = device.ID
 	adapter.Send(internal.AdapterRemoveDeviceRequest, data)
 
 }
 
 func (adapter *Adapter) cancelRemoveThing(deviceId string) {
-	logging.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.id))
+	adapter.logger.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.id))
 	data := make(map[string]interface{})
 	data["deviceId"] = deviceId
 	adapter.Send(internal.AdapterCancelRemoveDeviceCommand, data)
@@ -79,7 +79,7 @@ func (adapter *Adapter) Send(messageType int, data map[string]interface{}) {
 	adapter.plugin.send(messageType, data)
 }
 
-func (adapter *Adapter) getDevice(deviceId string)*internal.Device {
+func (adapter *Adapter) getDevice(deviceId string) *internal.Device {
 	device, ok := adapter.devices[deviceId]
 	if ok {
 		return device
@@ -87,12 +87,12 @@ func (adapter *Adapter) getDevice(deviceId string)*internal.Device {
 	return nil
 }
 
-func (adapter *Adapter) handleDeviceRemoved(*internal.Device) {
-	delete(adapter.devices, device.GetID())
+func (adapter *Adapter) handleDeviceRemoved(d *internal.Device) {
+	delete(adapter.devices, d.ID)
 
 }
 
 func (adapter *Adapter) handleDeviceAdded(device *internal.Device) {
 	adapter.devices[device.GetId()] = device
-	adapter.manager.handleDeviceAdded(device)
+	adapter.plugin.pluginServer.manager.handleDeviceAdded(device)
 }

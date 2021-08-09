@@ -1,4 +1,5 @@
-//package configs
+package configs
+
 //
 //import (
 //	_ "embed"

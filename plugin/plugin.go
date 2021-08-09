@@ -7,7 +7,6 @@ import (
 	addon "github.com/galenliu/gateway-addon"
 	"github.com/galenliu/gateway/configs"
 	"github.com/galenliu/gateway/pkg/constant"
-	"github.com/galenliu/gateway/pkg/ipc"
 	"github.com/galenliu/gateway/pkg/ipc_server"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/plugin/internal"
@@ -134,7 +133,7 @@ func (plugin *Plugin) handleMessage(data []byte) {
 			return
 		}
 		adapter := NewAdapter(plugin, name, adapterId, packageName, plugin.logger)
-		plugin.pluginServer.manager.addAdapter(adapter)
+		plugin.pluginServer.manager.handleAdapterAdded(adapter)
 		return
 	}
 

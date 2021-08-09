@@ -5,7 +5,6 @@ import (
 	"compress/gzip"
 	"context"
 	"fmt"
-	addon "github.com/galenliu/gateway-addon"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
@@ -29,14 +28,13 @@ type eventBus interface {
 }
 
 type Options struct {
-	AddonDirs      []string
-	IPCPort        string
+	AddonDirs []string
+	IPCPort   string
 	UserProfile
 	Preferences
 }
 
 type Preferences struct {
-
 }
 
 type UserProfile struct {
@@ -59,21 +57,21 @@ type Manager struct {
 	options       Options
 	configPath    string
 	pluginServer  *PluginsServer
+
 	devices       map[string]*internal.Device
 	adapters      map[string]*Adapter
 	installAddons map[string]*AddonInfo
+	extensions    map[string]Extension
 
-	extensions map[string]Extension
-
-	bus eventBus
+	bus          eventBus
 	addonsLoaded bool
 	isPairing    bool
 	pluginCancel context.CancelFunc
-	locker  *sync.Mutex
-	running bool
-	verbose bool
-	logger  logging.Logger
-	actions map[string]*wot.ActionAffordance
+	locker       *sync.Mutex
+	running      bool
+	verbose      bool
+	logger       logging.Logger
+	actions      map[string]*wot.ActionAffordance
 
 	settingsStore models.SettingsStore
 }
@@ -96,7 +94,7 @@ func NewAddonsManager(options Options, settingStore models.SettingsStore, bus ev
 	return am
 }
 
-func (m *Manager) AddNewThing(pairingTimeout float64) error {
+func (m *Manager) addNewThing(pairingTimeout float64) error {
 	if m.isPairing {
 		return fmt.Errorf("add already in progress")
 	}
@@ -131,35 +129,34 @@ func (m *Manager) CancelAddNewThing() {
 	return
 }
 
-
-func (m *Manager) handleDeviceAdded(device *internal.Device) {
-	m.devices[device.GetId()] = device
-	//d, err := json.MarshalIndent(device, "", " ")
-	d := device.AsDict()
-	data, err := json.MarshalIndent(d, "", "  ")
-	if err != nil {
-		logging.Info("device marshal err")
-	}
-	m.bus.Publish(constant.DeviceAdded, data)
+func (m *Manager) actionNotify(action *internal.Action) {
+	m.bus.Publish(constant.ActionStatus, nil)
 }
 
-func (m *Manager) actionNotify(action *addon.Action) {
-	m.bus.Publish(constant.ActionStatus, action.MarshalJson())
+func (m *Manager) eventNotify(event *internal.Event) {
+	m.bus.Publish(constant.EVENT, nil)
 }
 
-func (m *Manager) eventNotify(event *addon.Event) {
-	m.bus.Publish(constant.EVENT, event.MarshalJson())
-}
-
-func (m *Manager) connectedNotify(device *addon.Device, connected bool) {
+func (m *Manager) connectedNotify(device *internal.Device, connected bool) {
 	m.bus.Publish(constant.CONNECTED, connected)
 }
 
-func (m *Manager) addAdapter(adapter *Adapter) {
+func (m *Manager) handleAdapterAdded(adapter *Adapter) {
 	m.locker.Lock()
 	defer m.locker.Unlock()
 	m.adapters[adapter.id] = adapter
-	logging.Debug(fmt.Sprintf("adapter：(%s) added", adapter.id))
+	m.logger.Debug(fmt.Sprintf("adapter：(%s) added", adapter.id))
+}
+
+func (m *Manager) handleDeviceAdded(device *internal.Device) {
+	m.locker.Lock()
+	defer m.locker.Unlock()
+	m.devices[device.GetId()] = device
+	data, err := json.MarshalIndent(device, "", "  ")
+	if err != nil {
+		m.logger.Info("device marshal err")
+	}
+	m.bus.Publish(constant.DeviceAdded, data)
 }
 
 func (m *Manager) getAdapter(adapterId string) *Adapter {
@@ -171,11 +168,11 @@ func (m *Manager) getAdapter(adapterId string) *Adapter {
 }
 
 func (m *Manager) handleSetProperty(deviceId, propName string, setValue interface{}) error {
-	device := m.getDevice(deviceId)
+	device := m.devices[deviceId]
 	if device == nil {
 		return fmt.Errorf("device id err")
 	}
-	adapter := m.getAdapter(device.GetAdapterId())
+	adapter := m.getAdapter(device.AdapterId)
 	if adapter == nil {
 		return fmt.Errorf("adapter id err")
 	}
@@ -185,16 +182,17 @@ func (m *Manager) handleSetProperty(deviceId, propName string, setValue interfac
 		return fmt.Errorf("property err")
 	}
 
-	var newValue = property.ToValue(setValue)
-	data := make(map[string]interface{})
-	data[addon.Did] = device.GetID()
-	data["propertyName"] = property.GetName()
-	data["propertyValue"] = newValue
-	go adapter.Send(internal.DeviceSetPropertyCommand, data)
+	//property.SetValue(setValue)
+	//var newValue = property.ToValue(setValue)
+	//data := make(map[string]interface{})
+	//data[addon.Did] = device.GetID()
+	//data["propertyName"] = property.GetName()
+	//data["propertyValue"] = newValue
+	go adapter.Send(internal.DeviceSetPropertyCommand, nil)
 	return nil
 }
 
-func (m *Manager) getDevice(deviceId string) addon.IDevice {
+func (m *Manager) getDevice(deviceId string) *internal.Device {
 	d, ok := m.devices[deviceId]
 	if !ok {
 		return nil
@@ -423,7 +421,10 @@ func (m *Manager) Start() error {
 }
 
 func (m *Manager) Stop() error {
-	m.pluginServer.Stop()
+	err := m.pluginServer.Stop()
+	if err != nil {
+		return err
+	}
 	m.bus.Publish(constant.AddonManagerStopped)
 	m.running = false
 	return nil

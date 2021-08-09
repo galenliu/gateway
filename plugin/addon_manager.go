@@ -2,8 +2,6 @@ package plugin
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/logging"
-
 	"github.com/galenliu/gateway/pkg/util"
 	json "github.com/json-iterator/go"
 	"io/ioutil"
@@ -85,7 +83,7 @@ func (m *Manager) InstallAddonFromUrl(id, url, checksum string, enabled bool) er
 		_ = resp.Body.Close()
 		err := os.Remove(destPath)
 		if err != nil {
-			logging.Info("remove temp file failed ,err:%s", err.Error())
+			m.logger.Info("remove temp file failed ,err:%s", err.Error())
 		}
 	}()
 	data, _ := ioutil.ReadAll(resp.Body)

@@ -76,7 +76,6 @@ func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {
 			LogDir:       path.Join(g.options.BaseDir,"log"),
 			GatewayVersion: Version,
 		},
-
 		AddonDirs: g.options.AddonDirs,
 		IPCPort:   o.IPCPort,
 	}, g.store, g.bus, g.logger)
@@ -114,9 +113,7 @@ func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {
 //}
 
 func (g *Gateway) Start() error {
-
 	// 首先启动plugin
-
 	err := g.addonManager.Start()
 	if err != nil {
 		return err
