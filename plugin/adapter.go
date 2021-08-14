@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/rpc"
 	"github.com/galenliu/gateway/plugin/internal"
 	"sync"
 )
@@ -46,20 +47,20 @@ func (adapter *Adapter) pairing(timeout float64) {
 	adapter.logger.Info(fmt.Sprintf("adapter: %s start pairing", adapter.id))
 	data := make(map[string]interface{})
 	data["timeout"] = timeout
-	adapter.Send(internal.AdapterStartPairingCommand, data)
+	adapter.SendMessage(internal.AdapterStartPairingCommand, data)
 }
 
 func (adapter *Adapter) cancelPairing() {
 	adapter.logger.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.id))
 	data := make(map[string]interface{})
-	adapter.Send(internal.AdapterCancelPairingCommand, data)
+	adapter.SendMessage(internal.AdapterCancelPairingCommand, data)
 }
 
 func (adapter *Adapter) removeThing(device *internal.Device) {
 	adapter.logger.Info("adapter delete thing Id: %v", device.ID)
 	data := make(map[string]interface{})
 	data["deviceId"] = device.ID
-	adapter.Send(internal.AdapterRemoveDeviceRequest, data)
+	adapter.SendMessage(internal.AdapterRemoveDeviceRequest, data)
 
 }
 
@@ -67,25 +68,18 @@ func (adapter *Adapter) cancelRemoveThing(deviceId string) {
 	adapter.logger.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.id))
 	data := make(map[string]interface{})
 	data["deviceId"] = deviceId
-	adapter.Send(internal.AdapterCancelRemoveDeviceCommand, data)
+	adapter.SendMessage(internal.AdapterCancelRemoveDeviceCommand, data)
 }
 
 func (adapter *Adapter) getManager() *Manager {
 	return adapter.plugin.pluginServer.manager
 }
 
-func (adapter *Adapter) Send(messageType int, data map[string]interface{}) {
+func (adapter *Adapter) SendMessage(messageType int, data map[string]interface{}) {
 	data["adapterId"] = adapter.id
-	adapter.plugin.send(messageType, data)
+	adapter.plugin.SendMessage(rpc.MessageType(messageType), data)
 }
 
-func (adapter *Adapter) getDevice(deviceId string) *internal.Device {
-	device, ok := adapter.devices[deviceId]
-	if ok {
-		return device
-	}
-	return nil
-}
 
 func (adapter *Adapter) handleDeviceRemoved(d *internal.Device) {
 	delete(adapter.devices, d.ID)

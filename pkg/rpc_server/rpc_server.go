@@ -4,78 +4,83 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/rpc"
+	"github.com/galenliu/gateway/plugin"
+	json "github.com/json-iterator/go"
 	"google.golang.org/grpc"
-	"io"
 	"net"
 )
+
+type PluginHandler interface {
+	MessageHandler(mt rpc.MessageType, data []byte) error
+}
 
 type RPCServer struct {
 	port     string
 	logger   logging.Logger
-	sendChan chan *rpc.BaseMessage
 	doneChan chan struct{}
-	rpcClint rpc.PluginServer_RegisterServer
 	rpc.UnimplementedPluginServerServer
+	pluginSever *plugin.PluginsServer
+	userProfile []byte
+	preferences []byte
 }
 
-func NewRPCServer(log logging.Logger) *RPCServer {
+func NewRPCServer(server *plugin.PluginsServer, port string, userProfile []byte, preferences []byte, log logging.Logger) *RPCServer {
 	s := &RPCServer{}
-	s.sendChan = make(chan *rpc.BaseMessage)
+	s.pluginSever = server
+	s.port = port
+	s.userProfile = userProfile
+	s.preferences = preferences
 	s.doneChan = make(chan struct{})
 	s.logger = log
 	return s
 }
 
-func (s *RPCServer) Register(p rpc.PluginServer_RegisterServer) error {
-	s.rpcClint = p
-	message, err := p.Recv()
+func (s *RPCServer) PluginHandler(p rpc.PluginServer_PluginHandlerServer) error {
+	r, err := p.Recv()
 	if err != nil {
 		return err
 	}
-	if message.MessageType != rpc.MessageType_PluginRegisterRequest {
-		return fmt.Errorf("RegisterRequest message type err")
+	message := rpc.PluginRegisterRequestMessage{
+		MessageType: 0,
+		Data:        &rpc.PluginRegisterRequestMessageDataTemp{PluginId: json.Get(r.Data, "pluginId").ToString()},
+	}
+
+	if message.Data.PluginId == "" {
+		return fmt.Errorf("plugin id faild")
 	}
 	err = p.SendMsg(rpc.PluginRegisterResponseMessage{
 		MessageType: 0,
 		Data: &rpc.PluginRegisterResponseMessageGatewayConfig{
 			PluginId:       "",
 			GatewayVersion: "",
-			UserProfile:    nil,
-			Preferences:    nil,
+			UserProfile:    s.userProfile,
+			Preferences:    s.preferences,
 		},
 	})
 	if err != nil {
 		return err
 	}
-	go s.Read()
+
+	clint := NewClint(message.Data.PluginId, p)
+	var pluginHandler PluginHandler
+	pluginHandler = s.pluginSever.RegisterPlugin(message.Data.PluginId, clint)
 
 	for {
-		select {
-		case m := <-s.sendChan:
-			err := s.rpcClint.Send(m)
-			if err != nil {
-				return err
-			}
-		case <-s.doneChan:
-			return nil
+		baseMessage, err := clint.Read()
+		if err != nil {
+			return err
 		}
-	}
-}
+		err = pluginHandler.MessageHandler(baseMessage.MessageType, baseMessage.Data)
+		if err != nil {
+			return err
+		}
+		select {
+		case <-s.doneChan:
+			return fmt.Errorf("rpc server stopped")
+		}
 
-func (s *RPCServer) Read() {
-	var revMsg interface{}
-	err := s.rpcClint.RecvMsg(&revMsg)
-	if err == io.EOF {
-		s.logger.Info("plugin is closed")
-		return
 	}
-	if err != nil {
-		return
-	}
-}
 
-func (s *RPCServer) Send(message *rpc.BaseMessage) {
-	s.sendChan <- message
 }
 
 func (s *RPCServer) Start() error {
@@ -89,5 +94,10 @@ func (s *RPCServer) Start() error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (s *RPCServer) Stop() error {
+	s.doneChan <- struct{}{}
 	return nil
 }

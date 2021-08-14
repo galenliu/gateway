@@ -4,11 +4,9 @@ package plugin
 import (
 	"context"
 	"fmt"
-	addon "github.com/galenliu/gateway-addon"
-	"github.com/galenliu/gateway/configs"
 	"github.com/galenliu/gateway/pkg/constant"
-	"github.com/galenliu/gateway/pkg/ipc_server"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/rpc"
 	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
@@ -24,17 +22,22 @@ import (
 const ExecNode = "{nodeLoader}"
 const ExecPython3 = "{python}"
 
+type IClint interface {
+	Send(message *rpc.BaseMessage) error
+	Read() (*rpc.BaseMessage, error)
+}
+
 type Plugin struct {
 	locker        *sync.Mutex
 	pluginId      string
 	exec          string
 	execPath      string
 	registered    bool
-	conn          *ipc_server.Connection
 	closeChan     chan struct{}
 	closeExecChan chan struct{}
 	pluginServer  *PluginsServer
 	logger        logging.Logger
+	Clint         IClint
 }
 
 func NewPlugin(s *PluginsServer, pluginId string, log logging.Logger) (plugin *Plugin) {
@@ -50,114 +53,58 @@ func NewPlugin(s *PluginsServer, pluginId string, log logging.Logger) (plugin *P
 	return
 }
 
-//当一个plugin建立连接后，则回复网关数据。
-func (plugin *Plugin) handleConnection(c *ipc_server.Connection, d []byte) {
-	if d != nil {
-		plugin.handleMessage(d)
-	}
-	for {
-		select {
-		case <-plugin.closeChan:
-			data := make(map[string]interface{})
-			plugin.send(internal.PluginUnloadResponse, data)
-			return
-		default:
-			_, data, err := c.ReadMessage()
-			if err != nil {
-				plugin.logger.Error("plugin read err :%s", err.Error())
-				plugin.registered = false
-				return
-			}
-			plugin.handleMessage(data)
-
-		}
-	}
-}
-
-func (plugin *Plugin) registerAndHandleConnection(c *ipc_server.Connection) {
-	if plugin.registered == true {
-		plugin.logger.Error("plugin is registered")
-		return
-	}
-	plugin.conn = c
-	data := make(map[string]interface{})
-	data["gatewayVersion"] = plugin.pluginServer.manager.options.GatewayVersion
-	data["userProfile"] = plugin.pluginServer.manager.options.UserProfile
-	data["preferences"] = plugin.pluginServer.manager.options.Preferences
-	plugin.send(constant.PluginRegisterResponse, data)
-	plugin.registered = true
-	plugin.logger.Info("plugin registered. pluginId: %s", plugin.pluginId)
-	plugin.handleConnection(c, nil)
-}
-
-//传入的data=序列化后的 Message.Data
-func (plugin *Plugin) handleMessage(data []byte) {
-
-	var messageType int
-	if tp := json.Get(data, "messageType"); tp.ValueType() == json.NumberValue {
-		messageType = tp.ToInt()
-	} else {
-		return
-	}
-
-	//如果为0，则消息不合法(如：缺少 messageType字段)
-	if messageType == 0 {
-		plugin.logger.Info("messageType err")
-		return
-	}
+func (plugin *Plugin) MessageHandler(messageType rpc.MessageType, data []byte) (err error) {
 	var adapterId = json.Get(data, "data", "adapterId").ToString()
-
+	if adapterId == "" {
+		return fmt.Errorf("pluginId is none")
+	}
 	// plugin handler
 	switch messageType {
-	case internal.DeviceRequestActionResponse:
+	case rpc.MessageType_DeviceRequestActionResponse:
 		break
-	case internal.DeviceRemoveActionResponse:
+	case rpc.MessageType_DeviceRemoveActionResponse:
 		break
-	case internal.OutletNotifyResponse:
+	case rpc.MessageType_OutletNotifyResponse:
 		break
 
-	case internal.AdapterUnloadResponse:
+	case rpc.MessageType_AdapterUnloadResponse:
 		break
-	case internal.DeviceSetCredentialsResponse:
+	case rpc.MessageType_DeviceSetCredentialsResponse:
 		break
-	case internal.ApiHandlerApiResponse:
+	case rpc.MessageType_ApiHandlerApiResponse:
 		break
 
 	}
 
 	switch messageType {
-	case internal.AdapterAddedNotification:
+	case rpc.MessageType_AdapterAddedNotification:
 		var name = json.Get(data, "data", "name").ToString()
 		var packageName = json.Get(data, "data", "packageName").ToString()
-		if packageName == "" {
-			return
-		}
 		adapter := NewAdapter(plugin, name, adapterId, packageName, plugin.logger)
 		plugin.pluginServer.manager.handleAdapterAdded(adapter)
-		return
+		return nil
 	}
 
 	adapter := plugin.pluginServer.manager.getAdapter(adapterId)
 	if adapter == nil {
 		plugin.logger.Info("(%s)adapter not found", internal.MessageTypeToString(int(messageType)))
-		return
+		return nil
 	}
 
 	switch messageType {
 
-	case internal.NotifierAddedNotification:
+	case rpc.MessageType_NotifierAddedNotification:
 		return
-	case internal.ApiHandlerAddedNotification:
+	case rpc.MessageType_ApiHandlerAddedNotification:
 		return
-	case internal.ApiHandlerUnloadResponse:
+	case rpc.MessageType_ApiHandlerUnloadResponse:
 		return
-	case internal.PluginUnloadRequest:
+	case rpc.MessageType_PluginUnloadRequest:
 		return
-	case internal.PluginErrorNotification:
+	case rpc.MessageType_PluginErrorNotification:
 		return
-	case internal.DeviceAddedNotification:
+	case rpc.MessageType_DeviceAddedNotification:
 		//messages.DeviceAddedNotification
-
 		data := gjson.GetBytes(data, "data").Get("device").String()
 		if data == "" {
 			plugin.logger.Info("marshal device err")
@@ -172,96 +119,95 @@ func (plugin *Plugin) handleMessage(data []byte) {
 		newDevice.AdapterId = adapterId
 		adapter.handleDeviceAdded(newDevice)
 		return
-
 	}
 
 	deviceId := json.Get(data, "data", "deviceId").ToString()
-	device := adapter.getDevice(deviceId)
-	if device == nil {
+	device, ok := adapter.devices[deviceId]
+	if !ok {
 		plugin.logger.Info("device cannot found: %s", deviceId)
 		return
 	}
-
 	switch messageType {
-	case internal.AdapterUnloadResponse:
+	case rpc.MessageType_AdapterUnloadResponse:
 		return
 
-	case internal.NotifierUnloadResponse:
+	case rpc.MessageType_NotifierUnloadResponse:
 		return
 
-	case internal.AdapterRemoveDeviceResponse:
+	case rpc.MessageType_AdapterRemoveDeviceResponse:
 		adapter.handleDeviceRemoved(device)
 
-	case internal.OutletAddedNotification:
+	case rpc.MessageType_OutletAddedNotification:
 		return
-	case internal.OutletRemovedNotification:
+	case rpc.MessageType_OutletRemovedNotification:
 		return
 
-	case internal.DeviceSetPinResponse:
-		s := json.Get(data, "pin").ToString()
-		var pin addon.PIN
-		err := json.UnmarshalFromString(s, &pin)
-		if err != nil {
-			plugin.logger.Info("pin error")
-			return
-		}
-		ee := device.SetPin(pin)
-		if ee != nil {
-			plugin.logger.Info(ee.Error())
-		}
+	case rpc.MessageType_DeviceSetPinResponse:
+		//s := json.Get(data, "pin").ToString()
+		//var pin addon.PIN
+		//err := json.UnmarshalFromString(s, &pin)
+		//if err != nil {
+		//	plugin.logger.Info("pin error")
+		//	return
+		//}
+		//ee := device.SetPin(pin)
+		//if ee != nil {
+		//	plugin.logger.Info(ee.Error())
+		//}
 
-	case internal.DevicePropertyChangedNotification:
+	case rpc.MessageType_DevicePropertyChangedNotification:
+		prop := json.Get(data, "property").ToString()
+		propName := json.Get(data, "property", "name").ToString()
 
-		prop := gjson.GetBytes(data, "data.property").String()
-		propName := gjson.GetBytes(data, "data.property.name").String()
-
-		property := device.GetProperty(propName)
-		if property == nil {
-			logging.Info("propName err")
+		property, ok := device.Properties[propName]
+		if !ok {
+			plugin.logger.Info("propName err")
 			return
 		}
 		if len(prop) == 0 {
 			return
 		}
-		property.DoPropertyChanged(prop)
-		Publish(constant.PropertyChanged, property.AsDict())
+		property.DoPropertyChanged([]byte(prop))
 		return
 
-	case internal.DeviceActionStatusNotification:
-
+	case rpc.MessageType_DeviceActionStatusNotification:
+		var action internal.Action
 		json.Get(data, "data", "action").ToVal(&action)
 		return
 
-	case internal.DeviceEventNotification:
-
+	case rpc.MessageType_DeviceEventNotification:
+		var event internal.Event
 		json.Get(data, "data", "event").ToVal(&event)
 
-	case internal.DeviceConnectedStateNotification:
+	case rpc.MessageType_DeviceConnectedStateNotification:
 		var connected = json.Get(data, "data", "connected")
 		if connected.LastError() == nil {
 			event_bus.Publish(constant.CONNECTED, device, connected.ToBool())
 		}
 		return
 
-	case internal.AdapterPairingPromptNotification:
+	case rpc.MessageType_AdapterPairingPromptNotification:
 		return
 
-	case internal.AdapterUnpairingPromptNotification:
+	case rpc.MessageType_AdapterUnpairingPromptNotification:
 		return
-	case internal.MockAdapterClearStateResponse:
+	case rpc.MessageType_MockAdapterClearStateResponse:
 		return
 
-	case internal.MockAdapterRemoveDeviceResponse:
+	case rpc.MessageType_MockAdapterRemoveDeviceResponse:
 		return
+	default:
+		return nil
 
 	}
+	return nil
 }
 
 func (plugin *Plugin) execute() {
 	plugin.exec = strings.Replace(plugin.exec, "\\", string(os.PathSeparator), -1)
 	plugin.exec = strings.Replace(plugin.exec, "/", string(os.PathSeparator), -1)
 	command := strings.Replace(plugin.exec, "{path}", plugin.execPath, 1)
-	command = strings.Replace(command, "{nodeLoader}", configs.GetNodeLoader(), 1)
+	//command = strings.Replace(command, "{nodeLoader}", configs.GetNodeLoader(), 1)
 	if !strings.HasPrefix(command, "python") {
 		plugin.logger.Error("Now only support plugin with python lang")
 		return
@@ -339,25 +285,18 @@ func (plugin *Plugin) unload() {
 	plugin.closeExecChan <- struct{}{}
 }
 
-
-
-func (plugin *Plugin) send(mt int, data map[string]interface{}) {
-	data["pluginId"] = plugin.pluginId
-	message := struct {
-		MessageType int         `json:"messageType"`
-		Data        interface{} `json:"data"`
-	}{
-		MessageType: mt,
-		Data:        data,
-	}
-	bt, err := json.MarshalIndent(message, "", " ")
-	if configs.IsVerbose() {
-		plugin.logger.Debug("Send-- %s : \t\n %s", internal.MessageTypeToString(mt), bt)
-	}
-
+func (plugin *Plugin) SendMessage(mt rpc.MessageType, message map[string]interface{}) {
+	message["pluginId"] = plugin.pluginId
+	data, err := json.Marshal(message)
 	if err != nil {
-		plugin.logger.Error(err.Error())
 		return
 	}
-	plugin.conn.Send(bt)
+	err = plugin.Clint.Send(&rpc.BaseMessage{
+		MessageType: mt,
+		Data:        data,
+	})
+	if err != nil {
+		plugin.logger.Warning("plugin send message err: %s", err.Error())
+		return
+	}
 }

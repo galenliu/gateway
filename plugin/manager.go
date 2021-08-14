@@ -30,22 +30,9 @@ type eventBus interface {
 type Options struct {
 	AddonDirs []string
 	IPCPort   string
+	RPCPort   string
 	UserProfile
 	Preferences
-}
-
-type Preferences struct {
-}
-
-type UserProfile struct {
-	BaseDir        string
-	DataDir        string
-	AddonsDir      string
-	ConfigDir      string
-	UploadDir      string
-	MediaDir       string
-	LogDir         string
-	GatewayVersion string
 }
 
 type Extension struct {
@@ -54,9 +41,9 @@ type Extension struct {
 }
 
 type Manager struct {
-	options       Options
-	configPath    string
-	pluginServer  *PluginsServer
+	options      Options
+	configPath   string
+	pluginServer *PluginsServer
 
 	devices       map[string]*internal.Device
 	adapters      map[string]*Adapter
@@ -188,7 +175,7 @@ func (m *Manager) handleSetProperty(deviceId, propName string, setValue interfac
 	//data[addon.Did] = device.GetID()
 	//data["propertyName"] = property.GetName()
 	//data["propertyValue"] = newValue
-	go adapter.Send(internal.DeviceSetPropertyCommand, nil)
+	go adapter.SendMessage(internal.DeviceSetPropertyCommand, nil)
 	return nil
 }
 
@@ -273,8 +260,16 @@ func (m *Manager) loadAddons() {
 		return
 	}
 	m.addonsLoaded = true
-	m.pluginServer = NewPluginServer(m)
-	err := m.pluginServer.Start()
+	var userProfile []byte
+	var prfe []byte
+
+	userProfile, err := json.Marshal(m.options.UserProfile)
+	prfe, err = json.Marshal(m.options.Preferences)
+	if err != nil {
+		return
+	}
+	m.pluginServer = NewPluginServer(m, userProfile, prfe)
+	err = m.pluginServer.Start()
 	if err != nil {
 		m.logger.Error("Plugin Server Start Failed. Err: %s", err.Error())
 		return

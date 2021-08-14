@@ -347,7 +347,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 //		_ = bus.Unsubscribe(util.ThingRemoved, controller.onRemoved)
 //		_ = bus.Unsubscribe(util.ThingAdded, controller.onThingAdded)
 //		if controller.ws != nil {
-//			_ = controller.ws.Close()
+//			_ = controller.ws.Stop()
 //		}
 //	}()
 //

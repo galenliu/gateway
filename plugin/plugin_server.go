@@ -2,11 +2,10 @@ package plugin
 
 //	plugin server
 import (
-	"github.com/galenliu/gateway/pkg/constant"
+	"context"
 	ipc "github.com/galenliu/gateway/pkg/ipc_server"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/rpc_server"
-	json "github.com/json-iterator/go"
 	"sync"
 )
 
@@ -15,56 +14,33 @@ type PluginsServer struct {
 	locker    *sync.Mutex
 	manager   *Manager
 	ipc       *ipc.IPCServer
-	grpc      *rpc_server.RPCServer
+	rpc       *rpc_server.RPCServer
 	closeChan chan struct{}
 	logger    logging.Logger
+	ctx       context.Context
 	verbose   bool
 }
 
-func NewPluginServer(manager *Manager) *PluginsServer {
+func NewPluginServer(manager *Manager, userProfile []byte, preferences []byte) *PluginsServer {
 	server := &PluginsServer{}
 	server.logger = manager.logger
 	server.closeChan = make(chan struct{})
 	server.Plugins = make(map[string]*Plugin, 30)
 	server.locker = new(sync.Mutex)
 	server.manager = manager
-	server.ipc = ipc.NewIPCServer(manager.options.IPCPort, manager.logger)
+	server.ipc = ipc.NewIPCServer(server, manager.options.IPCPort, userProfile, preferences, manager.logger)
+	server.rpc = rpc_server.NewRPCServer(server, manager.options.RPCPort, userProfile, preferences, manager.logger)
 	return server
 }
 
-func (s *PluginsServer) messageHandler(data []byte, c *ipc.Connection) {
-
-	//如果是注册请求的话，调用registerPlugin处理注册
-	t := json.Get(data, "messageType")
-	if t.ValueType() != json.NumberValue {
-		s.logger.Info("plugin message failed")
-		return
+func (s *PluginsServer) RegisterPlugin(pluginId string, clint IClint) *Plugin {
+	plugin, ok := s.Plugins[pluginId]
+	if !ok {
+		plugin = NewPlugin(s, pluginId, s.logger)
+		s.Plugins[pluginId] = plugin
 	}
-	messageType := t.ToInt()
-	if messageType == constant.PluginRegisterRequest {
-		s.registerHandler(data, c)
-	} else {
-		//获取Plugin，并且把消息交由对应的Plugin处理
-		pluginId := json.Get(data, "data", "pluginId").ToString()
-		plugin := s.registerPlugin(pluginId)
-		go plugin.handleConnection(c, data)
-	}
-}
-
-//并发，此处开启新协程，传入一个新的websocket连接,把读到的消息给MessageHandler
-func (s *PluginsServer) handleConnection(c *ipc.Connection) {
-	d, err := c.Read()
-	if err != nil {
-		s.logger.Info("plugin connection err:", err.Error())
-		return
-	}
-	s.messageHandler(d, c)
-}
-
-func (s *PluginsServer) registerHandler(data []byte, c *ipc.Connection) {
-	pluginId := json.Get(data, "data", "pluginId").ToString()
-	plugin := s.registerPlugin(pluginId)
-	go plugin.registerAndHandleConnection(c)
+	plugin.Clint = clint
+	return plugin
 }
 
 func (s *PluginsServer) loadPlugin(addonPath, id, exec string) {
@@ -96,28 +72,25 @@ func (s *PluginsServer) registerPlugin(packageId string) *Plugin {
 
 // Start create goroutines handle ipc massage
 func (s *PluginsServer) Start() error {
-	go func() {
-		err := s.ipc.Start()
-		if err != nil {
-			s.logger.Error("IPC Start Failed. Err: %s", err.Error())
-			return
-		}
-		for {
-			select {
-			//每一个连接都开一个协程处理了
-			case conn := <-s.ipc.Connections:
-				go s.handleConnection(conn)
-			case <-s.closeChan:
-				return
-			}
-		}
-	}()
+
+	err := s.rpc.Start()
+	if err != nil {
+		s.logger.Errorf("rpc server start err:%s", err.Error())
+		return err
+	}
+	err = s.ipc.Start()
+	if err != nil {
+		s.logger.Errorf("ipc server start err:%s", err.Error())
+		return err
+	}
 	return nil
 }
 
 // Stop if server stop, also need to stop all of package
 func (s *PluginsServer) Stop() error {
-	err := s.ipc.Close()
+
+	err := s.ipc.Stop()
+	err = s.rpc.Stop()
 	if err != nil {
 		return err
 	}

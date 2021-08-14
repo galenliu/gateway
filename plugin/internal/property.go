@@ -95,3 +95,14 @@ func (p *Property) setLocalValue(value interface{}) error {
 	p.Value = value
 	return nil
 }
+
+func (p *Property) DoPropertyChanged(data []byte) {
+	var changed = false
+	if t := json.Get(data, "type").ToString(); t != "" && p.Type != t {
+		p.Type = t
+		changed = true
+	}
+	if changed {
+
+	}
+}

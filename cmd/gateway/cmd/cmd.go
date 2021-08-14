@@ -20,14 +20,15 @@ import (
 const (
 	optionNameDataDir            = "data-dir"
 	optionNameMediaDir           = "media-dir"
-	optionNameLogDir           = "log-dir"
+	optionNameLogDir             = "log-dir"
 	optionNameAddonDirs          = "addon-dirs"
 	optionNameVerbosity          = "verbosity"
 	optionNameDBRemoveBeforeOpen = "db-remove-before-open"
-	optionNameAPIAddr            = "api-addr"
-	optionNameIpcAddr            = "ipc-addr"
-	optionNameHttpAddr           = "http-addr"
-	optionNameHttpsAddr          = "https-addr"
+	optionNameAPIPort            = "api-port"
+	optionNameIpcPort            = "ipc-port"
+	optionNameRpcPort            = "rpc-port"
+	optionNameHttpPort           = "http-port"
+	optionNameHttpsPort          = "https-port"
 	optionNameAddonUrls          = "addon-urls"
 	optionLogRotateDays          = "log-rotate-days"
 	optionHomeKitPin             = "hk-pin"
@@ -159,7 +160,6 @@ func (c *command) setAllFlags(cmd *cobra.Command) {
 
 	cmd.Flags().String(optionNameLogDir, filepath.Join(dataDir, "log"), "media directory")
 
-
 	cmd.Flags().String(optionNameAddonDirs, func() string {
 		p, err := cmd.Flags().GetString(optionNameDataDir)
 		if err != nil {
@@ -169,14 +169,17 @@ func (c *command) setAllFlags(cmd *cobra.Command) {
 	}(), "add-ons directory")
 	cmd.Flags().Bool(optionNameDBRemoveBeforeOpen, false, "remove db before open")
 	cmd.Flags().String(optionNameVerbosity, "info", "log verbosity level 0=silent, 1=error, 2=warn, 3=info, 4=debug, 5=trace")
-	cmd.Flags().String(optionNameAPIAddr, ":9090", "HTTP API listen address")
 	cmd.Flags().StringArray(optionNameAddonUrls, []string{"https://api.webthings.io:8443/addons"}, "addon urls")
-	cmd.Flags().String(optionNameIpcAddr, ":9090", "api addr")
-	cmd.Flags().String(optionNameHttpAddr, ":9090", "http port")
-	cmd.Flags().String(optionNameHttpsAddr, ":4443", "https port")
+
+	cmd.Flags().Int(optionNameAPIPort, 9090, "HTTP API listen address")
+	cmd.Flags().Int(optionNameHttpPort, 9090, "http port")
+	cmd.Flags().Int(optionNameHttpsPort, 4443, "https port")
+
+	cmd.Flags().Int(optionNameIpcPort, 9095, "ipc port")
+	cmd.Flags().Int(optionNameRpcPort, 9096, "rpc port")
+
 	cmd.Flags().Int(optionLogRotateDays, 7, "log rotate days")
 	cmd.Flags().String(optionHomeKitPin, "12344321", "homekit pin")
-
 	cmd.Flags().Bool(optionHomeKitEnable, true, "homekit enable")
 }
 

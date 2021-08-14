@@ -5,6 +5,6 @@ option go_package = "../../rpc";
 
 service PluginServer {
   // Sends another greeting
-  rpc Register (stream plugin.PluginRegisterRequestMessage) returns (stream BaseMessage) {}
+  rpc PluginHandler (stream BaseMessage) returns (stream BaseMessage) {}
 }
 

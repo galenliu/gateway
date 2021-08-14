@@ -33,6 +33,7 @@ type Options struct {
 	Verbosity          string
 	AddonUrls          []string
 	IPCPort            string
+	RPCPort            string
 	HttpAddr           string
 	HttpsAddr          string
 	LogRotateDays      int
@@ -68,16 +69,17 @@ func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {
 	g.addonManager = plugin.NewAddonsManager(plugin.Options{
 		UserProfile: plugin.UserProfile{
 			BaseDir:        g.options.BaseDir,
-			DataDir:        path.Join(g.options.BaseDir,"data"),
-			AddonsDir:      path.Join(g.options.BaseDir,"addons"),
-			ConfigDir:       path.Join(g.options.BaseDir,"config"),
-			UploadDir:      path.Join(g.options.BaseDir,"upload"),
-			MediaDir:       path.Join(g.options.BaseDir,"media"),
-			LogDir:       path.Join(g.options.BaseDir,"log"),
+			DataDir:        path.Join(g.options.BaseDir, "data"),
+			AddonsDir:      path.Join(g.options.BaseDir, "addons"),
+			ConfigDir:      path.Join(g.options.BaseDir, "config"),
+			UploadDir:      path.Join(g.options.BaseDir, "upload"),
+			MediaDir:       path.Join(g.options.BaseDir, "media"),
+			LogDir:         path.Join(g.options.BaseDir, "log"),
 			GatewayVersion: Version,
 		},
 		AddonDirs: g.options.AddonDirs,
 		IPCPort:   o.IPCPort,
+		RPCPort:   o.IPCPort,
 	}, g.store, g.bus, g.logger)
 
 	g.sever = server.Setup(server.Options{

@@ -14,7 +14,10 @@ message BaseMessage {
 
 message PluginRegisterRequestMessage {
   messageType messageType = 1;
-  bytes data = 2;
+  message dataTemp{
+    string pluginId = 2;
+  }
+  dataTemp data = 3;
 }
 
 message PluginRegisterResponseMessage{
