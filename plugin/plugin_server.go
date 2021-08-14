@@ -5,6 +5,7 @@ import (
 	"github.com/galenliu/gateway/pkg/constant"
 	ipc "github.com/galenliu/gateway/pkg/ipc_server"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/rpc_server"
 	json "github.com/json-iterator/go"
 	"sync"
 )
@@ -14,6 +15,7 @@ type PluginsServer struct {
 	locker    *sync.Mutex
 	manager   *Manager
 	ipc       *ipc.IPCServer
+	grpc      *rpc_server.RPCServer
 	closeChan chan struct{}
 	logger    logging.Logger
 	verbose   bool
@@ -26,7 +28,7 @@ func NewPluginServer(manager *Manager) *PluginsServer {
 	server.Plugins = make(map[string]*Plugin, 30)
 	server.locker = new(sync.Mutex)
 	server.manager = manager
-	server.ipc = ipc.NewAndStartIPCServer(manager.options.IPCPort, manager.logger)
+	server.ipc = ipc.NewIPCServer(manager.options.IPCPort, manager.logger)
 	return server
 }
 
@@ -34,10 +36,10 @@ func (s *PluginsServer) messageHandler(data []byte, c *ipc.Connection) {
 
 	//如果是注册请求的话，调用registerPlugin处理注册
 	t := json.Get(data, "messageType")
-	if t.ValueType() != json.NumberValue{
-	 	s.logger.Info("plugin message failed")
-		 return
-	 }
+	if t.ValueType() != json.NumberValue {
+		s.logger.Info("plugin message failed")
+		return
+	}
 	messageType := t.ToInt()
 	if messageType == constant.PluginRegisterRequest {
 		s.registerHandler(data, c)
@@ -64,7 +66,6 @@ func (s *PluginsServer) registerHandler(data []byte, c *ipc.Connection) {
 	plugin := s.registerPlugin(pluginId)
 	go plugin.registerAndHandleConnection(c)
 }
-
 
 func (s *PluginsServer) loadPlugin(addonPath, id, exec string) {
 	plugin := s.registerPlugin(id)

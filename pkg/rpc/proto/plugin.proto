@@ -1,16 +1,10 @@
 syntax = "proto3";
-
-package rpc;
-
-option go_package = "../rpc";
+package plugin;
+import "message.proto";
+option go_package = "../../rpc";
 
 service PluginServer {
-  rpc AllSteam(stream BaseMessage) returns(stream BaseMessage){}
-}
-
-message BaseMessage {
-  int32 messageType = 1;
-  string adapterId = 2;
-  string data = 3;
+  // Sends another greeting
+  rpc Register (stream plugin.PluginRegisterRequestMessage) returns (stream BaseMessage) {}
 }
 

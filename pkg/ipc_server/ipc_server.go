@@ -25,7 +25,7 @@ type IPCServer struct {
 	locker      *sync.Mutex
 }
 
-func NewAndStartIPCServer(port string, log logging.Logger) *IPCServer {
+func NewIPCServer(port string, log logging.Logger) *IPCServer {
 	ipc := &IPCServer{
 		addr:        "localhost:" + port,
 		Connections: make(chan *Connection, 5),
@@ -34,7 +34,7 @@ func NewAndStartIPCServer(port string, log logging.Logger) *IPCServer {
 	go func() {
 		err := ipc.Start()
 		if err != nil {
-			ipc.logger.Warningf("IPC Server Err: %s",err.Error())
+			ipc.logger.Warningf("IPC Server Err: %s", err.Error())
 		}
 	}()
 	return ipc

@@ -1,0 +1,30 @@
+syntax = "proto3";
+package plugin;
+import "messageType.proto";
+option go_package = "../../rpc";
+
+
+// The request message containing the user's name.
+message BaseMessage {
+  messageType messageType = 1;
+  bytes data = 2;
+}
+
+
+
+message PluginRegisterRequestMessage {
+  messageType messageType = 1;
+  bytes data = 2;
+}
+
+message PluginRegisterResponseMessage{
+  messageType messageType = 1;
+  message gatewayConfig {
+    string pluginId = 2;
+    string gatewayVersion = 3;
+    bytes userProfile = 4;
+    bytes preferences = 5;
+  }
+  gatewayConfig data = 6;
+}
+

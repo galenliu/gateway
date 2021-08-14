@@ -74,7 +74,6 @@ func NewAddonInfoFromString(des string) *AddonInfo {
 	return nil
 }
 
-
 func LoadManifest(destPath, packetId string) (*AddonInfo, *interface{}, error) {
 
 	//load manifest.json\
@@ -127,4 +126,9 @@ func LoadManifest(destPath, packetId string) (*AddonInfo, *interface{}, error) {
 		addonInfo.Enabled = true
 	}
 	return &addonInfo, &manifest.Options.Default, nil
+}
+
+func IsJson(in []byte) bool {
+	var js map[string]interface{}
+	return json.Unmarshal(in, &js) == nil
 }
