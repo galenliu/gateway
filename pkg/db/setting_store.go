@@ -2,7 +2,6 @@ package db
 
 import (
 	"database/sql"
-	"github.com/galenliu/gateway/pkg/logging"
 )
 
 func (s *Store) GetSetting(key string) (value string, err error) {
@@ -12,7 +11,7 @@ func (s *Store) GetSetting(key string) (value string, err error) {
 
 func (s *Store) SetSetting(key, value string) error {
 
-	logging.Info("set setting key:%s value:%s \t\n", key, value)
+	s.logger.Info("set setting key:%s value:%s \t\n", key, value)
 	_, err := s.GetSetting(key)
 	if err == nil {
 		_, e := s.db.Exec(`update settings set value=@value where key=@key`, sql.Named("value", value), sql.Named("key", key))
@@ -31,6 +30,6 @@ func (s *Store) SetSetting(key, value string) error {
 	if eee != nil {
 		return eee
 	}
-	logging.Debug("insert data,id:%d , value: %s \t\n", id, value)
+	s.logger.Debug("insert data,id:%d , value: %s \t\n", id, value)
 	return nil
 }

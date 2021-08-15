@@ -99,7 +99,7 @@ func (tc *thingsController) handleSetProperty(c *fiber.Ctx) error {
 	value := c.Body()
 	v, e := tc.handler.SetPropertyValue(thingId, propName, value)
 	if e != nil {
-		logging.Error("Failed set thing(%s) property:(%s) value:(%s),err:(%s)", thingId, propName, value, e.Error())
+		tc.logger.Error("Failed set thing(%s) property:(%s) value:(%s),err:(%s)", thingId, propName, value, e.Error())
 		return fiber.NewError(fiber.StatusGatewayTimeout, e.Error())
 	}
 	data := map[string]interface{}{propName: v}
