@@ -1,13 +1,14 @@
 package model
 
 import (
-	"github.com/galenliu/gateway-addon/wot"
-	data_schema2 "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
+	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
+	schema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
+	"github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
 )
 
 type Event struct {
-	*wot.EventAffordance
+	wot.EventAffordance
 
 	ID      string `json:"-" gorm:"primaryKey"`
 	Name    string `json:"name"`
@@ -20,7 +21,7 @@ func NewEventFromString(data string) *Event {
 	if aa.Forms == nil {
 		aa.Forms = append(aa.Forms, hypermedia_controls.Form{
 			Href:        "",
-			ContentType: data_schema2.ApplicationJson,
+			ContentType: schema.ApplicationJson,
 			Op:          []string{hypermedia_controls.SubscribeEvent},
 		})
 	}
