@@ -48,6 +48,7 @@ func (m *Manager) SetPropertyValue(deviceId, propName string, newValue interface
 	//		return nil, fmt.Errorf("timeout")
 	//	}
 	//}
+	return nil, nil
 }
 
 func (m *Manager) GetPropertyValue(deviceId, propName string) (interface{}, error) {
