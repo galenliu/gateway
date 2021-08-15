@@ -11,32 +11,22 @@ import (
 )
 
 // GetInstallAddons 获取已安装的add-on
-func (m *Manager) GetInstallAddons() []*AddonInfo {
-	m.locker.Lock()
-	defer m.locker.Unlock()
-	var addons []*AddonInfo
-	for _, v := range m.installAddons {
-		addons = append(addons, v)
+func (m *Manager) GetInstallAddons() []byte {
+	addons := m.getInstallAddons()
+	data, err := json.Marshal(addons)
+	if err != nil {
+		return nil
 	}
-	return addons
+	return data
 }
 
 func (m *Manager) EnableAddon(addonId string) error {
-	m.locker.Lock()
-	defer m.locker.Unlock()
-	addonInfo := m.installAddons[addonId]
+	addonInfo := m.getInstallAddon(addonId)
 	if addonInfo == nil {
-		return fmt.Errorf("addon not exit")
+		return fmt.Errorf("addon not installed")
 	}
-	addonInfo.Enabled = true
-	s, err := json.MarshalToString(addonInfo)
-	if err != nil {
-		return err
-	}
-	err = m.settingsStore.SetSetting(GetAddonKey(addonInfo.ID), s)
-	if err != nil {
-		return err
-	}
+	err := addonInfo.enable()
+
 	err = m.loadAddon(addonId)
 	if err != nil {
 		return err
@@ -45,22 +35,12 @@ func (m *Manager) EnableAddon(addonId string) error {
 }
 
 func (m *Manager) DisableAddon(addonId string) error {
-	m.locker.Lock()
-	defer m.locker.Unlock()
-	addonInfo := m.installAddons[addonId]
+	addonInfo := m.getInstallAddon(addonId)
 	if addonInfo == nil {
 		return fmt.Errorf("addon not installed")
 	}
-	addonInfo.Enabled = false
-	err := m.unloadAddon(addonId)
-	if err != nil {
-		return err
-	}
-	s, err := json.MarshalToString(addonInfo)
-	if err != nil {
-		return err
-	}
-	err = m.settingsStore.SetSetting(GetAddonKey(addonInfo.ID), s)
+	err := addonInfo.disable()
+	err = m.unloadAddon(addonId)
 	if err != nil {
 		return err
 	}
@@ -77,7 +57,7 @@ func (m *Manager) InstallAddonFromUrl(id, url, checksum string, enabled bool) er
 	m.logger.Info("fetching add-on %s as %s", url, destPath)
 	resp, err := http.Get(url)
 	if err != nil {
-		return fmt.Errorf(fmt.Sprintf("Download addon err,pakage id:%s err:%s", id, err.Error()))
+		return fmt.Errorf(fmt.Sprintf("Download addon err,pakage ID:%s err:%s", id, err.Error()))
 	}
 	defer func() {
 		_ = resp.Body.Close()
@@ -89,7 +69,7 @@ func (m *Manager) InstallAddonFromUrl(id, url, checksum string, enabled bool) er
 	data, _ := ioutil.ReadAll(resp.Body)
 	_ = ioutil.WriteFile(destPath, data, 777)
 	if !util.CheckSum(destPath, checksum) {
-		return fmt.Errorf(fmt.Sprintf("checksum err,pakage id:%s", id))
+		return fmt.Errorf(fmt.Sprintf("checksum err,pakage ID:%s", id))
 	}
 	err = m.installAddon(id, destPath, enabled)
 	if err != nil {
@@ -113,21 +93,16 @@ func (m *Manager) UninstallAddon(addonId string, disable bool) error {
 		}
 	}
 	if disable {
-		info, err := m.settingsStore.GetSetting(GetAddonKey(addonId))
-		if err == nil {
-			addonInfo := NewAddonInfoFromString(info)
-			addonInfo.Enabled = false
-			s, err := json.MarshalToString(addonInfo)
-			if err == nil {
-				err = m.settingsStore.SetSetting(addonInfo.ID, s)
-			}
+		addonInfo := m.getInstallAddon(addonId)
+		err := addonInfo.disable()
+		if err != nil {
+			return err
 		}
 	}
-	delete(m.installAddons, addonId)
+	m.installAddons.Delete(addonId)
+	m.installAddons.Delete(addonId)
 	return nil
 }
-
-
 
 func (m *Manager) GetAddonLicense(addonId string) string {
 	return ""

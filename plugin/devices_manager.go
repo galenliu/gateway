@@ -7,16 +7,16 @@ import (
 
 func (m *Manager) SetPropertyValue(deviceId, propName string, newValue interface{}) (interface{}, error) {
 
-	device, ok := m.devices[deviceId]
-	if !ok {
-		return nil, fmt.Errorf("device not found")
-	}
-	prop := device.GetProperty(propName)
-	if prop == nil {
-		return nil, fmt.Errorf("property not found")
-	}
-
-	return prop.SetValue(newValue)
+	//device, ok := m.devices[deviceId]
+	//if !ok {
+	//	return nil, fmt.Errorf("device not found")
+	//}
+	//prop := device.GetProperty(propName)
+	//if prop == nil {
+	//	return nil, fmt.Errorf("property not found")
+	//}
+	//
+	//return prop.SetValue(newValue)
 
 	//go func() {
 	//	err := m.handleSetProperty(deviceId, propName, newValue)
@@ -30,10 +30,10 @@ func (m *Manager) SetPropertyValue(deviceId, propName string, newValue interface
 	//	closeChan <- struct{}{}
 	//})
 	//changed := func(data []byte) {
-	//	id := json.Get(data, "deviceId").ToString()
+	//	ID := json.Get(data, "deviceId").ToString()
 	//	name := json.Get(data, "name").ToString()
 	//	value := json.Get(data, "value").GetInterface()
-	//	if id == deviceId && name == propName {
+	//	if ID == deviceId && name == propName {
 	//		propChan <- value
 	//	}
 	//}
@@ -51,15 +51,16 @@ func (m *Manager) SetPropertyValue(deviceId, propName string, newValue interface
 }
 
 func (m *Manager) GetPropertyValue(deviceId, propName string) (interface{}, error) {
-	device, ok := m.devices[deviceId]
-	if !ok {
-		return nil, fmt.Errorf("deviceId (%s)invaild", deviceId)
-	}
-	prop := device.GetProperty(propName)
-	if prop == nil {
-		return nil, fmt.Errorf("propName(%s)invaild", propName)
-	}
-	return prop.GetValue(), nil
+	//device, ok := m.devices[deviceId]
+	//if !ok {
+	//	return nil, fmt.Errorf("deviceId (%s)invaild", deviceId)
+	//}
+	//prop := device.GetProperty(propName)
+	//if prop == nil {
+	//	return nil, fmt.Errorf("propName(%s)invaild", propName)
+	//}
+	//return prop.GetValue(), nil
+	return nil, nil
 }
 
 //func (m *Manager)GetPropertiesValue(deviceId string)(map[string]interface{},error){
@@ -72,18 +73,11 @@ func (m *Manager) GetPropertyValue(deviceId, propName string) (interface{}, erro
 //}
 
 func (m *Manager) GetDevice(deviceId string) *internal.Device {
-	device, ok := m.devices[deviceId]
-	if !ok {
-		return nil
-	}
-	return device
+	return nil
 }
 
 func (m *Manager) GetDevices() (device []*internal.Device) {
-	for _, dev := range m.devices {
-		device = append(device, dev)
-	}
-	return
+	return nil
 }
 
 func (m *Manager) RemoveDevice(deviceId string) error {

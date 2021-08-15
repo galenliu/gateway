@@ -1,6 +1,6 @@
 module github.com/galenliu/gateway
 
-go 1.16
+go 1.17
 
 require (
 	github.com/andybalholm/brotli v1.0.3 // indirect
@@ -8,7 +8,7 @@ require (
 	github.com/brutella/hc v1.2.4
 	github.com/fasthttp/websocket v1.4.3 // indirect
 	github.com/go-oauth2/oauth2/v4 v4.3.0
-	github.com/gofiber/fiber/v2 v2.16.0
+	github.com/gofiber/fiber/v2 v2.17.0
 	github.com/gofiber/jwt/v2 v2.2.5 // indirect
 	github.com/gofiber/websocket/v2 v2.0.3
 	github.com/golang-jwt/jwt v3.2.2+incompatible
@@ -18,7 +18,6 @@ require (
 	github.com/kardianos/service v1.2.0
 	github.com/klauspost/compress v1.13.3 // indirect
 	github.com/mattn/go-sqlite3 v1.14.5
-	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/savsgio/gotils v0.0.0-20210316171653-c54912823645 // indirect
@@ -28,7 +27,6 @@ require (
 	github.com/tidwall/gjson v1.7.4
 	github.com/valyala/fasthttp v1.28.0 // indirect
 	github.com/xiam/to v0.0.0-20200126224905-d60d31e03561
-	go.uber.org/zap v1.16.0
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
 	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect

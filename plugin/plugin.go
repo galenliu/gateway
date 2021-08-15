@@ -4,12 +4,10 @@ package plugin
 import (
 	"context"
 	"fmt"
-	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/rpc"
 	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
-	"github.com/tidwall/gjson"
 	"io"
 	"os"
 	"os/exec"
@@ -54,7 +52,7 @@ func NewPlugin(s *PluginsServer, pluginId string, log logging.Logger) (plugin *P
 }
 
 func (plugin *Plugin) MessageHandler(messageType rpc.MessageType, data []byte) (err error) {
-	var adapterId = json.Get(data, "data", "adapterId").ToString()
+	var adapterId = json.Get(data, "adapterId").ToString()
 	if adapterId == "" {
 		return fmt.Errorf("pluginId is none")
 	}
@@ -78,8 +76,8 @@ func (plugin *Plugin) MessageHandler(messageType rpc.MessageType, data []byte) (
 
 	switch messageType {
 	case rpc.MessageType_AdapterAddedNotification:
-		var name = json.Get(data, "data", "name").ToString()
-		var packageName = json.Get(data, "data", "packageName").ToString()
+		var name = json.Get(data, "name").ToString()
+		var packageName = json.Get(data, "packageName").ToString()
 		adapter := NewAdapter(plugin, name, adapterId, packageName, plugin.logger)
 		plugin.pluginServer.manager.handleAdapterAdded(adapter)
 		return nil
@@ -87,7 +85,7 @@ func (plugin *Plugin) MessageHandler(messageType rpc.MessageType, data []byte) (
 
 	adapter := plugin.pluginServer.manager.getAdapter(adapterId)
 	if adapter == nil {
-		plugin.logger.Info("(%s)adapter not found", internal.MessageTypeToString(int(messageType)))
+		plugin.logger.Info("(%s)adapter not found", rpc.MessageType_name[int32(rpc.MessageType_AdapterAddedNotification)])
 		return nil
 	}
 
@@ -105,12 +103,12 @@ func (plugin *Plugin) MessageHandler(messageType rpc.MessageType, data []byte) (
 		return
 	case rpc.MessageType_DeviceAddedNotification:
 		//messages.DeviceAddedNotification
-		data := gjson.GetBytes(data, "data").Get("device").String()
-		if data == "" {
+		str := json.Get(data, "device").ToString()
+		if str == "" {
 			plugin.logger.Info("marshal device err")
 			return
 		}
-		var newDevice = internal.NewDeviceFormString(data)
+		var newDevice = internal.NewDeviceFormString(str)
 
 		if newDevice == nil {
 			plugin.logger.Error("device add err:")
@@ -121,9 +119,9 @@ func (plugin *Plugin) MessageHandler(messageType rpc.MessageType, data []byte) (
 		return
 	}
 
-	deviceId := json.Get(data, "data", "deviceId").ToString()
-	device, ok := adapter.devices[deviceId]
-	if !ok {
+	deviceId := json.Get(data, "deviceId").ToString()
+	device := adapter.plugin.pluginServer.manager.getDevice(deviceId)
+	if device == nil {
 		plugin.logger.Info("device cannot found: %s", deviceId)
 		return
 	}
@@ -172,18 +170,16 @@ func (plugin *Plugin) MessageHandler(messageType rpc.MessageType, data []byte) (
 
 	case rpc.MessageType_DeviceActionStatusNotification:
 		var action internal.Action
-		json.Get(data, "data", "action").ToVal(&action)
+		json.Get(data, "action").ToVal(&action)
 		return
 
 	case rpc.MessageType_DeviceEventNotification:
 		var event internal.Event
-		json.Get(data, "data", "event").ToVal(&event)
+		json.Get(data, "event").ToVal(&event)
 
 	case rpc.MessageType_DeviceConnectedStateNotification:
-		var connected = json.Get(data, "data", "connected")
-		if connected.LastError() == nil {
-			event_bus.Publish(constant.CONNECTED, device, connected.ToBool())
-		}
+		var connected = json.Get(data, "connected").ToBool()
+		device.SetConnect(connected)
 		return
 
 	case rpc.MessageType_AdapterPairingPromptNotification:

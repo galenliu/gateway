@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
 	json "github.com/json-iterator/go"
@@ -10,7 +9,7 @@ import (
 )
 
 type AddonHandler interface {
-	GetInstallAddons() []*plugin.AddonInfo
+	GetInstallAddons() []byte
 	EnableAddon(addonId string) error
 	DisableAddon(addonId string) error
 

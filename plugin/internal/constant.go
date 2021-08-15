@@ -45,6 +45,7 @@ const (
 )
 
 const (
+
 	AdapterAddedNotification           = 4096
 	AdapterCancelPairingCommand        = 4100
 	AdapterCancelRemoveDeviceCommand   = 4105
@@ -98,114 +99,4 @@ const (
 	PluginUnloadResponse               = 3
 )
 
-func MessageTypeToString(mt int) string {
-	switch mt {
 
-	case AdapterAddedNotification:
-		return "AdapterAddedNotification"
-	case AdapterCancelPairingCommand:
-		return "AdapterCancelPairingCommand"
-	case AdapterCancelRemoveDeviceCommand:
-		return "AdapterCancelRemoveDeviceCommand"
-	case AdapterPairingPromptNotification:
-		return "AdapterPairingPromptNotification"
-	case AdapterRemoveDeviceRequest:
-		return "AdapterRemoveDeviceRequest"
-	case AdapterRemoveDeviceResponse:
-		return "AdapterRemoveDeviceResponse"
-	case AdapterStartPairingCommand:
-		return "AdapterStartPairingCommand"
-	case AdapterUnloadRequest:
-		return "AdapterUnloadRequest"
-	case AdapterUnloadResponse:
-		return "AdapterUnloadResponse"
-	case AdapterUnpairingPromptNotification:
-		return "AdapterUnpairingPromptNotification"
-	case ApiHandlerAddedNotification:
-		return "ApiHandlerAddedNotification"
-	case ApiHandlerApiRequest:
-		return "ApiHandlerApiRequest"
-	case ApiHandlerApiResponse:
-		return "ApiHandlerApiResponse"
-	case ApiHandlerUnloadRequest:
-		return "ApiHandlerUnloadRequest"
-	case ApiHandlerUnloadResponse:
-		return "ApiHandlerUnloadResponse"
-	case DeviceActionStatusNotification:
-		return "DeviceActionStatusNotification"
-	case DeviceAddedNotification:
-		return "DeviceAddedNotification"
-	case DeviceConnectedStateNotification:
-		return "DeviceConnectedStateNotification"
-	case DeviceDebugCommand:
-		return "DeviceDebugCommand"
-	case DeviceEventNotification:
-		return "DeviceEventNotification"
-	case DevicePropertyChangedNotification:
-		return "DevicePropertyChangedNotification"
-	case DeviceRemoveActionRequest:
-		return "DeviceRemoveActionRequest"
-	case DeviceRemoveActionResponse:
-		return "DeviceRemoveActionResponse"
-	case DeviceRequestActionRequest:
-		return "DeviceRequestActionRequest"
-	case DeviceRequestActionResponse:
-		return "DeviceRequestActionResponse"
-	case DeviceSavedNotification:
-		return "DeviceSavedNotification"
-	case DeviceSetCredentialsRequest:
-		return "DeviceSetCredentialsRequest"
-	case DeviceSetCredentialsResponse:
-		return "DeviceSetCredentialsResponse"
-	case DeviceSetPinRequest:
-		return "DeviceSetPinRequest"
-	case DeviceSetPinResponse:
-		return "DeviceSetPinResponse"
-	case DeviceSetPropertyCommand:
-		return "DeviceSetPropertyCommand"
-	case MockAdapterAddDeviceRequest:
-		return "MockAdapterAddDeviceRequest"
-	case MockAdapterAddDeviceResponse:
-		return "MockAdapterAddDeviceResponse"
-	case MockAdapterClearStateRequest:
-		return "MockAdapterClearStateRequest"
-	case MockAdapterClearStateResponse:
-		return "MockAdapterClearStateResponse"
-	case MockAdapterPairDeviceCommand:
-		return "MockAdapterPairDeviceCommand"
-	case MockAdapterRemoveDeviceRequest:
-		return "MockAdapterRemoveDeviceRequest"
-	case MockAdapterRemoveDeviceResponse:
-		return "MockAdapterRemoveDeviceResponse"
-	case MockAdapterUnpairDeviceCommand:
-		return "MockAdapterUnpairDeviceCommand"
-	case NotifierAddedNotification:
-		return "NotifierAddedNotification"
-	case NotifierUnloadRequest:
-		return "NotifierUnloadRequest"
-	case NotifierUnloadResponse:
-		return "NotifierUnloadResponse"
-	case OutletAddedNotification:
-		return "OutletAddedNotification"
-	case OutletNotifyRequest:
-		return "OutletNotifyRequest"
-	case OutletNotifyResponse:
-		return "OutletNotifyResponse"
-	case OutletRemovedNotification:
-		return "OutletRemovedNotification"
-	case PluginErrorNotification:
-		return "PluginErrorNotification"
-	case PluginRegisterRequest:
-		return "PluginRegisterRequest"
-	case PluginRegisterResponse:
-		return "PluginRegisterResponse"
-	case PluginUnloadRequest:
-		return "PluginUnloadRequest"
-	case PluginUnloadResponse:
-		return "PluginUnloadResponse"
-	default:
-		return "unknown"
-	}
-}
-
-const IpcDefaultPort = "9500"

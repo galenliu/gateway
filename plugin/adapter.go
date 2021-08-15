@@ -16,13 +16,13 @@ type managerProxy interface {
 }
 
 type Adapter struct {
-	id             string
+	ID             string
 	name           string
 	pluginId       string
 	plugin         *Plugin
 	looker         *sync.Mutex
 	isPairing      bool
-	devices        map[string]*internal.Device
+	devices        sync.Map
 	pairingContext context.Context
 	manifest       interface{}
 	packageName    string
@@ -31,29 +31,29 @@ type Adapter struct {
 }
 
 func NewAdapter(p *Plugin, name, adapterId, packageName string, log logging.Logger) *Adapter {
-	proxy := &Adapter{}
-	proxy.logger = log
-	proxy.id = adapterId
-	proxy.name = name
-	proxy.packageName = packageName
-	proxy.plugin = p
-	proxy.devices = make(map[string]*internal.Device)
-	proxy.looker = new(sync.Mutex)
+	adapter := &Adapter{}
+	adapter.logger = log
+	adapter.ID = adapterId
+	adapter.pluginId = p.pluginId
+	adapter.name = name
+	adapter.packageName = packageName
+	adapter.plugin = p
+	adapter.looker = new(sync.Mutex)
 
-	return proxy
+	return adapter
 }
 
 func (adapter *Adapter) pairing(timeout float64) {
-	adapter.logger.Info(fmt.Sprintf("adapter: %s start pairing", adapter.id))
+	adapter.logger.Info(fmt.Sprintf("adapter: %s start pairing", adapter.ID))
 	data := make(map[string]interface{})
 	data["timeout"] = timeout
-	adapter.SendMessage(internal.AdapterStartPairingCommand, data)
+	adapter.SendMessage(rpc.MessageType_AdapterStartPairingCommand, data)
 }
 
 func (adapter *Adapter) cancelPairing() {
-	adapter.logger.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.id))
+	adapter.logger.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.ID))
 	data := make(map[string]interface{})
-	adapter.SendMessage(internal.AdapterCancelPairingCommand, data)
+	adapter.SendMessage(rpc.MessageType_AdapterCancelPairingCommand, data)
 }
 
 func (adapter *Adapter) removeThing(device *internal.Device) {
@@ -65,28 +65,43 @@ func (adapter *Adapter) removeThing(device *internal.Device) {
 }
 
 func (adapter *Adapter) cancelRemoveThing(deviceId string) {
-	adapter.logger.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.id))
+	adapter.logger.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.ID))
 	data := make(map[string]interface{})
 	data["deviceId"] = deviceId
-	adapter.SendMessage(internal.AdapterCancelRemoveDeviceCommand, data)
+	adapter.SendMessage(rpc.MessageType_AdapterCancelRemoveDeviceCommand, data)
 }
 
-func (adapter *Adapter) getManager() *Manager {
-	return adapter.plugin.pluginServer.manager
+func (adapter *Adapter) SendMessage(messageType rpc.MessageType, data map[string]interface{}) {
+	data["adapterId"] = adapter.ID
+	adapter.plugin.SendMessage(messageType, data)
 }
-
-func (adapter *Adapter) SendMessage(messageType int, data map[string]interface{}) {
-	data["adapterId"] = adapter.id
-	adapter.plugin.SendMessage(rpc.MessageType(messageType), data)
-}
-
 
 func (adapter *Adapter) handleDeviceRemoved(d *internal.Device) {
-	delete(adapter.devices, d.ID)
-
+	adapter.devices.Delete(d.ID)
+	adapter.plugin.pluginServer.manager.handleDeviceRemoved(d)
 }
 
 func (adapter *Adapter) handleDeviceAdded(device *internal.Device) {
-	adapter.devices[device.GetId()] = device
+	adapter.devices.Store(device.ID, device)
 	adapter.plugin.pluginServer.manager.handleDeviceAdded(device)
+}
+
+func (adapter *Adapter) getDevice(deviceId string) *internal.Device {
+	d, ok := adapter.devices.Load(deviceId)
+	device, ok := d.(*internal.Device)
+	if !ok {
+		return nil
+	}
+	return device
+}
+
+func (adapter *Adapter) getDevices() (devices []*internal.Device) {
+	adapter.devices.Range(func(key, value interface{}) bool {
+		device, ok := value.(*internal.Device)
+		if ok {
+			devices = append(devices, device)
+		}
+		return true
+	})
+	return
 }

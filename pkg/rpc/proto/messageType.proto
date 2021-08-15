@@ -11,13 +11,13 @@ enum messageType{
   AdapterAddedNotification = 4096;
   AdapterCancelPairingCommand = 4100;
   AdapterPairingPromptNotification = 4101;
-  AdapterCancelRemoveDeviceCommand = 4105;
+  AdapterUnpairingPromptNotification = 4102;
   AdapterRemoveDeviceRequest = 4103;
   AdapterRemoveDeviceResponse = 4104;
-  AdapterStartPairingCommand = 4099;
+  AdapterCancelRemoveDeviceCommand = 4105;
   AdapterUnloadRequest = 4097;
   AdapterUnloadResponse = 4098;
-  AdapterUnpairingPromptNotification = 4102;
+  AdapterStartPairingCommand = 4099;
   ApiHandlerAddedNotification = 20480;
   ApiHandlerApiRequest = 20483;
   ApiHandlerApiResponse = 20484;

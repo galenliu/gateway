@@ -10,7 +10,6 @@ import (
 	"github.com/galenliu/gateway/pkg/util"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	"github.com/galenliu/gateway/plugin/internal"
-	"github.com/galenliu/gateway/server/models"
 	json "github.com/json-iterator/go"
 	"time"
 
@@ -27,6 +26,11 @@ type eventBus interface {
 	Unsubscribe(string, interface{})
 }
 
+type Store interface {
+	GetSetting(key string) (string, error)
+	SetSetting(key, value string) error
+}
+
 type Options struct {
 	AddonDirs []string
 	IPCPort   string
@@ -35,20 +39,15 @@ type Options struct {
 	Preferences
 }
 
-type Extension struct {
-	Extensions string
-	Resources  string
-}
-
 type Manager struct {
 	options      Options
 	configPath   string
 	pluginServer *PluginsServer
 
-	devices       map[string]*internal.Device
-	adapters      map[string]*Adapter
-	installAddons map[string]*AddonInfo
-	extensions    map[string]Extension
+	devices       sync.Map
+	adapters      sync.Map
+	installAddons sync.Map
+	extensions    sync.Map
 
 	bus          eventBus
 	addonsLoaded bool
@@ -60,22 +59,31 @@ type Manager struct {
 	logger       logging.Logger
 	actions      map[string]*wot.ActionAffordance
 
-	settingsStore models.SettingsStore
+	store Store
 }
 
-func NewAddonsManager(options Options, settingStore models.SettingsStore, bus eventBus, log logging.Logger) *Manager {
+
+func (m *Manager) UnloadAddon(id string) error {
+	panic("implement me")
+}
+
+func (m *Manager) LoadAddon(id string) error {
+	panic("implement me")
+}
+
+func (m *Manager) GetPropertiesValue(thingId string) (map[string]interface{}, error) {
+	panic("implement me")
+}
+
+func NewAddonsManager(options Options, settingStore Store, bus eventBus, log logging.Logger) *Manager {
 	am := &Manager{}
 	am.options = options
 	am.logger = log
 	am.addonsLoaded = false
 	am.isPairing = false
 	am.running = false
-	am.devices = make(map[string]*internal.Device, 50)
-	am.installAddons = make(map[string]*AddonInfo, 50)
-	am.adapters = make(map[string]*Adapter, 20)
-	am.extensions = make(map[string]Extension)
 	am.bus = bus
-	am.settingsStore = settingStore
+	am.store = settingStore
 	am.locker = new(sync.Mutex)
 	am.loadAddons()
 	return am
@@ -85,7 +93,7 @@ func (m *Manager) addNewThing(pairingTimeout float64) error {
 	if m.isPairing {
 		return fmt.Errorf("add already in progress")
 	}
-	for _, adapter := range m.adapters {
+	for _, adapter := range m.getAdapters() {
 		adapter.pairing(pairingTimeout)
 	}
 	m.isPairing = true
@@ -109,7 +117,7 @@ func (m *Manager) CancelAddNewThing() {
 	if !m.isPairing {
 		return
 	}
-	for _, adapter := range m.adapters {
+	for _, adapter := range m.getAdapters() {
 		adapter.cancelPairing()
 	}
 	m.isPairing = false
@@ -129,16 +137,12 @@ func (m *Manager) connectedNotify(device *internal.Device, connected bool) {
 }
 
 func (m *Manager) handleAdapterAdded(adapter *Adapter) {
-	m.locker.Lock()
-	defer m.locker.Unlock()
-	m.adapters[adapter.id] = adapter
-	m.logger.Debug(fmt.Sprintf("adapter：(%s) added", adapter.id))
+	m.adapters.Store(adapter.ID, adapter)
+	m.logger.Debug(fmt.Sprintf("adapter：(%s) added", adapter.ID))
 }
 
 func (m *Manager) handleDeviceAdded(device *internal.Device) {
-	m.locker.Lock()
-	defer m.locker.Unlock()
-	m.devices[device.GetId()] = device
+	m.devices.Store(device.ID, device)
 	data, err := json.MarshalIndent(device, "", "  ")
 	if err != nil {
 		m.logger.Info("device marshal err")
@@ -146,22 +150,23 @@ func (m *Manager) handleDeviceAdded(device *internal.Device) {
 	m.bus.Publish(constant.DeviceAdded, data)
 }
 
-func (m *Manager) getAdapter(adapterId string) *Adapter {
-	adapter, ok := m.adapters[adapterId]
-	if !ok {
-		return nil
+func (m *Manager) handleDeviceRemoved(device *internal.Device) {
+	m.devices.Delete(device.ID)
+	data, err := json.MarshalIndent(device, "", "  ")
+	if err != nil {
+		m.logger.Info("device marshal err")
 	}
-	return adapter
+	m.bus.Publish(constant.DeviceAdded, data)
 }
 
 func (m *Manager) handleSetProperty(deviceId, propName string, setValue interface{}) error {
-	device := m.devices[deviceId]
+	device := m.getDevice(deviceId)
 	if device == nil {
-		return fmt.Errorf("device id err")
+		return fmt.Errorf("device ID err")
 	}
 	adapter := m.getAdapter(device.AdapterId)
 	if adapter == nil {
-		return fmt.Errorf("adapter id err")
+		return fmt.Errorf("adapter ID err")
 	}
 	property := device.GetProperty(propName)
 
@@ -179,12 +184,84 @@ func (m *Manager) handleSetProperty(deviceId, propName string, setValue interfac
 	return nil
 }
 
-func (m *Manager) getDevice(deviceId string) *internal.Device {
-	d, ok := m.devices[deviceId]
+func (m *Manager) getAdapter(adapterId string) *Adapter {
+	a, ok := m.adapters.Load(adapterId)
+	adapter, ok := a.(*Adapter)
 	if !ok {
 		return nil
 	}
-	return d
+	return adapter
+}
+
+func (m *Manager) getAdapters() (adapters []*Adapter) {
+	m.adapters.Range(func(key, value interface{}) bool {
+		adapter, ok := value.(*Adapter)
+		if ok {
+			adapters = append(adapters, adapter)
+		}
+		return true
+	})
+	return
+}
+
+func (m *Manager) getExtension(id string) *Extension {
+	a, ok := m.extensions.Load(id)
+	ext, ok := a.(*Extension)
+	if !ok {
+		return nil
+	}
+	return ext
+}
+
+func (m *Manager) getExtensions() (adapters []*Extension) {
+	m.extensions.Range(func(key, value interface{}) bool {
+		ext, ok := value.(*Extension)
+		if ok {
+			adapters = append(adapters, ext)
+		}
+		return true
+	})
+	return
+}
+
+func (m *Manager) getDevice(deviceId string) *internal.Device {
+	d, ok := m.devices.Load(deviceId)
+	device, ok := d.(*internal.Device)
+	if !ok {
+		return nil
+	}
+	return device
+}
+
+func (m *Manager) getDevices() (devices []*internal.Device) {
+	m.devices.Range(func(key, value interface{}) bool {
+		device, ok := value.(*internal.Device)
+		if ok {
+			devices = append(devices, device)
+		}
+		return true
+	})
+	return
+}
+
+func (m *Manager) getInstallAddon(addonId string) *AddonInfo {
+	a, ok := m.installAddons.Load(addonId)
+	addon, ok := a.(*AddonInfo)
+	if !ok {
+		return nil
+	}
+	return addon
+}
+
+func (m *Manager) getInstallAddons() (addons []*AddonInfo) {
+	m.installAddons.Range(func(key, value interface{}) bool {
+		addon, ok := value.(*AddonInfo)
+		if ok {
+			addons = append(addons, addon)
+		}
+		return true
+	})
+	return
 }
 
 //tar package to addon from the temp dir,
@@ -192,7 +269,7 @@ func (m *Manager) installAddon(packageId, packagePath string, enabled bool) erro
 	if !m.addonsLoaded {
 		return fmt.Errorf(`Cannot install add-on before other add-ons have been loaded.`)
 	}
-	m.logger.Info("execute install package id: %s ", packageId)
+	m.logger.Info("execute install package ID: %s ", packageId)
 	f, err := os.Open(packagePath)
 	if err != nil {
 		return err
@@ -233,7 +310,7 @@ func (m *Manager) installAddon(packageId, packagePath string, enabled bool) erro
 
 	}
 	var key = "addons." + packageId
-	saved, err := m.settingsStore.GetSetting(key)
+	saved, err := m.store.GetSetting(key)
 	if err == nil && saved != "" {
 		var old AddonInfo
 		ee := json.UnmarshalFromString(saved, &old)
@@ -241,7 +318,7 @@ func (m *Manager) installAddon(packageId, packagePath string, enabled bool) erro
 			old.Enabled = enabled
 			newAddonInfo, err := json.MarshalToString(old)
 			if err != nil {
-				ee := m.settingsStore.SetSetting(key, newAddonInfo)
+				ee := m.store.SetSetting(key, newAddonInfo)
 				if ee != nil {
 					m.logger.Error(ee.Error())
 				}
@@ -287,7 +364,7 @@ func (m *Manager) loadAddons() {
 				addonId := fi.Name()
 				err = m.loadAddon(addonId)
 				if err != nil {
-					m.logger.Error("load addon id:%s failed err:%s", addonId, err.Error())
+					m.logger.Error("load addon ID:%s failed err:%s", addonId, err.Error())
 				}
 			}
 		}
@@ -303,7 +380,7 @@ func (m *Manager) loadAddon(packageId string) error {
 
 	addonPath := m.findPluginPath(packageId)
 
-	addonInfo, obj, err := LoadManifest(addonPath, packageId)
+	addonInfo, obj, err := LoadManifest(addonPath, packageId, m.store)
 
 	if err != nil {
 		return err
@@ -319,26 +396,27 @@ func (m *Manager) loadAddon(packageId string) error {
 		}
 	}
 	info, err := json.MarshalToString(addonInfo)
-	err = m.settingsStore.SetSetting(GetAddonKey(addonInfo.ID), info)
+	err = m.store.SetSetting(GetAddonKey(addonInfo.ID), info)
 	if err != nil {
 		return err
 	}
-	savedConfig, e := m.settingsStore.GetSetting(configKey)
+	savedConfig, e := m.store.GetSetting(configKey)
 	if e != nil && savedConfig == "" {
 		if cfg != "" {
-			eee := m.settingsStore.SetSetting(configKey, cfg)
+			eee := m.store.SetSetting(configKey, cfg)
 			if eee != nil {
 				m.logger.Error(eee.Error())
 			}
 		}
 	}
 	if savedConfig == "" && cfg != "" {
-		eee := m.settingsStore.SetSetting(configKey, cfg)
+		eee := m.store.SetSetting(configKey, cfg)
 		if eee != nil {
 			return eee
 		}
 	}
-	m.installAddons[packageId] = addonInfo
+	m.installAddons.Store(packageId, addonInfo)
+
 	if !addonInfo.Enabled {
 		return fmt.Errorf("addon disenabled")
 	}
@@ -347,7 +425,7 @@ func (m *Manager) loadAddon(packageId string) error {
 			Extensions: addonInfo.ContentScripts,
 			Resources:  addonInfo.WSebAccessibleResources,
 		}
-		m.extensions[addonInfo.ID] = ext
+		m.extensions.Store(addonInfo.ID, ext)
 	}
 	if addonInfo.Exec == "" {
 		return nil
@@ -363,28 +441,25 @@ func (m *Manager) loadAddon(packageId string) error {
 	return nil
 }
 
-func (m *Manager) unloadAddon(packageId string) error {
+func (m *Manager) unloadAddon(pluginId string) error {
 	if !m.addonsLoaded {
 		return nil
 	}
-	_, ok := m.extensions[packageId]
-	if ok {
-		delete(m.extensions, packageId)
+	ext := m.getExtension(pluginId)
+	if ext != nil {
+		ext.unload()
+		m.extensions.Delete(pluginId)
 	}
-	plugin := m.pluginServer.Plugins[packageId]
-	if plugin == nil {
-		return fmt.Errorf("can not found plugin: %s", packageId)
-	}
-
-	for key, adapter := range m.adapters {
-		if adapter.id == plugin.pluginId {
-			for _, dev := range adapter.devices {
-				adapter.handleDeviceRemoved(dev)
+	for _, adapter := range m.getAdapters() {
+		if adapter.pluginId == pluginId {
+			for _, device := range adapter.getDevices() {
+				if device.AdapterId == adapter.ID {
+					adapter.handleDeviceRemoved(device)
+				}
 			}
-			delete(m.adapters, key)
 		}
 	}
-	m.pluginServer.uninstallPlugin(packageId)
+	m.pluginServer.unloadPlugin(pluginId)
 	return nil
 }
 

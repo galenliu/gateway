@@ -10,8 +10,7 @@ import (
 )
 
 type PluginsServer struct {
-	Plugins   map[string]*Plugin
-	locker    *sync.Mutex
+	Plugins   sync.Map
 	manager   *Manager
 	ipc       *ipc.IPCServer
 	rpc       *rpc_server.RPCServer
@@ -25,8 +24,7 @@ func NewPluginServer(manager *Manager, userProfile []byte, preferences []byte) *
 	server := &PluginsServer{}
 	server.logger = manager.logger
 	server.closeChan = make(chan struct{})
-	server.Plugins = make(map[string]*Plugin, 30)
-	server.locker = new(sync.Mutex)
+
 	server.manager = manager
 	server.ipc = ipc.NewIPCServer(server, manager.options.IPCPort, userProfile, preferences, manager.logger)
 	server.rpc = rpc_server.NewRPCServer(server, manager.options.RPCPort, userProfile, preferences, manager.logger)
@@ -34,40 +32,50 @@ func NewPluginServer(manager *Manager, userProfile []byte, preferences []byte) *
 }
 
 func (s *PluginsServer) RegisterPlugin(pluginId string, clint IClint) *Plugin {
-	plugin, ok := s.Plugins[pluginId]
-	if !ok {
+	plugin := s.getPlugin(pluginId)
+	if plugin == nil {
 		plugin = NewPlugin(s, pluginId, s.logger)
-		s.Plugins[pluginId] = plugin
+		s.Plugins.Store(pluginId, plugin)
 	}
 	plugin.Clint = clint
 	return plugin
 }
 
 func (s *PluginsServer) loadPlugin(addonPath, id, exec string) {
-	plugin := s.registerPlugin(id)
+	plugin := s.RegisterPlugin(id, nil)
 	plugin.exec = exec
 	plugin.execPath = addonPath
 	go plugin.execute()
 }
 
-func (s *PluginsServer) uninstallPlugin(packageId string) {
-	plugin := s.Plugins[packageId]
+func (s *PluginsServer) unloadPlugin(packageId string) {
+	plugin := s.getPlugin(packageId)
 	if plugin == nil {
 		s.logger.Error("plugin not exist")
 		return
 	}
 	plugin.unload()
-	delete(s.Plugins, packageId)
-
+	s.Plugins.Delete(packageId)
 }
 
-func (s *PluginsServer) registerPlugin(packageId string) *Plugin {
-	plugin, ok := s.Plugins[packageId]
+func (s *PluginsServer) getPlugin(id string) *Plugin {
+	p, ok := s.Plugins.Load(id)
+	plugin, ok := p.(*Plugin)
 	if !ok {
-		plugin = NewPlugin(s, packageId, s.logger)
-		s.Plugins[packageId] = plugin
+		return nil
 	}
 	return plugin
+}
+
+func (s *PluginsServer) getPlugins() (plugins []*Plugin) {
+	s.Plugins.Range(func(key, value interface{}) bool {
+		p, ok := value.(*Plugin)
+		if ok {
+			plugins = append(plugins, p)
+		}
+		return true
+	})
+	return
 }
 
 // Start create goroutines handle ipc massage
@@ -88,7 +96,6 @@ func (s *PluginsServer) Start() error {
 
 // Stop if server stop, also need to stop all of package
 func (s *PluginsServer) Stop() error {
-
 	err := s.ipc.Stop()
 	err = s.rpc.Stop()
 	if err != nil {
@@ -96,7 +103,7 @@ func (s *PluginsServer) Stop() error {
 	}
 	s.closeChan <- struct{}{}
 	s.logger.Info("Plugin server stopped")
-	for _, p := range s.Plugins {
+	for _, p := range s.getPlugins() {
 		p.unload()
 	}
 	return nil

@@ -125,3 +125,8 @@ func JsonIndent(data string) string {
 	}
 	return bf.String()
 }
+
+func IsJson(in []byte) bool {
+	var js map[string]interface{}
+	return json.Unmarshal(in, &js) == nil
+}

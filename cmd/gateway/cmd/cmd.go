@@ -175,8 +175,8 @@ func (c *command) setAllFlags(cmd *cobra.Command) {
 	cmd.Flags().Int(optionNameHttpPort, 9090, "http port")
 	cmd.Flags().Int(optionNameHttpsPort, 4443, "https port")
 
-	cmd.Flags().Int(optionNameIpcPort, 9095, "ipc port")
-	cmd.Flags().Int(optionNameRpcPort, 9096, "rpc port")
+	cmd.Flags().Int(optionNameIpcPort, 9500, "ipc port")
+	cmd.Flags().Int(optionNameRpcPort, 9600, "rpc port")
 
 	cmd.Flags().Int(optionLogRotateDays, 7, "log rotate days")
 	cmd.Flags().String(optionHomeKitPin, "12344321", "homekit pin")

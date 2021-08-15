@@ -28,3 +28,7 @@ func (d *Device) GetProperty(name string) *Property {
 func (d *Device) GetPropertyValue(name string) (interface{}, error) {
 	return nil, nil
 }
+
+func (d *Device) SetConnect(connected bool){
+
+}
