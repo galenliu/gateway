@@ -35,10 +35,18 @@ type Map = map[string]interface{}
 //	return controller
 //}
 
-func handleWebsocket(c *websocket.Conn) {
-	logging.Info("handler websocket....")
-	thingId, _ := c.Locals("thingId").(string)
-	websocketHandler(c, thingId)
+func handleWebsocket(model models.Container, log logging.Logger) func(conn *websocket.Conn) {
+	handler := func(c *websocket.Conn) {
+		thingId, _ := c.Locals("thingId").(string)
+		clint := NewWsClint(c, thingId, model, log)
+		err := clint.handler()
+		if err != nil {
+			log.Errorf("clint lost")
+			return
+		}
+	}
+	return handler
+
 }
 
 func websocketHandler(c *websocket.Conn, thingId string) {
@@ -298,7 +306,7 @@ func websocketHandler(c *websocket.Conn, thingId string) {
 		default:
 			_, data, readErr := c.ReadMessage()
 			if readErr != nil {
-				logging.Info("websocket disconnected err: %s", readErr.Error())
+
 				done <- struct{}{}
 				return
 			}

@@ -7,8 +7,8 @@ import (
 	"github.com/galenliu/gateway/server"
 	"github.com/galenliu/gateway/server/middleware"
 	"github.com/galenliu/gateway/server/models"
-
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/websocket/v2"
@@ -40,11 +40,14 @@ func Setup(options Options, addonManager server.AddonManager, store server.Store
 	app.options = options
 	app.App = fiber.New()
 	app.Use(recover.New())
+	app.Use(logger.New(logger.ConfigDefault))
+	app.Use(cors.New(cors.ConfigDefault))
 
 	//models init
 	settingModel := models.NewSettingsModel(store, log)
 	usersModel := models.NewUsersModel(store, log)
 	jsonwebtokenModel := models.NewJsonwebtokenModel(settingModel, store, log)
+	thingsModel := models.NewThingsContainer(store, log)
 
 	//logger
 	app.Use(logger.New())
@@ -105,7 +108,7 @@ func Setup(options Options, addonManager server.AddonManager, store server.Store
 
 	//Things Controller
 	{
-		thingsController := NewThingsController(models.NewThingsContainer(store, log), nil, log)
+		thingsController := NewThingsController(thingsModel, nil, log)
 		thingsGroup := app.Group(constant.ThingsPath)
 
 		//set a properties of a thing.
@@ -118,8 +121,8 @@ func Setup(options Options, addonManager server.AddonManager, store server.Store
 		thingsGroup.Get("/:thingId", thingsController.handleGetThing)
 		thingsGroup.Get("/", thingsController.handleGetThings)
 
-		thingsGroup.Get("/:thingId", websocket.New(handleWebsocket))
-		thingsGroup.Get("/", websocket.New(handleWebsocket))
+		thingsGroup.Get("/:thingId", websocket.New(handleWebsocket(thingsModel, log)))
+		thingsGroup.Get("/", websocket.New(handleWebsocket(thingsModel, log)))
 
 		//Get the properties of a thing
 		thingsGroup.Get(constant.ThingIdParam+constant.PropertiesPath, thingsController.handleGetProperties)

@@ -20,12 +20,6 @@ import (
 	"sync"
 )
 
-type eventBus interface {
-	Publish(string, ...interface{})
-	Subscribe(string, interface{})
-	Unsubscribe(string, interface{})
-}
-
 type Store interface {
 	GetSetting(key string) (string, error)
 	SetSetting(key, value string) error
@@ -49,7 +43,7 @@ type Manager struct {
 	installAddons sync.Map
 	extensions    sync.Map
 
-	bus          eventBus
+	Eventbus     *Eventbus
 	addonsLoaded bool
 	isPairing    bool
 	pluginCancel context.CancelFunc
@@ -61,7 +55,6 @@ type Manager struct {
 
 	store Store
 }
-
 
 func (m *Manager) UnloadAddon(id string) error {
 	panic("implement me")
@@ -75,14 +68,14 @@ func (m *Manager) GetPropertiesValue(thingId string) (map[string]interface{}, er
 	panic("implement me")
 }
 
-func NewAddonsManager(options Options, settingStore Store, bus eventBus, log logging.Logger) *Manager {
+func NewAddonsManager(options Options, settingStore Store, bus bus, log logging.Logger) *Manager {
 	am := &Manager{}
 	am.options = options
 	am.logger = log
 	am.addonsLoaded = false
 	am.isPairing = false
 	am.running = false
-	am.bus = bus
+	am.Eventbus = NewEventBus(bus)
 	am.store = settingStore
 	am.locker = new(sync.Mutex)
 	am.loadAddons()
@@ -125,15 +118,15 @@ func (m *Manager) CancelAddNewThing() {
 }
 
 func (m *Manager) actionNotify(action *internal.Action) {
-	m.bus.Publish(constant.ActionStatus, nil)
+	m.Eventbus.bus.Publish(constant.ActionStatus, nil)
 }
 
 func (m *Manager) eventNotify(event *internal.Event) {
-	m.bus.Publish(constant.EVENT, nil)
+	m.Eventbus.bus.Publish(constant.EVENT, nil)
 }
 
 func (m *Manager) connectedNotify(device *internal.Device, connected bool) {
-	m.bus.Publish(constant.CONNECTED, connected)
+	m.Eventbus.bus.Publish(constant.CONNECTED, connected)
 }
 
 func (m *Manager) handleAdapterAdded(adapter *Adapter) {
@@ -147,7 +140,7 @@ func (m *Manager) handleDeviceAdded(device *internal.Device) {
 	if err != nil {
 		m.logger.Info("device marshal err")
 	}
-	m.bus.Publish(constant.DeviceAdded, data)
+	m.Eventbus.bus.Publish(constant.DeviceAdded, data)
 }
 
 func (m *Manager) handleDeviceRemoved(device *internal.Device) {
@@ -156,7 +149,7 @@ func (m *Manager) handleDeviceRemoved(device *internal.Device) {
 	if err != nil {
 		m.logger.Info("device marshal err")
 	}
-	m.bus.Publish(constant.DeviceAdded, data)
+	m.Eventbus.bus.Publish(constant.DeviceAdded, data)
 }
 
 func (m *Manager) handleSetProperty(deviceId, propName string, setValue interface{}) error {
@@ -338,14 +331,14 @@ func (m *Manager) loadAddons() {
 	}
 	m.addonsLoaded = true
 	var userProfile []byte
-	var prfe []byte
+	var pref []byte
 
 	userProfile, err := json.Marshal(m.options.UserProfile)
-	prfe, err = json.Marshal(m.options.Preferences)
+	pref, err = json.Marshal(m.options.Preferences)
 	if err != nil {
 		return
 	}
-	m.pluginServer = NewPluginServer(m, userProfile, prfe)
+	m.pluginServer = NewPluginServer(m, userProfile, pref)
 	err = m.pluginServer.Start()
 	if err != nil {
 		m.logger.Error("Plugin Server Start Failed. Err: %s", err.Error())
@@ -485,7 +478,7 @@ func (m *Manager) Start() error {
 	}()
 	m.running = true
 	if err == nil {
-		m.bus.Publish(constant.AddonManagerStarted)
+		m.Eventbus.bus.Publish(constant.AddonManagerStarted)
 	}
 	return err
 }
@@ -495,7 +488,7 @@ func (m *Manager) Stop() error {
 	if err != nil {
 		return err
 	}
-	m.bus.Publish(constant.AddonManagerStopped)
+	m.Eventbus.bus.Publish(constant.AddonManagerStopped)
 	m.running = false
 	return nil
 }
