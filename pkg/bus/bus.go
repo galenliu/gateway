@@ -10,6 +10,15 @@ type eventBus struct {
 	logger logging.Logger
 }
 
+type BaseBus interface {
+	Subscribe(topic string, fn interface{})
+	Unsubscribe(topic string, fn interface{})
+	Publish(topic string, args ...interface{})
+	SubscribeOnce(topic string, fn interface{})
+	SubscribeAsync(topic string, fn interface{})
+	WaitAsync()
+}
+
 func NewEventBus(log logging.Logger) (eventBus, error) {
 	b := eventBus{}
 	b.logger = log

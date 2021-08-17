@@ -2,7 +2,6 @@ package plugin
 
 //	plugin server
 import (
-	"context"
 	ipc "github.com/galenliu/gateway/pkg/ipc_server"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/rpc_server"
@@ -16,7 +15,6 @@ type PluginsServer struct {
 	rpc       *rpc_server.RPCServer
 	closeChan chan struct{}
 	logger    logging.Logger
-	ctx       context.Context
 	verbose   bool
 }
 
