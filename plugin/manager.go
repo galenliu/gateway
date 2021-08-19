@@ -25,7 +25,7 @@ type Store interface {
 	SetSetting(key, value string) error
 }
 
-type Options struct {
+type Config struct {
 	AddonDirs []string
 	IPCPort   string
 	RPCPort   string
@@ -34,7 +34,7 @@ type Options struct {
 }
 
 type Manager struct {
-	options      Options
+	config       Config
 	configPath   string
 	pluginServer *PluginsServer
 
@@ -46,14 +46,27 @@ type Manager struct {
 	Eventbus     *Eventbus
 	addonsLoaded bool
 	isPairing    bool
-	pluginCancel context.CancelFunc
-	locker       *sync.Mutex
 	running      bool
-	verbose      bool
-	logger       logging.Logger
-	actions      map[string]*wot.ActionAffordance
+
+	locker  *sync.Mutex
+	logger  logging.Logger
+	actions map[string]*wot.ActionAffordance
 
 	store Store
+}
+
+func NewAddonsManager(conf Config, settingStore Store, bus bus, log logging.Logger) *Manager {
+	am := &Manager{}
+	am.config = conf
+	am.logger = log
+	am.addonsLoaded = false
+	am.isPairing = false
+	am.running = false
+	am.Eventbus = NewEventBus(bus)
+	am.store = settingStore
+	am.locker = new(sync.Mutex)
+	am.loadAddons()
+	return am
 }
 
 func (m *Manager) UnloadAddon(id string) error {
@@ -66,20 +79,6 @@ func (m *Manager) LoadAddon(id string) error {
 
 func (m *Manager) GetPropertiesValue(thingId string) (map[string]interface{}, error) {
 	panic("implement me")
-}
-
-func NewAddonsManager(options Options, settingStore Store, bus bus, log logging.Logger) *Manager {
-	am := &Manager{}
-	am.options = options
-	am.logger = log
-	am.addonsLoaded = false
-	am.isPairing = false
-	am.running = false
-	am.Eventbus = NewEventBus(bus)
-	am.store = settingStore
-	am.locker = new(sync.Mutex)
-	am.loadAddons()
-	return am
 }
 
 func (m *Manager) addNewThing(pairingTimeout float64) error {
@@ -284,7 +283,7 @@ func (m *Manager) installAddon(packageId, packagePath string, enabled bool) erro
 		fi := hdr.FileInfo()
 		p := strings.Replace(hdr.Name, "package", packageId, 1)
 
-		localPath := m.options.AddonDirs[0] + string(os.PathSeparator) + p
+		localPath := m.config.AddonDirs[0] + string(os.PathSeparator) + p
 		if fi.IsDir() {
 			_ = os.MkdirAll(localPath, os.ModePerm)
 			continue
@@ -333,8 +332,8 @@ func (m *Manager) loadAddons() {
 	var userProfile []byte
 	var pref []byte
 
-	userProfile, err := json.Marshal(m.options.UserProfile)
-	pref, err = json.Marshal(m.options.Preferences)
+	userProfile, err := json.Marshal(m.config.UserProfile)
+	pref, err = json.Marshal(m.config.Preferences)
 	if err != nil {
 		return
 	}
@@ -345,7 +344,7 @@ func (m *Manager) loadAddons() {
 		return
 	}
 
-	for _, d := range m.options.AddonDirs {
+	for _, d := range m.config.AddonDirs {
 		fs, err := os.ReadDir(d)
 		if err != nil {
 			m.logger.Warning("load addon form path: %s ,err: %s", d, err.Error())
@@ -424,7 +423,7 @@ func (m *Manager) loadAddon(packageId string) error {
 		return nil
 	}
 
-	err = util.EnsureDir(path.Join(path.Join(m.options.BaseDir, "data"), addonInfo.ID))
+	err = util.EnsureDir(path.Join(path.Join(m.config.BaseDir, "data"), addonInfo.ID))
 	if err != nil {
 		return err
 	}
@@ -457,7 +456,7 @@ func (m *Manager) unloadAddon(pluginId string) error {
 }
 
 func (m *Manager) findPluginPath(packageId string) string {
-	for _, dir := range m.options.AddonDirs {
+	for _, dir := range m.config.AddonDirs {
 		_, e := os.Stat(path.Join(dir, packageId))
 		if os.IsNotExist(e) {
 			continue

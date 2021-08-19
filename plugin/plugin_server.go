@@ -24,8 +24,8 @@ func NewPluginServer(manager *Manager, userProfile []byte, preferences []byte) *
 	server.closeChan = make(chan struct{})
 
 	server.manager = manager
-	server.ipc = ipc.NewIPCServer(server, manager.options.IPCPort, userProfile, preferences, manager.logger)
-	server.rpc = rpc_server.NewRPCServer(server, manager.options.RPCPort, userProfile, preferences, manager.logger)
+	server.ipc = ipc.NewIPCServer(server, manager.config.IPCPort, userProfile, preferences, manager.logger)
+	server.rpc = rpc_server.NewRPCServer(server, manager.config.RPCPort, userProfile, preferences, manager.logger)
 	return server
 }
 

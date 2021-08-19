@@ -3,28 +3,38 @@ package internal
 import (
 	"fmt"
 	json "github.com/json-iterator/go"
+	"github.com/xiam/to"
 	"time"
 )
 
-type PropertyHandler interface {
+type DeviceProxy interface {
 	HandleGetValue() (interface{}, error)
+	NotifyValueChanged(property *Property)
 }
 
 type GetValueFunc func() (interface{}, error)
 type SetValueFunc func(v interface{}) (interface{}, error)
-type NotifyValueChanged func(value interface{})
+type NotifyPropertyChanged func(value interface{})
 
 type Property struct {
-	Name   string `json:"name"`
-	Type   string `json:"type"`
-	AtType string `json:"@type"`
+	Name        string        `json:"name"`
+	Title       string        `json:"title"`
+	Type        string        `json:"type"`
+	AtType      string        `json:"@type"`
+	Unit        string        `json:"unit"`
+	Description string        `json:"description"`
+	Minimum     int           `json:"minimum"`
+	Maximum     int           `json:"maximum"`
+	Enum        []interface{} `json:"enum"`
+	ReadOnly    bool          `json:"readOnly"`
+	MultipleOf  int           `json:"MultipleOf"`
+	Forms       []interface{} `json:"forms"`
+	Value       interface{}   `json:"value"`
 
-	Value interface{} `json:"value"`
-
-	response           chan interface{}
-	getValueFunc       GetValueFunc
-	setValueFunc       SetValueFunc
-	notifyValueChanged NotifyValueChanged
+	proxy        DeviceProxy
+	response     chan interface{}
+	getValueFunc GetValueFunc
+	setValueFunc SetValueFunc
 }
 
 func NewProperty(des string, getFunc GetValueFunc) *Property {
@@ -38,8 +48,8 @@ func NewProperty(des string, getFunc GetValueFunc) *Property {
 	return prop
 }
 
-func NewPropertyFromString(des string) *Property {
-	data := []byte(des)
+func NewPropertyFromString(propertyDescr string) *Property {
+	data := []byte(propertyDescr)
 	p := Property{}
 	p.Name = json.Get(data, "name").ToString()
 	p.Type = json.Get(data, "type").ToString()
@@ -63,6 +73,9 @@ func (p *Property) GetValue() (interface{}, error) {
 }
 
 func (p *Property) SetValue(value interface{}, await ...int) (interface{}, error) {
+	if p.ReadOnly {
+		return nil, fmt.Errorf("read-only property")
+	}
 	var i = 1000
 	if len(await) > 0 {
 		i = await[0]
@@ -83,17 +96,29 @@ func (p *Property) SetValue(value interface{}, await ...int) (interface{}, error
 }
 
 func (p *Property) OnValueChanged(value interface{}) {
-	err := p.setLocalValue(value)
-	if err != nil {
+	hasChanged := p.setCachedValueAndNotify(value)
+	if hasChanged {
 		return
 	}
-
-	p.notifyValueChanged(value)
 }
 
-func (p *Property) setLocalValue(value interface{}) error {
-	p.Value = value
-	return nil
+func (p *Property) setCachedValueAndNotify(value interface{}) bool {
+	oldValue := p.Value
+	p.setCachedValue(value)
+	var hasChanged = oldValue != p.Value
+	if hasChanged {
+		p.proxy.NotifyValueChanged(p)
+	}
+	return hasChanged
+}
+
+func (p *Property) setCachedValue(value interface{}) interface{} {
+	if p.Type == TypeBoolean {
+		p.Value = !!to.Bool(value)
+	} else {
+		p.Value = value
+	}
+	return p.Value
 }
 
 func (p *Property) DoPropertyChanged(data []byte) {

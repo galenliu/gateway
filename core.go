@@ -66,7 +66,7 @@ func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {
 		return nil, e
 	}
 
-	g.addonManager = plugin.NewAddonsManager(plugin.Options{
+	g.addonManager = plugin.NewAddonsManager(plugin.Config{
 		UserProfile: plugin.UserProfile{
 			BaseDir:        g.options.BaseDir,
 			DataDir:        path.Join(g.options.BaseDir, "data"),
