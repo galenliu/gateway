@@ -17,8 +17,8 @@ func NewEventBus(bus bus) *Eventbus {
 	return b
 }
 
-func (e Eventbus) PublishPropertyChanged(deviceId, propName string, data []byte) {
-	e.bus.Publish(constant.PropertyChanged, deviceId, propName, data)
+func (e Eventbus) PublishPropertyChanged(data []byte) {
+	e.bus.Publish(constant.PropertyChanged, data)
 }
 
 func (e Eventbus) SubscribePropertyChanged(f func(deviceId, propName string, data []byte)) {
