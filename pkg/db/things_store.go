@@ -7,11 +7,11 @@ import (
 	json "github.com/json-iterator/go"
 )
 
-func (s *Store) SaveThing(t *models.Thing) error {
+func (s *Storage) SaveThing(t *models.Thing) error {
 	panic("implement me")
 }
 
-func (s *Store) CreateThing(t *models.Thing) error {
+func (s *Storage) CreateThing(t *models.Thing) error {
 	if t.ID == "" {
 		return fmt.Errorf("description is emtry")
 	}
@@ -38,7 +38,7 @@ func (s *Store) CreateThing(t *models.Thing) error {
 	return nil
 }
 
-func (s *Store) GetThings() (things []*models.Thing) {
+func (s *Storage) GetThings() (things []*models.Thing) {
 	rows, err := s.db.Query("SELECT id, description FROM things")
 	if err != nil {
 		return nil
@@ -60,7 +60,7 @@ func (s *Store) GetThings() (things []*models.Thing) {
 	return things
 }
 
-func (s *Store) RemoveThing(id string) error {
+func (s *Storage) RemoveThing(id string) error {
 	stmt, err := s.db.Prepare(`delete from things where id = ?`)
 	if err != nil {
 		return err
@@ -78,7 +78,7 @@ func (s *Store) RemoveThing(id string) error {
 	return nil
 }
 
-func (s *Store) UpdateThing(t *models.Thing) (err error) {
+func (s *Storage) UpdateThing(t *models.Thing) (err error) {
 	d, _ := json.MarshalToString(t)
 	_, err = s.db.Exec(`update things set id=@id where description=@description`, sql.Named("id", t.GetID()), sql.Named("description", d))
 	return

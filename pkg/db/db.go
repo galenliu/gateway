@@ -10,14 +10,14 @@ import (
 
 const dbFileName = "database.sqlite3"
 
-type Store struct {
+type Storage struct {
 	file   string
 	db     *sql.DB
 	logger logging.Logger
 }
 
-func NewStore(filePath string, reset bool, log logging.Logger) (*Store, error) {
-	s := &Store{}
+func NewStore(filePath string, reset bool, log logging.Logger) (*Storage, error) {
+	s := &Storage{}
 	s.logger = log
 	f := path.Join(filePath, dbFileName)
 	s.file = f
@@ -37,14 +37,14 @@ func NewStore(filePath string, reset bool, log logging.Logger) (*Store, error) {
 	return s, nil
 }
 
-func (s *Store) reset() {
+func (s *Storage) reset() {
 	_, err := os.Stat(s.file)
 	if err == nil {
 		_ = os.Remove(s.file)
 	}
 }
 
-func (s *Store) createTable() error {
+func (s *Storage) createTable() error {
 
 	thingsTable := `
     CREATE TABLE IF NOT EXISTS things(
@@ -105,17 +105,17 @@ func (s *Store) createTable() error {
 	return nil
 }
 
-func (s *Store) updateValue(k, v string) (err error) {
+func (s *Storage) updateValue(k, v string) (err error) {
 	_, err = s.db.Exec(`update data set value=@value where key=@key`, sql.Named("value", v), sql.Named("key", k))
 	return
 }
 
-func (s *Store) queryValue(k string) (value string, err error) {
+func (s *Storage) queryValue(k string) (value string, err error) {
 	err = s.db.QueryRow("SELECT value FROM data where key = @key", sql.Named("key", k)).Scan(&value)
 	return value, err
 }
 
-func (s *Store) deleteValue(key string) error {
+func (s *Storage) deleteValue(key string) error {
 	stmt, err := s.db.Prepare(`delete from data where key = ?`)
 	if err != nil {
 		return err

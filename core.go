@@ -43,7 +43,7 @@ type Options struct {
 
 type Gateway struct {
 	options      Options
-	store        *db.Store
+	storage      *db.Storage
 	bus          eventBus
 	logger       logging.Logger
 	addonManager *plugin.Manager
@@ -56,7 +56,7 @@ func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {
 	g.options = o
 
 	var e error = nil
-	g.store, e = db.NewStore(path.Join(g.options.BaseDir, constant.ConfigDirName), g.options.DBRemoveBeforeOpen, logger)
+	g.storage, e = db.NewStore(path.Join(g.options.BaseDir, constant.ConfigDirName), g.options.DBRemoveBeforeOpen, logger)
 	if e != nil {
 		return nil, e
 	}
@@ -80,7 +80,7 @@ func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {
 		AddonDirs: g.options.AddonDirs,
 		IPCPort:   o.IPCPort,
 		RPCPort:   o.IPCPort,
-	}, g.store, g.bus, g.logger)
+	}, g.storage, g.bus, g.logger)
 
 	g.sever = server.Setup(server.Options{
 		HttpAddr:    g.options.HttpAddr,
@@ -89,30 +89,10 @@ func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {
 		TemplateDir: path.Join(g.options.BaseDir, "template"),
 		UploadDir:   path.Join(g.options.BaseDir, "upload"),
 		LogDir:      path.Join(g.options.BaseDir, "log"),
-	}, g.addonManager, g.store, g.bus, g.logger)
+	}, g.addonManager, g.storage, g.bus, g.logger)
 
 	return g, nil
 }
-
-//func (g *Gateway) FindNewThings() (ts []*models.Thing) {
-//	storedThings := g.thingsContainer.GetThings()
-//	connectedDevices := g.addonManager.GetDevices()
-//	for _, dev := range connectedDevices {
-//		var isExit = false
-//		for _, th := range storedThings {
-//			if dev.GetID() == th.GetID() {
-//				isExit = true
-//			}
-//		}
-//		if !isExit {
-//			t, err := models.NewThingFromString(dev.ToJson())
-//			if err != nil {
-//				ts = append(ts, t)
-//			}
-//		}
-//	}
-//	return
-//}
 
 func (g *Gateway) Start() error {
 	// 首先启动plugin

@@ -6,27 +6,33 @@ import (
 )
 
 type Device struct {
-	adapter *Adapter
+	AdapterId string `json:"adapterId"`
+	adapter   *Adapter
 	*internal.Device
 	Properties map[string]*Property
 }
 
 func NewDeviceFormString(desc string, adapter *Adapter) *Device {
-	date := []byte(desc)
+	data := []byte(desc)
 	device := &Device{}
 	device.adapter = adapter
+	device.AdapterId = adapter.ID
 	device.Properties = make(map[string]*Property)
-	device.Device = internal.NewDeviceFormString(desc)
+
+	device.AtContext = json.Get(data, "@context").ToString()
+	device.AtType = json.Get(data, "@type").ToString()
+	device.Name = json.Get(data, "name").ToString()
+	device.Description = json.Get(data, "description").ToString()
+	device.Device = internal.NewDeviceFormString(adapter, json.Get(data, "id").ToString())
 	if device.Device == nil {
 		return nil
 	}
 	var properties map[string]string
-	json.Get(date, "properties").ToVal(&properties)
+	json.Get(data, "properties").ToVal(&properties)
 	if properties != nil {
 		for name, prop := range properties {
-			p := NewPropertyFormString(prop)
+			p := NewPropertyFormString(prop, device)
 			if p != nil {
-				p.NotifyValueChanged = device.NotifyValueChanged
 				p.Name = name
 				device.Properties[name] = p
 			}
@@ -35,10 +41,14 @@ func NewDeviceFormString(desc string, adapter *Adapter) *Device {
 	return device
 }
 
-func (device Device) NotifyValueChanged(property *internal.Property) {
+func (device *Device) NotifyValueChanged(property *internal.Property) {
 	data, err := json.Marshal(property)
 	if err != nil {
 		return
 	}
 	device.adapter.plugin.pluginServer.manager.Eventbus.PublishPropertyChanged(data)
+}
+
+func (device *Device) connectedNotify(connected bool) {
+	device.adapter.plugin.pluginServer.manager.Eventbus.PublishConnected(device.ID, connected)
 }

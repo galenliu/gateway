@@ -1,34 +1,30 @@
 package internal
 
-type Device struct {
-	ID    string `json:"id"`
-	Title string `json:"title"`
-
-	Properties map[string]*Property
-
-	AdapterId string `json:"adapterId"`
+type adapter interface {
 }
 
-func NewDeviceFormString(des string) *Device {
-	return nil
+type Device struct {
+	adapter     adapter
+	ID          string `json:"id"`
+	AtContext   string `json:"@context"`
+	AtType      string `json:"@type"`
+	Name        string `json:"name"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+
+	Links               []string `json:"links"`
+	BaseHref            string   `json:"baseHref"`
+	PinRequired         bool     `json:"pinRequired"`
+	CredentialsRequired bool     `json:"credentialsRequired"`
+}
+
+func NewDeviceFormString(adapter adapter, id string) *Device {
+	device := &Device{}
+	device.ID = id
+	device.adapter = adapter
+	return device
 }
 
 func (d *Device) GetId() string {
 	return d.ID
-}
-
-func (d *Device) GetProperty(name string) *Property {
-	prop, ok := d.Properties[name]
-	if ok {
-		return prop
-	}
-	return nil
-}
-
-func (d *Device) GetPropertyValue(name string) (interface{}, error) {
-	return nil, nil
-}
-
-func (d *Device) SetConnect(connected bool){
-
 }

@@ -1,9 +1,11 @@
 package plugin
 
 import (
+	"fmt"
 	"github.com/galenliu/gateway/pkg/rpc"
 	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
+	"time"
 )
 
 type GetValueFunc func() (interface{}, error)
@@ -13,15 +15,15 @@ type NotifyPropertyChanged func(value interface{})
 type Property struct {
 	*internal.Property
 
-	device       Device
+	device       *Device
 	response     chan interface{}
 	SetValueFunc SetValueFunc
 }
 
-func NewPropertyFormString(desc string) *Property {
+func NewPropertyFormString(desc string, dev *Device) *Property {
 	p := &Property{}
-	p.Property = internal.NewPropertyFromString(desc)
-	p.Property.NotifyValueChanged = p.device.NotifyValueChanged
+	p.device = dev
+	p.Property = internal.NewPropertyFromString(dev, desc)
 	return p
 }
 
@@ -30,6 +32,9 @@ func (p *Property) DoPropertyChanged(data []byte) {
 	err := p.Property.SetCachedValue(value)
 	if err != nil {
 		return
+	}
+	select {
+	case p.response <- value:
 	}
 	p.Title = json.Get(data, "title").ToString()
 	p.Description = json.Get(data, "description").ToString()
@@ -46,5 +51,15 @@ func (p *Property) SetValue(value interface{}) (interface{}, error) {
 	data["propertyName"] = p.Name
 	data["propertyValue"] = value
 	p.device.adapter.SendMessage(rpc.MessageType_DeviceSetPropertyCommand, data)
-	return nil, nil
+
+	setTimeOut := time.After(time.Duration(1 * time.Second))
+	for {
+		select {
+		case <-setTimeOut:
+			return nil, fmt.Errorf("time out")
+		case v := <-p.response:
+			return v, nil
+		}
+
+	}
 }

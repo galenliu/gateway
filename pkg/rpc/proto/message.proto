@@ -11,23 +11,94 @@ message BaseMessage {
 }
 
 
+message NotifierAddedNotificationMessage {
+  messageType messageType = 1;
+  Data data = 3;
+  message Data{
+    string pluginId = 2;
+    string  notifierId = 3;
+    string name = 4;
+    string  packageName = 5;
+  }
+}
+
 
 message PluginRegisterRequestMessage {
   messageType messageType = 1;
-  message dataTemp{
-    string pluginId = 2;
+  Data data = 2;
+  message Data{
+    string pluginId = 11;
   }
-  dataTemp data = 3;
+
 }
 
 message PluginRegisterResponseMessage{
   messageType messageType = 1;
-  message gatewayConfig {
-    string pluginId = 2;
-    string gatewayVersion = 3;
-    bytes userProfile = 4;
-    bytes preferences = 5;
+  Data data = 2;
+  message Data {
+    string pluginId = 11;
+    string gatewayVersion = 12;
+    UsrProfile userProfile = 13;
+    Preferences preferences = 14;
+    message UsrProfile{
+      string addonsDir = 11;
+      string  baseDir = 12 ;
+      string  configDir = 13;
+      string  dataDir = 14 ;
+      string  mediaDir = 15 ;
+      string  logDir = 16 ;
+      string  gatewayDir = 17 ;
+    }
+    message Preferences{
+      string language = 40;
+      Units units = 41;
+      message Units{
+        string temperature = 21;
+      }
+    }
   }
-  gatewayConfig data = 6;
+}
+
+message AdapterAddedNotificationMessage{
+  messageType messageType = 1;
+  Data data = 2;
+  message Data{
+    string pluginId = 1;
+    string adapterId = 2;
+    string name = 3;
+    string packageName = 4;
+  }
+}
+
+message DeviceAddedNotificationMessage{
+  messageType messageType = 1;
+  Data data = 2;
+  message Data{
+    string pluginId = 1;
+    string adapterId = 2;
+    bytes device = 3;
+  }
+}
+
+message DevicePropertyChangedNotificationMessage{
+  messageType messageType = 1;
+  Data data = 2;
+  message Data{
+    string pluginId = 11;
+    string adapterId = 12;
+    string deviceId = 13;
+    bytes property = 14;
+  }
+}
+
+
+message DeviceConnectedStateNotificationMessage{
+  messageType messageType = 1;
+  Data data = 2;
+  message Data{
+    string pluginId = 11;
+    string adapterId = 21;
+    bool connected = 22;
+  }
 }
 

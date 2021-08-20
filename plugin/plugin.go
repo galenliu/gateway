@@ -52,150 +52,133 @@ func NewPlugin(s *PluginsServer, pluginId string, log logging.Logger) (plugin *P
 }
 
 func (plugin *Plugin) MessageHandler(messageType rpc.MessageType, data []byte) (err error) {
-	var adapterId = json.Get(data, "adapterId").ToString()
-	if adapterId == "" {
-		return fmt.Errorf("pluginId is none")
-	}
-	// plugin handler
-	switch messageType {
-	case rpc.MessageType_DeviceRequestActionResponse:
-		break
-	case rpc.MessageType_DeviceRemoveActionResponse:
-		break
-	case rpc.MessageType_OutletNotifyResponse:
-		break
-
-	case rpc.MessageType_AdapterUnloadResponse:
-		break
-	case rpc.MessageType_DeviceSetCredentialsResponse:
-		break
-	case rpc.MessageType_ApiHandlerApiResponse:
-		break
-
-	}
-
-	switch messageType {
-	case rpc.MessageType_AdapterAddedNotification:
-		var name = json.Get(data, "name").ToString()
-		var packageName = json.Get(data, "packageName").ToString()
-		adapter := NewAdapter(plugin, name, adapterId, packageName, plugin.logger)
-		plugin.pluginServer.manager.handleAdapterAdded(adapter)
-		return nil
-	}
-
+	adapterId := json.Get(data, "adapterId").ToString()
 	adapter := plugin.pluginServer.manager.getAdapter(adapterId)
 	if adapter == nil {
-		plugin.logger.Info("(%s)adapter not found", rpc.MessageType_name[int32(rpc.MessageType_AdapterAddedNotification)])
-		return nil
+		return fmt.Errorf("(%s)adapter not found", rpc.MessageType_name[int32(rpc.MessageType_AdapterAddedNotification)])
+	}
+	// adapter handler
+	{
+		switch messageType {
+		case rpc.MessageType_DeviceRequestActionResponse:
+			break
+		case rpc.MessageType_DeviceRemoveActionResponse:
+			break
+		case rpc.MessageType_OutletNotifyResponse:
+			break
+		case rpc.MessageType_AdapterUnloadResponse:
+			break
+		case rpc.MessageType_DeviceSetCredentialsResponse:
+			break
+		case rpc.MessageType_ApiHandlerApiResponse:
+			break
+		case rpc.MessageType_AdapterAddedNotification:
+			var message rpc.AdapterAddedNotificationMessage_Data
+			err = json.Unmarshal(data, &message)
+			if err != nil {
+				return err
+			}
+			adapter := NewAdapter(plugin, message.Name, adapterId, message.PackageName, plugin.logger)
+			plugin.pluginServer.manager.handleAdapterAdded(adapter)
+			return nil
+
+		case rpc.MessageType_NotifierAddedNotification:
+			return
+		case rpc.MessageType_ApiHandlerAddedNotification:
+			return
+		case rpc.MessageType_ApiHandlerUnloadResponse:
+			return
+		case rpc.MessageType_PluginUnloadRequest:
+			return
+		case rpc.MessageType_PluginErrorNotification:
+			return
+		case rpc.MessageType_DeviceAddedNotification:
+			//messages.DeviceAddedNotification
+			var message rpc.DeviceAddedNotificationMessage_Data
+			err = json.Unmarshal(data, &message)
+			if err != nil {
+				return err
+			}
+			var newDevice = NewDeviceFormString(string(message.Device), adapter)
+			if newDevice == nil {
+				return fmt.Errorf("device add failed")
+			}
+			adapter.handleDeviceAdded(newDevice)
+			return nil
+		}
 	}
 
-	switch messageType {
-
-	case rpc.MessageType_NotifierAddedNotification:
-		return
-	case rpc.MessageType_ApiHandlerAddedNotification:
-		return
-	case rpc.MessageType_ApiHandlerUnloadResponse:
-		return
-	case rpc.MessageType_PluginUnloadRequest:
-		return
-	case rpc.MessageType_PluginErrorNotification:
-		return
-	case rpc.MessageType_DeviceAddedNotification:
-		//messages.DeviceAddedNotification
-		str := json.Get(data, "device").ToString()
-		if str == "" {
-			plugin.logger.Info("marshal device err")
-			return
+	// device handler
+	{
+		deviceId := json.Get(data, "deviceId").ToString()
+		device := adapter.plugin.pluginServer.manager.getDevice(deviceId)
+		if device == nil {
+			return fmt.Errorf("device cannot found: %s", deviceId)
 		}
-		var newDevice = NewDeviceFormString(str, adapter)
-
-		if newDevice == nil {
-			plugin.logger.Error("device add err:")
+		switch messageType {
+		case rpc.MessageType_AdapterUnloadResponse:
 			return
+
+		case rpc.MessageType_NotifierUnloadResponse:
+			return
+
+		case rpc.MessageType_AdapterRemoveDeviceResponse:
+			adapter.handleDeviceRemoved(device)
+
+		case rpc.MessageType_OutletAddedNotification:
+			return
+		case rpc.MessageType_OutletRemovedNotification:
+			return
+
+		case rpc.MessageType_DeviceSetPinResponse:
+
+		case rpc.MessageType_DevicePropertyChangedNotification:
+			var message rpc.DevicePropertyChangedNotificationMessage_Data
+			err = json.Unmarshal(data, &message)
+			if err != nil {
+				return err
+			}
+			propName := json.Get(message.Property, "name").ToString()
+			property, ok := device.Properties[propName]
+			if !ok {
+				return fmt.Errorf("property not found")
+			}
+			property.DoPropertyChanged(message.Property)
+			return
+
+		case rpc.MessageType_DeviceActionStatusNotification:
+			var action internal.Action
+			json.Get(data, "action").ToVal(&action)
+			return
+
+		case rpc.MessageType_DeviceEventNotification:
+			var event internal.Event
+			json.Get(data, "event").ToVal(&event)
+
+		case rpc.MessageType_DeviceConnectedStateNotification:
+			var message rpc.DeviceConnectedStateNotificationMessage_Data
+			err = json.Unmarshal(data, &message)
+			if err != nil {
+				return err
+			}
+			device.connectedNotify(message.Connected)
+			return
+
+		case rpc.MessageType_AdapterPairingPromptNotification:
+			return
+
+		case rpc.MessageType_AdapterUnpairingPromptNotification:
+			return
+		case rpc.MessageType_MockAdapterClearStateResponse:
+			return
+
+		case rpc.MessageType_MockAdapterRemoveDeviceResponse:
+			return
+		default:
+			return nil
 		}
-		newDevice.AdapterId = adapterId
-		adapter.handleDeviceAdded(newDevice)
-		return
 	}
 
-	deviceId := json.Get(data, "deviceId").ToString()
-	device := adapter.plugin.pluginServer.manager.getDevice(deviceId)
-	if device == nil {
-		plugin.logger.Info("device cannot found: %s", deviceId)
-		return
-	}
-	switch messageType {
-	case rpc.MessageType_AdapterUnloadResponse:
-		return
-
-	case rpc.MessageType_NotifierUnloadResponse:
-		return
-
-	case rpc.MessageType_AdapterRemoveDeviceResponse:
-		adapter.handleDeviceRemoved(device)
-
-	case rpc.MessageType_OutletAddedNotification:
-		return
-	case rpc.MessageType_OutletRemovedNotification:
-		return
-
-	case rpc.MessageType_DeviceSetPinResponse:
-		//s := json.Get(data, "pin").ToString()
-		//var pin addon.PIN
-		//err := json.UnmarshalFromString(s, &pin)
-		//if err != nil {
-		//	plugin.logger.Info("pin error")
-		//	return
-		//}
-		//ee := device.SetPin(pin)
-		//if ee != nil {
-		//	plugin.logger.Info(ee.Error())
-		//}
-
-	case rpc.MessageType_DevicePropertyChangedNotification:
-		prop := json.Get(data, "property").ToString()
-		propName := json.Get(data, "property", "name").ToString()
-
-		property, ok := device.Properties[propName]
-		if !ok {
-			plugin.logger.Info("propName err")
-			return
-		}
-		if len(prop) == 0 {
-			return
-		}
-		property.DoPropertyChanged([]byte(prop))
-		return
-
-	case rpc.MessageType_DeviceActionStatusNotification:
-		var action internal.Action
-		json.Get(data, "action").ToVal(&action)
-		return
-
-	case rpc.MessageType_DeviceEventNotification:
-		var event internal.Event
-		json.Get(data, "event").ToVal(&event)
-
-	case rpc.MessageType_DeviceConnectedStateNotification:
-		var connected = json.Get(data, "connected").ToBool()
-		device.SetConnect(connected)
-		return
-
-	case rpc.MessageType_AdapterPairingPromptNotification:
-		return
-
-	case rpc.MessageType_AdapterUnpairingPromptNotification:
-		return
-	case rpc.MessageType_MockAdapterClearStateResponse:
-		return
-
-	case rpc.MessageType_MockAdapterRemoveDeviceResponse:
-		return
-	default:
-		return nil
-
-	}
 	return nil
 }
 

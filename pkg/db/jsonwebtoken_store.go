@@ -6,7 +6,7 @@ import (
 	json "github.com/json-iterator/go"
 )
 
-func (s *Store) CreateJSONWebToken(t *models.TokenData) error {
+func (s *Storage) CreateJSONWebToken(t *models.TokenData) error {
 	stmt, err := s.db.Prepare("INSERT INTO jsonwebtoken(keyId,user,issuedAt,publicKey,payload) values(?,?,?,?,?)")
 	if err != nil {
 		return err
@@ -22,6 +22,6 @@ func (s *Store) CreateJSONWebToken(t *models.TokenData) error {
 	return err
 }
 
-func (s *Store) GetJSONWebTokenByKeyId(keyId string) *models.TokenData {
+func (s *Storage) GetJSONWebTokenByKeyId(keyId string) *models.TokenData {
 	panic("implement me")
 }

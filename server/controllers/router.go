@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-type Options struct {
+type Config struct {
 	HttpAddr  string
 	HttpsAddr string
 }
@@ -29,15 +29,15 @@ type Models struct {
 type Router struct {
 	*fiber.App
 	logger  logging.Logger
-	options Options
+	options Config
 }
 
-func Setup(options Options, addonManager server.AddonManager, store server.Store, log logging.Logger) *Router {
+func Setup(config Config, addonManager server.AddonManager, store server.Storage, log logging.Logger) *Router {
 
 	//router init
 	app := Router{}
 	app.logger = log
-	app.options = options
+	app.options = config
 	app.App = fiber.New()
 	app.Use(recover.New())
 	app.Use(logger.New(logger.ConfigDefault))
@@ -163,8 +163,8 @@ func Setup(options Options, addonManager server.AddonManager, store server.Store
 		addonGroup.Post("/", addonController.handlerInstallAddon)
 		addonGroup.Put("/:addonId", addonController.handlerSetAddon)
 		addonGroup.Patch("/:addonId", addonController.handlerUpdateAddon)
-		addonGroup.Get("/:addonId/options", addonController.handlerGetAddonConfig)
-		addonGroup.Put("/:addonId/options", addonController.handlerSetAddonConfig)
+		addonGroup.Get("/:addonId/config", addonController.handlerGetAddonConfig)
+		addonGroup.Put("/:addonId/config", addonController.handlerSetAddonConfig)
 	}
 
 	//settings Controller

@@ -4,12 +4,12 @@ import (
 	"database/sql"
 )
 
-func (s *Store) GetSetting(key string) (value string, err error) {
+func (s *Storage) GetSetting(key string) (value string, err error) {
 	err = s.db.QueryRow("SELECT value FROM settings where key = @key", sql.Named("key", key), sql.Named("key", key)).Scan(&value)
 	return value, err
 }
 
-func (s *Store) SetSetting(key, value string) error {
+func (s *Storage) SetSetting(key, value string) error {
 
 	s.logger.Info("set setting key:%s value:%s \t\n", key, value)
 	_, err := s.GetSetting(key)

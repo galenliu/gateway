@@ -12,13 +12,12 @@ type EventBus interface {
 	Publish(topic string, args ...interface{})
 }
 
-type Store interface {
+type Storage interface {
 	models.UsersStore
 	models.ThingsStore
 	models.SettingsStore
 	models.JsonwebtokenStore
 }
-
 
 type AddonManager interface {
 	controllers.AddonHandler
@@ -41,13 +40,13 @@ type WebServe struct {
 	bus     EventBus
 }
 
-func Setup(options Options,addonManager AddonManager, store Store, bus EventBus, log logging.Logger) *WebServe {
+func Setup(options Options, addonManager AddonManager, store Storage, bus EventBus, log logging.Logger) *WebServe {
 	sev := WebServe{}
 	sev.options = options
 	sev.logger = log
 	sev.bus = bus
 
-	sev.Router = controllers.Setup(controllers.Options{
+	sev.Router = controllers.Setup(controllers.Config{
 		HttpAddr:  sev.options.HttpAddr,
 		HttpsAddr: sev.options.HttpsAddr,
 	}, addonManager, store, log)

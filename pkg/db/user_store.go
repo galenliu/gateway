@@ -6,7 +6,7 @@ import (
 	"github.com/galenliu/gateway/server/models"
 )
 
-func (s *Store) GetUsers() []*models.User {
+func (s *Storage) GetUsers() []*models.User {
 	var users []*models.User
 	rows, err := s.db.Query("SELECT * FROM users")
 	if err != nil {
@@ -39,7 +39,7 @@ func (s *Store) GetUsers() []*models.User {
 	return users
 }
 
-func (s *Store) CreateUser(u *models.User) (int64, error) {
+func (s *Storage) CreateUser(u *models.User) (int64, error) {
 	if u.Email == "" {
 		return 0, fmt.Errorf("email is emtry")
 	}
@@ -67,7 +67,7 @@ func (s *Store) CreateUser(u *models.User) (int64, error) {
 	return id, nil
 }
 
-func (s *Store) DeleteUser(id int64) error {
+func (s *Storage) DeleteUser(id int64) error {
 	stmt, err := s.db.Prepare("delete from users where id=?")
 	defer func(stmt *sql.Stmt) {
 		err := stmt.Close()
@@ -85,7 +85,7 @@ func (s *Store) DeleteUser(id int64) error {
 	return nil
 }
 
-func (s *Store) UpdateUser(u *models.User) error {
+func (s *Storage) UpdateUser(u *models.User) error {
 	stmt, err := s.db.Prepare("update users set password=? name=? mfaSharedSecret=? mfaEnrolled=? mfaBackupCodes=? where id=?")
 	if err != nil {
 		return err

@@ -7,9 +7,12 @@ import (
 	"math"
 )
 
-type NotifyValueChangedFunc func(property *Property)
+type device interface {
+	NotifyValueChanged(property *Property)
+}
 
 type Property struct {
+	device      device
 	Name        string        `json:"name"`
 	Title       string        `json:"title"`
 	Type        string        `json:"type"`
@@ -23,13 +26,12 @@ type Property struct {
 	MultipleOf  interface{}   `json:"multipleOf"`
 	Forms       []interface{} `json:"forms"`
 	Value       interface{}   `json:"value"`
-
-	NotifyValueChanged NotifyValueChangedFunc
 }
 
-func NewPropertyFromString(propertyDesc string) *Property {
+func NewPropertyFromString(dev device, propertyDesc string) *Property {
 	data := []byte(propertyDesc)
 	p := Property{}
+	p.device = dev
 	p.Name = json.Get(data, "name").ToString()
 	p.Type = json.Get(data, "type").ToString()
 	p.AtType = json.Get(data, "@type").ToString()
@@ -102,7 +104,7 @@ func (p *Property) setCachedValueAndNotify(value interface{}) bool {
 	p.SetCachedValue(value)
 	var hasChanged = oldValue != p.Value
 	if hasChanged {
-		p.NotifyValueChanged(p)
+		p.device.NotifyValueChanged(p)
 	}
 	return hasChanged
 }
