@@ -108,7 +108,7 @@ func (plugin *Plugin) MessageHandler(messageType rpc.MessageType, data []byte) (
 			plugin.logger.Info("marshal device err")
 			return
 		}
-		var newDevice = internal.NewDeviceFormString(str)
+		var newDevice = NewDeviceFormString(str, adapter)
 
 		if newDevice == nil {
 			plugin.logger.Error("device add err:")

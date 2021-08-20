@@ -99,7 +99,7 @@ func (p *Property) SetValue(value interface{}) error {
 
 func (p *Property) setCachedValueAndNotify(value interface{}) bool {
 	oldValue := p.Value
-	p.setCachedValue(value)
+	p.SetCachedValue(value)
 	var hasChanged = oldValue != p.Value
 	if hasChanged {
 		p.NotifyValueChanged(p)
@@ -107,7 +107,7 @@ func (p *Property) setCachedValueAndNotify(value interface{}) bool {
 	return hasChanged
 }
 
-func (p *Property) setCachedValue(value interface{}) interface{} {
+func (p *Property) SetCachedValue(value interface{}) interface{} {
 	if p.Type == TypeBoolean {
 		p.Value = !!to.Bool(value)
 	} else {

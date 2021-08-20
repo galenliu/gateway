@@ -76,28 +76,28 @@ func (adapter *Adapter) SendMessage(messageType rpc.MessageType, data map[string
 	adapter.plugin.SendMessage(messageType, data)
 }
 
-func (adapter *Adapter) handleDeviceRemoved(d *internal.Device) {
+func (adapter *Adapter) handleDeviceRemoved(d *Device) {
 	adapter.devices.Delete(d.ID)
 	adapter.plugin.pluginServer.manager.handleDeviceRemoved(d)
 }
 
-func (adapter *Adapter) handleDeviceAdded(device *internal.Device) {
+func (adapter *Adapter) handleDeviceAdded(device *Device) {
 	adapter.devices.Store(device.ID, device)
 	adapter.plugin.pluginServer.manager.handleDeviceAdded(device)
 }
 
-func (adapter *Adapter) getDevice(deviceId string) *internal.Device {
+func (adapter *Adapter) getDevice(deviceId string) *Device {
 	d, ok := adapter.devices.Load(deviceId)
-	device, ok := d.(*internal.Device)
+	device, ok := d.(*Device)
 	if !ok {
 		return nil
 	}
 	return device
 }
 
-func (adapter *Adapter) getDevices() (devices []*internal.Device) {
+func (adapter *Adapter) getDevices() (devices []*Device) {
 	adapter.devices.Range(func(key, value interface{}) bool {
-		device, ok := value.(*internal.Device)
+		device, ok := value.(*Device)
 		if ok {
 			devices = append(devices, device)
 		}

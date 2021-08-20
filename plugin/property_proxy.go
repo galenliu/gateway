@@ -19,16 +19,25 @@ type Property struct {
 }
 
 func NewPropertyFormString(desc string) *Property {
-	return nil
+	p := &Property{}
+	p.Property = internal.NewPropertyFromString(desc)
+	p.Property.NotifyValueChanged = p.device.NotifyValueChanged
+	return p
 }
 
 func (p *Property) DoPropertyChanged(data []byte) {
 	value := json.Get(data, "value").GetInterface()
-	err := p.Property.SetValue(value)
+	err := p.Property.SetCachedValue(value)
 	if err != nil {
 		return
 	}
-
+	p.Title = json.Get(data, "title").ToString()
+	p.Description = json.Get(data, "description").ToString()
+	bytes, err := json.Marshal(p)
+	if err != nil {
+		return
+	}
+	p.device.adapter.plugin.pluginServer.manager.Eventbus.PublishPropertyChanged(bytes)
 }
 
 func (p *Property) SetValue(value interface{}) (interface{}, error) {

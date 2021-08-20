@@ -133,7 +133,7 @@ func (m *Manager) handleAdapterAdded(adapter *Adapter) {
 	m.logger.Debug(fmt.Sprintf("adapter：(%s) added", adapter.ID))
 }
 
-func (m *Manager) handleDeviceAdded(device *internal.Device) {
+func (m *Manager) handleDeviceAdded(device *Device) {
 	m.devices.Store(device.ID, device)
 	data, err := json.MarshalIndent(device, "", "  ")
 	if err != nil {
@@ -142,7 +142,7 @@ func (m *Manager) handleDeviceAdded(device *internal.Device) {
 	m.Eventbus.bus.Publish(constant.DeviceAdded, data)
 }
 
-func (m *Manager) handleDeviceRemoved(device *internal.Device) {
+func (m *Manager) handleDeviceRemoved(device *Device) {
 	m.devices.Delete(device.ID)
 	data, err := json.MarshalIndent(device, "", "  ")
 	if err != nil {
@@ -216,18 +216,18 @@ func (m *Manager) getExtensions() (adapters []*Extension) {
 	return
 }
 
-func (m *Manager) getDevice(deviceId string) *internal.Device {
+func (m *Manager) getDevice(deviceId string) *Device {
 	d, ok := m.devices.Load(deviceId)
-	device, ok := d.(*internal.Device)
+	device, ok := d.(*Device)
 	if !ok {
 		return nil
 	}
 	return device
 }
 
-func (m *Manager) getDevices() (devices []*internal.Device) {
+func (m *Manager) getDevices() (devices []*Device) {
 	m.devices.Range(func(key, value interface{}) bool {
-		device, ok := value.(*internal.Device)
+		device, ok := value.(*Device)
 		if ok {
 			devices = append(devices, device)
 		}
