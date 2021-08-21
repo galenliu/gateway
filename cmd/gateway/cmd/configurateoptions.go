@@ -5,9 +5,8 @@
 package cmd
 
 import (
-	"gopkg.in/yaml.v2"
-
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 )
 
 func (c *command) initConfiguratorOptionsCmd() (err error) {

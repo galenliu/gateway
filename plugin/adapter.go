@@ -16,17 +16,15 @@ type managerProxy interface {
 }
 
 type Adapter struct {
-	ID             string
-	name           string
-	pluginId       string
-	plugin         *Plugin
-	looker         *sync.Mutex
-	isPairing      bool
-	devices        sync.Map
-	pairingContext context.Context
-	manifest       interface{}
-	packageName    string
-	logger         logging.Logger
+	ID          string
+	name        string
+	pluginId    string
+	plugin      *Plugin
+	looker      *sync.Mutex
+	isPairing   bool
+	devices     sync.Map
+	packageName string
+	logger      logging.Logger
 }
 
 func NewAdapter(p *Plugin, name, adapterId, packageName string, log logging.Logger) *Adapter {

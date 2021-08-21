@@ -3,14 +3,15 @@ package data_schema
 import (
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
+	"github.com/xiam/to"
 )
 
 type NumberSchema struct {
 	*dataSchema
-	Minimum          controls.Number `json:"minimum"`
-	ExclusiveMinimum float64         `json:"exclusiveMinimum,omitempty"`
-	Maximum          controls.Number `json:"maximum,omitempty"`
-	ExclusiveMaximum controls.Number `json:"exclusiveMaximum,omitempty"`
+	Minimum          controls.Double `json:"minimum"`
+	ExclusiveMinimum controls.Double `json:"exclusiveMinimum,omitempty"`
+	Maximum          controls.Double `json:"maximum,omitempty"`
+	ExclusiveMaximum controls.Double `json:"exclusiveMaximum,omitempty"`
 	MultipleOf       float64         `json:"multipleOf,omitempty"`
 }
 
@@ -22,19 +23,19 @@ func NewNumberSchemaFromString(description string) *NumberSchema {
 		return nil
 	}
 
-	schema.Minimum = controls.ToNumber(json.Get(data, "minimum").ToFloat64())
-	schema.ExclusiveMinimum = json.Get(data, "exclusiveMinimum").ToFloat64()
-	schema.Maximum = controls.ToNumber(json.Get(data, "maximum").ToFloat64())
-	schema.ExclusiveMaximum = controls.ToNumber(json.Get(data, "exclusiveMaximum").ToFloat64())
+	schema.Minimum = controls.Double(controls.ToNumber(json.Get(data, "minimum").ToFloat64()))
+	schema.ExclusiveMinimum = controls.Double(json.Get(data, "exclusiveMinimum").ToFloat64())
+	schema.Maximum = controls.Double(controls.ToNumber(json.Get(data, "maximum").ToFloat64()))
+	schema.ExclusiveMaximum = controls.Double(controls.ToNumber(json.Get(data, "exclusiveMaximum").ToFloat64()))
 	schema.MultipleOf = json.Get(data, "multipleOf").ToFloat64()
 	return &schema
 }
 
 func (n *NumberSchema) Convert(v interface{}) interface{} {
-	return n.clamp(controls.ToNumber(v))
+	return n.clamp(controls.Double(to.Float64(v)))
 }
 
-func (n NumberSchema) clamp(value controls.Number) controls.Number {
+func (n NumberSchema) clamp(value controls.Double) controls.Double {
 	if n.Maximum != 0 {
 		if value > n.Maximum {
 			return n.Maximum
@@ -46,9 +47,6 @@ func (n NumberSchema) clamp(value controls.Number) controls.Number {
 	return value
 }
 
-
 func (n *NumberSchema) MarshalJSON() ([]byte, error) {
 	return json.Marshal(n)
 }
-
-

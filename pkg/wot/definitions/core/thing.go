@@ -13,16 +13,13 @@ type ThingInterface interface {
 }
 
 type Thing struct {
-	AtContext    []string          `json:"@context"`
-	Title        string            `json:"title"`
+	AtContext    []string          `json:"@context"` //mandatory
+	Title        string            `json:"title"`    //mandatory
 	Titles       map[string]string `json:"titles,omitempty"`
 	ID           controls.URI      `json:"id"`
 	AtType       []string          `json:"@type"`
 	Description  string            `json:"description,omitempty"`
 	Descriptions map[string]string `json:"descriptions,omitempty"`
-
-	Forms []controls.Form `json:"forms,omitempty"`
-	Links []controls.Link `json:"links,omitempty"`
 
 	Support controls.URI `json:"support,omitempty"`
 	Base    controls.URI `json:"base"`
@@ -35,9 +32,14 @@ type Thing struct {
 	Actions    map[string]ActionAffordance   `json:"actions,omitempty"`
 	Events     map[string]EventAffordance    `json:"events,omitempty"`
 
-	Security            []string                                 `json:"security,omitempty"`
-	SecurityDefinitions map[string]securityScheme.SecurityScheme `json:"securityDefinitions"`
-	SchemaDefinitions   []dataSchema.DataSchema
+	Links []controls.Link `json:"links,omitempty"`
+	Forms []controls.Form `json:"forms,omitempty"`
+
+	Security            []string                                 `json:"security,omitempty"`  //mandatory
+	SecurityDefinitions map[string]securityScheme.SecurityScheme `json:"securityDefinitions"` //mandatory
+
+	Profile           []controls.URI `json:"profile,omitempty"`
+	SchemaDefinitions map[string]dataSchema.DataSchema
 }
 
 func NewThingFromString(description string) (thing *Thing, err error) {

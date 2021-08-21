@@ -53,20 +53,19 @@ func (c *command) initStartCmd() (err error) {
 
 			logger.Infof("version: %v", gateway.Version)
 
-			g, err := gateway.NewGateway(gateway.Options{
-				BaseDir:   c.config.GetString(optionNameDataDir),
-				AddonDirs: c.config.GetStringSlice(optionNameAddonDirs),
-
-				DBRemoveBeforeOpen: c.config.GetBool(optionNameDBRemoveBeforeOpen),
-				Verbosity:          c.config.GetString(optionNameVerbosity),
-				AddonUrls:          c.config.GetStringSlice(optionNameAddonUrls),
-				IPCPort:            ":" + strconv.Itoa(c.config.GetInt(optionNameIpcPort)),
-				RPCPort:            ":" + strconv.Itoa(c.config.GetInt(optionNameRpcPort)),
-				HttpAddr:           ":" + strconv.Itoa(c.config.GetInt(optionNameHttpPort)),
-				HttpsAddr:          ":" + strconv.Itoa(c.config.GetInt(optionNameHttpsPort)),
-				LogRotateDays:      c.config.GetInt(optionLogRotateDays),
-				HomeKitPin:         c.config.GetString(optionHomeKitPin),
-				HomeKitEnable:      c.config.GetBool(optionHomeKitEnable),
+			g, err := gateway.NewGateway(gateway.Config{
+				BaseDir:          c.config.GetString(optionNameDataDir),
+				AddonDirs:        c.config.GetStringSlice(optionNameAddonDirs),
+				RemoveBeforeOpen: c.config.GetBool(optionNameDBRemoveBeforeOpen),
+				Verbosity:        c.config.GetString(optionNameVerbosity),
+				AddonUrls:        c.config.GetStringSlice(optionNameAddonUrls),
+				IPCPort:          ":" + strconv.Itoa(c.config.GetInt(optionNameIpcPort)),
+				RPCPort:          ":" + strconv.Itoa(c.config.GetInt(optionNameRpcPort)),
+				HttpAddr:         ":" + strconv.Itoa(c.config.GetInt(optionNameHttpPort)),
+				HttpsAddr:        ":" + strconv.Itoa(c.config.GetInt(optionNameHttpsPort)),
+				LogRotateDays:    c.config.GetInt(optionLogRotateDays),
+				HomeKitPin:       c.config.GetString(optionHomeKitPin),
+				HomeKitEnable:    c.config.GetBool(optionHomeKitEnable),
 			}, logger)
 			if err != nil {
 				return err

@@ -55,6 +55,10 @@ func (p *Property) GetName() string {
 	return p.Name
 }
 
+func (p *Property) GetTitle() string {
+	return p.Title
+}
+
 func (p *Property) GetType() string {
 	return p.Type
 }
@@ -63,13 +67,40 @@ func (p *Property) GetAtType() string {
 	return p.AtType
 }
 
+func (p *Property) GetUnit() string {
+	return p.Unit
+}
+
+func (p *Property) GetDescription() string {
+	return p.Description
+}
+
+func (p *Property) GetMinimum() interface{} {
+	return p.Minimum
+}
+func (p *Property) GetMaximum() interface{} {
+	return p.Maximum
+}
+
+func (p *Property) IsReadOnly() bool {
+	return p.ReadOnly
+}
+
+func (p *Property) GetMultipleOf() interface{} {
+	return p.MultipleOf
+}
+
+func (p *Property) GetForms() []interface{} {
+	return p.Forms
+}
+
 func (p *Property) GetValue() interface{} {
 	return p.Value
 }
 
 func (p *Property) SetValue(value interface{}) error {
 	if p.ReadOnly {
-		return fmt.Errorf("read-only property")
+		return fmt.Errorf("read-only Prop")
 	}
 	var numberValue = to.Float64(value)
 	if p.Minimum != nil {

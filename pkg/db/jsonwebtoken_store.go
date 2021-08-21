@@ -2,11 +2,18 @@ package db
 
 import (
 	"database/sql"
-	"github.com/galenliu/gateway/server/models"
-	json "github.com/json-iterator/go"
+	"time"
 )
 
-func (s *Storage) CreateJSONWebToken(t *models.TokenData) error {
+type TokeDataStorage struct {
+	KeyId     string
+	User      int64
+	IssuedAt  time.Time
+	PublicKey string
+	PayLoad   []byte
+}
+
+func (s *Storage) CreateJSONWebToken(t *TokeDataStorage) error {
 	stmt, err := s.db.Prepare("INSERT INTO jsonwebtoken(keyId,user,issuedAt,publicKey,payload) values(?,?,?,?,?)")
 	if err != nil {
 		return err
@@ -17,11 +24,10 @@ func (s *Storage) CreateJSONWebToken(t *models.TokenData) error {
 			s.logger.Error(err.Error())
 		}
 	}(stmt)
-	p, _ := json.MarshalToString(t.Payload)
-	_, err = stmt.Exec(t.KeyId, t.User, t.IssuedAt, t.PublicKey, p)
+	_, err = stmt.Exec(t.KeyId, t.User, t.IssuedAt, t.PublicKey, t.PayLoad)
 	return err
 }
 
-func (s *Storage) GetJSONWebTokenByKeyId(keyId string) *models.TokenData {
+func (s *Storage) GetJSONWebTokenByKeyId(keyId string) *TokeDataStorage {
 	panic("implement me")
 }

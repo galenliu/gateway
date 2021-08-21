@@ -11,13 +11,12 @@ import (
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
-	"time"
-
 	"io"
 	"os"
 	"path"
 	"strings"
 	"sync"
+	"time"
 )
 
 type Store interface {

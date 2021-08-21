@@ -17,7 +17,7 @@ type Component interface {
 	Stop() error
 }
 
-type eventBus interface {
+type EvBus interface {
 	Subscribe(topic string, fn interface{})
 	Unsubscribe(topic string, fn interface{})
 	Publish(topic string, args ...interface{})
@@ -25,38 +25,40 @@ type eventBus interface {
 	SubscribeAsync(topic string, fn interface{})
 }
 
-type Options struct {
+type Config struct {
 	BaseDir   string
 	AddonDirs []string
 
-	DBRemoveBeforeOpen bool
-	Verbosity          string
-	AddonUrls          []string
-	IPCPort            string
-	RPCPort            string
-	HttpAddr           string
-	HttpsAddr          string
-	LogRotateDays      int
-	HomeKitPin         string
-	HomeKitEnable      bool
+	RemoveBeforeOpen bool
+	Verbosity        string
+	AddonUrls        []string
+	IPCPort          string
+	RPCPort          string
+	HttpAddr         string
+	HttpsAddr        string
+	LogRotateDays    int
+	HomeKitPin       string
+	HomeKitEnable    bool
 }
 
 type Gateway struct {
-	options      Options
+	options      Config
 	storage      *db.Storage
-	bus          eventBus
+	bus          EvBus
 	logger       logging.Logger
 	addonManager *plugin.Manager
 	sever        *server.WebServe
 }
 
-func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {
+func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 	g := &Gateway{}
 	g.logger = logger
-	g.options = o
+	g.options = config
 
 	var e error = nil
-	g.storage, e = db.NewStore(path.Join(g.options.BaseDir, constant.ConfigDirName), g.options.DBRemoveBeforeOpen, logger)
+	g.storage, e = db.NewStorage(path.Join(g.options.BaseDir, constant.ConfigDirName), logger, db.Config{
+		Reset: config.RemoveBeforeOpen,
+	})
 	if e != nil {
 		return nil, e
 	}
@@ -78,11 +80,11 @@ func NewGateway(o Options, logger logging.Logger) (*Gateway, error) {
 			GatewayVersion: Version,
 		},
 		AddonDirs: g.options.AddonDirs,
-		IPCPort:   o.IPCPort,
-		RPCPort:   o.IPCPort,
+		IPCPort:   config.IPCPort,
+		RPCPort:   config.IPCPort,
 	}, g.storage, g.bus, g.logger)
 
-	g.sever = server.Setup(server.Options{
+	g.sever = server.Setup(server.Config{
 		HttpAddr:    g.options.HttpAddr,
 		HttpsAddr:   g.options.HttpsAddr,
 		StaticDir:   path.Join(g.options.BaseDir, "static"),

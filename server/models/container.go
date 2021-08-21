@@ -6,15 +6,11 @@ import (
 	json "github.com/json-iterator/go"
 )
 
-type eventBus interface {
-	Publish(string, ...interface{})
-	Subscribe(topic string, fn interface{})
-}
-
 // Container Things CRUD
 type Container interface {
 	GetThing(id string) *Thing
 	GetThings() []*Thing
+	GetMapThings() map[string]*Thing
 	CreateThing(data []byte) (*Thing, error)
 	RemoveThing(id string) error
 	UpdateThing(data []byte) error
@@ -30,7 +26,7 @@ type FireController interface {
 	FireThingRemoved(id string)
 }
 
-type ThingsStore interface {
+type ThingsStorage interface {
 	RemoveThing(id string) error
 	CreateThing(t *Thing) error
 	UpdateThing(t *Thing) error
@@ -39,12 +35,12 @@ type ThingsStore interface {
 
 type container struct {
 	things map[string]*Thing
-	store  ThingsStore
+
+	store  ThingsStorage
 	logger logging.Logger
 }
 
-func NewThingsContainer(store ThingsStore, log logging.Logger) Container {
-
+func NewThingsContainer(store ThingsStorage, log logging.Logger) Container {
 	instance := &container{}
 	instance.store = store
 	instance.logger = log
@@ -66,6 +62,18 @@ func (c *container) GetThings() (ts []*Thing) {
 		ts = append(ts, t)
 	}
 	return
+}
+
+func (c *container) GetMapThings() map[string]*Thing {
+	things := c.GetThings()
+	if things == nil {
+		return nil
+	}
+	var thingsMap = make(map[string]*Thing)
+	for _, th := range things {
+		thingsMap[th.GetID()] = th
+	}
+	return thingsMap
 }
 
 func (c *container) CreateThing(data []byte) (*Thing, error) {

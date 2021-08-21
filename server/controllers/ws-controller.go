@@ -142,7 +142,7 @@ func handleWebsocket(model models.Container, log logging.Logger) func(conn *webs
 //		m["messageType"] = constant.PropertyStatus
 //		propertyValues := make(map[string]interface{})
 //		for propName, prop := range thing.Properties {
-//			value, err := AddonManager.GetPropertyValue(thing.GetID(), propName)
+//			value, err := AddonManagerHandler.GetPropertyValue(thing.GetID(), propName)
 //			prop.SetCachedValue(value)
 //			if err != nil {
 //				continue
@@ -202,14 +202,14 @@ func handleWebsocket(model models.Container, log logging.Logger) func(conn *webs
 //		}
 //	}
 //
-//	AddonManager.Subscribe(constant.PropertyChanged, onPropertyChanged)
+//	AddonManagerHandler.Subscribe(constant.PropertyChanged, onPropertyChanged)
 //	Things.Subscribe(constant.ThingAdded, onThingAdded)
 //	Actions.Subscribe(constant.ActionStatus, onActionStatus)
 //
 //	clearFunc := func() {
 //		Things.Unsubscribe(constant.ThingAdded, onThingAdded)
 //		Actions.Unsubscribe(constant.ActionStatus, onActionStatus)
-//		AddonManager.Unsubscribe(constant.PropertyChanged, onPropertyChanged)
+//		AddonManagerHandler.Unsubscribe(constant.PropertyChanged, onPropertyChanged)
 //	}
 //
 //	defer clearFunc()
@@ -230,7 +230,7 @@ func handleWebsocket(model models.Container, log logging.Logger) func(conn *webs
 //		if id == "" {
 //			id = thingId
 //		}
-//		device := AddonManager.GetDevice(id)
+//		device := AddonManagerHandler.GetDevice(id)
 //		messageType := json.Get(bytes, "messageType").ToString()
 //		if id == "" {
 //			sendError(400, "400 Bed Request", "Missing thing id")
@@ -251,7 +251,7 @@ func handleWebsocket(model models.Container, log logging.Logger) func(conn *webs
 //			var propertyMap map[string]interface{}
 //			json.Get(bytes, "data").ToVal(&propertyMap)
 //			for propName, value := range propertyMap {
-//				_, setErr := AddonManager.SetProperty(device.GetID(), propName, value)
+//				_, setErr := AddonManagerHandler.SetProperty(device.GetID(), propName, value)
 //				if setErr != nil {
 //					m["messageType"] = constant.ERROR
 //					m["bytes"] = map[string]interface{}{
@@ -281,7 +281,7 @@ func handleWebsocket(model models.Container, log logging.Logger) func(conn *webs
 //				if err != nil {
 //					return
 //				}
-//				err = AddonManager.RequestAction(id, action.ID, actionName, actionNames)
+//				err = AddonManagerHandler.RequestAction(id, action.ID, actionName, actionNames)
 //				if err != nil {
 //					sendError(400, "400 Bad Request", err.Error())
 //				}

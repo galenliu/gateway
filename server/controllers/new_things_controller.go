@@ -1,88 +1,48 @@
 package controllers
 
 import (
-	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
-	AddonManager "github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/websocket/v2"
 	"sync"
 )
 
-type NewThingsController1 struct {
+type NewThingAddonHandler interface {
+	GetDevicesBytes() map[string][]byte
+}
+
+type NEWThingsController struct {
 	locker     *sync.Mutex
-	container  *models.ThingsModel
 	ws         *websocket.Conn
 	foundThing chan string
 	closeChan  chan struct{}
+	logger     logging.Logger
 }
 
-func NewNewThingsController(ws *websocket.Conn) *NewThingsController1 {
-	controller := &NewThingsController1{}
-	controller.locker = new(sync.Mutex)
-	controller.closeChan = make(chan struct{})
-	controller.foundThing = make(chan string)
-	controller.ws = ws
-	return controller
+func NewNEWThingsController(log logging.Logger) *NEWThingsController {
+	c := &NEWThingsController{}
+	c.logger = log
+	c.locker = new(sync.Mutex)
+	c.closeChan = make(chan struct{})
+	c.foundThing = make(chan string)
+	return c
 }
 
-func (controller *NewThingsController1) handlerConnection() {
-
-	newThings := controller.container.GetNewThings()
-	for _, t := range newThings {
-		err := controller.ws.WriteJSON(t)
-		if err != nil {
-			logging.Error("web socket err: %s", err.Error())
-			return
-		}
-	}
-	AddonManager.Subscribe(constant.ThingAdded, controller.handleNewThing)
-	defer func() {
-		err := controller.ws.Close()
-		if err != nil {
-			logging.Error(err.Error())
-		}
-		AddonManager.Unsubscribe(constant.ThingAdded, controller.handleNewThing)
-	}()
-
-	go func() {
-		for {
-			_, _, err := controller.ws.ReadMessage()
-			if err != nil {
-				controller.closeChan <- struct{}{}
-				return
-			}
-		}
-	}()
-
-	for {
-		select {
-		case <-controller.closeChan:
-			logging.Info("new things websocket disconnection")
-			return
-		case s := <-controller.foundThing:
-			thing := models.NewThingFromString(s)
-			if thing != nil {
-				err := controller.ws.WriteJSON(thing)
-				if err != nil {
-					controller.closeChan <- struct{}{}
+func (controller *NEWThingsController) handleNewThingsWebsocket(thingsModel models.Container, addonHandler NewThingAddonHandler) func(conn *websocket.Conn) {
+	return func(conn *websocket.Conn) {
+		addonDevices := addonHandler.GetDevicesBytes()
+		savedThings := thingsModel.GetMapThings()
+		for id, dev := range addonDevices {
+			_, ok := savedThings[id]
+			if !ok {
+				dev, err := models.NewThingFromString(string(dev))
+				if err == nil {
+					err := conn.WriteJSON(dev)
+					if err != nil {
+						return
+					}
 				}
 			}
-
 		}
-
 	}
-}
-
-func (controller *NewThingsController1) handleNewThing(data []byte) {
-	controller.foundThing <- string(data)
-}
-
-func handleNewThingsWebsocket(conn *websocket.Conn) {
-	if !conn.Locals("websocket").(bool) {
-		return
-	}
-	controller := NewNewThingsController(conn)
-	controller.handlerConnection()
-
 }

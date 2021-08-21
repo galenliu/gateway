@@ -139,8 +139,8 @@ func (plugin *Plugin) MessageHandler(messageType rpc.MessageType, data []byte) (
 				return err
 			}
 			propName := json.Get(message.Property, "name").ToString()
-			property, ok := device.Properties[propName]
-			if !ok {
+			property := device.GetProperty(propName)
+			if property == nil {
 				return fmt.Errorf("property not found")
 			}
 			property.DoPropertyChanged(message.Property)

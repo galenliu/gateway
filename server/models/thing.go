@@ -1,7 +1,10 @@
 package models
 
 import (
+	"fmt"
+	"github.com/galenliu/gateway/pkg/constant"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
+	"github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
 )
 
@@ -12,6 +15,7 @@ type PIN struct {
 
 type Thing struct {
 	*wot.Thing
+
 	//The configuration  of the device
 	Pin                 *PIN `json:"pin,omitempty"`
 	CredentialsRequired bool `json:"credentialsRequired,omitempty"`
@@ -28,6 +32,7 @@ func NewThingFromString(description string) (thing *Thing, err error) {
 
 	t := Thing{}
 	t.Thing, err = wot.NewThingFromString(description)
+	t.Thing.ID = hypermedia_controls.URI(fmt.Sprintf("%s/%s", constant.ThingsPath, thing.ID.GetID()))
 	if err != nil {
 		return nil, err
 	}

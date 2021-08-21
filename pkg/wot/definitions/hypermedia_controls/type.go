@@ -9,6 +9,7 @@ type UnsignedInt uint
 type Integer uint
 type Number float64
 type URI string
+type Double float64
 
 const (
 	TypeNumber  = "number"

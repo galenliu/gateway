@@ -26,13 +26,19 @@ type Models struct {
 	SettingModel *models.Settings
 }
 
+type AddonManagerHandler interface {
+	AddonHandler
+	ThingsHandler
+	NewThingAddonHandler
+}
+
 type Router struct {
 	*fiber.App
 	logger  logging.Logger
 	options Config
 }
 
-func Setup(config Config, addonManager server.AddonManager, store server.Storage, log logging.Logger) *Router {
+func Setup(config Config, addonManager AddonManagerHandler, store server.Storage, log logging.Logger) *Router {
 
 	//router init
 	app := Router{}
@@ -138,8 +144,9 @@ func Setup(config Config, addonManager server.AddonManager, store server.Storage
 		thingsGroup.Post(constant.ThingIdParam+constant.ActionsPath, actionsController.handleAction)
 	}
 
-	//NewThingFromString Controller
+	//NewThing Controller
 	{
+		newThingsController := NewNEWThingsController(log)
 		newThingsGroup := app.Group(constant.NewThingsPath)
 		newThingsGroup.Use("/", func(c *fiber.Ctx) error {
 			if websocket.IsWebSocketUpgrade(c) {
@@ -149,9 +156,7 @@ func Setup(config Config, addonManager server.AddonManager, store server.Storage
 			return fiber.ErrUpgradeRequired
 		})
 
-		newThingsGroup.Get("/", websocket.New(func(conn *websocket.Conn) {
-			handleNewThingsWebsocket(conn)
-		}))
+		newThingsGroup.Get("/", websocket.New(newThingsController.handleNewThingsWebsocket(thingsModel, addonManager)))
 	}
 
 	//Addons Controller

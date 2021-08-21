@@ -2,7 +2,8 @@ package internal
 
 type adapter interface {
 }
-type property interface {
+type Prop interface {
+	DoPropertyChanged(property []byte)
 }
 
 type Device struct {
@@ -19,7 +20,7 @@ type Device struct {
 	PinRequired         bool     `json:"pinRequired"`
 	CredentialsRequired bool     `json:"credentialsRequired"`
 
-	Properties map[string]property `json:"properties"`
+	Properties map[string]Prop `json:"properties"`
 }
 
 func NewDeviceFormString(adapter adapter, id string) *Device {
@@ -31,4 +32,8 @@ func NewDeviceFormString(adapter adapter, id string) *Device {
 
 func (d *Device) GetId() string {
 	return d.ID
+}
+
+func (d *Device) GetProperty(name string) Prop {
+	return d.Properties[name]
 }

@@ -9,7 +9,6 @@ type Device struct {
 	AdapterId string `json:"adapterId"`
 	adapter   *Adapter
 	*internal.Device
-	Properties map[string]*Property
 }
 
 func NewDeviceFormString(desc string, adapter *Adapter) *Device {
@@ -17,7 +16,7 @@ func NewDeviceFormString(desc string, adapter *Adapter) *Device {
 	device := &Device{}
 	device.adapter = adapter
 	device.AdapterId = adapter.ID
-	device.Properties = make(map[string]*Property)
+	device.Properties = make(map[string]internal.Prop)
 
 	device.AtContext = json.Get(data, "@context").ToString()
 	device.AtType = json.Get(data, "@type").ToString()

@@ -1,6 +1,8 @@
 package models
 
 import (
+	"encoding/json"
+	"github.com/galenliu/gateway/pkg/db"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/golang-jwt/jwt"
@@ -32,8 +34,8 @@ type TokenData struct {
 }
 
 type JsonwebtokenStore interface {
-	CreateJSONWebToken(data *TokenData) error
-	GetJSONWebTokenByKeyId(keyId string) *TokenData
+	CreateJSONWebToken(data *db.TokeDataStorage) error
+	GetJSONWebTokenByKeyId(keyId string) *db.TokeDataStorage
 }
 
 type Jsonwebtoken struct {
@@ -52,7 +54,14 @@ func NewJsonwebtokenModel(settingsModel *Settings, store JsonwebtokenStore, logg
 
 func (j *Jsonwebtoken) IssueToken(user int64) string {
 	sig, token, _ := j.crateUser(user, Payload{Role: RoleUserToken})
-	err := j.Store.CreateJSONWebToken(token)
+	p, err := json.Marshal(token.Payload)
+	err = j.Store.CreateJSONWebToken(&db.TokeDataStorage{
+		KeyId:     token.KeyId,
+		User:      token.User,
+		IssuedAt:  token.IssuedAt,
+		PublicKey: token.PublicKey,
+		PayLoad:   p,
+	})
 	if err != nil {
 		j.logger.Info("Issue token err : %s", err.Error())
 		return ""

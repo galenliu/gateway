@@ -24,22 +24,20 @@ type DataSchema interface {
 }
 
 type dataSchema struct {
-	AtType           string            `json:"@type,omitempty"`
-	Title            string            `json:"title"`
-	Titles           map[string]string `json:"titles,omitempty"`
-	Description      string            `json:"description,omitempty"`
-	Descriptions     map[string]string `json:"descriptions,omitempty"`
-	Unit             string            `json:"unit,omitempty"`
-	Default          interface{}       `json:"default"`
-	Const            interface{}       `json:"const,omitempty"`
-	OneOf            []dataSchema      `json:"oneOf,,omitempty"`
-	Enum             []interface{}     `json:"enum,omitempty"`
-	ReadOnly         bool              `json:"readOnly,omitempty"`
-	WriteOnly        bool              `json:"writeOnly,omitempty"`
-	Format           string            `json:"format,omitempty"`
-	ContentEncoding  string            `json:"contentEncoding,,omitempty"`
-	ContentMediaType string            `json:"contentMediaType,,omitempty"`
-	Type             string            `json:"type"`
+	AtType       string            `json:"@type,omitempty"`
+	Title        string            `json:"title,omitempty"`
+	Titles       map[string]string `json:"titles,omitempty"`
+	Description  string            `json:"description,omitempty"`
+	Descriptions map[string]string `json:"descriptions,omitempty"`
+	Const        interface{}       `json:"const,omitempty"`
+	Default      interface{}       `json:"default,omitempty"`
+	Unit         string            `json:"unit,omitempty"`
+	OneOf        []dataSchema      `json:"oneOf,,omitempty"`
+	Enum         []interface{}     `json:"enum,omitempty"`
+	ReadOnly     bool              `json:"readOnly,omitempty"`
+	WriteOnly    bool              `json:"writeOnly,omitempty"`
+	Format       string            `json:"format,omitempty"`
+	Type         string            `json:"type"`
 }
 
 func newDataSchemaFromString(description string) *dataSchema {
@@ -66,8 +64,6 @@ func newDataSchemaFromString(description string) *dataSchema {
 	schema.ReadOnly = controls.JSONGetBool(data, "readOnly", false)
 	schema.WriteOnly = controls.JSONGetBool(data, "writeOnly", false)
 	schema.Format = controls.JSONGetString(data, "format", "")
-	schema.ContentEncoding = controls.JSONGetString(data, "contentEncoding", "")
-	schema.ContentMediaType = controls.JSONGetString(data, "contentMediaType", "")
 	schema.Type = controls.JSONGetString(data, "type", "")
 	if schema.Type == controls.TypeNumber || schema.Type == controls.TypeString || schema.Type == controls.TypeInteger || schema.Type == controls.TypeNull ||
 		schema.Type == controls.TypeObject || schema.Type == controls.TypeArray || schema.Type == controls.TypeBoolean {

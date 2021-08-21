@@ -14,17 +14,12 @@ type EventBus interface {
 
 type Storage interface {
 	models.UsersStore
-	models.ThingsStore
+	models.ThingsStorage
 	models.SettingsStore
 	models.JsonwebtokenStore
 }
 
-type AddonManager interface {
-	controllers.AddonHandler
-	controllers.ThingsHandler
-}
-
-type Options struct {
+type Config struct {
 	HttpAddr    string
 	HttpsAddr   string
 	StaticDir   string
@@ -36,13 +31,13 @@ type Options struct {
 type WebServe struct {
 	*controllers.Router
 	logger  logging.Logger
-	options Options
+	options Config
 	bus     EventBus
 }
 
-func Setup(options Options, addonManager AddonManager, store Storage, bus EventBus, log logging.Logger) *WebServe {
+func Setup(config Config, addonManager controllers.AddonManagerHandler, store Storage, bus EventBus, log logging.Logger) *WebServe {
 	sev := WebServe{}
-	sev.options = options
+	sev.options = config
 	sev.logger = log
 	sev.bus = bus
 

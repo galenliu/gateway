@@ -14,6 +14,7 @@ type Eventbus struct {
 
 func NewEventBus(bus bus) *Eventbus {
 	b := &Eventbus{}
+	b.bus = bus
 	return b
 }
 

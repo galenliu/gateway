@@ -10,8 +10,8 @@ type StringSchema struct {
 	MinLength        controls.UnsignedInt `json:"minLength,omitempty"`
 	MaxLength        controls.UnsignedInt `json:"maxLength,omitempty"`
 	Pattern          string               `json:"pattern,omitempty"`
-	ContentEncoding  string               `json:"contentEncoding"`
-	ContentMediaType string               `json:"contentMediaType"`
+	ContentEncoding  string               `json:"contentEncoding,omitempty"`
+	ContentMediaType string               `json:"contentMediaType,omitempty"`
 }
 
 func NewStringSchemaFromString(description string) *StringSchema {

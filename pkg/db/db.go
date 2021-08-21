@@ -8,7 +8,12 @@ import (
 	"path"
 )
 
-const dbFileName = "database.sqlite3"
+const dbDefaultFileName = "database.sqlite3"
+
+type Config struct {
+	Reset    bool
+	FileName string
+}
 
 type Storage struct {
 	file   string
@@ -16,12 +21,20 @@ type Storage struct {
 	logger logging.Logger
 }
 
-func NewStore(filePath string, reset bool, log logging.Logger) (*Storage, error) {
+func NewStorage(filePath string, log logging.Logger, conf ...Config) (*Storage, error) {
 	s := &Storage{}
 	s.logger = log
-	f := path.Join(filePath, dbFileName)
-	s.file = f
-	if reset {
+	var config = Config{
+		Reset: false,
+	}
+	if len(conf) > 0 {
+		config = conf[0]
+	}
+	if config.FileName == "" {
+		config.FileName = dbDefaultFileName
+	}
+	s.file = path.Join(filePath, config.FileName)
+	if config.Reset {
 		s.reset()
 	}
 	d, e := sql.Open("sqlite3", filePath)

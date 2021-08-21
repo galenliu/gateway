@@ -1,8 +1,8 @@
 package plugin
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/galenliu/gateway/plugin/internal"
 )
 
 func (m *Manager) SetPropertyValue(deviceId, propName string, newValue interface{}) (interface{}, error) {
@@ -73,22 +73,33 @@ func (m *Manager) GetPropertyValue(deviceId, propName string) (interface{}, erro
 //
 //}
 
-func (m *Manager) GetDevice(deviceId string) *internal.Device {
+func (m *Manager) GetDevice(deviceId string) *Device {
 	return nil
 }
 
-func (m *Manager) GetDevices() (device []*internal.Device) {
+func (m *Manager) GetDevicesBytes() (devices map[string][]byte) {
+	devs := m.getDevices()
+	var devicesMap = make(map[string][]byte)
+	if devs != nil {
+		for _, dev := range devs {
+			bt, err := json.Marshal(dev)
+			if err != nil {
+				devicesMap[dev.GetId()] = bt
+			}
+		}
+		return devicesMap
+	}
 	return nil
 }
 
 func (m *Manager) RemoveDevice(deviceId string) error {
-
-	device := m.getDevice(deviceId)
-	adapter := m.getAdapter(device.AdapterId)
-	if adapter != nil {
-		adapter.removeThing(device)
-		return nil
-	}
+	//
+	//device := m.getDevice(deviceId)
+	//adapter := m.getAdapter(device.AdapterId)
+	//if adapter != nil {
+	//	adapter.removeThing(device)
+	//	return nil
+	//}
 	return fmt.Errorf("can not find thing")
 }
 
