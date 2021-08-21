@@ -1,16 +1,9 @@
 package controllers
 
 import (
-	"fmt"
-	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/util"
-	AddonManager "github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/models"
-	"github.com/galenliu/gateway/server/models/model"
 	"github.com/gofiber/websocket/v2"
-	json "github.com/json-iterator/go"
-	"net/http"
 )
 
 type Map = map[string]interface{}
@@ -49,276 +42,276 @@ func handleWebsocket(model models.Container, log logging.Logger) func(conn *webs
 
 }
 
-func websocketHandler(c *websocket.Conn, thingId string) {
-	Things := models.NewThingsOnce()
-	Actions := models.NewActions()
-	subscribedEventNames := make(map[string]bool)
-	thingCleanups := map[string]func(){}
-	var done = make(chan struct{})
-
-	sendMessage := func(data map[string]interface{}) {
-		d, _ := json.MarshalIndent(&data, "", " ")
-		logging.Info(util.JsonIndent(string(d)))
-		writeErr := c.WriteMessage(websocket.TextMessage, d)
-		if writeErr != nil {
-			return
-		}
-	}
-
-	onEvent := func(event *model.Event) {
-		if thingId != "" && event.ThingId != thingId {
-			return
-		}
-		_, ok := subscribedEventNames[event.Name]
-		if !ok {
-			return
-		}
-		m := make(map[string]interface{})
-		m["id"] = event.ThingId
-		m["messageType"] = constant.EVENT
-		m["data"] = map[string]interface{}{
-			event.Name: event.GetDescription(),
-		}
-		sendMessage(m)
-	}
-
-	onActionStatus := func(action *models.Action) {
-		if action.ThingId != "" && action.ThingId != thingId {
-			return
-		}
-		m := make(map[string]interface{})
-		m["messageType"] = constant.ActionStatus
-		if action.ThingId != "" {
-			m["id"] = action.ThingId
-		}
-
-		m["data"] = map[string]interface{}{
-			action.Name: action,
-		}
-		sendMessage(m)
-	}
-
-	addThing := func(thing *models.Thing) {
-
-		onConnected := func(connected bool) {
-			m := make(map[string]interface{})
-			m["id"] = thing.GetID()
-			m["messageType"] = constant.CONNECTED
-			m["data"] = connected
-			sendMessage(m)
-		}
-
-		onRemoved := func() {
-			f, ok := thingCleanups[thing.GetID()]
-			if ok {
-				f()
-				delete(thingCleanups, thing.GetID())
-			}
-			m := make(map[string]interface{})
-			m["messageType"] = constant.ThingRemoved
-			m["id"] = thing.GetID()
-			m["data"] = struct{}{}
-			sendMessage(m)
-		}
-
-		onModified := func() {
-			m := make(map[string]interface{})
-			m["id"] = thing.GetID()
-			m["messageType"] = constant.ThingModified
-			m["data"] = struct{}{}
-			sendMessage(m)
-
-		}
-
-		thing.Subscribe(constant.CONNECTED, onConnected)
-		thing.Subscribe(constant.ThingRemoved, onRemoved)
-		thing.Subscribe(constant.ThingModified, onModified)
-		thing.Subscribe(constant.EVENT, onEvent)
-
-		thingCleanup := func() {
-			thing.Unsubscribe(constant.CONNECTED, onConnected)
-			thing.Unsubscribe(constant.ThingRemoved, onRemoved)
-			thing.Unsubscribe(constant.ThingModified, onModified)
-			thing.Unsubscribe(constant.EVENT, onEvent)
-		}
-
-		thingCleanups[thing.GetID()] = thingCleanup
-
-		m := make(map[string]interface{})
-		m["id"] = thing.GetID()
-		m["messageType"] = constant.PropertyStatus
-		propertyValues := make(map[string]interface{})
-		for propName, prop := range thing.Properties {
-			value, err := AddonManager.GetPropertyValue(thing.GetID(), propName)
-			prop.SetCachedValue(value)
-			if err != nil {
-				continue
-			} else {
-				propertyValues[propName] = prop.Value
-			}
-		}
-		m["data"] = propertyValues
-		sendMessage(m)
-	}
-
-	onThingAdded := func(thing *models.Thing) {
-		m := make(map[string]interface{})
-		m["id"] = thing.GetID()
-		m["messageType"] = constant.ThingAdded
-		m["data"] = struct{}{}
-		sendMessage(m)
-		addThing(thing)
-	}
-
-	onPropertyChanged := func(data []byte) {
-		deviceId := json.Get(data, "deviceId").ToString()
-		if thingId != "" && thingId != deviceId {
-			return
-		}
-		name := json.Get(data, "name").ToString()
-		v := json.Get(data, "value").GetInterface()
-		if name == "" || v == nil {
-			return
-		}
-		m := make(Map)
-		m["id"] = deviceId
-		m["messageType"] = constant.PropertyStatus
-		m["data"] = map[string]interface{}{
-			name: v,
-		}
-		sendMessage(m)
-	}
-
-	if thingId != "" {
-		m := make(map[string]interface{})
-		t := Things.GetThing(thingId)
-		if t == nil {
-			m["messageType"] = constant.ERROR
-			m["data"] = map[string]interface{}{
-				"code":    http.StatusBadRequest,
-				"status":  "400 Bed Request",
-				"message": fmt.Sprintf("Thing(%s) not found", thingId),
-			}
-			sendMessage(m)
-			return
-		}
-		addThing(t)
-	} else {
-		for _, t := range Things.GetMapOfThings() {
-			addThing(t)
-		}
-	}
-
-	AddonManager.Subscribe(constant.PropertyChanged, onPropertyChanged)
-	Things.Subscribe(constant.ThingAdded, onThingAdded)
-	Actions.Subscribe(constant.ActionStatus, onActionStatus)
-
-	clearFunc := func() {
-		Things.Unsubscribe(constant.ThingAdded, onThingAdded)
-		Actions.Unsubscribe(constant.ActionStatus, onActionStatus)
-		AddonManager.Unsubscribe(constant.PropertyChanged, onPropertyChanged)
-	}
-
-	defer clearFunc()
-
-	handleMessage := func(bytes []byte) {
-		var sendError = func(code int, status string, message string) {
-			m := make(map[string]interface{})
-			m["messageType"] = constant.ERROR
-			m["data"] = map[string]interface{}{
-				"code":    code,
-				"status":  status,
-				"message": message,
-			}
-			sendMessage(m)
-		}
-
-		id := json.Get(bytes, "id").ToString()
-		if id == "" {
-			id = thingId
-		}
-		device := AddonManager.GetDevice(id)
-		messageType := json.Get(bytes, "messageType").ToString()
-		if id == "" {
-			sendError(400, "400 Bed Request", "Missing thing id")
-			return
-		}
-		if device == nil {
-			sendError(400, "400 Bed Request", "device can not found")
-			return
-		}
-		if messageType == "" {
-			sendError(400, "400 Bed Request", "messageType err")
-			return
-		}
-
-		m := make(map[string]interface{})
-		switch messageType {
-		case constant.SetProperty:
-			var propertyMap map[string]interface{}
-			json.Get(bytes, "data").ToVal(&propertyMap)
-			for propName, value := range propertyMap {
-				_, setErr := AddonManager.SetProperty(device.GetID(), propName, value)
-				if setErr != nil {
-					m["messageType"] = constant.ERROR
-					m["bytes"] = map[string]interface{}{
-						"code":    http.StatusBadRequest,
-						"status":  "400 Bed Request",
-						"message": setErr.Error(),
-						"request": bytes,
-					}
-				}
-			}
-			return
-		case constant.AddEventSubscription:
-			var eventsName []string
-			json.Get(bytes, "data").ToVal(&eventsName)
-			for _, eventName := range eventsName {
-				subscribedEventNames[eventName] = true
-			}
-			return
-
-		case constant.RequestAction:
-			var actionNames map[string]interface{}
-			json.Get(bytes, "data").ToVal(&actionNames)
-			for actionName := range actionNames {
-				data := json.Get(bytes, "data").ToString()
-				action := models.NewAction([]byte(data), id)
-				err := Things.Actions.Add(action)
-				if err != nil {
-					return
-				}
-				err = AddonManager.RequestAction(id, action.ID, actionName, actionNames)
-				if err != nil {
-					sendError(400, "400 Bad Request", err.Error())
-				}
-			}
-		default:
-			sendError(400, "400 Bed Request", fmt.Sprintf("Unknown messageType:%s", messageType))
-			return
-		}
-	}
-
-	for {
-		select {
-		case <-done:
-			return
-		default:
-			_, data, readErr := c.ReadMessage()
-			if readErr != nil {
-
-				done <- struct{}{}
-				return
-			}
-			if data != nil {
-				handleMessage(data)
-			}
-
-		}
-
-	}
-
-}
+//func websocketHandler(c *websocket.Conn, thingId string) {
+//	Things := models.NewThingsOnce()
+//	Actions := models.NewActions()
+//	subscribedEventNames := make(map[string]bool)
+//	thingCleanups := map[string]func(){}
+//	var done = make(chan struct{})
+//
+//	sendMessage := func(data map[string]interface{}) {
+//		d, _ := json.MarshalIndent(&data, "", " ")
+//		logging.Info(util.JsonIndent(string(d)))
+//		writeErr := c.WriteMessage(websocket.TextMessage, d)
+//		if writeErr != nil {
+//			return
+//		}
+//	}
+//
+//	onEvent := func(event *model.Event) {
+//		if thingId != "" && event.ThingId != thingId {
+//			return
+//		}
+//		_, ok := subscribedEventNames[event.Name]
+//		if !ok {
+//			return
+//		}
+//		m := make(map[string]interface{})
+//		m["id"] = event.ThingId
+//		m["messageType"] = constant.EVENT
+//		m["data"] = map[string]interface{}{
+//			event.Name: event.GetDescription(),
+//		}
+//		sendMessage(m)
+//	}
+//
+//	onActionStatus := func(action *models.Action) {
+//		if action.ThingId != "" && action.ThingId != thingId {
+//			return
+//		}
+//		m := make(map[string]interface{})
+//		m["messageType"] = constant.ActionStatus
+//		if action.ThingId != "" {
+//			m["id"] = action.ThingId
+//		}
+//
+//		m["data"] = map[string]interface{}{
+//			action.Name: action,
+//		}
+//		sendMessage(m)
+//	}
+//
+//	addThing := func(thing *models.Thing) {
+//
+//		onConnected := func(connected bool) {
+//			m := make(map[string]interface{})
+//			m["id"] = thing.GetID()
+//			m["messageType"] = constant.CONNECTED
+//			m["data"] = connected
+//			sendMessage(m)
+//		}
+//
+//		onRemoved := func() {
+//			f, ok := thingCleanups[thing.GetID()]
+//			if ok {
+//				f()
+//				delete(thingCleanups, thing.GetID())
+//			}
+//			m := make(map[string]interface{})
+//			m["messageType"] = constant.ThingRemoved
+//			m["id"] = thing.GetID()
+//			m["data"] = struct{}{}
+//			sendMessage(m)
+//		}
+//
+//		onModified := func() {
+//			m := make(map[string]interface{})
+//			m["id"] = thing.GetID()
+//			m["messageType"] = constant.ThingModified
+//			m["data"] = struct{}{}
+//			sendMessage(m)
+//
+//		}
+//
+//		thing.Subscribe(constant.CONNECTED, onConnected)
+//		thing.Subscribe(constant.ThingRemoved, onRemoved)
+//		thing.Subscribe(constant.ThingModified, onModified)
+//		thing.Subscribe(constant.EVENT, onEvent)
+//
+//		thingCleanup := func() {
+//			thing.Unsubscribe(constant.CONNECTED, onConnected)
+//			thing.Unsubscribe(constant.ThingRemoved, onRemoved)
+//			thing.Unsubscribe(constant.ThingModified, onModified)
+//			thing.Unsubscribe(constant.EVENT, onEvent)
+//		}
+//
+//		thingCleanups[thing.GetID()] = thingCleanup
+//
+//		m := make(map[string]interface{})
+//		m["id"] = thing.GetID()
+//		m["messageType"] = constant.PropertyStatus
+//		propertyValues := make(map[string]interface{})
+//		for propName, prop := range thing.Properties {
+//			value, err := AddonManager.GetPropertyValue(thing.GetID(), propName)
+//			prop.SetCachedValue(value)
+//			if err != nil {
+//				continue
+//			} else {
+//				propertyValues[propName] = prop.Value
+//			}
+//		}
+//		m["data"] = propertyValues
+//		sendMessage(m)
+//	}
+//
+//	onThingAdded := func(thing *models.Thing) {
+//		m := make(map[string]interface{})
+//		m["id"] = thing.GetID()
+//		m["messageType"] = constant.ThingAdded
+//		m["data"] = struct{}{}
+//		sendMessage(m)
+//		addThing(thing)
+//	}
+//
+//	onPropertyChanged := func(data []byte) {
+//		deviceId := json.Get(data, "deviceId").ToString()
+//		if thingId != "" && thingId != deviceId {
+//			return
+//		}
+//		name := json.Get(data, "name").ToString()
+//		v := json.Get(data, "value").GetInterface()
+//		if name == "" || v == nil {
+//			return
+//		}
+//		m := make(Map)
+//		m["id"] = deviceId
+//		m["messageType"] = constant.PropertyStatus
+//		m["data"] = map[string]interface{}{
+//			name: v,
+//		}
+//		sendMessage(m)
+//	}
+//
+//	if thingId != "" {
+//		m := make(map[string]interface{})
+//		t := Things.GetThing(thingId)
+//		if t == nil {
+//			m["messageType"] = constant.ERROR
+//			m["data"] = map[string]interface{}{
+//				"code":    http.StatusBadRequest,
+//				"status":  "400 Bed Request",
+//				"message": fmt.Sprintf("Thing(%s) not found", thingId),
+//			}
+//			sendMessage(m)
+//			return
+//		}
+//		addThing(t)
+//	} else {
+//		for _, t := range Things.GetMapOfThings() {
+//			addThing(t)
+//		}
+//	}
+//
+//	AddonManager.Subscribe(constant.PropertyChanged, onPropertyChanged)
+//	Things.Subscribe(constant.ThingAdded, onThingAdded)
+//	Actions.Subscribe(constant.ActionStatus, onActionStatus)
+//
+//	clearFunc := func() {
+//		Things.Unsubscribe(constant.ThingAdded, onThingAdded)
+//		Actions.Unsubscribe(constant.ActionStatus, onActionStatus)
+//		AddonManager.Unsubscribe(constant.PropertyChanged, onPropertyChanged)
+//	}
+//
+//	defer clearFunc()
+//
+//	handleMessage := func(bytes []byte) {
+//		var sendError = func(code int, status string, message string) {
+//			m := make(map[string]interface{})
+//			m["messageType"] = constant.ERROR
+//			m["data"] = map[string]interface{}{
+//				"code":    code,
+//				"status":  status,
+//				"message": message,
+//			}
+//			sendMessage(m)
+//		}
+//
+//		id := json.Get(bytes, "id").ToString()
+//		if id == "" {
+//			id = thingId
+//		}
+//		device := AddonManager.GetDevice(id)
+//		messageType := json.Get(bytes, "messageType").ToString()
+//		if id == "" {
+//			sendError(400, "400 Bed Request", "Missing thing id")
+//			return
+//		}
+//		if device == nil {
+//			sendError(400, "400 Bed Request", "device can not found")
+//			return
+//		}
+//		if messageType == "" {
+//			sendError(400, "400 Bed Request", "messageType err")
+//			return
+//		}
+//
+//		m := make(map[string]interface{})
+//		switch messageType {
+//		case constant.SetProperty:
+//			var propertyMap map[string]interface{}
+//			json.Get(bytes, "data").ToVal(&propertyMap)
+//			for propName, value := range propertyMap {
+//				_, setErr := AddonManager.SetProperty(device.GetID(), propName, value)
+//				if setErr != nil {
+//					m["messageType"] = constant.ERROR
+//					m["bytes"] = map[string]interface{}{
+//						"code":    http.StatusBadRequest,
+//						"status":  "400 Bed Request",
+//						"message": setErr.Error(),
+//						"request": bytes,
+//					}
+//				}
+//			}
+//			return
+//		case constant.AddEventSubscription:
+//			var eventsName []string
+//			json.Get(bytes, "data").ToVal(&eventsName)
+//			for _, eventName := range eventsName {
+//				subscribedEventNames[eventName] = true
+//			}
+//			return
+//
+//		case constant.RequestAction:
+//			var actionNames map[string]interface{}
+//			json.Get(bytes, "data").ToVal(&actionNames)
+//			for actionName := range actionNames {
+//				data := json.Get(bytes, "data").ToString()
+//				action := models.NewAction([]byte(data), id)
+//				err := Things.Actions.Add(action)
+//				if err != nil {
+//					return
+//				}
+//				err = AddonManager.RequestAction(id, action.ID, actionName, actionNames)
+//				if err != nil {
+//					sendError(400, "400 Bad Request", err.Error())
+//				}
+//			}
+//		default:
+//			sendError(400, "400 Bed Request", fmt.Sprintf("Unknown messageType:%s", messageType))
+//			return
+//		}
+//	}
+//
+//	for {
+//		select {
+//		case <-done:
+//			return
+//		default:
+//			_, data, readErr := c.ReadMessage()
+//			if readErr != nil {
+//
+//				done <- struct{}{}
+//				return
+//			}
+//			if data != nil {
+//				handleMessage(data)
+//			}
+//
+//		}
+//
+//	}
+//
+//}
 
 //func (controller *WsHandler) handlerConn() {
 //

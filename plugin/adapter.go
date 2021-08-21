@@ -26,8 +26,7 @@ type Adapter struct {
 	pairingContext context.Context
 	manifest       interface{}
 	packageName    string
-
-	logger logging.Logger
+	logger         logging.Logger
 }
 
 func NewAdapter(p *Plugin, name, adapterId, packageName string, log logging.Logger) *Adapter {
@@ -39,7 +38,6 @@ func NewAdapter(p *Plugin, name, adapterId, packageName string, log logging.Logg
 	adapter.packageName = packageName
 	adapter.plugin = p
 	adapter.looker = new(sync.Mutex)
-
 	return adapter
 }
 
@@ -47,20 +45,20 @@ func (adapter *Adapter) pairing(timeout float64) {
 	adapter.logger.Info(fmt.Sprintf("adapter: %s start pairing", adapter.ID))
 	data := make(map[string]interface{})
 	data["timeout"] = timeout
-	adapter.SendMessage(rpc.MessageType_AdapterStartPairingCommand, data)
+	adapter.sendMessage(rpc.MessageType_AdapterStartPairingCommand, data)
 }
 
 func (adapter *Adapter) cancelPairing() {
 	adapter.logger.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.ID))
 	data := make(map[string]interface{})
-	adapter.SendMessage(rpc.MessageType_AdapterCancelPairingCommand, data)
+	adapter.sendMessage(rpc.MessageType_AdapterCancelPairingCommand, data)
 }
 
 func (adapter *Adapter) removeThing(device *internal.Device) {
 	adapter.logger.Info("adapter delete thing Id: %v", device.ID)
 	data := make(map[string]interface{})
 	data["deviceId"] = device.ID
-	adapter.SendMessage(internal.AdapterRemoveDeviceRequest, data)
+	adapter.sendMessage(internal.AdapterRemoveDeviceRequest, data)
 
 }
 
@@ -68,10 +66,10 @@ func (adapter *Adapter) cancelRemoveThing(deviceId string) {
 	adapter.logger.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.ID))
 	data := make(map[string]interface{})
 	data["deviceId"] = deviceId
-	adapter.SendMessage(rpc.MessageType_AdapterCancelRemoveDeviceCommand, data)
+	adapter.sendMessage(rpc.MessageType_AdapterCancelRemoveDeviceCommand, data)
 }
 
-func (adapter *Adapter) SendMessage(messageType rpc.MessageType, data map[string]interface{}) {
+func (adapter *Adapter) sendMessage(messageType rpc.MessageType, data map[string]interface{}) {
 	data["adapterId"] = adapter.ID
 	adapter.plugin.SendMessage(messageType, data)
 }

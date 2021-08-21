@@ -95,7 +95,7 @@ func (m *Manager) addNewThing(pairingTimeout float64) error {
 			select {
 			case <-ctx.Done():
 				cancelFn()
-				m.CancelAddNewThing()
+				m.cancelAddNewThing()
 				//bus.Publish(util.PairingTimeout)
 				return
 			}
@@ -105,7 +105,7 @@ func (m *Manager) addNewThing(pairingTimeout float64) error {
 	return nil
 }
 
-func (m *Manager) CancelAddNewThing() {
+func (m *Manager) cancelAddNewThing() {
 	if !m.isPairing {
 		return
 	}
@@ -172,7 +172,7 @@ func (m *Manager) handleSetProperty(deviceId, propName string, setValue interfac
 	//data[addon.Did] = device.GetID()
 	//data["propertyName"] = property.GetName()
 	//data["propertyValue"] = newValue
-	go adapter.SendMessage(internal.DeviceSetPropertyCommand, nil)
+	go adapter.sendMessage(internal.DeviceSetPropertyCommand, nil)
 	return nil
 }
 

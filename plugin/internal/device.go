@@ -2,6 +2,8 @@ package internal
 
 type adapter interface {
 }
+type property interface {
+}
 
 type Device struct {
 	adapter     adapter
@@ -16,6 +18,8 @@ type Device struct {
 	BaseHref            string   `json:"baseHref"`
 	PinRequired         bool     `json:"pinRequired"`
 	CredentialsRequired bool     `json:"credentialsRequired"`
+
+	Properties map[string]property `json:"properties"`
 }
 
 func NewDeviceFormString(adapter adapter, id string) *Device {
