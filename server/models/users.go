@@ -1,14 +1,15 @@
 package models
 
 import (
+	"github.com/galenliu/gateway/pkg/db"
 	"github.com/galenliu/gateway/pkg/logging"
 )
 
 type UsersStore interface {
-	CreateUser(user *User) (int64, error)
+	CreateUser(user *db.User) (int64, error)
 	DeleteUser(id int64) error
-	GetUsers() []*User
-	UpdateUser(user *User) error
+	GetUsers() []*db.User
+	UpdateUser(user *db.User) error
 }
 
 type Users struct {
@@ -31,7 +32,15 @@ func (u *Users) GetUser(email string) *User {
 	users := u.store.GetUsers()
 	for _, user := range users {
 		if user.Email == email {
-			return user
+			return &User{
+				ID:              user.ID,
+				Name:            user.Name,
+				Email:           user.Email,
+				Hash:            user.Hash,
+				MfaSharedSecret: user.MfaSharedSecret,
+				MfaEnrolled:     user.MfaEnrolled,
+				MfaBackupCodes:  user.MfaBackupCodes,
+			}
 		}
 	}
 	return nil
@@ -39,5 +48,13 @@ func (u *Users) GetUser(email string) *User {
 
 func (u *Users) CreateUser(email, password, name string) (int64, error) {
 	user := newUser(email, password, name)
-	return u.store.CreateUser(user)
+	return u.store.CreateUser(&db.User{
+		ID:              user.ID,
+		Name:            user.Name,
+		Email:           user.Email,
+		Hash:            user.Hash,
+		MfaSharedSecret: user.MfaSharedSecret,
+		MfaEnrolled:     user.MfaEnrolled,
+		MfaBackupCodes:  user.MfaBackupCodes,
+	})
 }

@@ -28,8 +28,8 @@ type FireController interface {
 
 type ThingsStorage interface {
 	RemoveThing(id string) error
-	CreateThing(id string, bytes []byte) error
-	UpdateThing(id string, bytes []byte) error
+	CreateThing(id string, thing interface{}) error
+	UpdateThing(id string, thing interface{}) error
 	GetThings() map[string][]byte
 }
 

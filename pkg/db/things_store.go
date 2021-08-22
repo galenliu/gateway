@@ -3,15 +3,11 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"github.com/galenliu/gateway/server/models"
+	json "github.com/json-iterator/go"
 )
 
-func (s *Storage) SaveThing(t *models.Thing) error {
-	panic("implement me")
-}
-
-func (s *Storage) CreateThing(id string, bytes []byte) error {
-
+func (s *Storage) CreateThing(id string, thing interface{}) error {
+	bytes, _ := json.Marshal(thing)
 	stmt, err := s.db.Prepare("INSERT INTO things(id, description) values(?,?)")
 	if err != nil {
 		return err
@@ -72,8 +68,8 @@ func (s *Storage) RemoveThing(id string) error {
 	return nil
 }
 
-func (s *Storage) UpdateThing(id string, bytes []byte) (err error) {
-
+func (s *Storage) UpdateThing(id string, thing interface{}) (err error) {
+	bytes, _ := json.Marshal(thing)
 	_, err = s.db.Exec(`update things set id=@id where description=@description`, sql.Named("id", id), sql.Named("description", bytes))
 	return
 }

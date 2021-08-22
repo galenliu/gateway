@@ -3,11 +3,20 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"github.com/galenliu/gateway/server/models"
 )
 
-func (s *Storage) GetUsers() []*models.User {
-	var users []*models.User
+type User struct {
+	ID              int64
+	Name            string
+	Email           string
+	Hash            string
+	MfaSharedSecret string
+	MfaEnrolled     bool
+	MfaBackupCodes  string
+}
+
+func (s *Storage) GetUsers() []*User {
+	var users []*User
 	rows, err := s.db.Query("SELECT * FROM users")
 	if err != nil {
 		s.logger.Error("DataBase GetUsers Err:", err.Error())
@@ -25,7 +34,7 @@ func (s *Storage) GetUsers() []*models.User {
 		)
 		err = rows.Scan(&id, &email, &password, &name, &mfaSharedSecret, &mfaEnrolled, &mfaBackupCodes)
 		if err == nil {
-			users = append(users, &models.User{
+			users = append(users, &User{
 				ID:              id,
 				Name:            name,
 				Email:           email,
@@ -39,7 +48,7 @@ func (s *Storage) GetUsers() []*models.User {
 	return users
 }
 
-func (s *Storage) CreateUser(u *models.User) (int64, error) {
+func (s *Storage) CreateUser(u *User) (int64, error) {
 	if u.Email == "" {
 		return 0, fmt.Errorf("email is emtry")
 	}
@@ -85,7 +94,7 @@ func (s *Storage) DeleteUser(id int64) error {
 	return nil
 }
 
-func (s *Storage) UpdateUser(u *models.User) error {
+func (s *Storage) UpdateUser(u *User) error {
 	stmt, err := s.db.Prepare("update users set password=? name=? mfaSharedSecret=? mfaEnrolled=? mfaBackupCodes=? where id=?")
 	if err != nil {
 		return err

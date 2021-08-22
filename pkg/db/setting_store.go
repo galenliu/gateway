@@ -21,7 +21,12 @@ func (s *Storage) SetSetting(key, value string) error {
 	if err != nil {
 		return err
 	}
-	defer stmt.Close()
+	defer func(stmt *sql.Stmt) {
+		err := stmt.Close()
+		if err != nil {
+			s.logger.Error(err.Error())
+		}
+	}(stmt)
 	res, ee := stmt.Exec(key, value)
 	if ee != nil {
 		return ee

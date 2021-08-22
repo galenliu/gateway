@@ -4,19 +4,11 @@ import (
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/server/controllers"
-	"github.com/galenliu/gateway/server/models"
 )
 
 type EventBus interface {
 	Subscribe(topic string, fn interface{})
 	Publish(topic string, args ...interface{})
-}
-
-type Storage interface {
-	models.UsersStore
-	models.ThingsStorage
-	models.SettingsStore
-	models.JsonwebtokenStore
 }
 
 type Config struct {
@@ -35,7 +27,7 @@ type WebServe struct {
 	bus     EventBus
 }
 
-func Setup(config Config, addonManager controllers.AddonManagerHandler, store Storage, bus EventBus, log logging.Logger) *WebServe {
+func Setup(config Config, addonManager controllers.AddonManagerHandler, store controllers.Storage, bus EventBus, log logging.Logger) *WebServe {
 	sev := WebServe{}
 	sev.options = config
 	sev.logger = log

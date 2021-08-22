@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/server"
 	"github.com/galenliu/gateway/server/middleware"
 	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
@@ -15,6 +14,13 @@ import (
 	"net/http"
 	"time"
 )
+
+type Storage interface {
+	models.UsersStore
+	models.ThingsStorage
+	models.SettingsStore
+	models.JsonwebtokenStore
+}
 
 type Config struct {
 	HttpAddr  string
@@ -38,7 +44,7 @@ type Router struct {
 	options Config
 }
 
-func Setup(config Config, addonManager AddonManagerHandler, store server.Storage, log logging.Logger) *Router {
+func Setup(config Config, addonManager AddonManagerHandler, store Storage, log logging.Logger) *Router {
 
 	//router init
 	app := Router{}

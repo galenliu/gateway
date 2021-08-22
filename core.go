@@ -26,9 +26,8 @@ type EvBus interface {
 }
 
 type Config struct {
-	BaseDir   string
-	AddonDirs []string
-
+	BaseDir          string
+	AddonDirs        []string
 	RemoveBeforeOpen bool
 	Verbosity        string
 	AddonUrls        []string
@@ -42,7 +41,7 @@ type Config struct {
 }
 
 type Gateway struct {
-	options      Config
+	config       Config
 	storage      *db.Storage
 	bus          EvBus
 	logger       logging.Logger
@@ -53,10 +52,10 @@ type Gateway struct {
 func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 	g := &Gateway{}
 	g.logger = logger
-	g.options = config
+	g.config = config
 
 	var e error = nil
-	g.storage, e = db.NewStorage(path.Join(g.options.BaseDir, constant.ConfigDirName), logger, db.Config{
+	g.storage, e = db.NewStorage(path.Join(g.config.BaseDir, constant.ConfigDirName), logger, db.Config{
 		Reset: config.RemoveBeforeOpen,
 	})
 	if e != nil {
@@ -70,27 +69,27 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 
 	g.addonManager = plugin.NewAddonsManager(plugin.Config{
 		UserProfile: plugin.UserProfile{
-			BaseDir:        g.options.BaseDir,
-			DataDir:        path.Join(g.options.BaseDir, "data"),
-			AddonsDir:      path.Join(g.options.BaseDir, "addons"),
-			ConfigDir:      path.Join(g.options.BaseDir, "config"),
-			UploadDir:      path.Join(g.options.BaseDir, "upload"),
-			MediaDir:       path.Join(g.options.BaseDir, "media"),
-			LogDir:         path.Join(g.options.BaseDir, "log"),
+			BaseDir:        g.config.BaseDir,
+			DataDir:        path.Join(g.config.BaseDir, "data"),
+			AddonsDir:      path.Join(g.config.BaseDir, "addons"),
+			ConfigDir:      path.Join(g.config.BaseDir, "config"),
+			UploadDir:      path.Join(g.config.BaseDir, "upload"),
+			MediaDir:       path.Join(g.config.BaseDir, "media"),
+			LogDir:         path.Join(g.config.BaseDir, "log"),
 			GatewayVersion: Version,
 		},
-		AddonDirs: g.options.AddonDirs,
+		AddonDirs: g.config.AddonDirs,
 		IPCPort:   config.IPCPort,
 		RPCPort:   config.IPCPort,
 	}, g.storage, g.bus, g.logger)
 
 	g.sever = server.Setup(server.Config{
-		HttpAddr:    g.options.HttpAddr,
-		HttpsAddr:   g.options.HttpsAddr,
-		StaticDir:   path.Join(g.options.BaseDir, "static"),
-		TemplateDir: path.Join(g.options.BaseDir, "template"),
-		UploadDir:   path.Join(g.options.BaseDir, "upload"),
-		LogDir:      path.Join(g.options.BaseDir, "log"),
+		HttpAddr:    g.config.HttpAddr,
+		HttpsAddr:   g.config.HttpsAddr,
+		StaticDir:   path.Join(g.config.BaseDir, "static"),
+		TemplateDir: path.Join(g.config.BaseDir, "template"),
+		UploadDir:   path.Join(g.config.BaseDir, "upload"),
+		LogDir:      path.Join(g.config.BaseDir, "log"),
 	}, g.addonManager, g.storage, g.bus, g.logger)
 
 	return g, nil
