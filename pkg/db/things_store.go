@@ -4,18 +4,14 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/galenliu/gateway/server/models"
-	json "github.com/json-iterator/go"
 )
 
 func (s *Storage) SaveThing(t *models.Thing) error {
 	panic("implement me")
 }
 
-func (s *Storage) CreateThing(t *models.Thing) error {
-	if t.ID == "" {
-		return fmt.Errorf("description is emtry")
-	}
-	description, _ := json.MarshalToString(t)
+func (s *Storage) CreateThing(id string, bytes []byte) error {
+
 	stmt, err := s.db.Prepare("INSERT INTO things(id, description) values(?,?)")
 	if err != nil {
 		return err
@@ -26,7 +22,7 @@ func (s *Storage) CreateThing(t *models.Thing) error {
 			s.logger.Error("stmt close err: %s", err.Error())
 		}
 	}(stmt)
-	res, ee := stmt.Exec(t.GetID(), description)
+	res, ee := stmt.Exec(id, bytes)
 	if ee != nil {
 		return ee
 	}
@@ -34,11 +30,14 @@ func (s *Storage) CreateThing(t *models.Thing) error {
 	if eee != nil {
 		return eee
 	}
-	fmt.Printf("insert data,id:%s , value: %s \t\n", t.GetID(), description)
+	fmt.Printf("insert data,id:%s , value: %s \t\n", id, bytes)
 	return nil
 }
 
-func (s *Storage) GetThings() (things []*models.Thing) {
+func (s *Storage) GetThings() (things map[string][]byte) {
+	if things == nil {
+		things = make(map[string][]byte)
+	}
 	rows, err := s.db.Query("SELECT id, description FROM things")
 	if err != nil {
 		return nil
@@ -50,12 +49,7 @@ func (s *Storage) GetThings() (things []*models.Thing) {
 		if err == nil {
 			continue
 		}
-		t, er := models.NewThingFromString(description)
-		if er != nil {
-			s.logger.Error("thing err: %s", er.Error())
-			continue
-		}
-		things = append(things, t)
+		things[id] = []byte(description)
 	}
 	return things
 }
@@ -78,8 +72,8 @@ func (s *Storage) RemoveThing(id string) error {
 	return nil
 }
 
-func (s *Storage) UpdateThing(t *models.Thing) (err error) {
-	d, _ := json.MarshalToString(t)
-	_, err = s.db.Exec(`update things set id=@id where description=@description`, sql.Named("id", t.GetID()), sql.Named("description", d))
+func (s *Storage) UpdateThing(id string, bytes []byte) (err error) {
+
+	_, err = s.db.Exec(`update things set id=@id where description=@description`, sql.Named("id", id), sql.Named("description", bytes))
 	return
 }

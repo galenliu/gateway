@@ -28,14 +28,13 @@ type FireController interface {
 
 type ThingsStorage interface {
 	RemoveThing(id string) error
-	CreateThing(t *Thing) error
-	UpdateThing(t *Thing) error
-	GetThings() []*Thing
+	CreateThing(id string, bytes []byte) error
+	UpdateThing(id string, bytes []byte) error
+	GetThings() map[string][]byte
 }
 
 type container struct {
 	things map[string]*Thing
-
 	store  ThingsStorage
 	logger logging.Logger
 }
@@ -114,11 +113,12 @@ func (c *container) handleCreateThing(data []byte) (*Thing, error) {
 	if ok {
 		return nil, fmt.Errorf("thing id: %s is exited", th.GetID())
 	}
-	c.things[th.GetID()] = th
-	err = c.store.CreateThing(th)
+	bytes, err := json.Marshal(th)
+	err = c.store.CreateThing(th.GetID(), bytes)
 	if err != nil {
 		return nil, err
 	}
+	c.things[th.GetID()] = th
 	return c.things[th.GetID()], nil
 }
 
@@ -144,7 +144,8 @@ func (c *container) handleUpdateThing(data []byte) error {
 		}
 		if newThing != nil {
 			c.things[newThing.ID.GetID()] = newThing
-			err := c.store.UpdateThing(newThing)
+			bytes, _ := json.Marshal(newThing)
+			err := c.store.UpdateThing(newThing.GetID(), bytes)
 			if err != nil {
 				return err
 			}
@@ -155,8 +156,12 @@ func (c *container) handleUpdateThing(data []byte) error {
 
 func (c *container) updateThings() {
 	if len(c.things) < 1 {
-		for _, t := range c.store.GetThings() {
-			c.things[t.GetID()] = t
+		for id, bytes := range c.store.GetThings() {
+			thing, err := NewThingFromString(string(bytes))
+			if err != nil {
+				continue
+			}
+			c.things[id] = thing
 		}
 	}
 }
