@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/galenliu/gateway"
+	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/spf13/cobra"
 )
 
@@ -10,7 +10,7 @@ func (c *command) initVersionCmd() {
 		Use:   "version",
 		Short: "Print version number",
 		Run: func(cmd *cobra.Command, args []string) {
-			cmd.Println(gateway.Version)
+			cmd.Println(constant.Version)
 		},
 	}
 	v.SetOut(c.root.OutOrStdout())

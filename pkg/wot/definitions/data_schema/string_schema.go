@@ -6,7 +6,7 @@ import (
 )
 
 type StringSchema struct {
-	*dataSchema
+	*DataSchema
 	MinLength        controls.UnsignedInt `json:"minLength,omitempty"`
 	MaxLength        controls.UnsignedInt `json:"maxLength,omitempty"`
 	Pattern          string               `json:"pattern,omitempty"`
@@ -17,8 +17,8 @@ type StringSchema struct {
 func NewStringSchemaFromString(description string) *StringSchema {
 	data := []byte(description)
 	var schema = StringSchema{}
-	schema.dataSchema = newDataSchemaFromString(description)
-	if schema.dataSchema == nil || schema.dataSchema.GetType() != controls.TypeString {
+	schema.DataSchema = NewDataSchemaFromString(description)
+	if schema.DataSchema == nil || schema.DataSchema.GetType() != controls.TypeString {
 		return nil
 	}
 	if json.Get(data, "minLength").ValueType() != json.NilValue {
@@ -47,8 +47,8 @@ func (s *StringSchema) Convert(v interface{}) interface{} {
 }
 
 func (s *StringSchema) GetDefaultValue() interface{} {
-	if s.dataSchema.Default != nil {
-		return s.Convert(s.dataSchema.Default)
+	if s.DataSchema.Default != nil {
+		return s.Convert(s.DataSchema.Default)
 	}
 	return ""
 }

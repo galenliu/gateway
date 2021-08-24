@@ -1,6 +1,7 @@
 package core
 
 import (
+	"github.com/galenliu/gateway/pkg/wot/definitions/core/interaction_affordance"
 	"github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
@@ -11,19 +12,19 @@ type ActionAffordance interface {
 }
 
 type actionAffordance struct {
-	*InteractionAffordance
+	*interaction_affordance.InteractionAffordance
 
-	Input      data_schema.DataSchema `json:"input,omitempty"`
-	Output     data_schema.DataSchema `json:"output,omitempty"`
-	Safe       bool                   `json:"safe,omitempty"`
-	Idempotent bool                   `json:"idempotent,omitempty"`
+	Input      *data_schema.DataSchema `json:"input,omitempty"`
+	Output     *data_schema.DataSchema `json:"output,omitempty"`
+	Safe       bool                    `json:"safe,omitempty"`
+	Idempotent bool                    `json:"idempotent,omitempty"`
 }
 
 func NewActionAffordanceFromString(description string) *actionAffordance {
 	data := []byte(description)
 	var a = actionAffordance{}
 
-	if a.InteractionAffordance = NewInteractionAffordanceFromString(description); a.InteractionAffordance == nil {
+	if a.InteractionAffordance = interaction_affordance.NewInteractionAffordanceFromString(description); a.InteractionAffordance == nil {
 		return nil
 	}
 

@@ -6,22 +6,22 @@ import (
 )
 
 type ObjectSchema struct {
-	*dataSchema
-	Properties map[string]DataSchema `json:"properties,omitempty"`
-	Required   []string              `json:"required,omitempty"`
+	*DataSchema
+	Properties map[string]*DataSchema `json:"properties,omitempty"`
+	Required   []string               `json:"required,omitempty"`
 }
 
 func NewObjectSchemaFromString(description string) *ObjectSchema {
 	data := []byte(description)
 	var schema = ObjectSchema{}
-	schema.dataSchema = newDataSchemaFromString(description)
-	if schema.dataSchema == nil || schema.dataSchema.GetType() != hypermedia_controls.TypeObject {
+	schema.DataSchema = NewDataSchemaFromString(description)
+	if schema.DataSchema == nil || schema.DataSchema.GetType() != hypermedia_controls.TypeObject {
 		return nil
 	}
 	var properties map[string]string
 	json.Get(data, "properties").ToVal(&properties)
 	if len(properties) > 0 {
-		schema.Properties = make(map[string]DataSchema)
+		schema.Properties = make(map[string]*DataSchema)
 		for n, p := range properties {
 			schema.Properties[n] = NewDataSchemaFromString(p)
 		}
@@ -46,5 +46,5 @@ func (o *ObjectSchema) Convert(v interface{}) interface{} {
 }
 
 func (o *ObjectSchema) GetDefaultValue() interface{} {
-	return nil
+	return o.Default
 }

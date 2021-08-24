@@ -1,7 +1,12 @@
 package plugin
 
+type Units struct {
+	Temperature string `json:"temperature"`
+}
 
 type Preferences struct {
+	Units    Units  `json:"units"`
+	Language string `json:"language"`
 }
 
 type UserProfile struct {
@@ -14,5 +19,3 @@ type UserProfile struct {
 	LogDir         string
 	GatewayVersion string
 }
-
-

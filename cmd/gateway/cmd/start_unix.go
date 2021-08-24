@@ -2,13 +2,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build !windows
 // +build !windows
 
 package cmd
 
 import (
 	"errors"
-
 	"github.com/galenliu/gateway/pkg/logging"
 )
 
@@ -19,5 +19,3 @@ func isWindowsService() (bool, error) {
 func createWindowsEventLogger(svcName string, logger logging.Logger) (logging.Logger, error) {
 	return nil, errors.New("cannot create Windows event logger")
 }
-
-

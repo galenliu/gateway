@@ -3,13 +3,13 @@ package data_schema
 import controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 
 type BooleanSchema struct {
-	*dataSchema
+	*DataSchema
 }
 
 func NewBooleanSchemaFromString(description string) *BooleanSchema {
 	var schema = BooleanSchema{}
-	schema.dataSchema = newDataSchemaFromString(description)
-	if schema.dataSchema == nil || schema.dataSchema.GetType() != controls.TypeString {
+	schema.DataSchema = NewDataSchemaFromString(description)
+	if schema.DataSchema == nil || schema.DataSchema.GetType() != controls.TypeString {
 		return nil
 	}
 	return &schema
@@ -20,7 +20,7 @@ func (b *BooleanSchema) Convert(v interface{}) interface{} {
 }
 
 func (b *BooleanSchema) GetDefaultValue() interface{} {
-	if b.dataSchema.Default != nil {
+	if b.DataSchema.Default != nil {
 		return b.Convert(b.Default)
 	}
 	return false

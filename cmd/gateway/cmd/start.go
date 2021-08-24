@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/galenliu/gateway"
+	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/kardianos/service"
 	"github.com/spf13/cobra"
 	"os"
@@ -47,9 +48,9 @@ func (c *command) initStartCmd() (err error) {
 				}
 			}
 
-			logger.Infof("version: %v", gateway.Version)
+			logger.Infof("gateway version: %v", constant.Version)
 
-			g, err := gateway.NewGateway(gateway.Config{
+			gw, err := gateway.NewGateway(gateway.Config{
 				BaseDir:          c.config.GetString(optionNameDataDir),
 				AddonDirs:        c.config.GetStringSlice(optionNameAddonDirs),
 				RemoveBeforeOpen: c.config.GetBool(optionNameDBRemoveBeforeOpen),
@@ -74,6 +75,10 @@ func (c *command) initStartCmd() (err error) {
 
 			p := &program{
 				start: func() {
+					err := gw.Start()
+					if err != nil {
+						return
+					}
 					// Block main goroutine until it is interrupted
 					sig := <-interruptChannel
 					logger.Debugf("received signal: %v", sig)
@@ -88,7 +93,7 @@ func (c *command) initStartCmd() (err error) {
 						ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 						defer cancel()
 
-						if err := g.Shutdown(ctx); err != nil {
+						if err := gw.Shutdown(ctx); err != nil {
 							logger.Errorf("shutdown: %v", err)
 						}
 					}()

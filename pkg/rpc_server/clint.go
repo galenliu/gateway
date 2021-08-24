@@ -3,16 +3,16 @@ package rpc_server
 import "github.com/galenliu/gateway/pkg/rpc"
 
 type Stream interface {
-	Send(message *rpc.BaseMessage)error
-	Recv()(message *rpc.BaseMessage, err error)
+	Send(message *rpc.BaseMessage) error
+	Recv() (message *rpc.BaseMessage, err error)
 }
 
 type Clint struct {
 	pluginId string
-	stream Stream
+	stream   Stream
 }
 
-func NewClint(pluginId string,s Stream) *Clint {
+func NewClint(pluginId string, s Stream) *Clint {
 	c := &Clint{}
 	c.pluginId = pluginId
 	c.stream = s
@@ -26,6 +26,3 @@ func (c *Clint) Send(message *rpc.BaseMessage) error {
 func (c *Clint) Read() (message *rpc.BaseMessage, err error) {
 	return c.stream.Recv()
 }
-
-
-

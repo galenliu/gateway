@@ -52,12 +52,12 @@ func NewAddonInfoFromManifest(manifest *ManifestJson, store Store) *AddonInfo {
 	return addonInfo
 }
 
-func (a *AddonInfo) disable()error{
-	if a.Enabled == false{
+func (a *AddonInfo) disable() error {
+	if a.Enabled == false {
 		return nil
 	}
 	a.Enabled = false
-	b,err := json.Marshal(a)
+	b, err := json.Marshal(a)
 	err = a.store.SetSetting(GetAddonKey(a.ID), string(b))
 	if err != nil {
 		return err
@@ -65,12 +65,12 @@ func (a *AddonInfo) disable()error{
 	return nil
 }
 
-func (a *AddonInfo) enable()error{
-	if a.Enabled == true{
+func (a *AddonInfo) enable() error {
+	if a.Enabled == true {
 		return nil
 	}
 	a.Enabled = true
-	b,err := json.Marshal(a)
+	b, err := json.Marshal(a)
 	err = a.store.SetSetting(GetAddonKey(a.ID), string(b))
 	if err != nil {
 		return err

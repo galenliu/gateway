@@ -6,6 +6,8 @@ import (
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/db"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/rpc"
+	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server"
 	"path"
@@ -53,37 +55,47 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 	g := &Gateway{}
 	g.logger = logger
 	g.config = config
+	u := &rpc.PluginRegisterResponseMessage_Data_UsrProfile{
+		BaseDir:    g.config.BaseDir,
+		DataDir:    path.Join(g.config.BaseDir, "data"),
+		AddonsDir:  path.Join(g.config.BaseDir, "addons"),
+		ConfigDir:  path.Join(g.config.BaseDir, "config"),
+		MediaDir:   path.Join(g.config.BaseDir, "media"),
+		LogDir:     path.Join(g.config.BaseDir, "log"),
+		GatewayDir: "",
+	}
 
-	var e error = nil
-	g.storage, e = db.NewStorage(path.Join(g.config.BaseDir, constant.ConfigDirName), logger, db.Config{
+	//检查Gateway运行需要的文件目录
+	err := util.EnsureDir(u.BaseDir, u.DataDir, u.ConfigDir, u.AddonsDir, u.ConfigDir, u.MediaDir, u.LogDir)
+
+	// 数据化初始化
+	g.storage, err = db.NewStorage(u.ConfigDir, logger, db.Config{
 		Reset: config.RemoveBeforeOpen,
 	})
-	if e != nil {
-		return nil, e
+	if err != nil {
+		return nil, err
 	}
 
-	g.bus, e = bus.NewEventBus(g.logger)
-	if e != nil {
-		return nil, e
+	//  EventBus init
+	g.bus, err = bus.NewEventBus(g.logger)
+	if err != nil {
+		return nil, err
 	}
 
+	//Addon manager init
 	g.addonManager = plugin.NewAddonsManager(plugin.Config{
-		UserProfile: plugin.UserProfile{
-			BaseDir:        g.config.BaseDir,
-			DataDir:        path.Join(g.config.BaseDir, "data"),
-			AddonsDir:      path.Join(g.config.BaseDir, "addons"),
-			ConfigDir:      path.Join(g.config.BaseDir, "config"),
-			UploadDir:      path.Join(g.config.BaseDir, "upload"),
-			MediaDir:       path.Join(g.config.BaseDir, "media"),
-			LogDir:         path.Join(g.config.BaseDir, "log"),
-			GatewayVersion: Version,
+		UserProfile: u,
+		Preferences: &rpc.PluginRegisterResponseMessage_Data_Preferences{
+			Language: "zh-cn",
+			Units:    &rpc.PluginRegisterResponseMessage_Data_Preferences_Units{Temperature: ""},
 		},
 		AddonDirs: g.config.AddonDirs,
 		IPCPort:   config.IPCPort,
 		RPCPort:   config.IPCPort,
 	}, g.storage, g.bus, g.logger)
 
-	g.sever = server.Setup(server.Config{
+	// Web service init
+	g.sever = server.NewServe(server.Config{
 		HttpAddr:    g.config.HttpAddr,
 		HttpsAddr:   g.config.HttpsAddr,
 		StaticDir:   path.Join(g.config.BaseDir, "static"),
@@ -91,18 +103,12 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 		UploadDir:   path.Join(g.config.BaseDir, "upload"),
 		LogDir:      path.Join(g.config.BaseDir, "log"),
 	}, g.addonManager, g.storage, g.bus, g.logger)
-
 	return g, nil
 }
 
 func (g *Gateway) Start() error {
-	// 首先启动plugin
-	err := g.addonManager.Start()
-	if err != nil {
-		return err
-	}
-
-	g.bus.Publish(constant.GatewayStarted)
+	// 向总线发送启运信号
+	go g.bus.Publish(constant.GatewayStart)
 	return nil
 }
 
@@ -117,7 +123,7 @@ func (g *Gateway) Stop() error {
 }
 
 func (g *Gateway) Shutdown(ctx context.Context) error {
-	g.bus.Publish(constant.GatewayStopped)
+	g.bus.Publish(constant.GatewayStop)
 	<-ctx.Done()
 	return nil
 }

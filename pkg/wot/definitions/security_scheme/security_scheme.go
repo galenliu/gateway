@@ -13,6 +13,6 @@ type securityScheme struct {
 	Scheme       interface{}
 }
 
-func NewSecuritySchemeFormString(description string)SecurityScheme{
+func NewSecuritySchemeFormString(description string) SecurityScheme {
 	return ""
 }

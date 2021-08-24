@@ -1,6 +1,7 @@
 package core
 
 import (
+	"github.com/galenliu/gateway/pkg/wot/definitions/core/interaction_affordance"
 	"github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 
@@ -12,14 +13,14 @@ type EventAffordance interface {
 }
 
 type eventAffordance struct {
-	*InteractionAffordance
-	Subscription data_schema.DataSchema `json:"subscription,omitempty"`
-	Data         data_schema.DataSchema `json:"data,omitempty"`
-	Cancellation data_schema.DataSchema `json:"cancellation,omitempty"`
+	*interaction_affordance.InteractionAffordance
+	Subscription *data_schema.DataSchema `json:"subscription,omitempty"`
+	Data         *data_schema.DataSchema `json:"data,omitempty"`
+	Cancellation *data_schema.DataSchema `json:"cancellation,omitempty"`
 }
 
 func NewEventAffordanceFromString(data string) *eventAffordance {
-	var ia = InteractionAffordance{}
+	var ia = interaction_affordance.InteractionAffordance{}
 	err := json.Unmarshal([]byte(data), &ia)
 	if err != nil {
 		return nil

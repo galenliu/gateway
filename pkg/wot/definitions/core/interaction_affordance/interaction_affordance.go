@@ -1,4 +1,4 @@
-package core
+package interaction_affordance
 
 import (
 	schema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
@@ -8,13 +8,13 @@ import (
 )
 
 type InteractionAffordance struct {
-	AtType       string                       `json:"@type"`
-	Title        string                       `json:"title,omitempty"`
-	Titles       map[string]string            `json:"titles,omitempty"`
-	Description  string                       `json:"description,omitempty"`
-	Descriptions map[string]string            `json:"descriptions,omitempty"`
-	Forms        []controls.Form              `json:"forms,omitempty"`
-	UriVariables map[string]schema.DataSchema `json:"uriVariables,omitempty"`
+	AtType       string                        `json:"@type"`
+	Title        string                        `json:"title,omitempty"`
+	Titles       map[string]string             `json:"titles,omitempty"`
+	Description  string                        `json:"description,omitempty"`
+	Descriptions map[string]string             `json:"descriptions,omitempty"`
+	Forms        []controls.Form               `json:"forms,omitempty"`
+	UriVariables map[string]*schema.DataSchema `json:"uriVariables,omitempty"`
 }
 
 func NewInteractionAffordanceFromString(description string) *InteractionAffordance {
@@ -23,7 +23,7 @@ func NewInteractionAffordanceFromString(description string) *InteractionAffordan
 	if gjson.Get(description, "uriVariables").Exists() {
 		m := gjson.Get(description, "uriVariables").Map()
 		if len(m) > 0 {
-			i.UriVariables = make(map[string]schema.DataSchema)
+			i.UriVariables = make(map[string]*schema.DataSchema)
 			for k, v := range m {
 				i.UriVariables[k] = schema.NewDataSchemaFromString(v.String())
 			}
@@ -42,7 +42,7 @@ func NewInteractionAffordanceFromString(description string) *InteractionAffordan
 	} else {
 		return nil
 	}
-	var uris map[string]schema.DataSchema
+	var uris map[string]*schema.DataSchema
 	json.Get(data, "uriVariables").ToVal(&uris)
 	if len(uris) > 0 {
 		i.UriVariables = uris

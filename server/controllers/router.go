@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/server/middleware"
@@ -198,38 +197,23 @@ func Setup(config Config, addonManager AddonManagerHandler, store Storage, log l
 }
 
 func (app *Router) Start() error {
-
-	var errs []error
 	go func() {
-
 		err := app.Listen(app.options.HttpAddr)
 		if err != nil {
-			errs[0] = fmt.Errorf("http server err:%s", err.Error())
+			app.logger.Errorf("http server err:%s", err.Error())
 
 			return
 		}
 	}()
 
 	go func() {
-
-		err1 := app.Listen(app.options.HttpsAddr)
-		if err1 != nil {
-			errs[1] = fmt.Errorf("https server err:%s", err1.Error())
-
+		err := app.Listen(app.options.HttpsAddr)
+		if err != nil {
+			app.logger.Errorf("https server err:%s", err.Error())
 			return
 		}
 	}()
 	time.Sleep(1 * time.Second)
-
-	if errs[0] != nil && errs[1] != nil {
-		return fmt.Errorf("http serve err:%s ,https serve err:%s", errs[0].Error(), errs[1].Error())
-	}
-	if errs[0] != nil {
-		return fmt.Errorf("http serve err:%s ", errs[0].Error())
-	}
-	if errs[1] != nil {
-		return fmt.Errorf("https serve err:%s ", errs[1].Error())
-	}
 	return nil
 }
 

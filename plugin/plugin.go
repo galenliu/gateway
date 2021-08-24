@@ -20,11 +20,6 @@ import (
 const ExecNode = "{nodeLoader}"
 const ExecPython3 = "{python}"
 
-type IClint interface {
-	Send(message *rpc.BaseMessage) error
-	Read() (*rpc.BaseMessage, error)
-}
-
 type Plugin struct {
 	locker        *sync.Mutex
 	pluginId      string
@@ -35,7 +30,7 @@ type Plugin struct {
 	closeExecChan chan struct{}
 	pluginServer  *PluginsServer
 	logger        logging.Logger
-	Clint         IClint
+	Clint         rpc.Clint
 }
 
 func NewPlugin(s *PluginsServer, pluginId string, log logging.Logger) (plugin *Plugin) {
@@ -47,7 +42,7 @@ func NewPlugin(s *PluginsServer, pluginId string, log logging.Logger) (plugin *P
 	plugin.pluginId = pluginId
 	plugin.registered = false
 	plugin.pluginServer = s
-	plugin.execPath = path.Join(plugin.pluginServer.manager.config.BaseDir, pluginId)
+	plugin.execPath = path.Join(plugin.pluginServer.manager.config.UserProfile.AddonsDir, pluginId)
 	return
 }
 

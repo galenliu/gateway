@@ -7,7 +7,7 @@ import (
 )
 
 type NumberSchema struct {
-	*dataSchema
+	*DataSchema
 	Minimum          controls.Double `json:"minimum"`
 	ExclusiveMinimum controls.Double `json:"exclusiveMinimum,omitempty"`
 	Maximum          controls.Double `json:"maximum,omitempty"`
@@ -18,8 +18,8 @@ type NumberSchema struct {
 func NewNumberSchemaFromString(description string) *NumberSchema {
 	data := []byte(description)
 	var schema = NumberSchema{}
-	schema.dataSchema = newDataSchemaFromString(description)
-	if schema.dataSchema == nil || schema.dataSchema.GetType() != controls.TypeNumber {
+	schema.DataSchema = NewDataSchemaFromString(description)
+	if schema.DataSchema == nil || schema.DataSchema.GetType() != controls.TypeNumber {
 		return nil
 	}
 

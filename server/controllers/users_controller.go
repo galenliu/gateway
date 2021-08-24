@@ -9,8 +9,6 @@ import (
 	"strings"
 )
 
-
-
 type UserController struct {
 	model  *models.Users
 	logger logging.Logger

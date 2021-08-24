@@ -2,8 +2,8 @@ package constant
 
 // Events
 const (
-	GatewayStarted = "gatewayStarted"
-	GatewayStopped = "gatewayStopped"
+	GatewayStart = "gatewayStart"
+	GatewayStop  = "gatewayStop"
 
 	ThingAdded    = "thingAdded"
 	ThingModified = "thingModified"
@@ -89,4 +89,3 @@ const (
 	PrefUnitsTempCelsius = "degree celsius"
 	ConfDirName          = ".gateway"
 )
-

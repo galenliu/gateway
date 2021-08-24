@@ -37,7 +37,7 @@ func NewStorage(filePath string, log logging.Logger, conf ...Config) (*Storage, 
 	if config.Reset {
 		s.reset()
 	}
-	d, e := sql.Open("sqlite3", filePath)
+	d, e := sql.Open("sqlite3", s.file)
 	if e != nil {
 		return nil, e
 	}

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/rpc"
 	"github.com/galenliu/gateway/pkg/util"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	"github.com/galenliu/gateway/plugin/internal"
@@ -25,11 +26,11 @@ type Store interface {
 }
 
 type Config struct {
-	AddonDirs []string
-	IPCPort   string
-	RPCPort   string
-	UserProfile
-	Preferences
+	AddonDirs   []string
+	IPCPort     string
+	RPCPort     string
+	UserProfile *rpc.PluginRegisterResponseMessage_Data_UsrProfile
+	Preferences *rpc.PluginRegisterResponseMessage_Data_Preferences
 }
 
 type Manager struct {
@@ -65,6 +66,7 @@ func NewAddonsManager(conf Config, settingStore Store, bus bus, log logging.Logg
 	am.store = settingStore
 	am.locker = new(sync.Mutex)
 	am.loadAddons()
+	am.Eventbus.bus.Subscribe(constant.GatewayStart, am.Start)
 	return am
 }
 
@@ -318,7 +320,7 @@ func (m *Manager) installAddon(packageId, packagePath string, enabled bool) erro
 		}
 	}
 	if enabled {
-		return m.loadAddon(packageId)
+		//return m.loadAddon(packageId)
 	}
 	return nil
 }
@@ -328,25 +330,16 @@ func (m *Manager) loadAddons() {
 		return
 	}
 	m.addonsLoaded = true
-	var userProfile []byte
-	var pref []byte
-
-	userProfile, err := json.Marshal(m.config.UserProfile)
-	pref, err = json.Marshal(m.config.Preferences)
-	if err != nil {
-		return
-	}
-	m.pluginServer = NewPluginServer(m, userProfile, pref)
-	err = m.pluginServer.Start()
-	if err != nil {
-		m.logger.Error("Plugin Server Start Failed. Err: %s", err.Error())
-		return
-	}
-
+	m.pluginServer = NewPluginServer(m)
+	go func() {
+		err := m.pluginServer.Start()
+		if err != nil {
+		}
+	}()
 	for _, d := range m.config.AddonDirs {
 		fs, err := os.ReadDir(d)
 		if err != nil {
-			m.logger.Warning("load addon form path: %s ,err: %s", d, err.Error())
+			m.logger.Warningf("load addon  %s ,err: %s", d, err.Error())
 			continue
 		}
 
@@ -422,7 +415,7 @@ func (m *Manager) loadAddon(packageId string) error {
 		return nil
 	}
 
-	err = util.EnsureDir(path.Join(path.Join(m.config.BaseDir, "data"), addonInfo.ID))
+	err = util.EnsureDir(path.Join(path.Join(m.config.UserProfile.BaseDir, "data"), addonInfo.ID))
 	if err != nil {
 		return err
 	}
@@ -467,13 +460,6 @@ func (m *Manager) findPluginPath(packageId string) string {
 
 func (m *Manager) Start() error {
 	var err error
-	go func() {
-		err = m.pluginServer.Start()
-		if err != nil {
-			m.running = false
-			m.logger.Error(err.Error())
-		}
-	}()
 	m.running = true
 	if err == nil {
 		m.Eventbus.bus.Publish(constant.AddonManagerStarted)

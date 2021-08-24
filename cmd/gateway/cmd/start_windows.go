@@ -2,20 +2,19 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package cmd
 
 import (
 	"fmt"
-	"io"
-
+	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/debug"
 	"golang.org/x/sys/windows/svc/eventlog"
-
-	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/sirupsen/logrus"
+	"io"
 )
 
 func isWindowsService() (bool, error) {

@@ -1,13 +1,13 @@
 package property_affordance
 
 import (
+	"github.com/galenliu/gateway/pkg/wot/definitions/core/interaction_affordance"
 	schema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 )
-import "github.com/galenliu/gateway/pkg/wot/definitions/core"
 
 type ObjectPropertyAffordance struct {
-	*core.InteractionAffordance
+	*interaction_affordance.InteractionAffordance
 	*schema.ObjectSchema
 	Observable bool        `json:"observable"`
 	Value      interface{} `json:"value"`
@@ -16,7 +16,7 @@ type ObjectPropertyAffordance struct {
 func NewObjectPropertyAffordanceFormString(description string) *ObjectPropertyAffordance {
 	data := []byte(description)
 	var p = ObjectPropertyAffordance{}
-	p.InteractionAffordance = core.NewInteractionAffordanceFromString(description)
+	p.InteractionAffordance = interaction_affordance.NewInteractionAffordanceFromString(description)
 	p.ObjectSchema = schema.NewObjectSchemaFromString(description)
 	if p.ObjectSchema == nil {
 		return nil

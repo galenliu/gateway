@@ -2,12 +2,10 @@ package core
 
 import (
 	"github.com/galenliu/gateway/pkg/wot/definitions/core/property_affordance"
-	schema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 )
 
 type PropertyAffordance interface {
-	schema.DataSchema
 }
 
 func NewPropertyAffordanceFromString(description string) PropertyAffordance {

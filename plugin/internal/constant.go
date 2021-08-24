@@ -45,7 +45,6 @@ const (
 )
 
 const (
-
 	AdapterAddedNotification           = 4096
 	AdapterCancelPairingCommand        = 4100
 	AdapterCancelRemoveDeviceCommand   = 4105
@@ -98,5 +97,3 @@ const (
 	PluginUnloadRequest                = 2
 	PluginUnloadResponse               = 3
 )
-
-

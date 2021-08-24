@@ -2,8 +2,10 @@ package plugin
 
 //	plugin server
 import (
+	"github.com/galenliu/gateway/pkg/constant"
 	ipc "github.com/galenliu/gateway/pkg/ipc_server"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/rpc"
 	"github.com/galenliu/gateway/pkg/rpc_server"
 	"sync"
 )
@@ -15,21 +17,33 @@ type PluginsServer struct {
 	rpc       *rpc_server.RPCServer
 	closeChan chan struct{}
 	logger    logging.Logger
-	verbose   bool
+
+	verbose bool
 }
 
-func NewPluginServer(manager *Manager, userProfile []byte, preferences []byte) *PluginsServer {
+func NewPluginServer(manager *Manager) *PluginsServer {
 	server := &PluginsServer{}
 	server.logger = manager.logger
 	server.closeChan = make(chan struct{})
-
 	server.manager = manager
-	server.ipc = ipc.NewIPCServer(server, manager.config.IPCPort, userProfile, preferences, manager.logger)
-	server.rpc = rpc_server.NewRPCServer(server, manager.config.RPCPort, userProfile, preferences, manager.logger)
+	u := &rpc.PluginRegisterResponseMessage_Data_UsrProfile{
+		AddonsDir:  manager.config.UserProfile.AddonsDir,
+		ConfigDir:  manager.config.UserProfile.ConfigDir,
+		DataDir:    manager.config.UserProfile.DataDir,
+		MediaDir:   manager.config.UserProfile.MediaDir,
+		LogDir:     manager.config.UserProfile.LogDir,
+		GatewayDir: constant.Version,
+	}
+	p := &rpc.PluginRegisterResponseMessage_Data_Preferences{
+		Language: manager.config.Preferences.Language,
+		Units:    &rpc.PluginRegisterResponseMessage_Data_Preferences_Units{Temperature: manager.config.Preferences.Units.Temperature},
+	}
+	server.ipc = ipc.NewIPCServer(server, manager.config.IPCPort, u, p, manager.logger)
+	server.rpc = rpc_server.NewRPCServer(server, manager.config.RPCPort, u, p, manager.logger)
 	return server
 }
 
-func (s *PluginsServer) RegisterPlugin(pluginId string, clint IClint) *Plugin {
+func (s *PluginsServer) RegisterPlugin(pluginId string, clint rpc.Clint) rpc.PluginHandler {
 	plugin := s.getPlugin(pluginId)
 	if plugin == nil {
 		plugin = NewPlugin(s, pluginId, s.logger)
@@ -40,10 +54,10 @@ func (s *PluginsServer) RegisterPlugin(pluginId string, clint IClint) *Plugin {
 }
 
 func (s *PluginsServer) loadPlugin(addonPath, id, exec string) {
-	plugin := s.RegisterPlugin(id, nil)
-	plugin.exec = exec
-	plugin.execPath = addonPath
-	go plugin.execute()
+	_ = s.RegisterPlugin(id, nil)
+	//plugin.exec = exec
+	//plugin.execPath = addonPath
+	//go plugin.execute()
 }
 
 func (s *PluginsServer) unloadPlugin(packageId string) {

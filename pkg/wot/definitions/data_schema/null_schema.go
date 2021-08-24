@@ -6,13 +6,13 @@ import (
 )
 
 type NullSchema struct {
-	*dataSchema
+	*DataSchema
 }
 
 func NewNullSchemaFromString(description string) *NullSchema {
 	var schema = NullSchema{}
-	schema.dataSchema = newDataSchemaFromString(description)
-	if schema.dataSchema == nil || schema.dataSchema.GetType() != hypermedia_controls.TypeString {
+	schema.DataSchema = NewDataSchemaFromString(description)
+	if schema.DataSchema == nil || schema.DataSchema.GetType() != hypermedia_controls.TypeString {
 		return nil
 	}
 	return &schema

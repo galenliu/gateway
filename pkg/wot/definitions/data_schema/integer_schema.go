@@ -6,7 +6,7 @@ import (
 )
 
 type IntegerSchema struct {
-	*dataSchema
+	*DataSchema
 	Minimum          controls.Integer `json:"minimum"`
 	ExclusiveMinimum controls.Integer `json:"exclusiveMinimum,omitempty"`
 	Maximum          controls.Integer `json:"maximum,omitempty"`
@@ -17,8 +17,8 @@ type IntegerSchema struct {
 func NewIntegerSchemaFromString(description string) *IntegerSchema {
 	data := []byte(description)
 	var schema = IntegerSchema{}
-	schema.dataSchema = newDataSchemaFromString(description)
-	if schema.dataSchema == nil && schema.dataSchema.GetType() != controls.TypeString {
+	schema.DataSchema = NewDataSchemaFromString(description)
+	if schema.DataSchema == nil && schema.DataSchema.GetType() != controls.TypeString {
 		return nil
 	}
 	schema.Minimum = controls.Integer(json.Get(data, "minimum").ToInt64())
@@ -48,5 +48,3 @@ func (i *IntegerSchema) clamp(value controls.Integer) controls.Integer {
 func (i IntegerSchema) MarshalJSON() ([]byte, error) {
 	return json.Marshal(i)
 }
-
-

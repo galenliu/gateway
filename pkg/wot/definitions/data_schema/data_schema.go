@@ -17,13 +17,7 @@ const (
 	EXI      = "application/exi"
 )
 
-type DataSchema interface {
-	GetType() string
-	GetAtType() string
-	IsReadOnly() bool
-}
-
-type dataSchema struct {
+type DataSchema struct {
 	AtType       string            `json:"@type,omitempty"`
 	Title        string            `json:"title,omitempty"`
 	Titles       map[string]string `json:"titles,omitempty"`
@@ -32,7 +26,7 @@ type dataSchema struct {
 	Const        interface{}       `json:"const,omitempty"`
 	Default      interface{}       `json:"default,omitempty"`
 	Unit         string            `json:"unit,omitempty"`
-	OneOf        []dataSchema      `json:"oneOf,,omitempty"`
+	OneOf        []DataSchema      `json:"oneOf,,omitempty"`
 	Enum         []interface{}     `json:"enum,omitempty"`
 	ReadOnly     bool              `json:"readOnly,omitempty"`
 	WriteOnly    bool              `json:"writeOnly,omitempty"`
@@ -40,9 +34,9 @@ type dataSchema struct {
 	Type         string            `json:"type"`
 }
 
-func newDataSchemaFromString(description string) *dataSchema {
+func NewDataSchemaFromString(description string) *DataSchema {
 	data := []byte(description)
-	schema := dataSchema{}
+	schema := DataSchema{}
 	schema.AtType = controls.JSONGetString(data, "@type", "")
 	schema.Title = controls.JSONGetString(data, "title", "")
 	schema.Titles = controls.JSONGetMap(data, "titles")
@@ -51,7 +45,7 @@ func newDataSchemaFromString(description string) *dataSchema {
 	schema.Unit = controls.JSONGetString(data, "unit", "")
 	schema.Const = json.Get(data, "const").GetInterface()
 	schema.Default = json.Get(data, "default").GetInterface()
-	var oneOf []dataSchema
+	var oneOf []DataSchema
 	json.Get(data, "oneOff").ToVal(&oneOf)
 	if len(oneOf) > 0 {
 		schema.OneOf = oneOf
@@ -72,44 +66,44 @@ func newDataSchemaFromString(description string) *dataSchema {
 	return nil
 }
 
-func NewDataSchemaFromString(description string) DataSchema {
-	data := []byte(description)
-	typ := controls.JSONGetString(data, "type", "")
-	if typ == "" {
-		return nil
-	}
-	switch typ {
-	case controls.TypeNumber:
-		return NewNumberSchemaFromString(description)
-	case controls.TypeInteger:
-		return NewNumberSchemaFromString(description)
-	case controls.TypeString:
-		return NewStringSchemaFromString(description)
-	case controls.TypeArray:
-		return NewArraySchemaFromString(description)
-	case controls.TypeBoolean:
-		return NewBooleanSchemaFromString(description)
-	case controls.TypeNull:
-		return NewNullSchemaFromString(description)
-	case controls.TypeObject:
-		return NewObjectSchemaFromString(description)
-	default:
-		return nil
-	}
-}
+//func NewDataSchemaFromString(description string) DataSchema {
+//	data := []byte(description)
+//	typ := controls.JSONGetString(data, "type", "")
+//	if typ == "" {
+//		return nil
+//	}
+//	switch typ {
+//	case controls.TypeNumber:
+//		return NewNumberSchemaFromString(description)
+//	case controls.TypeInteger:
+//		return NewNumberSchemaFromString(description)
+//	case controls.TypeString:
+//		return NewStringSchemaFromString(description)
+//	case controls.TypeArray:
+//		return NewArraySchemaFromString(description)
+//	case controls.TypeBoolean:
+//		return NewBooleanSchemaFromString(description)
+//	case controls.TypeNull:
+//		return NewNullSchemaFromString(description)
+//	case controls.TypeObject:
+//		return NewObjectSchemaFromString(description)
+//	default:
+//		return nil
+//	}
+//}
 
-func (d *dataSchema) GetType() string {
+func (d *DataSchema) GetType() string {
 	return d.Type
 }
 
-func (d *dataSchema) GetAtType() string {
+func (d *DataSchema) GetAtType() string {
 	return d.AtType
 }
 
-func (d *dataSchema) GetDescription() string {
+func (d *DataSchema) GetDescription() string {
 	return d.Description
 }
 
-func (d *dataSchema) IsReadOnly() bool {
+func (d *DataSchema) IsReadOnly() bool {
 	return d.ReadOnly
 }

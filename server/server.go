@@ -27,7 +27,7 @@ type WebServe struct {
 	bus     EventBus
 }
 
-func Setup(config Config, addonManager controllers.AddonManagerHandler, store controllers.Storage, bus EventBus, log logging.Logger) *WebServe {
+func NewServe(config Config, addonManager controllers.AddonManagerHandler, store controllers.Storage, bus EventBus, log logging.Logger) *WebServe {
 	sev := WebServe{}
 	sev.options = config
 	sev.logger = log
@@ -37,7 +37,7 @@ func Setup(config Config, addonManager controllers.AddonManagerHandler, store co
 		HttpAddr:  sev.options.HttpAddr,
 		HttpsAddr: sev.options.HttpsAddr,
 	}, addonManager, store, log)
-	sev.bus.Subscribe(constant.GatewayStarted, sev.start)
+	sev.bus.Subscribe(constant.GatewayStart, sev.start)
 	return &sev
 }
 

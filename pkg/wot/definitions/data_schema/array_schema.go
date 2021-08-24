@@ -7,8 +7,8 @@ import (
 )
 
 type ArraySchema struct {
-	*dataSchema
-	Items    []DataSchema         `json:"items,omitempty"`
+	*DataSchema
+	Items    []*DataSchema        `json:"items,omitempty"`
 	MinItems controls.UnsignedInt `json:"minItems,omitempty"`
 	MaxItems controls.UnsignedInt `json:"maxItems,omitempty"`
 }
@@ -16,8 +16,8 @@ type ArraySchema struct {
 func NewArraySchemaFromString(description string) *ArraySchema {
 	data := []byte(description)
 	var schema = ArraySchema{}
-	schema.dataSchema = newDataSchemaFromString(description)
-	if schema.dataSchema == nil || schema.dataSchema.GetType() != controls.TypeArray {
+	schema.DataSchema = NewDataSchemaFromString(description)
+	if schema.DataSchema == nil || schema.DataSchema.GetType() != controls.TypeArray {
 		return nil
 	}
 	var items []string
@@ -25,8 +25,8 @@ func NewArraySchemaFromString(description string) *ArraySchema {
 	for _, i := range items {
 		schema.Items = append(schema.Items, NewDataSchemaFromString(i))
 	}
-	schema.MinItems = controls.UnsignedInt(controls.JSONGetUint64(data, "minItems", math.MinInt64))
-	schema.MaxItems = controls.UnsignedInt(controls.JSONGetUint64(data, "maxItems", math.MaxUint64))
+	schema.MinItems = controls.UnsignedInt(controls.JSONGetUint64(data, "minItems", math.MaxInt))
+	schema.MaxItems = controls.UnsignedInt(controls.JSONGetUint64(data, "maxItems", math.MaxInt))
 	return &schema
 }
 
@@ -35,7 +35,7 @@ func (a *ArraySchema) Convert(v interface{}) interface{} {
 }
 
 func (a *ArraySchema) GetDefaultValue() interface{} {
-	if a.dataSchema.Default != nil {
+	if a.DataSchema.Default != nil {
 		return a.Convert(a.Default)
 	}
 	return nil

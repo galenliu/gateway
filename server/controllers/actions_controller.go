@@ -2,19 +2,17 @@ package controllers
 
 import (
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
 )
 
 type ActionsController struct {
-	Actions *models.Actions
-	logger  logging.Logger
+	logger logging.Logger
 }
 
 func NewActionsController(log logging.Logger) *ActionsController {
 	return &ActionsController{
-		Actions: models.NewActions(),
-		logger:  log,
+
+		logger: log,
 	}
 }
 
@@ -52,14 +50,14 @@ func (controller *ActionsController) handleGetActions(c *fiber.Ctx) error {
 
 	// POST /actions
 	var thingId = c.Params("thingId", "")
-	var actionName = c.Params("actionName", "")
+	//var actionName = c.Params("actionName", "")
 
 	if thingId != "" {
-		actions := controller.Actions.GetAction(thingId, actionName)
-		return c.Status(fiber.StatusOK).JSON(actions)
+		//actions := controller.Actions.GetAction(thingId, actionName)
+		return c.Status(fiber.StatusOK).JSON("")
 	} else {
-		actions := controller.Actions.GetGatewayActions(actionName)
-		return c.Status(fiber.StatusOK).JSON(actions)
+		//actions := controller.Actions.GetGatewayActions(actionName)
+		return c.Status(fiber.StatusOK).JSON("")
 	}
 }
 

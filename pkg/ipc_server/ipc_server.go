@@ -3,7 +3,6 @@ package ipc_server
 import (
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/rpc"
-	"github.com/galenliu/gateway/plugin"
 	"github.com/gorilla/websocket"
 	"net/http"
 	"sync"
@@ -19,25 +18,20 @@ var upgrade = websocket.Upgrader{
 	},
 }
 
-type PluginHandler interface {
-	MessageHandler(mt rpc.MessageType, data []byte) error
-}
-
 type IPCServer struct {
 	logger       logging.Logger
-	addr         string
 	path         string
 	port         string
 	locker       *sync.Mutex
-	pluginServer *plugin.PluginsServer
-	userProfile  []byte
-	preferences  []byte
+	pluginServer rpc.PluginServer
+	userProfile  *rpc.PluginRegisterResponseMessage_Data_UsrProfile
+	preferences  *rpc.PluginRegisterResponseMessage_Data_Preferences
 	doneChan     chan struct{}
 }
 
-func NewIPCServer(server *plugin.PluginsServer, port string, userProfile []byte, preferences []byte, log logging.Logger) *IPCServer {
+func NewIPCServer(pluginServer rpc.PluginServer, port string, userProfile *rpc.PluginRegisterResponseMessage_Data_UsrProfile, preferences *rpc.PluginRegisterResponseMessage_Data_Preferences, log logging.Logger) *IPCServer {
 	ipc := &IPCServer{}
-	ipc.pluginServer = server
+	ipc.pluginServer = pluginServer
 	ipc.logger = log
 	ipc.doneChan = make(chan struct{})
 	ipc.port = port
@@ -47,13 +41,21 @@ func NewIPCServer(server *plugin.PluginsServer, port string, userProfile []byte,
 }
 
 func (s *IPCServer) Start() error {
-	http.HandleFunc("/", s.handle)
-	s.logger.Info("IPC server run addr: %s", s.addr)
-	err := http.ListenAndServe(s.addr, nil)
-	if err != nil {
-		s.logger.Error("ipc s fail,err: %s", err.Error())
-		return err
-	}
+	go func() {
+		err := func() error {
+			http.HandleFunc("/", s.handle)
+			s.logger.Infof("IPC server run addr: %s", s.port)
+			err := http.ListenAndServe(s.port, nil)
+			if err != nil {
+				s.logger.Error("ipc fail,err: %s", err.Error())
+				return err
+			}
+			return nil
+		}()
+		if err != nil {
+			s.logger.Errorf("ipc start err : %s", err.Error())
+		}
+	}()
 	return nil
 }
 
@@ -83,7 +85,7 @@ func (s *IPCServer) handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	clint := NewClint(message.Data.PluginId, conn)
-	var pluginHandler PluginHandler
+	var pluginHandler rpc.PluginHandler
 	pluginHandler = s.pluginServer.RegisterPlugin(message.Data.PluginId, clint)
 	for {
 		message, err := clint.Read()
