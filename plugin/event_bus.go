@@ -6,6 +6,7 @@ type bus interface {
 	Publish(string, ...interface{})
 	Subscribe(string, interface{})
 	Unsubscribe(string, interface{})
+	SubscribeAsync(string, interface{})
 }
 
 type Eventbus struct {

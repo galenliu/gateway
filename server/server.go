@@ -9,6 +9,7 @@ import (
 type EventBus interface {
 	Subscribe(topic string, fn interface{})
 	Publish(topic string, args ...interface{})
+	SubscribeAsync(topic string, fn interface{})
 }
 
 type Config struct {
@@ -28,7 +29,7 @@ type WebServe struct {
 }
 
 func NewServe(config Config, addonManager controllers.AddonManagerHandler, store controllers.Storage, bus EventBus, log logging.Logger) *WebServe {
-	sev := WebServe{}
+	sev := &WebServe{}
 	sev.options = config
 	sev.logger = log
 	sev.bus = bus
@@ -37,22 +38,21 @@ func NewServe(config Config, addonManager controllers.AddonManagerHandler, store
 		HttpAddr:  sev.options.HttpAddr,
 		HttpsAddr: sev.options.HttpsAddr,
 	}, addonManager, store, log)
-	sev.bus.Subscribe(constant.GatewayStart, sev.start)
-	return &sev
+	bus.Subscribe(constant.GatewayStart, sev.Start)
+	return sev
 }
 
-func (serve *WebServe) start() error {
-
+func (serve *WebServe) Start() error {
 	err := serve.Router.Start()
 	if err != nil {
 		serve.logger.Error("Web server err: %s", err.Error())
 		return err
 	}
-	serve.bus.Publish(constant.WebServerStarted)
+	go serve.bus.Publish(constant.WebServerStarted)
 	return nil
 }
 
-func (serve *WebServe) stop() error {
+func (serve *WebServe) Stop() error {
 	err := serve.Router.Stop()
 	if err != nil {
 		serve.logger.Error("Web sever stop err: %s", err.Error())

@@ -19,7 +19,7 @@ type Component interface {
 	Stop() error
 }
 
-type EvBus interface {
+type BusController interface {
 	Subscribe(topic string, fn interface{})
 	Unsubscribe(topic string, fn interface{})
 	Publish(topic string, args ...interface{})
@@ -45,13 +45,14 @@ type Config struct {
 type Gateway struct {
 	config       Config
 	storage      *db.Storage
-	bus          EvBus
+	bus          BusController
 	logger       logging.Logger
 	addonManager *plugin.Manager
 	sever        *server.WebServe
 }
 
 func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
+
 	g := &Gateway{}
 	g.logger = logger
 	g.config = config
@@ -77,7 +78,7 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 	}
 
 	//  EventBus init
-	g.bus, err = bus.NewEventBus(g.logger)
+	newBus, err := bus.NewBus(g.logger)
 	if err != nil {
 		return nil, err
 	}
@@ -91,8 +92,8 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 		},
 		AddonDirs: g.config.AddonDirs,
 		IPCPort:   config.IPCPort,
-		RPCPort:   config.IPCPort,
-	}, g.storage, g.bus, g.logger)
+		RPCPort:   config.RPCPort,
+	}, g.storage, newBus, g.logger)
 
 	// Web service init
 	g.sever = server.NewServe(server.Config{
@@ -102,7 +103,9 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 		TemplateDir: path.Join(g.config.BaseDir, "template"),
 		UploadDir:   path.Join(g.config.BaseDir, "upload"),
 		LogDir:      path.Join(g.config.BaseDir, "log"),
-	}, g.addonManager, g.storage, g.bus, g.logger)
+	}, g.addonManager, g.storage, newBus, g.logger)
+
+	g.bus = newBus
 	return g, nil
 }
 
@@ -123,7 +126,8 @@ func (g *Gateway) Stop() error {
 }
 
 func (g *Gateway) Shutdown(ctx context.Context) error {
-	g.bus.Publish(constant.GatewayStop)
+	go g.bus.Publish(constant.GatewayStop)
+	time.Sleep(1 * time.Second)
 	<-ctx.Done()
 	return nil
 }

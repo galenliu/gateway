@@ -65,8 +65,7 @@ func NewAddonsManager(conf Config, settingStore Store, bus bus, log logging.Logg
 	am.Eventbus = NewEventBus(bus)
 	am.store = settingStore
 	am.locker = new(sync.Mutex)
-	am.loadAddons()
-	am.Eventbus.bus.Subscribe(constant.GatewayStart, am.Start)
+	bus.SubscribeAsync(constant.GatewayStart, am.Start)
 	return am
 }
 
@@ -329,13 +328,10 @@ func (m *Manager) loadAddons() {
 	if m.addonsLoaded {
 		return
 	}
+	m.logger.Infof("starting loading addons.")
 	m.addonsLoaded = true
 	m.pluginServer = NewPluginServer(m)
-	go func() {
-		err := m.pluginServer.Start()
-		if err != nil {
-		}
-	}()
+	_ = m.pluginServer.Start()
 	for _, d := range m.config.AddonDirs {
 		fs, err := os.ReadDir(d)
 		if err != nil {
@@ -459,12 +455,10 @@ func (m *Manager) findPluginPath(packageId string) string {
 }
 
 func (m *Manager) Start() error {
-	var err error
 	m.running = true
-	if err == nil {
-		m.Eventbus.bus.Publish(constant.AddonManagerStarted)
-	}
-	return err
+	m.loadAddons()
+	go m.Eventbus.bus.Publish(constant.AddonManagerStarted)
+	return nil
 }
 
 func (m *Manager) Stop() error {
@@ -472,7 +466,7 @@ func (m *Manager) Stop() error {
 	if err != nil {
 		return err
 	}
-	m.Eventbus.bus.Publish(constant.AddonManagerStopped)
+	go m.Eventbus.bus.Publish(constant.AddonManagerStopped)
 	m.running = false
 	return nil
 }

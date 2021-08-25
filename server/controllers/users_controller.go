@@ -29,7 +29,7 @@ func (u *UserController) getCount(c *fiber.Ctx) error {
 func (u *UserController) createUser(c *fiber.Ctx) error {
 	email := strings.ToLower(json.Get(c.Body(), "email").ToString())
 	pw := json.Get(c.Body(), "password").ToString()
-	name := json.Get(c.Body(), "password").ToString()
+	name := json.Get(c.Body(), "name").ToString()
 
 	if email == "" && pw == "" {
 		return c.Status(fiber.StatusBadRequest).SendString("User requires email and password.")

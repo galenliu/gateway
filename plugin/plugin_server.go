@@ -17,8 +17,6 @@ type PluginsServer struct {
 	rpc       *rpc_server.RPCServer
 	closeChan chan struct{}
 	logger    logging.Logger
-
-	verbose bool
 }
 
 func NewPluginServer(manager *Manager) *PluginsServer {
@@ -92,17 +90,8 @@ func (s *PluginsServer) getPlugins() (plugins []*Plugin) {
 
 // Start create goroutines handle ipc massage
 func (s *PluginsServer) Start() error {
-
-	err := s.rpc.Start()
-	if err != nil {
-		s.logger.Errorf("rpc server start err:%s", err.Error())
-		return err
-	}
-	err = s.ipc.Start()
-	if err != nil {
-		s.logger.Errorf("ipc server start err:%s", err.Error())
-		return err
-	}
+	_ = s.rpc.Start()
+	_ = s.ipc.Start()
 	return nil
 }
 

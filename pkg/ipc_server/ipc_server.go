@@ -47,7 +47,6 @@ func (s *IPCServer) Start() error {
 			s.logger.Infof("IPC server run addr: %s", s.port)
 			err := http.ListenAndServe(s.port, nil)
 			if err != nil {
-				s.logger.Error("ipc fail,err: %s", err.Error())
 				return err
 			}
 			return nil
