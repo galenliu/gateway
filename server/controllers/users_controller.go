@@ -9,13 +9,19 @@ import (
 	"strings"
 )
 
+type JWT interface {
+	IssueToken(user int64) string
+}
+
 type UserController struct {
 	model  *models.Users
 	logger logging.Logger
+	jwt    JWT
 }
 
-func NewUsersController(m *models.Users, log logging.Logger) *UserController {
+func NewUsersController(m *models.Users, jwt JWT, log logging.Logger) *UserController {
 	uc := &UserController{}
+	uc.jwt = jwt
 	uc.model = m
 	uc.logger = log
 	return uc
@@ -38,9 +44,11 @@ func (u *UserController) createUser(c *fiber.Ctx) error {
 	if exit != nil {
 		return c.Status(fiber.StatusBadRequest).SendString("User already exists.")
 	}
-	jwt, err := u.model.CreateUser(email, pw, name)
+	id, err := u.model.CreateUser(email, pw, name)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
-	return c.Status(fiber.StatusOK).JSON(jwt)
+	jwt := u.jwt.IssueToken(id)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"token": jwt})
+
 }

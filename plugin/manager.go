@@ -457,7 +457,7 @@ func (m *Manager) findPluginPath(packageId string) string {
 func (m *Manager) Start() error {
 	m.running = true
 	m.loadAddons()
-	go m.Eventbus.bus.Publish(constant.AddonManagerStarted)
+	m.Eventbus.bus.Publish(constant.AddonManagerStarted)
 	return nil
 }
 
@@ -466,7 +466,7 @@ func (m *Manager) Stop() error {
 	if err != nil {
 		return err
 	}
-	go m.Eventbus.bus.Publish(constant.AddonManagerStopped)
+	m.Eventbus.bus.Publish(constant.AddonManagerStopped)
 	m.running = false
 	return nil
 }

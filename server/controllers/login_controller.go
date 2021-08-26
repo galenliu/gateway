@@ -28,7 +28,6 @@ func NewLoginController(users *models.Users, jsonwebtoken *models.Jsonwebtoken, 
 func (c *LoginController) handleLogin(ctx *fiber.Ctx) error {
 	password := ctx.FormValue("password")
 	email := ctx.FormValue("email")
-
 	if email == "" || password == "" {
 		return ctx.SendStatus(fiber.StatusBadRequest)
 	}

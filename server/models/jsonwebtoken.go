@@ -84,9 +84,9 @@ func (j *Jsonwebtoken) crateUser(userId int64, payload Payload) (string, *TokenD
 		claims.Issuer = issuer
 	}
 	claims.Payload = payload
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodES512, claims)
 
-	sig, err := token.SignedString(privateKeyStr)
+	sig, err := token.SignedString([]byte(privateKeyStr))
 	if err != nil {
 		return "", nil, err
 	}

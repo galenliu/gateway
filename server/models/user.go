@@ -21,7 +21,7 @@ func newUser(email, password, name string) *User {
 	u.Hash = hash
 	u.Name = name
 	u.Email = email
-	return nil
+	return u
 }
 
 func (u *User) ComparePassword(password string) bool {

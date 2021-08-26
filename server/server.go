@@ -38,7 +38,7 @@ func NewServe(config Config, addonManager controllers.AddonManagerHandler, store
 		HttpAddr:  sev.options.HttpAddr,
 		HttpsAddr: sev.options.HttpsAddr,
 	}, addonManager, store, log)
-	bus.Subscribe(constant.GatewayStart, sev.Start)
+	bus.SubscribeAsync(constant.AddonManagerStarted, sev.Start)
 	return sev
 }
 
@@ -48,7 +48,7 @@ func (serve *WebServe) Start() error {
 		serve.logger.Error("Web server err: %s", err.Error())
 		return err
 	}
-	go serve.bus.Publish(constant.WebServerStarted)
+	serve.bus.Publish(constant.WebServerStarted)
 	return nil
 }
 

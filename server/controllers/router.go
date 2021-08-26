@@ -3,7 +3,6 @@ package controllers
 import (
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/server/middleware"
 	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -63,7 +62,7 @@ func Setup(config Config, addonManager AddonManagerHandler, store Storage, log l
 	//logger
 	app.Use(logger.New())
 
-	auth := middleware.NewJWTWare(store)
+	//auth := middleware.NewJWTWare(store)
 
 	app.Use(func(c *fiber.Ctx) error {
 		if c.Protocol() == "https" {
@@ -77,7 +76,7 @@ func Setup(config Config, addonManager AddonManagerHandler, store Storage, log l
 		return nil
 	}
 	app.Use(func(c *fiber.Ctx) error {
-		if c.Path() == "/" && c.Accepts("html") == "" {
+		if c.Path() != "/" || c.Accepts("html") == "" {
 			return c.Next()
 		}
 		return staticHandler(c)
@@ -89,7 +88,7 @@ func Setup(config Config, addonManager AddonManagerHandler, store Storage, log l
 		c.Response().Header.Set("Access-Control-Allow-Headers",
 			"Origin, X-Requested-With, Content-Type, Accept, Authorization")
 		c.Response().Header.Set("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE")
-		return nil
+		return c.Next()
 	})
 
 	//ping controller
@@ -111,7 +110,7 @@ func Setup(config Config, addonManager AddonManagerHandler, store Storage, log l
 
 	// Users Controller
 	{
-		usersController := NewUsersController(usersModel, log)
+		usersController := NewUsersController(usersModel, jsonwebtokenModel, log)
 		usersGroup := app.Group(constant.UsersPath)
 		usersGroup.Get("/count", usersController.getCount)
 		usersGroup.Post("/", usersController.createUser)
@@ -127,7 +126,7 @@ func Setup(config Config, addonManager AddonManagerHandler, store Storage, log l
 		thingsGroup.Get("/:thingId/properties/*", thingsController.handleGetPropertyValue)
 
 		//Handle creating a new thing.
-		thingsGroup.Post("/", auth, thingsController.handleCreateThing)
+		thingsGroup.Post("/", thingsController.handleCreateThing)
 
 		thingsGroup.Get("/:thingId", thingsController.handleGetThing)
 		thingsGroup.Get("/", thingsController.handleGetThings)

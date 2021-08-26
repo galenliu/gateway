@@ -11,13 +11,13 @@ import (
 
 func GenerateEccKey() (publicKeyStr, privateKeyStr string, err error) {
 
-	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	privateKey, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
 	priBytes, err := x509.MarshalECPrivateKey(privateKey)
 	if err != nil {
 		return
 	}
 	privateBlock := pem.Block{
-		Type:  "ECD PRIVATE KEY",
+		Type:  "ecdsa private key",
 		Bytes: priBytes,
 	}
 	bufferPrivate := new(bytes.Buffer)
