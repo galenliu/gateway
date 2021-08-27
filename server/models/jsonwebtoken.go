@@ -1,6 +1,7 @@
 package models
 
 import (
+	"crypto/ecdsa"
 	"encoding/json"
 	"github.com/galenliu/gateway/pkg/db"
 	"github.com/galenliu/gateway/pkg/logging"
@@ -16,21 +17,6 @@ type Payload struct {
 	Role     string `json:"role"`
 	Scope    string `json:"scope"`
 	ClientId string `json:"clientId"`
-}
-
-type Claims struct {
-	jwt.StandardClaims
-	KeyId string `json:"keyId"`
-	Payload
-}
-
-type TokenData struct {
-	int64
-	User      int64     `json:"user"`
-	IssuedAt  time.Time `json:"issuedAt"`
-	PublicKey string    `json:"publicKey"`
-	KeyId     string    `json:"keyId"`
-	Payload
 }
 
 type JsonwebtokenStore interface {
@@ -64,6 +50,32 @@ func (j *Jsonwebtoken) IssueToken(user int64) string {
 	})
 	if err != nil {
 		j.logger.Info("Issue token err : %s", err.Error())
+		return ""
+	}
+	return sig
+}
+
+type Claims struct {
+	UserId string `json:"userId"`
+	jwt.StandardClaims
+}
+
+func (j *Jsonwebtoken) releaseToken(userId string, key ecdsa.PrivateKey) string {
+	claims := Claims{
+		UserId: userId,
+		StandardClaims: jwt.StandardClaims{
+			Audience:  "",
+			ExpiresAt: time.Now().Add(time.Hour * 240).Unix(),
+			Id:        userId,
+			IssuedAt:  time.Now().Unix(),
+			Issuer:    "webThings Gateway",
+			NotBefore: 0,
+			Subject:   "",
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+	sig, err := token.SignedString(key)
+	if err != nil {
 		return ""
 	}
 	return sig
