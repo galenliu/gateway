@@ -104,10 +104,10 @@ func (addon *AddonController) handlerUpdateAddon(c *fiber.Ctx) error {
 
 }
 
-//GET /addon/:addonId/options
+//GET /addon/:addonId/config
 func (addon *AddonController) handlerGetAddonConfig(c *fiber.Ctx) error {
 	var addonId = c.Params("addonId")
-	var key = "addons.options." + addonId
+	var key = "addons.config." + addonId
 	if addonId == "" {
 		return fiber.NewError(fiber.StatusInternalServerError, "addonId failed")
 	}
@@ -132,7 +132,7 @@ func (addon *AddonController) handlerSetAddonConfig(c *fiber.Ctx) error {
 	}
 	err := addon.settingsStore.SetSetting(key, config)
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "Failed to set options for add-on: "+addonId)
+		return fiber.NewError(fiber.StatusInternalServerError, "Failed to set config for add-on: "+addonId)
 	}
 	err = addon.handler.UnloadAddon(addonId)
 

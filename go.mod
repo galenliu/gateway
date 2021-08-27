@@ -11,7 +11,7 @@ require (
 	github.com/fasthttp/websocket v0.0.0-20200320073529-1554a54587ab // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-oauth2/oauth2/v4 v4.4.1
-	github.com/gofiber/fiber/v2 v2.17.0
+	github.com/gofiber/fiber/v2 v2.18.0
 	github.com/gofiber/jwt/v2 v2.2.6
 	github.com/gofiber/websocket/v2 v2.0.8
 	github.com/golang-jwt/jwt v3.2.2+incompatible
@@ -22,7 +22,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.11
 	github.com/kardianos/service v1.2.0
-	github.com/klauspost/compress v1.12.2 // indirect
+	github.com/klauspost/compress v1.13.4 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mattn/go-sqlite3 v1.14.8
@@ -54,7 +54,7 @@ require (
 	github.com/tidwall/rtree v0.0.0-20180113144539-6cd427091e0e // indirect
 	github.com/tidwall/tinyqueue v0.0.0-20180302190814-1e39f5511563 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.28.0 // indirect
+	github.com/valyala/fasthttp v1.29.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	github.com/xiam/to v0.0.0-20200126224905-d60d31e03561
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
