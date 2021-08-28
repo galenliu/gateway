@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/server/middleware"
 	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -38,8 +39,8 @@ type AddonManagerHandler interface {
 
 type Router struct {
 	*fiber.App
-	logger  logging.Logger
-	options Config
+	logger logging.Logger
+	config Config
 }
 
 func Setup(config Config, addonManager AddonManagerHandler, store Storage, log logging.Logger) *Router {
@@ -47,7 +48,7 @@ func Setup(config Config, addonManager AddonManagerHandler, store Storage, log l
 	//router init
 	app := Router{}
 	app.logger = log
-	app.options = config
+	app.config = config
 	app.App = fiber.New()
 	app.Use(recover.New())
 	app.Use(logger.New(logger.ConfigDefault))
@@ -55,6 +56,8 @@ func Setup(config Config, addonManager AddonManagerHandler, store Storage, log l
 
 	//models init
 	settingModel := models.NewSettingsModel(store, log)
+	jwtMiddleware := middleware.NewJWTMiddleware(log)
+	auth := jwtMiddleware.Handler
 	usersModel := models.NewUsersModel(store, log)
 	jsonwebtokenModel := models.NewJsonwebtokenModel(settingModel, store, log)
 	thingsModel := models.NewThingsContainer(store, log)
@@ -139,7 +142,7 @@ func Setup(config Config, addonManager AddonManagerHandler, store Storage, log l
 
 		// Modify a ThingInfo.
 		thingsGroup.Put("/:thingId", thingsController.handleSetThing)
-		thingsGroup.Patch("/", thingsController.handlePatchThings)
+		thingsGroup.Patch("/", auth, thingsController.handlePatchThings)
 		thingsGroup.Patch("/:thingId", thingsController.handlePatchThing)
 		thingsGroup.Delete("/:thingId", thingsController.handleDeleteThing)
 
@@ -197,7 +200,7 @@ func Setup(config Config, addonManager AddonManagerHandler, store Storage, log l
 
 func (app *Router) Start() error {
 	go func() {
-		err := app.Listen(app.options.HttpAddr)
+		err := app.Listen(app.config.HttpAddr)
 		if err != nil {
 			app.logger.Errorf("http server err:%s", err.Error())
 
@@ -206,7 +209,7 @@ func (app *Router) Start() error {
 	}()
 
 	go func() {
-		err := app.Listen(app.options.HttpsAddr)
+		err := app.Listen(app.config.HttpsAddr)
 		if err != nil {
 			app.logger.Errorf("https server err:%s", err.Error())
 			return
