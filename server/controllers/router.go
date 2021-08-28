@@ -56,7 +56,7 @@ func Setup(config Config, addonManager AddonManagerHandler, store Storage, log l
 
 	//models init
 	settingModel := models.NewSettingsModel(store, log)
-	jwtMiddleware := middleware.NewJWTMiddleware(log)
+	jwtMiddleware := middleware.NewJWTMiddleware(store, log)
 	auth := jwtMiddleware.Handler
 	usersModel := models.NewUsersModel(store, log)
 	jsonwebtokenModel := models.NewJsonwebtokenModel(settingModel, store, log)
@@ -122,8 +122,7 @@ func Setup(config Config, addonManager AddonManagerHandler, store Storage, log l
 	//Things Controller
 	{
 		thingsController := NewThingsController(thingsModel, nil, log)
-		thingsGroup := app.Group(constant.ThingsPath)
-
+		thingsGroup := app.Group(constant.ThingsPath, auth)
 		//set a properties of a thing.
 		thingsGroup.Put("/:thingId/properties/*", thingsController.handleSetProperty)
 		thingsGroup.Get("/:thingId/properties/*", thingsController.handleGetPropertyValue)

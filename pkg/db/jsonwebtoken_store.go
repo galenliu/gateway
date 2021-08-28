@@ -28,6 +28,12 @@ func (s *Storage) CreateJSONWebToken(t *TokeDataStorage) error {
 	return err
 }
 
-func (s *Storage) GetJSONWebTokenByKeyId(keyId string) *TokeDataStorage {
-	panic("implement me")
+func (s *Storage) GetJSONWebTokenByKeyId(keyId string) (*TokeDataStorage, error) {
+	row := s.db.QueryRow("SELECT user, issuedAt, publicKey, payload from jsonwebtoken where keyId =@keyId", sql.Named("keyId", keyId))
+	t := TokeDataStorage{}
+	t.KeyId = keyId
+	if err := row.Scan(&t.User, &t.IssuedAt, &t.PublicKey, &t.PayLoad); err != nil {
+		return nil, err
+	}
+	return &t, nil
 }

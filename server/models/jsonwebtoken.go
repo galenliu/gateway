@@ -26,7 +26,7 @@ type Payload struct {
 
 type JsonwebtokenStore interface {
 	CreateJSONWebToken(data *db.TokeDataStorage) error
-	GetJSONWebTokenByKeyId(keyId string) *db.TokeDataStorage
+	GetJSONWebTokenByKeyId(keyId string) (*db.TokeDataStorage, error)
 }
 
 type Jsonwebtoken struct {
@@ -68,26 +68,6 @@ type Claims struct {
 	KeyId  string `json:"KeyId"`
 	Payload
 	jwt.StandardClaims
-}
-
-func (j *Jsonwebtoken) releaseToken(userId int64, key ecdsa.PrivateKey) string {
-	claims := Claims{
-		UserId: userId,
-		StandardClaims: jwt.StandardClaims{
-			Audience:  "",
-			ExpiresAt: time.Now().Add(time.Hour * 240).Unix(),
-			IssuedAt:  time.Now().Unix(),
-			Issuer:    "webThings Gateway",
-			NotBefore: 0,
-			Subject:   "",
-		},
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
-	sig, err := token.SignedString(key)
-	if err != nil {
-		return ""
-	}
-	return sig
 }
 
 func (j *Jsonwebtoken) crateUser(userId int64, payload Payload) (string, *TokenData, error) {
