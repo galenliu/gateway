@@ -38,6 +38,10 @@ func (c *LoginController) handleLogin(ctx *fiber.Ctx) error {
 	if !user.ComparePassword(password) {
 		return ctx.SendStatus(fiber.StatusUnauthorized)
 	}
-	jwt := c.jsonwebtoken.IssueToken(user.ID)
+	jwt, err := c.jsonwebtoken.IssueToken(user.ID)
+	if err != nil {
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"token": jwt})
 }

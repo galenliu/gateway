@@ -9,7 +9,7 @@ type TokeDataStorage struct {
 	KeyId     string
 	User      int64
 	IssuedAt  time.Time
-	PublicKey string
+	PublicKey []byte
 	PayLoad   []byte
 }
 

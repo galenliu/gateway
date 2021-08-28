@@ -11,7 +11,7 @@ type TokenData struct {
 	int64
 	User      int64     `json:"user"`
 	IssuedAt  time.Time `json:"issuedAt"`
-	PublicKey string    `json:"publicKey"`
+	PublicKey []byte    `json:"publicKey"`
 	KeyId     string    `json:"keyId"`
 	Payload
 }

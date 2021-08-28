@@ -1,11 +1,16 @@
 package models
 
 import (
+	"bytes"
 	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
+	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
+	"fmt"
 	"github.com/galenliu/gateway/pkg/db"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/util"
 	"github.com/golang-jwt/jwt"
 	uuid "github.com/satori/go.uuid"
 	"time"
@@ -38,8 +43,11 @@ func NewJsonwebtokenModel(settingsModel *Settings, store JsonwebtokenStore, logg
 	return m
 }
 
-func (j *Jsonwebtoken) IssueToken(user int64) string {
-	sig, token, _ := j.crateUser(user, Payload{Role: RoleUserToken})
+func (j *Jsonwebtoken) IssueToken(userId int64) (string, error) {
+	sig, token, err := j.crateUser(userId, Payload{Role: RoleUserToken})
+	if err != nil {
+		return "", err
+	}
 	p, err := json.Marshal(token.Payload)
 	err = j.Store.CreateJSONWebToken(&db.TokeDataStorage{
 		KeyId:     token.KeyId,
@@ -49,24 +57,25 @@ func (j *Jsonwebtoken) IssueToken(user int64) string {
 		PayLoad:   p,
 	})
 	if err != nil {
-		j.logger.Info("Issue token err : %s", err.Error())
-		return ""
+		return "", fmt.Errorf("Issue token err : %s", err.Error())
+
 	}
-	return sig
+	return sig, nil
 }
 
 type Claims struct {
-	UserId string `json:"userId"`
+	UserId int64  `json:"userId"`
+	KeyId  string `json:"KeyId"`
+	Payload
 	jwt.StandardClaims
 }
 
-func (j *Jsonwebtoken) releaseToken(userId string, key ecdsa.PrivateKey) string {
+func (j *Jsonwebtoken) releaseToken(userId int64, key ecdsa.PrivateKey) string {
 	claims := Claims{
 		UserId: userId,
 		StandardClaims: jwt.StandardClaims{
 			Audience:  "",
 			ExpiresAt: time.Now().Add(time.Hour * 240).Unix(),
-			Id:        userId,
 			IssuedAt:  time.Now().Unix(),
 			Issuer:    "webThings Gateway",
 			NotBefore: 0,
@@ -82,31 +91,45 @@ func (j *Jsonwebtoken) releaseToken(userId string, key ecdsa.PrivateKey) string 
 }
 
 func (j *Jsonwebtoken) crateUser(userId int64, payload Payload) (string, *TokenData, error) {
-	publicKeyStr, privateKeyStr, err := util.GenerateEccKey()
+	privateKey, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
 	if err != nil {
 		return "", nil, err
 	}
-	keyId := uuid.NewV4()
+	keyId := uuid.NewV4().String()
 	issuer := j.settingsModel.GetTunnelInfo()
 	claims := &Claims{
+		UserId:         userId,
 		StandardClaims: jwt.StandardClaims{},
-		KeyId:          keyId.String(),
 	}
+	claims.KeyId = keyId
+	claims.UserId = userId
+	claims.Payload = payload
 	if issuer != "" {
 		claims.Issuer = issuer
 	}
-	claims.Payload = payload
 	token := jwt.NewWithClaims(jwt.SigningMethodES512, claims)
-
-	sig, err := token.SignedString([]byte(privateKeyStr))
+	sig, err := token.SignedString(privateKey)
+	if err != nil {
+		return "", nil, err
+	}
+	bufferPublicKey, err := x509.MarshalPKIXPublicKey(&privateKey.PublicKey)
+	if err != nil {
+		return "", nil, err
+	}
+	block := pem.Block{
+		Type:  "ecdsa public key",
+		Bytes: bufferPublicKey,
+	}
+	bufferPrivate := new(bytes.Buffer)
+	err = pem.Encode(bufferPrivate, &block)
 	if err != nil {
 		return "", nil, err
 	}
 	tokenData := &TokenData{
 		User:      userId,
 		IssuedAt:  time.Now(),
-		PublicKey: publicKeyStr,
-		KeyId:     keyId.String(),
+		PublicKey: bufferPrivate.Bytes(),
+		KeyId:     keyId,
 		Payload:   payload,
 	}
 	return sig, tokenData, nil

@@ -13,7 +13,6 @@ func GenerateEccKey() (publicKeyStr, privateKeyStr string, err error) {
 
 	privateKey, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
 	priBytes, err := x509.MarshalECPrivateKey(privateKey)
-	x509.ParseECPrivateKey()
 	if err != nil {
 		return
 	}

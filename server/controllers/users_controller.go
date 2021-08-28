@@ -4,13 +4,11 @@ import (
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
-	json "github.com/json-iterator/go"
 	"strconv"
-	"strings"
 )
 
 type JWT interface {
-	IssueToken(user int64) string
+	IssueToken(user int64) (string, error)
 }
 
 type UserController struct {
@@ -33,9 +31,9 @@ func (u *UserController) getCount(c *fiber.Ctx) error {
 }
 
 func (u *UserController) createUser(c *fiber.Ctx) error {
-	email := strings.ToLower(json.Get(c.Body(), "email").ToString())
-	pw := json.Get(c.Body(), "password").ToString()
-	name := json.Get(c.Body(), "name").ToString()
+	email := c.FormValue("email")
+	pw := c.FormValue("password")
+	name := c.FormValue("name")
 
 	if email == "" && pw == "" {
 		return c.Status(fiber.StatusBadRequest).SendString("User requires email and password.")
@@ -48,7 +46,10 @@ func (u *UserController) createUser(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
-	jwt := u.jwt.IssueToken(id)
+	jwt, err := u.jwt.IssueToken(id)
+	if err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"token": jwt})
 
 }
