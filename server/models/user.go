@@ -24,6 +24,7 @@ func newUser(email, password, name string) *User {
 	return u
 }
 
+// ComparePassword check the password
 func (u *User) ComparePassword(password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(u.Hash), []byte(password))
 	if err != nil {
@@ -32,6 +33,7 @@ func (u *User) ComparePassword(password string) bool {
 	return true
 }
 
+// password hash
 func hashAndSalt(pwd string) string {
 	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
 	if err != nil {

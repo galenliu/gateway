@@ -33,10 +33,10 @@ func (c *LoginController) handleLogin(ctx *fiber.Ctx) error {
 	}
 	user := c.users.GetUser(email)
 	if user == nil {
-		return ctx.SendStatus(fiber.StatusUnauthorized)
+		return ctx.Status(fiber.StatusUnauthorized).SendString("user not exist")
 	}
 	if !user.ComparePassword(password) {
-		return ctx.SendStatus(fiber.StatusUnauthorized)
+		return ctx.Status(fiber.StatusUnauthorized).SendString("password invalid")
 	}
 	jwt, err := c.jsonwebtoken.IssueToken(user.ID)
 	if err != nil {
