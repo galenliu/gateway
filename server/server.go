@@ -34,7 +34,7 @@ func NewServe(config Config, addonManager controllers.AddonManagerHandler, store
 	sev.logger = log
 	sev.bus = bus
 
-	sev.Router = controllers.Setup(controllers.Config{
+	sev.Router = controllers.NewRouter(controllers.Config{
 		HttpAddr:  sev.options.HttpAddr,
 		HttpsAddr: sev.options.HttpsAddr,
 	}, addonManager, store, log)
@@ -43,11 +43,9 @@ func NewServe(config Config, addonManager controllers.AddonManagerHandler, store
 }
 
 func (serve *WebServe) Start() error {
-	err := serve.Router.Start()
-	if err != nil {
-		serve.logger.Error("Web server err: %s", err.Error())
-		return err
-	}
+	go func() {
+		_ = serve.Router.Start()
+	}()
 	serve.bus.Publish(constant.WebServerStarted)
 	return nil
 }

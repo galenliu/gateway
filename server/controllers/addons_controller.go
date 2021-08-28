@@ -12,14 +12,12 @@ type AddonHandler interface {
 	GetInstallAddons() []byte
 	EnableAddon(addonId string) error
 	DisableAddon(addonId string) error
-
 	InstallAddonFromUrl(id, url, checksum string, enabled bool) error
 	UnloadAddon(id string) error
-	UninstallAddon(id string, disabled bool) error
-
-	GetAddonLicense(addonId string) string
-
 	LoadAddon(id string) error
+	UninstallAddon(id string, disabled bool) error
+	GetAddonLicense(addonId string) (string, error)
+	AddonEnabled(addonId string) bool
 }
 
 type AddonController struct {
@@ -37,14 +35,24 @@ func NewAddonController(addonHandler AddonHandler, settingsStore models.Settings
 }
 
 //  GET /addons
-func (addon *AddonController) handlerGetAddons(c *fiber.Ctx) error {
+func (addon *AddonController) handlerGetInstallAddons(c *fiber.Ctx) error {
 	data := addon.handler.GetInstallAddons()
-	return c.Status(fiber.StatusOK).JSON(data)
+	return c.Status(fiber.StatusOK).Send(data)
 }
 
-// PUT /addon/:id
-func (addon *AddonController) handlerSetAddon(c *fiber.Ctx) error {
+// Get addonId/license"
+func (addon *AddonController) handlerGetLicense(c *fiber.Ctx) error {
 	addonId := c.Params("addonId")
+	data, err := addon.handler.GetAddonLicense(addonId)
+	if err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+	return c.Type("text/plain").Status(fiber.StatusOK).SendString(data)
+}
+
+// PUT /addons/:id
+func (addon *AddonController) handlerSetAddon(c *fiber.Ctx) error {
+	addonId := c.FormValue("addonId")
 	enabled := json.Get(c.Body(), "enabled").ToBool()
 	var err error
 	if enabled {
@@ -53,55 +61,9 @@ func (addon *AddonController) handlerSetAddon(c *fiber.Ctx) error {
 		err = addon.handler.DisableAddon(addonId)
 	}
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 	return c.Status(fiber.StatusOK).JSON(enabled)
-}
-
-// Post /addons
-func (addon *AddonController) handlerInstallAddon(c *fiber.Ctx) error {
-
-	id := json.Get(c.Body(), "id").ToString()
-	url := json.Get(c.Body(), "url").ToString()
-	checksum := json.Get(c.Body(), "checksum").ToString()
-	if id == "" || url == "" || checksum == "" {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "Bad Request"})
-	}
-	e := addon.handler.InstallAddonFromUrl(id, url, checksum, true)
-	if e != nil {
-
-		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": e.Error()})
-	}
-	key := "addons." + id
-	setting, ee := addon.settingsStore.GetSetting(key)
-	if ee != nil {
-
-		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": ee.Error()})
-	}
-	return c.Status(fiber.StatusOK).SendString(setting)
-}
-
-// Patch /:addonId
-func (addon *AddonController) handlerUpdateAddon(c *fiber.Ctx) error {
-	id := c.Params("addonId")
-	url := json.Get(c.Body(), "url").ToString()
-	checksum := json.Get(c.Body(), "checksum").ToString()
-	if id == "" || url == "" || checksum == "" {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "Bad Request"})
-	}
-	e := addon.handler.InstallAddonFromUrl(id, url, checksum, true)
-	if e != nil {
-		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": e.Error()})
-
-	}
-	key := "addons." + id
-	setting, ee := addon.settingsStore.GetSetting(key)
-	if ee != nil {
-
-		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": ee.Error()})
-	}
-	return c.Status(fiber.StatusOK).SendString(setting)
-
 }
 
 //GET /addon/:addonId/config
@@ -135,14 +97,62 @@ func (addon *AddonController) handlerSetAddonConfig(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to set config for add-on: "+addonId)
 	}
 	err = addon.handler.UnloadAddon(addonId)
-
+	if addon.handler.AddonEnabled(addonId) {
+		err := addon.handler.LoadAddon(addonId)
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, "Failed to restart add-on: "+addonId)
+		}
+	}
 	err = addon.handler.LoadAddon(addonId)
 	if err != nil {
-
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to restart add-on: "+addonId)
 	}
-
 	return c.Status(fiber.StatusOK).SendString(config)
+}
+
+// Post /addons
+func (addon *AddonController) handlerInstallAddon(c *fiber.Ctx) error {
+
+	id := c.FormValue("id")
+	url := c.FormValue("url")
+	checksum := c.FormValue("checksum")
+	if id == "" || url == "" || checksum == "" {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "Bad Request"})
+	}
+	e := addon.handler.InstallAddonFromUrl(id, url, checksum, true)
+	if e != nil {
+
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": e.Error()})
+	}
+	key := "addons." + id
+	setting, ee := addon.settingsStore.GetSetting(key)
+	if ee != nil {
+
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": ee.Error()})
+	}
+	return c.Status(fiber.StatusOK).SendString(setting)
+}
+
+// Patch /:addonId
+func (addon *AddonController) handlerUpdateAddon(c *fiber.Ctx) error {
+	id := c.Params("addonId")
+	url := json.Get(c.Body(), "url").ToString()
+	checksum := json.Get(c.Body(), "checksum").ToString()
+	if id == "" || url == "" || checksum == "" {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "Bad Request"})
+	}
+	e := addon.handler.InstallAddonFromUrl(id, url, checksum, true)
+	if e != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": e.Error()})
+	}
+	key := "addons." + id
+	setting, ee := addon.settingsStore.GetSetting(key)
+	if ee != nil {
+
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": ee.Error()})
+	}
+	return c.Status(fiber.StatusOK).SendString(setting)
+
 }
 
 //Delete /:addonId
@@ -153,11 +163,4 @@ func (addon *AddonController) handlerDeleteAddon(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 	return c.SendStatus(fiber.StatusNoContent)
-}
-
-func (addon *AddonController) handlerGetLicense(c *fiber.Ctx) error {
-	//addonId := c.Params("addonId")
-	//
-	//addon.handler
-	return nil
 }

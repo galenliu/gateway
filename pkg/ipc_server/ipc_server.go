@@ -91,7 +91,7 @@ func (s *IPCServer) handle(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return
 		}
-		err = pluginHandler.MessageHandler(message.MessageType, message.Data)
+		err = pluginHandler.OnMsg(message.MessageType, message.Data)
 		if err != nil {
 			return
 		}

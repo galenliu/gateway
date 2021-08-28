@@ -6,7 +6,7 @@ type Clint interface {
 }
 
 type PluginHandler interface {
-	MessageHandler(mt MessageType, data []byte) error
+	OnMsg(mt MessageType, data []byte) error
 }
 
 type PluginServer interface {

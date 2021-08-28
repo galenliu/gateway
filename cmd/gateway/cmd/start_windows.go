@@ -95,3 +95,7 @@ func (l *windowsEventLogger) WriterLevel(level logrus.Level) *io.PipeWriter {
 func (l *windowsEventLogger) NewEntry() *logrus.Entry {
 	return l.logger.NewEntry()
 }
+
+func (l *windowsEventLogger) Write(p []byte) (n int, err error) {
+	return l.logger.Write(p)
+}

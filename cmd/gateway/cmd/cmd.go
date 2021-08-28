@@ -21,7 +21,7 @@ const (
 	optionNameDataDir            = "data-dir"
 	optionNameMediaDir           = "media-dir"
 	optionNameLogDir             = "log-dir"
-	optionNameAddonDirs          = "addon-dirs"
+	optionNameAttachAddonDirs    = "attach-addons-dir"
 	optionNameVerbosity          = "verbosity"
 	optionNameDBRemoveBeforeOpen = "db-remove-before-open"
 	optionNameAPIPort            = "api-port"
@@ -32,8 +32,7 @@ const (
 	optionNameAddonUrls          = "addon-urls"
 	optionLogRotateDays          = "log-rotate-days"
 	optionHomeKitPin             = "hk-pin"
-
-	optionHomeKitEnable = "homekit-enable"
+	optionHomeKitEnable          = "homekit-enable"
 )
 
 func init() {
@@ -159,14 +158,7 @@ func (c *command) setAllFlags(cmd *cobra.Command) {
 	cmd.Flags().String(optionNameMediaDir, filepath.Join(dataDir, "media"), "media directory")
 
 	cmd.Flags().String(optionNameLogDir, filepath.Join(dataDir, "log"), "media directory")
-
-	cmd.Flags().String(optionNameAddonDirs, func() string {
-		p, err := cmd.Flags().GetString(optionNameDataDir)
-		if err != nil {
-			return filepath.Join(p, "addons")
-		}
-		return filepath.Join(filepath.Join(c.homeDir, ".gateway"), "addons")
-	}(), "add-ons directory")
+	cmd.Flags().String(optionNameAttachAddonDirs, "", "add-ons directory")
 	cmd.Flags().Bool(optionNameDBRemoveBeforeOpen, false, "remove db before open")
 	cmd.Flags().String(optionNameVerbosity, "info", "log verbosity level 0=silent, 1=error, 2=warn, 3=info, 4=debug, 5=trace")
 	cmd.Flags().StringArray(optionNameAddonUrls, []string{"https://api.webthings.io:8443/addons"}, "addon urls")

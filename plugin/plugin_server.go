@@ -44,18 +44,24 @@ func NewPluginServer(manager *Manager) *PluginsServer {
 func (s *PluginsServer) RegisterPlugin(pluginId string, clint rpc.Clint) rpc.PluginHandler {
 	plugin := s.getPlugin(pluginId)
 	if plugin == nil {
-		plugin = NewPlugin(s, pluginId, s.logger)
+		plugin = NewPlugin(pluginId, s.manager, s, s.logger)
 		s.Plugins.Store(pluginId, plugin)
 	}
-	plugin.Clint = clint
+	if clint != nil {
+		plugin.Clint = clint
+	}
 	return plugin
 }
 
 func (s *PluginsServer) loadPlugin(addonPath, id, exec string) {
-	_ = s.RegisterPlugin(id, nil)
-	//plugin.exec = exec
-	//plugin.execPath = addonPath
-	//go plugin.execute()
+	plugin := s.getPlugin(id)
+	if plugin == nil {
+		plugin = NewPlugin(id, s.manager, s, s.logger)
+		s.Plugins.Store(id, plugin)
+	}
+	plugin.exec = exec
+	plugin.execPath = addonPath
+	plugin.start()
 }
 
 func (s *PluginsServer) unloadPlugin(packageId string) {

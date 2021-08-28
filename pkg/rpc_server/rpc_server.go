@@ -62,7 +62,7 @@ func (s *RPCServer) PluginHandler(p rpc.PluginServer_PluginHandlerServer) error 
 		if err != nil {
 			return err
 		}
-		err = pluginHandler.MessageHandler(baseMessage.MessageType, baseMessage.Data)
+		err = pluginHandler.OnMsg(baseMessage.MessageType, baseMessage.Data)
 		if err != nil {
 			return err
 		}

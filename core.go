@@ -29,7 +29,7 @@ type BusController interface {
 
 type Config struct {
 	BaseDir          string
-	AddonDirs        []string
+	AttachAddonsDir  string
 	RemoveBeforeOpen bool
 	Verbosity        string
 	AddonUrls        []string
@@ -47,7 +47,7 @@ type Gateway struct {
 	storage      *db.Storage
 	bus          BusController
 	logger       logging.Logger
-	addonManager *plugin.Manager
+	AddonManager *plugin.Manager
 	sever        *server.WebServe
 }
 
@@ -84,15 +84,16 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 	}
 
 	//Addon manager init
-	g.addonManager = plugin.NewAddonsManager(plugin.Config{
+	g.AddonManager = plugin.NewAddonsManager(plugin.Config{
 		UserProfile: u,
 		Preferences: &rpc.PluginRegisterResponseMessage_Data_Preferences{
 			Language: "zh-cn",
 			Units:    &rpc.PluginRegisterResponseMessage_Data_Preferences_Units{Temperature: ""},
 		},
-		AddonDirs: g.config.AddonDirs,
-		IPCPort:   config.IPCPort,
-		RPCPort:   config.RPCPort,
+		AddonDirs:       u.AddonsDir,
+		AttachAddonsDir: g.config.AttachAddonsDir,
+		IPCPort:         config.IPCPort,
+		RPCPort:         config.RPCPort,
 	}, g.storage, newBus, g.logger)
 
 	// Web service init
@@ -103,7 +104,7 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 		TemplateDir: path.Join(g.config.BaseDir, "template"),
 		UploadDir:   path.Join(g.config.BaseDir, "upload"),
 		LogDir:      path.Join(g.config.BaseDir, "log"),
-	}, g.addonManager, g.storage, newBus, g.logger)
+	}, g.AddonManager, g.storage, newBus, g.logger)
 
 	g.bus = newBus
 	return g, nil

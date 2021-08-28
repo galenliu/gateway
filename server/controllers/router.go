@@ -43,7 +43,7 @@ type Router struct {
 	config Config
 }
 
-func Setup(config Config, addonManager AddonManagerHandler, store Storage, log logging.Logger) *Router {
+func NewRouter(config Config, addonManager AddonManagerHandler, store Storage, log logging.Logger) *Router {
 
 	//router init
 	app := Router{}
@@ -51,7 +51,6 @@ func Setup(config Config, addonManager AddonManagerHandler, store Storage, log l
 	app.config = config
 	app.App = fiber.New()
 	app.Use(recover.New())
-	app.Use(logger.New(logger.ConfigDefault))
 	app.Use(cors.New(cors.ConfigDefault))
 
 	//models init
@@ -63,10 +62,15 @@ func Setup(config Config, addonManager AddonManagerHandler, store Storage, log l
 	thingsModel := models.NewThingsContainer(store, log)
 
 	//logger
-	app.Use(logger.New())
+	//app.Use(logger.New())
+	app.Use(func(c *fiber.Ctx) error {
+		return logger.New(logger.Config{
+			Format: "\x1b[36m" + "| " + c.IP() + " | \x1b[31m${status} \u001B[32m| -${latency} \u001B[33m| ${method} \u001B[35m| ${path}\n",
+			Output: log,
+		})(c)
+	})
 
 	//auth := middleware.NewJWTWare(store)
-
 	app.Use(func(c *fiber.Ctx) error {
 		if c.Protocol() == "https" {
 			c.Response().Header.Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
@@ -169,7 +173,8 @@ func Setup(config Config, addonManager AddonManagerHandler, store Storage, log l
 	{
 		addonController := NewAddonController(addonManager, store, log)
 		addonGroup := app.Group(constant.AddonsPath)
-		addonGroup.Get("/", addonController.handlerGetAddons)
+
+		addonGroup.Get("/", addonController.handlerGetInstallAddons)
 		addonGroup.Get("/:addonId/license", addonController.handlerGetLicense)
 		addonGroup.Post("/", addonController.handlerInstallAddon)
 		addonGroup.Put("/:addonId", addonController.handlerSetAddon)
@@ -202,11 +207,10 @@ func (app *Router) Start() error {
 		err := app.Listen(app.config.HttpAddr)
 		if err != nil {
 			app.logger.Errorf("http server err:%s", err.Error())
-
 			return
 		}
 	}()
-
+	time.Sleep(100 * time.Millisecond)
 	go func() {
 		err := app.Listen(app.config.HttpsAddr)
 		if err != nil {
@@ -214,7 +218,6 @@ func (app *Router) Start() error {
 			return
 		}
 	}()
-	time.Sleep(1 * time.Second)
 	return nil
 }
 

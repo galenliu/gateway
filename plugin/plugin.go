@@ -14,7 +14,6 @@ import (
 	"path"
 	"strings"
 	"sync"
-	"time"
 )
 
 const ExecNode = "{nodeLoader}"
@@ -25,30 +24,97 @@ type Plugin struct {
 	pluginId      string
 	exec          string
 	execPath      string
-	registered    bool
+	restart       bool
+	unloading     bool
 	closeChan     chan struct{}
 	closeExecChan chan struct{}
 	pluginServer  *PluginsServer
-	logger        logging.Logger
 	Clint         rpc.Clint
+	logger        logging.Logger
+
+	addonManager *Manager
+
+	adapters    sync.Map
+	notifiers   sync.Map
+	apiHandlers sync.Map
 }
 
-func NewPlugin(s *PluginsServer, pluginId string, log logging.Logger) (plugin *Plugin) {
+func NewPlugin(pluginId string, manager *Manager, s *PluginsServer, log logging.Logger) (plugin *Plugin) {
 	plugin = &Plugin{}
 	plugin.logger = log
 	plugin.locker = new(sync.Mutex)
+	plugin.addonManager = manager
 	plugin.closeChan = make(chan struct{})
 	plugin.closeExecChan = make(chan struct{})
 	plugin.pluginId = pluginId
-	plugin.registered = false
+	plugin.restart = false
 	plugin.pluginServer = s
 	plugin.execPath = path.Join(plugin.pluginServer.manager.config.UserProfile.AddonsDir, pluginId)
 	return
 }
 
-func (plugin *Plugin) MessageHandler(messageType rpc.MessageType, data []byte) (err error) {
+func (plugin *Plugin) getAdapter(adapterId string) *Adapter {
+	a, ok := plugin.adapters.Load(adapterId)
+	adapter, ok := a.(*Adapter)
+	if !ok {
+		return nil
+	}
+	return adapter
+}
+
+func (plugin *Plugin) getAdapters() (adapters []*Adapter) {
+	plugin.adapters.Range(func(key, value interface{}) bool {
+		adapter, ok := value.(*Adapter)
+		if ok {
+			adapters = append(adapters, adapter)
+		}
+		return true
+	})
+	return
+}
+
+func (plugin *Plugin) getNotifiers() (notifiers []*Notifier) {
+	plugin.notifiers.Range(func(key, value interface{}) bool {
+		notifier, ok := value.(*Notifier)
+		if ok {
+			notifiers = append(notifiers, notifier)
+		}
+		return true
+	})
+	return
+}
+
+func (plugin *Plugin) getApiHandlers() (apiHandlers []*ApiHandler) {
+	plugin.apiHandlers.Range(func(key, value interface{}) bool {
+		apiHandler, ok := value.(*ApiHandler)
+		if ok {
+			apiHandlers = append(apiHandlers, apiHandler)
+		}
+		return true
+	})
+	return
+}
+
+func (plugin *Plugin) OnMsg(messageType rpc.MessageType, data []byte) (err error) {
+
+	switch messageType {
+	case rpc.MessageType_AdapterAddedNotification:
+		var message rpc.AdapterAddedNotificationMessage_Data
+		err = json.Unmarshal(data, &message)
+		if err != nil {
+			return err
+		}
+		adapter := NewAdapter(plugin.addonManager, plugin, message.AdapterId, message.Name, message.PackageName, plugin.logger)
+		plugin.adapters.Store(adapter.ID, adapter)
+		plugin.addonManager.addAdapter(adapter)
+		return nil
+
+	case rpc.MessageType_NotifierAddedNotification:
+		return
+
+	}
 	adapterId := json.Get(data, "adapterId").ToString()
-	adapter := plugin.pluginServer.manager.getAdapter(adapterId)
+	adapter := plugin.getAdapter(adapterId)
 	if adapter == nil {
 		return fmt.Errorf("(%s)adapter not found", rpc.MessageType_name[int32(rpc.MessageType_AdapterAddedNotification)])
 	}
@@ -67,18 +133,7 @@ func (plugin *Plugin) MessageHandler(messageType rpc.MessageType, data []byte) (
 			break
 		case rpc.MessageType_ApiHandlerApiResponse:
 			break
-		case rpc.MessageType_AdapterAddedNotification:
-			var message rpc.AdapterAddedNotificationMessage_Data
-			err = json.Unmarshal(data, &message)
-			if err != nil {
-				return err
-			}
-			adapter := NewAdapter(plugin, message.Name, adapterId, message.PackageName, plugin.logger)
-			plugin.pluginServer.manager.handleAdapterAdded(adapter)
-			return nil
 
-		case rpc.MessageType_NotifierAddedNotification:
-			return
 		case rpc.MessageType_ApiHandlerAddedNotification:
 			return
 		case rpc.MessageType_ApiHandlerUnloadResponse:
@@ -177,13 +232,33 @@ func (plugin *Plugin) MessageHandler(messageType rpc.MessageType, data []byte) (
 	return nil
 }
 
-func (plugin *Plugin) execute() {
+func (plugin *Plugin) SendMsg(mt rpc.MessageType, message map[string]interface{}) {
+	message["pluginId"] = plugin.pluginId
+	data, err := json.Marshal(message)
+	if err != nil {
+		return
+	}
+	err = plugin.Clint.Send(&rpc.BaseMessage{
+		MessageType: mt,
+		Data:        data,
+	})
+	if err != nil {
+		plugin.logger.Infof("plugin send message err: %s", err.Error())
+		return
+	}
+}
+
+func (plugin *Plugin) start() {
 	plugin.exec = strings.Replace(plugin.exec, "\\", string(os.PathSeparator), -1)
 	plugin.exec = strings.Replace(plugin.exec, "/", string(os.PathSeparator), -1)
+
+	plugin.execPath = strings.Replace(plugin.execPath, "\\", string(os.PathSeparator), -1)
+	plugin.execPath = strings.Replace(plugin.execPath, "/", string(os.PathSeparator), -1)
+
 	command := strings.Replace(plugin.exec, "{path}", plugin.execPath, 1)
 	//command = strings.Replace(command, "{nodeLoader}", configs.GetNodeLoader(), 1)
 	if !strings.HasPrefix(command, "python") {
-		plugin.logger.Error("Now only support plugin with python lang")
+		plugin.logger.Error("now only support plugin with python lang")
 		return
 	}
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -191,19 +266,17 @@ func (plugin *Plugin) execute() {
 	commands := strings.Split(command, " ")
 
 	var syncLog = func(reader io.ReadCloser) {
-		defer cancelFunc()
 		for {
 			select {
 			case <-plugin.closeChan:
-				cancelFunc()
 				return
 			default:
-				buf := make([]byte, 1024, 1024)
+				buf := make([]byte, 1024)
 				for {
 					strNum, err := reader.Read(buf)
 					if strNum > 0 {
 						outputByte := buf[:strNum]
-						plugin.logger.Info(fmt.Sprintf("plugin(%s) out: %s \t\n", plugin.pluginId, string(outputByte)))
+						plugin.logger.Infof("%s out:[%s]", plugin.pluginId, string(outputByte))
 					}
 					if err != nil {
 						//读到结尾
@@ -226,19 +299,16 @@ func (plugin *Plugin) execute() {
 	}
 	stdout, _ := cmd.StdoutPipe()
 	stderr, _ := cmd.StderrPipe()
-	//stdOut, err := cmd.StdoutPipe()
 
 	go func() {
 		err := cmd.Start()
 		if err != nil {
-			plugin.logger.Info("plugin(%s) run err: %s", plugin.pluginId, err.Error())
+			plugin.logger.Infof("%s run err: %s", plugin.pluginId, err.Error())
 			return
 		}
 	}()
 
-	plugin.logger.Debug(fmt.Sprintf("plugin(%s) execute \t\n", plugin.pluginId))
-	go syncLog(stdout)
-	go syncLog(stderr)
+	plugin.logger.Infof("%s start", plugin.pluginId)
 
 	closeExec := func() {
 		for {
@@ -250,27 +320,55 @@ func (plugin *Plugin) execute() {
 		}
 	}
 	go closeExec()
+
+	//stdOut, err := cmd.StdoutPipe()
+	go syncLog(stdout)
+	go syncLog(stderr)
 }
 
 func (plugin *Plugin) unload() {
-	plugin.registered = false
-	plugin.closeChan <- struct{}{}
-	time.Sleep(2 * time.Second)
-	plugin.closeExecChan <- struct{}{}
+	plugin.restart = false
+	plugin.unloading = true
+	plugin.SendMsg(rpc.MessageType_PluginUnloadRequest, map[string]interface{}{})
 }
 
-func (plugin *Plugin) SendMessage(mt rpc.MessageType, message map[string]interface{}) {
-	message["pluginId"] = plugin.pluginId
-	data, err := json.Marshal(message)
-	if err != nil {
-		return
+func (plugin *Plugin) unloadComponents() {
+	adapters := plugin.getAdapters()
+	notifiers := plugin.getNotifiers()
+	apiHandlers := plugin.getApiHandlers()
+
+	var unloadsFunc []func()
+	for _, adapter := range adapters {
+		plugin.addonManager.removeAdapter(adapter)
+		for _, device := range adapter.getDevices() {
+			plugin.addonManager.handleDeviceRemoved(device)
+		}
+		unloadsFunc = append(unloadsFunc, adapter.unload)
 	}
-	err = plugin.Clint.Send(&rpc.BaseMessage{
-		MessageType: mt,
-		Data:        data,
-	})
-	if err != nil {
-		plugin.logger.Warning("plugin send message err: %s", err.Error())
-		return
+
+	for _, notifier := range notifiers {
+		plugin.addonManager.removeNotifier(notifier.ID)
+		unloadsFunc = append(unloadsFunc, notifier.unload)
+		for _, device := range notifier.getOutlets() {
+			plugin.addonManager.handleOutletRemoved(device)
+		}
+	}
+
+	for id, apiHandler := range apiHandlers {
+		plugin.addonManager.removeApiHandler(id)
+		unloadsFunc = append(unloadsFunc, apiHandler.unload)
+	}
+
+	for _, f := range unloadsFunc {
+		f()
+	}
+}
+
+func (plugin *Plugin) kill() {
+	select {
+	case plugin.closeChan <- struct{}{}:
+	}
+	select {
+	case plugin.closeExecChan <- struct{}{}:
 	}
 }

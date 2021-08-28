@@ -33,10 +33,10 @@ type ManifestJson struct {
 			PrimaryType      string `json:"primary_type"`
 			StrictMaxVersion string `json:"strict_max_version"`
 			StrictMinVersion string `json:"strict_min_version"`
-			Enable           bool   `json:"enable"`
+			Enable           bool   `json:"setEnabled"`
 		} `json:"webthings"`
 	} `json:"gateway_specific_settings"`
-	Enable bool `json:"enable"`
+	Enable bool `json:"setEnabled"`
 }
 
 func ReadManifestJson(file string) (*ManifestJson, error) {

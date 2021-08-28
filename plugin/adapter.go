@@ -18,23 +18,23 @@ type managerProxy interface {
 type Adapter struct {
 	ID          string
 	name        string
-	pluginId    string
-	plugin      *Plugin
+	manager     *Manager
 	looker      *sync.Mutex
 	isPairing   bool
 	devices     sync.Map
 	packageName string
 	logger      logging.Logger
+	plugin      *Plugin
 }
 
-func NewAdapter(p *Plugin, name, adapterId, packageName string, log logging.Logger) *Adapter {
+func NewAdapter(m *Manager, plugin *Plugin, adapterId, name, packageName string, log logging.Logger) *Adapter {
 	adapter := &Adapter{}
+	adapter.plugin = plugin
 	adapter.logger = log
 	adapter.ID = adapterId
-	adapter.pluginId = p.pluginId
 	adapter.name = name
 	adapter.packageName = packageName
-	adapter.plugin = p
+	adapter.manager = m
 	adapter.looker = new(sync.Mutex)
 	return adapter
 }
@@ -47,7 +47,7 @@ func (adapter *Adapter) pairing(timeout float64) {
 }
 
 func (adapter *Adapter) cancelPairing() {
-	adapter.logger.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.ID))
+	adapter.logger.Info(fmt.Sprintf("adapter: %s start pairing", adapter.ID))
 	data := make(map[string]interface{})
 	adapter.sendMessage(rpc.MessageType_AdapterCancelPairingCommand, data)
 }
@@ -61,7 +61,7 @@ func (adapter *Adapter) removeThing(device *internal.Device) {
 }
 
 func (adapter *Adapter) cancelRemoveThing(deviceId string) {
-	adapter.logger.Info(fmt.Sprintf("adapter: %s execute pairing", adapter.ID))
+	adapter.logger.Info(fmt.Sprintf("adapter: %s start pairing", adapter.ID))
 	data := make(map[string]interface{})
 	data["deviceId"] = deviceId
 	adapter.sendMessage(rpc.MessageType_AdapterCancelRemoveDeviceCommand, data)
@@ -69,7 +69,7 @@ func (adapter *Adapter) cancelRemoveThing(deviceId string) {
 
 func (adapter *Adapter) sendMessage(messageType rpc.MessageType, data map[string]interface{}) {
 	data["adapterId"] = adapter.ID
-	adapter.plugin.SendMessage(messageType, data)
+	adapter.plugin.SendMsg(messageType, data)
 }
 
 func (adapter *Adapter) handleDeviceRemoved(d *Device) {
@@ -100,4 +100,8 @@ func (adapter *Adapter) getDevices() (devices []*Device) {
 		return true
 	})
 	return
+}
+
+func (adapter *Adapter) unload() {
+
 }

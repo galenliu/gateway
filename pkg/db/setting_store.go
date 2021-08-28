@@ -11,7 +11,7 @@ func (s *Storage) GetSetting(key string) (value string, err error) {
 
 func (s *Storage) SetSetting(key, value string) error {
 
-	s.logger.Info("set setting key:%s value:%s \t\n", key, value)
+	s.logger.Debugf("set setting key:%v value:%v ", key, value)
 	_, err := s.GetSetting(key)
 	if err == nil {
 		_, e := s.db.Exec(`update settings set value=@value where key=@key`, sql.Named("value", value), sql.Named("key", key))
@@ -35,6 +35,6 @@ func (s *Storage) SetSetting(key, value string) error {
 	if eee != nil {
 		return eee
 	}
-	s.logger.Debug("insert data,id:%d , value: %s \t\n", id, value)
+	s.logger.Debugf("insert data,id:%d , value: %s \t\n", id, value)
 	return nil
 }

@@ -12,19 +12,19 @@ type SettingsStore interface {
 }
 
 type Settings struct {
-	logger logging.Logger
-	store  SettingsStore
+	logger  logging.Logger
+	storage SettingsStore
 }
 
-func NewSettingsModel(store SettingsStore, logger logging.Logger) *Settings {
+func NewSettingsModel(storage SettingsStore, logger logging.Logger) *Settings {
 	settingsModel := Settings{}
-	settingsModel.store = store
+	settingsModel.storage = storage
 	settingsModel.logger = logger
 	return &settingsModel
 }
 
 func (settings *Settings) GetTunnelInfo() string {
-	token, err := settings.store.GetSetting("tunneltoken")
+	token, err := settings.storage.GetSetting("tunneltoken")
 	if err != nil {
 		settings.logger.Info("Tunnel domain not set.")
 		return "Not Set."

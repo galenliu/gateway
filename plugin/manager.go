@@ -21,16 +21,19 @@ import (
 )
 
 type Store interface {
-	GetSetting(key string) (string, error)
-	SetSetting(key, value string) error
+	GetAddonsSetting(key string) (string, error)
+	SetAddonsSetting(key, value string) error
+	GetAddonsConfig(key string) (string, error)
+	SetAddonsConfig(key, value string) error
 }
 
 type Config struct {
-	AddonDirs   []string
-	IPCPort     string
-	RPCPort     string
-	UserProfile *rpc.PluginRegisterResponseMessage_Data_UsrProfile
-	Preferences *rpc.PluginRegisterResponseMessage_Data_Preferences
+	AddonDirs       string
+	AttachAddonsDir string
+	IPCPort         string
+	RPCPort         string
+	UserProfile     *rpc.PluginRegisterResponseMessage_Data_UsrProfile
+	Preferences     *rpc.PluginRegisterResponseMessage_Data_Preferences
 }
 
 type Manager struct {
@@ -128,8 +131,9 @@ func (m *Manager) connectedNotify(device *internal.Device, connected bool) {
 	m.Eventbus.bus.Publish(constant.CONNECTED, connected)
 }
 
-func (m *Manager) handleAdapterAdded(adapter *Adapter) {
+func (m *Manager) addAdapter(adapter *Adapter) {
 	m.adapters.Store(adapter.ID, adapter)
+	m.Eventbus.bus.Publish(constant.AdapterAdded, adapter)
 	m.logger.Debug(fmt.Sprintf("adapter：(%s) added", adapter.ID))
 }
 
@@ -259,9 +263,9 @@ func (m *Manager) getInstallAddons() (addons []*AddonInfo) {
 //tar package to addon from the temp dir,
 func (m *Manager) installAddon(packageId, packagePath string, enabled bool) error {
 	if !m.addonsLoaded {
-		return fmt.Errorf(`Cannot install add-on before other add-ons have been loaded.`)
+		return fmt.Errorf("cannot install add-on before other add-ons have been loaded")
 	}
-	m.logger.Info("execute install package ID: %s ", packageId)
+	m.logger.Info("start install package ID: %s ", packageId)
 	f, err := os.Open(packagePath)
 	if err != nil {
 		return err
@@ -283,7 +287,7 @@ func (m *Manager) installAddon(packageId, packagePath string, enabled bool) erro
 		fi := hdr.FileInfo()
 		p := strings.Replace(hdr.Name, "package", packageId, 1)
 
-		localPath := m.config.AddonDirs[0] + string(os.PathSeparator) + p
+		localPath := m.config.AddonDirs + string(os.PathSeparator) + p
 		if fi.IsDir() {
 			_ = os.MkdirAll(localPath, os.ModePerm)
 			continue
@@ -301,8 +305,8 @@ func (m *Manager) installAddon(packageId, packagePath string, enabled bool) erro
 		_ = fw.Close()
 
 	}
-	var key = "addons." + packageId
-	saved, err := m.store.GetSetting(key)
+
+	saved, err := m.store.GetAddonsSetting(packageId)
 	if err == nil && saved != "" {
 		var old AddonInfo
 		ee := json.UnmarshalFromString(saved, &old)
@@ -310,7 +314,7 @@ func (m *Manager) installAddon(packageId, packagePath string, enabled bool) erro
 			old.Enabled = enabled
 			newAddonInfo, err := json.MarshalToString(old)
 			if err != nil {
-				ee := m.store.SetSetting(key, newAddonInfo)
+				ee := m.store.SetAddonsSetting(packageId, newAddonInfo)
 				if ee != nil {
 					m.logger.Error(ee.Error())
 				}
@@ -332,41 +336,37 @@ func (m *Manager) loadAddons() {
 	m.addonsLoaded = true
 	m.pluginServer = NewPluginServer(m)
 	_ = m.pluginServer.Start()
-	for _, d := range m.config.AddonDirs {
-		fs, err := os.ReadDir(d)
-		if err != nil {
-			m.logger.Warningf("load addon  %s ,err: %s", d, err.Error())
-			continue
-		}
 
+	download := func(dir string) {
+		fs, err := os.ReadDir(dir)
+		if err != nil {
+			m.logger.Warningf("load addon  %s ,err: %s", dir, err.Error())
+			return
+		}
 		for _, fi := range fs {
 			if fi.IsDir() {
-				addonId := fi.Name()
-				err = m.loadAddon(addonId)
+				err = m.loadAddon(fi.Name(), dir)
 				if err != nil {
-					m.logger.Error("load addon ID:%s failed err:%s", addonId, err.Error())
+					m.logger.Error("load addon ID:%s failed err:%s", fi.Name(), err.Error())
 				}
 			}
 		}
 	}
+	download(m.config.AddonDirs)
+	if m.config.AttachAddonsDir != "" {
+		download(m.config.AttachAddonsDir)
+	}
 	return
 }
 
-func (m *Manager) loadAddon(packageId string) error {
+func (m *Manager) loadAddon(packageId string, dir string) error {
 
-	if !m.addonsLoaded {
-		return nil
-	}
-
-	addonPath := m.findPluginPath(packageId)
-
-	addonInfo, obj, err := LoadManifest(addonPath, packageId, m.store)
-
+	packageDir := path.Join(dir, packageId)
+	addonInfo, obj, err := LoadManifest(packageDir, packageId, m.store)
 	if err != nil {
 		return err
 	}
 
-	configKey := "addons.config." + packageId
 	var cfg string
 	if obj != nil {
 		var ee error
@@ -376,21 +376,21 @@ func (m *Manager) loadAddon(packageId string) error {
 		}
 	}
 	info, err := json.MarshalToString(addonInfo)
-	err = m.store.SetSetting(GetAddonKey(addonInfo.ID), info)
+	err = m.store.SetAddonsSetting(addonInfo.ID, info)
 	if err != nil {
 		return err
 	}
-	savedConfig, e := m.store.GetSetting(configKey)
-	if e != nil && savedConfig == "" {
+	savedSetting, e := m.store.GetAddonsSetting(packageId)
+	if e != nil && savedSetting == "" {
 		if cfg != "" {
-			eee := m.store.SetSetting(configKey, cfg)
+			eee := m.store.SetAddonsConfig(packageId, cfg)
 			if eee != nil {
 				m.logger.Error(eee.Error())
 			}
 		}
 	}
-	if savedConfig == "" && cfg != "" {
-		eee := m.store.SetSetting(configKey, cfg)
+	if savedSetting == "" && cfg != "" {
+		eee := m.store.SetAddonsSetting(packageId, cfg)
 		if eee != nil {
 			return eee
 		}
@@ -416,7 +416,7 @@ func (m *Manager) loadAddon(packageId string) error {
 		return err
 	}
 
-	m.pluginServer.loadPlugin(addonPath, addonInfo.ID, addonInfo.Exec)
+	m.pluginServer.loadPlugin(packageDir, addonInfo.ID, addonInfo.Exec)
 
 	return nil
 }
@@ -425,26 +425,20 @@ func (m *Manager) unloadAddon(pluginId string) error {
 	if !m.addonsLoaded {
 		return nil
 	}
-	ext := m.getExtension(pluginId)
-	if ext != nil {
-		ext.unload()
-		m.extensions.Delete(pluginId)
-	}
-	for _, adapter := range m.getAdapters() {
-		if adapter.pluginId == pluginId {
-			for _, device := range adapter.getDevices() {
-				if device.AdapterId == adapter.ID {
-					adapter.handleDeviceRemoved(device)
-				}
-			}
-		}
-	}
-	m.pluginServer.unloadPlugin(pluginId)
+	plugin := m.pluginServer.getPlugin(pluginId)
+	plugin.unloadComponents()
 	return nil
 }
 
+func (m *Manager) removeAdapter(adapter *Adapter) {
+	m.adapters.Delete(adapter.ID)
+}
+
 func (m *Manager) findPluginPath(packageId string) string {
-	for _, dir := range m.config.AddonDirs {
+	for _, dir := range []string{m.config.AddonDirs, m.config.AttachAddonsDir} {
+		if dir == "" {
+			continue
+		}
 		_, e := os.Stat(path.Join(dir, packageId))
 		if os.IsNotExist(e) {
 			continue
@@ -469,4 +463,16 @@ func (m *Manager) Stop() error {
 	m.Eventbus.bus.Publish(constant.AddonManagerStopped)
 	m.running = false
 	return nil
+}
+
+func (m *Manager) removeNotifier(notifierId string) {
+
+}
+
+func (m *Manager) handleOutletRemoved(device *internal.Outlet) {
+
+}
+
+func (m *Manager) removeApiHandler(id int) {
+
 }

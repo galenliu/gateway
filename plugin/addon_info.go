@@ -9,10 +9,6 @@ import (
 const ManifestVersion = 1
 const FileName = "manifest.json"
 
-func GetAddonKey(id string) string {
-	return fmt.Sprintf("addons.%s", id)
-}
-
 type AddonInfo struct {
 	ID                      string `json:"ID"`
 	Name                    string `json:"name"`
@@ -29,6 +25,7 @@ type AddonInfo struct {
 	ContentScripts          string `json:"content_scripts"`
 	WSebAccessibleResources string `json:"web_accessible_resources"`
 	store                   Store
+	dir                     string
 }
 
 func NewAddonInfoFromManifest(manifest *ManifestJson, store Store) *AddonInfo {
@@ -52,26 +49,13 @@ func NewAddonInfoFromManifest(manifest *ManifestJson, store Store) *AddonInfo {
 	return addonInfo
 }
 
-func (a *AddonInfo) disable() error {
-	if a.Enabled == false {
+func (a *AddonInfo) setEnabled(disabled bool) error {
+	if a.Enabled == disabled {
 		return nil
 	}
-	a.Enabled = false
+	a.Enabled = disabled
 	b, err := json.Marshal(a)
-	err = a.store.SetSetting(GetAddonKey(a.ID), string(b))
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (a *AddonInfo) enable() error {
-	if a.Enabled == true {
-		return nil
-	}
-	a.Enabled = true
-	b, err := json.Marshal(a)
-	err = a.store.SetSetting(GetAddonKey(a.ID), string(b))
+	err = a.store.SetAddonsSetting(a.ID, string(b))
 	if err != nil {
 		return err
 	}
@@ -105,6 +89,7 @@ func LoadManifest(destPath, packetId string, store Store) (*AddonInfo, interface
 	//TODO :checksum every file.
 	//TODO: Verify that manifest filed schema
 	addonInfo := NewAddonInfoFromManifest(manifest, store)
+	addonInfo.dir = destPath
 	if !manifest.GatewaySpecificSettings.WebThings.Enable {
 		addonInfo.Enabled = true
 	}

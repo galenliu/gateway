@@ -33,7 +33,6 @@ func (b *Bus) Unsubscribe(topic string, fn interface{}) {
 
 func (b *Bus) Publish(topic string, args ...interface{}) {
 	if !b.Bus.HasCallback(topic) {
-		b.logger.Infof("topic[%s] has not callback", topic)
 		return
 	}
 	b.logger.Infof("bus publish topic:[%s]", topic)

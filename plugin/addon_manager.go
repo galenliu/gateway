@@ -23,11 +23,11 @@ func (m *Manager) GetInstallAddons() []byte {
 func (m *Manager) EnableAddon(addonId string) error {
 	addonInfo := m.getInstallAddon(addonId)
 	if addonInfo == nil {
-		return fmt.Errorf("addon not installed")
+		return fmt.Errorf("package not installed")
 	}
-	err := addonInfo.enable()
+	err := addonInfo.setEnabled(true)
 
-	err = m.loadAddon(addonId)
+	err = m.loadAddon(addonInfo.dir, addonId)
 	if err != nil {
 		return err
 	}
@@ -37,39 +37,40 @@ func (m *Manager) EnableAddon(addonId string) error {
 func (m *Manager) DisableAddon(addonId string) error {
 	addonInfo := m.getInstallAddon(addonId)
 	if addonInfo == nil {
-		return fmt.Errorf("addon not installed")
+		return fmt.Errorf("package not installed")
 	}
-	err := addonInfo.disable()
+	err := addonInfo.setEnabled(false)
 	err = m.unloadAddon(addonId)
-	if err != nil {
-		return err
-	}
-	err = m.loadAddon(addonId)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
+func (m *Manager) AddonEnabled(addonId string) bool {
+	addon := m.getInstallAddon(addonId)
+	return addon.Enabled
+}
+
 func (m *Manager) InstallAddonFromUrl(id, url, checksum string, enabled bool) error {
 
 	destPath := path.Join(os.TempDir(), id+".tar.gz")
-	m.logger.Info("fetching add-on %s as %s", url, destPath)
+	m.logger.Infof("fetching add-on %s as %s", url, destPath)
 	resp, err := http.Get(url)
 	if err != nil {
-		return fmt.Errorf(fmt.Sprintf("Download addon err,pakage ID:%s err:%s", id, err.Error()))
+		return fmt.Errorf("download addon err,pakage ID:%s err:%s", id, err.Error())
 	}
 	defer func() {
 		_ = resp.Body.Close()
 		err := os.Remove(destPath)
 		if err != nil {
-			m.logger.Info("remove temp file failed ,err:%s", err.Error())
+			m.logger.Infof("remove temp file failed ,err:%s", err.Error())
 		}
 	}()
 	data, _ := ioutil.ReadAll(resp.Body)
 	_ = ioutil.WriteFile(destPath, data, 777)
 	if !util.CheckSum(destPath, checksum) {
-		return fmt.Errorf(fmt.Sprintf("checksum err,pakage ID:%s", id))
+		return fmt.Errorf("checksum err,pakage ID:%s", id)
 	}
 	err = m.installAddon(id, destPath, enabled)
 	if err != nil {
@@ -89,12 +90,12 @@ func (m *Manager) UninstallAddon(addonId string, disable bool) error {
 	if f != "" {
 		err := util.RemoveDir(f)
 		if err != nil {
-			m.logger.Error("remove dir from: %s err :%s", f, err)
+			m.logger.Errorf("remove dir from: %s err :%s", f, err)
 		}
 	}
 	if disable {
 		addonInfo := m.getInstallAddon(addonId)
-		err := addonInfo.disable()
+		err := addonInfo.setEnabled(disable)
 		if err != nil {
 			return err
 		}
@@ -104,18 +105,14 @@ func (m *Manager) UninstallAddon(addonId string, disable bool) error {
 	return nil
 }
 
-func (m *Manager) GetAddonLicense(addonId string) string {
-	return ""
+func (m *Manager) GetAddonLicense(addonId string) (string, error) {
+	addonDir := m.findPluginPath(addonId)
+	if addonDir == "" {
+		return "", fmt.Errorf("can not find addon")
+	}
+	data, err := os.ReadFile(path.Join(addonDir, "LICENSE"))
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
 }
-
-//func Subscribe(typ string, f interface{}) {
-//	_ = event_bus.Subscribe(typ, f)
-//}
-//
-//func Unsubscribe(typ string, f interface{}) {
-//	_ = event_bus.Unsubscribe(typ, f)
-//}
-//
-//func Publish(typ string, args ...interface{}) {
-//	event_bus.Publish(typ, args...)
-//}

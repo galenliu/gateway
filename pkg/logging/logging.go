@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"github.com/shiena/ansicolor"
 	"github.com/sirupsen/logrus"
 	"io"
 )
@@ -20,6 +21,7 @@ type Logger interface {
 	WithFields(fields logrus.Fields) *logrus.Entry
 	WriterLevel(logrus.Level) *io.PipeWriter
 	NewEntry() *logrus.Entry
+	Write(p []byte) (n int, err error)
 }
 
 type logger struct {
@@ -29,17 +31,23 @@ type logger struct {
 
 func New(w io.Writer, level logrus.Level) Logger {
 	l := logrus.New()
-	l.SetOutput(w)
 	l.SetLevel(level)
 	l.Formatter = &logrus.TextFormatter{
 		FullTimestamp: true,
+		ForceColors:   true,
 	}
+	l.SetOutput(ansicolor.NewAnsiColorWriter(w))
 	metrics := newMetrics()
 	l.AddHook(metrics)
 	return &logger{
 		Logger:  l,
 		metrics: metrics,
 	}
+}
+
+func (l *logger) Write(p []byte) (n int, err error) {
+	l.Logger.Infof(string(p))
+	return len(p), nil
 }
 
 func (l *logger) NewEntry() *logrus.Entry {
