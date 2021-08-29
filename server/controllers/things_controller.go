@@ -11,21 +11,13 @@ import (
 	"strings"
 )
 
-type ThingsHandler interface {
-	SetPropertyValue(thingId, propertyName string, value interface{}) (interface{}, error)
-	GetPropertyValue(thingId, propertyName string) (interface{}, error)
-	GetPropertiesValue(thingId string) (map[string]interface{}, error)
-}
-
 type thingsController struct {
-	model   models.Container
-	handler ThingsHandler
-	logger  logging.Logger
+	model  models.ThingsContainer
+	logger logging.Logger
 }
 
-func NewThingsController(model models.Container, handler ThingsHandler, log logging.Logger) *thingsController {
+func NewThingsControllerFunc(model models.ThingsContainer, log logging.Logger) *thingsController {
 	tc := &thingsController{}
-	tc.handler = handler
 	tc.model = model
 	tc.logger = log
 	return tc
@@ -34,10 +26,10 @@ func NewThingsController(model models.Container, handler ThingsHandler, log logg
 // POST /things
 func (tc *thingsController) handleCreateThing(c *fiber.Ctx) error {
 
-	tc.logger.Debug("Post /thing,Body: \t\n %s", c.Body())
+	tc.logger.Infof("Post /thing,Body: %s", c.Body())
 	des, e := tc.model.CreateThing(c.Body())
 	if e != nil {
-		return fiber.NewError(http.StatusInternalServerError, fmt.Sprintf("create thing err: %v", e.Error()))
+		return c.SendStatus(fiber.StatusBadRequest)
 	}
 	return c.Status(fiber.StatusOK).JSON(des)
 }
@@ -97,7 +89,7 @@ func (tc *thingsController) handleSetProperty(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid params")
 	}
 	value := c.Body()
-	v, e := tc.handler.SetPropertyValue(thingId, propName, value)
+	v, e := tc.model.SetPropertyValue(thingId, propName, value)
 	if e != nil {
 		tc.logger.Error("Failed set thing(%s) property:(%s) value:(%s),err:(%s)", thingId, propName, value, e.Error())
 		return fiber.NewError(fiber.StatusGatewayTimeout, e.Error())
@@ -109,7 +101,7 @@ func (tc *thingsController) handleSetProperty(c *fiber.Ctx) error {
 func (tc *thingsController) handleGetPropertyValue(c *fiber.Ctx) error {
 	id := c.Params("thingId")
 	propName := c.Params("*")
-	v, err := tc.handler.GetPropertyValue(id, propName)
+	v, err := tc.model.GetPropertyValue(id, propName)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
@@ -118,7 +110,7 @@ func (tc *thingsController) handleGetPropertyValue(c *fiber.Ctx) error {
 
 func (tc *thingsController) handleGetProperties(c *fiber.Ctx) error {
 	id := c.Params("thingId")
-	m, err := tc.handler.GetPropertiesValue(id)
+	m, err := tc.model.GetPropertiesValue(id)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}

@@ -1,6 +1,7 @@
 package ipc_server
 
 import (
+	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/rpc"
 	"github.com/gorilla/websocket"
@@ -76,14 +77,21 @@ func (s *IPCServer) handle(w http.ResponseWriter, r *http.Request) {
 	if message.MessageType != rpc.MessageType_PluginRegisterRequest {
 		return
 	}
-	err = conn.WriteJSON(rpc.PluginRegisterResponseMessage{
-		MessageType: 0,
-	})
+	responseMessage := &rpc.PluginRegisterResponseMessage{
+		MessageType: rpc.MessageType_PluginRegisterResponse,
+		Data: &rpc.PluginRegisterResponseMessage_Data{
+			PluginId:       message.Data.PluginId,
+			GatewayVersion: constant.Version,
+			UserProfile:    s.userProfile,
+			Preferences:    s.preferences,
+		},
+	}
+	err = conn.WriteJSON(responseMessage)
 	if err != nil {
 		return
 	}
-
 	clint := NewClint(message.Data.PluginId, conn)
+
 	var pluginHandler rpc.PluginHandler
 	pluginHandler = s.pluginServer.RegisterPlugin(message.Data.PluginId, clint)
 	for {

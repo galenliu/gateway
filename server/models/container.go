@@ -6,7 +6,18 @@ import (
 	json "github.com/json-iterator/go"
 )
 
-// Container Things CRUD
+type ThingsContainer interface {
+	ThingsManager
+	Container
+}
+
+type ThingsManager interface {
+	SetPropertyValue(thingId, propertyName string, value interface{}) (interface{}, error)
+	GetPropertyValue(thingId, propertyName string) (interface{}, error)
+	GetPropertiesValue(thingId string) (map[string]interface{}, error)
+}
+
+// Container  Things CRUD
 type Container interface {
 	GetThing(id string) *Thing
 	GetThings() []*Thing
@@ -16,16 +27,6 @@ type Container interface {
 	UpdateThing(data []byte) error
 }
 
-type ListenController interface {
-	ListenCreateThing(func(data []byte) (*Thing, error))
-	ListenRemoveThing(func(id string) error)
-}
-
-type FireController interface {
-	FireThingAdded(thing *Thing)
-	FireThingRemoved(id string)
-}
-
 type ThingsStorage interface {
 	RemoveThing(id string) error
 	CreateThing(id string, thing interface{}) error
@@ -33,21 +34,23 @@ type ThingsStorage interface {
 	GetThings() map[string][]byte
 }
 
-type container struct {
+type ThingsModel struct {
 	things map[string]*Thing
 	store  ThingsStorage
+	ThingsManager
 	logger logging.Logger
 }
 
-func NewThingsContainer(store ThingsStorage, log logging.Logger) Container {
-	instance := &container{}
-	instance.store = store
-	instance.logger = log
-	instance.things = make(map[string]*Thing)
-	return instance
+func NewThingsContainerModel(m ThingsManager, store ThingsStorage, log logging.Logger) *ThingsModel {
+	t := &ThingsModel{}
+	t.ThingsManager = m
+	t.store = store
+	t.logger = log
+	t.things = make(map[string]*Thing)
+	return t
 }
 
-func (c *container) GetThing(id string) *Thing {
+func (c *ThingsModel) GetThing(id string) *Thing {
 	t, ok := c.things[id]
 	if !ok {
 		return nil
@@ -55,7 +58,7 @@ func (c *container) GetThing(id string) *Thing {
 	return t
 }
 
-func (c *container) GetThings() (ts []*Thing) {
+func (c *ThingsModel) GetThings() (ts []*Thing) {
 	c.updateThings()
 	for _, t := range c.things {
 		ts = append(ts, t)
@@ -63,7 +66,7 @@ func (c *container) GetThings() (ts []*Thing) {
 	return
 }
 
-func (c *container) GetMapThings() map[string]*Thing {
+func (c *ThingsModel) GetMapThings() map[string]*Thing {
 	things := c.GetThings()
 	if things == nil {
 		return nil
@@ -75,7 +78,7 @@ func (c *container) GetMapThings() map[string]*Thing {
 	return thingsMap
 }
 
-func (c *container) CreateThing(data []byte) (*Thing, error) {
+func (c *ThingsModel) CreateThing(data []byte) (*Thing, error) {
 	t, err := c.handleCreateThing(data)
 	if err != nil {
 		return nil, err
@@ -83,7 +86,7 @@ func (c *container) CreateThing(data []byte) (*Thing, error) {
 	return t, nil
 }
 
-func (c *container) RemoveThing(thingId string) error {
+func (c *ThingsModel) RemoveThing(thingId string) error {
 	err := c.handleRemoveThing(thingId)
 	if err != nil {
 		return err
@@ -91,7 +94,7 @@ func (c *container) RemoveThing(thingId string) error {
 	return nil
 }
 
-func (c *container) UpdateThing(data []byte) error {
+func (c *ThingsModel) UpdateThing(data []byte) error {
 	id := json.Get(data, "id")
 	if id.ValueType() != json.StringValue {
 		return fmt.Errorf("thing id invaild")
@@ -104,7 +107,7 @@ func (c *container) UpdateThing(data []byte) error {
 	return nil
 }
 
-func (c *container) handleCreateThing(data []byte) (*Thing, error) {
+func (c *ThingsModel) handleCreateThing(data []byte) (*Thing, error) {
 	th, err := NewThingFromString(string(data))
 	if err != nil {
 		return nil, err
@@ -122,7 +125,7 @@ func (c *container) handleCreateThing(data []byte) (*Thing, error) {
 	return c.things[th.GetID()], nil
 }
 
-func (c *container) handleRemoveThing(thingId string) error {
+func (c *ThingsModel) handleRemoveThing(thingId string) error {
 	err := c.store.RemoveThing(thingId)
 	if err != nil {
 		c.logger.Error("remove thing id: %s from Store err: %s", thingId, err.Error())
@@ -135,7 +138,7 @@ func (c *container) handleRemoveThing(thingId string) error {
 	return nil
 }
 
-func (c *container) handleUpdateThing(data []byte) error {
+func (c *ThingsModel) handleUpdateThing(data []byte) error {
 	thingId := json.Get(data, "id").ToString()
 	if _, ok := c.things[thingId]; ok {
 		newThing, err := NewThingFromString(string(data))
@@ -154,7 +157,7 @@ func (c *container) handleUpdateThing(data []byte) error {
 	return nil
 }
 
-func (c *container) updateThings() {
+func (c *ThingsModel) updateThings() {
 	if len(c.things) < 1 {
 		for id, bytes := range c.store.GetThings() {
 			thing, err := NewThingFromString(string(bytes))

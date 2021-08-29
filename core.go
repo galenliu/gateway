@@ -63,7 +63,7 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 		ConfigDir:  path.Join(g.config.BaseDir, "config"),
 		MediaDir:   path.Join(g.config.BaseDir, "media"),
 		LogDir:     path.Join(g.config.BaseDir, "log"),
-		GatewayDir: "",
+		GatewayDir: g.config.BaseDir,
 	}
 
 	//检查Gateway运行需要的文件目录
@@ -88,7 +88,7 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 		UserProfile: u,
 		Preferences: &rpc.PluginRegisterResponseMessage_Data_Preferences{
 			Language: "zh-cn",
-			Units:    &rpc.PluginRegisterResponseMessage_Data_Preferences_Units{Temperature: ""},
+			Units:    &rpc.PluginRegisterResponseMessage_Data_Preferences_Units{Temperature: "℃"},
 		},
 		AddonDirs:       u.AddonsDir,
 		AttachAddonsDir: g.config.AttachAddonsDir,
@@ -100,6 +100,7 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 	g.sever = server.NewServe(server.Config{
 		HttpAddr:    g.config.HttpAddr,
 		HttpsAddr:   g.config.HttpsAddr,
+		AddonUrls:   g.config.AddonUrls,
 		StaticDir:   path.Join(g.config.BaseDir, "static"),
 		TemplateDir: path.Join(g.config.BaseDir, "template"),
 		UploadDir:   path.Join(g.config.BaseDir, "upload"),

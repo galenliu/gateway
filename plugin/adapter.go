@@ -39,8 +39,8 @@ func NewAdapter(m *Manager, plugin *Plugin, adapterId, name, packageName string,
 	return adapter
 }
 
-func (adapter *Adapter) pairing(timeout float64) {
-	adapter.logger.Info(fmt.Sprintf("adapter: %s start pairing", adapter.ID))
+func (adapter *Adapter) pairing(timeout int) {
+	adapter.logger.Infof("adapter: %s start pairing", adapter.ID)
 	data := make(map[string]interface{})
 	data["timeout"] = timeout
 	adapter.sendMessage(rpc.MessageType_AdapterStartPairingCommand, data)

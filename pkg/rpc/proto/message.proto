@@ -41,19 +41,19 @@ message PluginRegisterResponseMessage{
     UsrProfile userProfile = 13;
     Preferences preferences = 14;
     message UsrProfile{
-      string addonsDir = 11;
-      string  baseDir = 12 ;
-      string  configDir = 13;
-      string  dataDir = 14 ;
-      string  mediaDir = 15 ;
-      string  logDir = 16 ;
-      string  gatewayDir = 17 ;
+      string addonsDir = 21;
+      string  baseDir = 22 ;
+      string  configDir = 23;
+      string  dataDir = 24 ;
+      string  mediaDir = 25 ;
+      string  logDir = 26 ;
+      string  gatewayDir = 27 ;
     }
     message Preferences{
-      string language = 40;
-      Units units = 41;
+      string language = 31;
+      Units units = 32;
       message Units{
-        string temperature = 21;
+        string temperature = 41;
       }
     }
   }

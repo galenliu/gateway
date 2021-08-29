@@ -10,7 +10,7 @@ type Map = map[string]interface{}
 
 //type WsHandler struct {
 //	thingId              string
-//	Container            *models.ThingsModel
+//	ThingsModel            *models.ThingsModel
 //	ws                   *websocket.Conn
 //	locker               *sync.Mutex
 //	done                 chan struct{}
@@ -23,7 +23,7 @@ type Map = map[string]interface{}
 //	controller.subscriptionThings = make(map[string]*models.Thing, 10)
 //	controller.subscribedEventNames = make(map[string]bool)
 //	controller.locker = new(sync.Mutex)
-//	controller.Container = models.NewThingsOnce()
+//	controller.ThingsModel = models.NewThingsOnce()
 //	controller.done = make(chan struct{})
 //	return controller
 //}
@@ -142,7 +142,7 @@ func handleWebsocket(model models.Container, log logging.Logger) func(conn *webs
 //		m["messageType"] = constant.PropertyStatus
 //		propertyValues := make(map[string]interface{})
 //		for propName, prop := range thing.Properties {
-//			value, err := AddonManagerHandler.GetPropertyValue(thing.GetID(), propName)
+//			value, err := Manager.GetPropertyValue(thing.GetID(), propName)
 //			prop.SetCachedValue(value)
 //			if err != nil {
 //				continue
@@ -202,14 +202,14 @@ func handleWebsocket(model models.Container, log logging.Logger) func(conn *webs
 //		}
 //	}
 //
-//	AddonManagerHandler.Subscribe(constant.PropertyChanged, onPropertyChanged)
+//	Manager.Subscribe(constant.PropertyChanged, onPropertyChanged)
 //	Things.Subscribe(constant.ThingAdded, onThingAdded)
 //	Actions.Subscribe(constant.ActionStatus, onActionStatus)
 //
 //	clearFunc := func() {
 //		Things.Unsubscribe(constant.ThingAdded, onThingAdded)
 //		Actions.Unsubscribe(constant.ActionStatus, onActionStatus)
-//		AddonManagerHandler.Unsubscribe(constant.PropertyChanged, onPropertyChanged)
+//		Manager.Unsubscribe(constant.PropertyChanged, onPropertyChanged)
 //	}
 //
 //	defer clearFunc()
@@ -230,7 +230,7 @@ func handleWebsocket(model models.Container, log logging.Logger) func(conn *webs
 //		if id == "" {
 //			id = thingId
 //		}
-//		device := AddonManagerHandler.GetDevice(id)
+//		device := Manager.GetDevice(id)
 //		messageType := json.Get(bytes, "messageType").ToString()
 //		if id == "" {
 //			sendError(400, "400 Bed Request", "Missing thing id")
@@ -251,7 +251,7 @@ func handleWebsocket(model models.Container, log logging.Logger) func(conn *webs
 //			var propertyMap map[string]interface{}
 //			json.Get(bytes, "data").ToVal(&propertyMap)
 //			for propName, value := range propertyMap {
-//				_, setErr := AddonManagerHandler.SetProperty(device.GetID(), propName, value)
+//				_, setErr := Manager.SetProperty(device.GetID(), propName, value)
 //				if setErr != nil {
 //					m["messageType"] = constant.ERROR
 //					m["bytes"] = map[string]interface{}{
@@ -281,7 +281,7 @@ func handleWebsocket(model models.Container, log logging.Logger) func(conn *webs
 //				if err != nil {
 //					return
 //				}
-//				err = AddonManagerHandler.RequestAction(id, action.ID, actionName, actionNames)
+//				err = Manager.RequestAction(id, action.ID, actionName, actionNames)
 //				if err != nil {
 //					sendError(400, "400 Bad Request", err.Error())
 //				}
@@ -317,7 +317,7 @@ func handleWebsocket(model models.Container, log logging.Logger) func(conn *webs
 //
 //	if controller.thingId != "" {
 //		m := make(map[string]interface{})
-//		t := controller.Container.GetThing(controller.thingId)
+//		t := controller.ThingsModel.GetThing(controller.thingId)
 //		if t == nil {
 //			m["messageType"] = util.ERROR
 //			m["data"] = map[string]interface{}{
@@ -330,7 +330,7 @@ func handleWebsocket(model models.Container, log logging.Logger) func(conn *webs
 //		}
 //		controller.addThing(t)
 //	} else {
-//		for _, t := range controller.Container.GetMapOfThings() {
+//		for _, t := range controller.ThingsModel.GetMapOfThings() {
 //			controller.addThing(t)
 //		}
 //	}
@@ -438,9 +438,9 @@ func handleWebsocket(model models.Container, log logging.Logger) func(conn *webs
 //		for actionName, _ := range actionNames {
 //			var actionParams map[string]interface{}
 //			json.Get(bytes, "data", actionName, "input").ToVal(&actionParams)
-//			th := controller.Container.GetThing(id)
+//			th := controller.ThingsModel.GetThing(id)
 //			action := models.NewAction(actionName, actionParams, th)
-//			controller.Container.Actions.Add(action)
+//			controller.ThingsModel.Actions.Add(action)
 //			err := manager.RequestAction(id, action.ID, actionName, actionParams)
 //			if err != nil {
 //				sendError(400, "400 Bad Request", err.Error())

@@ -2,7 +2,6 @@ package plugin
 
 //	plugin server
 import (
-	"github.com/galenliu/gateway/pkg/constant"
 	ipc "github.com/galenliu/gateway/pkg/ipc_server"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/rpc"
@@ -24,20 +23,8 @@ func NewPluginServer(manager *Manager) *PluginsServer {
 	server.logger = manager.logger
 	server.closeChan = make(chan struct{})
 	server.manager = manager
-	u := &rpc.PluginRegisterResponseMessage_Data_UsrProfile{
-		AddonsDir:  manager.config.UserProfile.AddonsDir,
-		ConfigDir:  manager.config.UserProfile.ConfigDir,
-		DataDir:    manager.config.UserProfile.DataDir,
-		MediaDir:   manager.config.UserProfile.MediaDir,
-		LogDir:     manager.config.UserProfile.LogDir,
-		GatewayDir: constant.Version,
-	}
-	p := &rpc.PluginRegisterResponseMessage_Data_Preferences{
-		Language: manager.config.Preferences.Language,
-		Units:    &rpc.PluginRegisterResponseMessage_Data_Preferences_Units{Temperature: manager.config.Preferences.Units.Temperature},
-	}
-	server.ipc = ipc.NewIPCServer(server, manager.config.IPCPort, u, p, manager.logger)
-	server.rpc = rpc_server.NewRPCServer(server, manager.config.RPCPort, u, p, manager.logger)
+	server.ipc = ipc.NewIPCServer(server, manager.config.IPCPort, manager.config.UserProfile, manager.config.Preferences, manager.logger)
+	server.rpc = rpc_server.NewRPCServer(server, manager.config.RPCPort, manager.config.UserProfile, manager.config.Preferences, manager.logger)
 	return server
 }
 

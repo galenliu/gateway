@@ -276,7 +276,7 @@ func (plugin *Plugin) start() {
 					strNum, err := reader.Read(buf)
 					if strNum > 0 {
 						outputByte := buf[:strNum]
-						plugin.logger.Infof("%s out:[%s]", plugin.pluginId, string(outputByte))
+						plugin.logger.Infof("%s out:[ %s ]", plugin.pluginId, string(outputByte))
 					}
 					if err != nil {
 						//读到结尾

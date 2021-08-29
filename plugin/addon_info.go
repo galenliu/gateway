@@ -9,6 +9,13 @@ import (
 const ManifestVersion = 1
 const FileName = "manifest.json"
 
+type AddonsStore interface {
+	GetAddonsSetting(key string) (string, error)
+	SetAddonsSetting(key, value string) error
+	GetAddonsConfig(key string) (string, error)
+	SetAddonsConfig(key, value string) error
+}
+
 type AddonInfo struct {
 	ID                      string `json:"ID"`
 	Name                    string `json:"name"`
@@ -24,11 +31,11 @@ type AddonInfo struct {
 	PrimaryType             string `json:"primary_type"`
 	ContentScripts          string `json:"content_scripts"`
 	WSebAccessibleResources string `json:"web_accessible_resources"`
-	store                   Store
+	store                   AddonsStore
 	dir                     string
 }
 
-func NewAddonInfoFromManifest(manifest *ManifestJson, store Store) *AddonInfo {
+func NewAddonInfoFromManifest(manifest *ManifestJson, store AddonsStore) *AddonInfo {
 	addonInfo := &AddonInfo{
 		ID:                      manifest.ID,
 		Name:                    manifest.Name,
@@ -62,7 +69,7 @@ func (a *AddonInfo) setEnabled(disabled bool) error {
 	return nil
 }
 
-func LoadManifest(destPath, packetId string, store Store) (*AddonInfo, interface{}, error) {
+func LoadManifest(destPath, packetId string, store AddonsStore) (*AddonInfo, interface{}, error) {
 
 	//load manifest.json\
 	manifest, err := ReadManifestJson(path.Join(destPath, FileName))

@@ -2,9 +2,19 @@ package models
 
 import (
 	"fmt"
+	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/util"
 	json "github.com/json-iterator/go"
 )
+
+type AddonInfo struct {
+	Urls          []string `json:"urls"`
+	Architecture  string   `json:"architecture"`
+	Version       string   `json:"version"`
+	NodeVersion   string   `json:"nodeVersion"`
+	PythonVersion []string `json:"pythonVersion"`
+}
 
 type SettingsStore interface {
 	GetSetting(key string) (string, error)
@@ -12,26 +22,38 @@ type SettingsStore interface {
 }
 
 type Settings struct {
-	logger  logging.Logger
-	storage SettingsStore
+	logger    logging.Logger
+	storage   SettingsStore
+	addonInfo AddonInfo
 }
 
-func NewSettingsModel(storage SettingsStore, logger logging.Logger) *Settings {
-	settingsModel := Settings{}
-	settingsModel.storage = storage
-	settingsModel.logger = logger
-	return &settingsModel
+func NewSettingsModel(addonUrl []string, storage SettingsStore, logger logging.Logger) *Settings {
+	s := Settings{}
+	s.addonInfo = AddonInfo{
+		Urls:          addonUrl,
+		Architecture:  util.GetArch(),
+		Version:       constant.Version,
+		NodeVersion:   util.GetNodeVersion(),
+		PythonVersion: util.GetPythonVersion(),
+	}
+	s.storage = storage
+	s.logger = logger
+	return &s
 }
 
-func (settings *Settings) GetTunnelInfo() string {
-	token, err := settings.storage.GetSetting("tunneltoken")
+func (s *Settings) GetTunnelInfo() string {
+	token, err := s.storage.GetSetting("tunneltoken")
 	if err != nil {
-		settings.logger.Info("Tunnel domain not set.")
+		s.logger.Info("Tunnel domain not set.")
 		return "Not Set."
 	}
 	name := json.Get([]byte(token), "name").ToString()
 	base := json.Get([]byte(token), "base").ToString()
-	settings.logger.Info("Tunnel domain found. Tunnel name is: &s and tunnel domain is: %s", name, base)
+	s.logger.Info("Tunnel domain found. Tunnel name is: &s and tunnel domain is: %s", name, base)
 	tunnelDomain := fmt.Sprintf("https://%s.%s", name, base)
 	return tunnelDomain
+}
+
+func (s *Settings) GetAddonInfo() AddonInfo {
+	return s.addonInfo
 }

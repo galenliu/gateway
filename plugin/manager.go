@@ -20,12 +20,10 @@ import (
 	"time"
 )
 
-type Store interface {
-	GetAddonsSetting(key string) (string, error)
-	SetAddonsSetting(key, value string) error
-	GetAddonsConfig(key string) (string, error)
-	SetAddonsConfig(key, value string) error
-}
+const (
+	ActionPair   = "pair"
+	ActionUnpair = "unpair"
+)
 
 type Config struct {
 	AddonDirs       string
@@ -55,10 +53,10 @@ type Manager struct {
 	logger  logging.Logger
 	actions map[string]*wot.ActionAffordance
 
-	store Store
+	store AddonsStore
 }
 
-func NewAddonsManager(conf Config, settingStore Store, bus bus, log logging.Logger) *Manager {
+func NewAddonsManager(conf Config, settingStore AddonsStore, bus bus, log logging.Logger) *Manager {
 	am := &Manager{}
 	am.config = conf
 	am.logger = log
@@ -84,15 +82,15 @@ func (m *Manager) GetPropertiesValue(thingId string) (map[string]interface{}, er
 	panic("implement me")
 }
 
-func (m *Manager) addNewThing(pairingTimeout float64) error {
+func (m *Manager) AddNewThings(timeout int) error {
 	if m.isPairing {
-		return fmt.Errorf("add already in progress")
-	}
-	for _, adapter := range m.getAdapters() {
-		adapter.pairing(pairingTimeout)
+		return fmt.Errorf("addNewThings already in progress")
 	}
 	m.isPairing = true
-	ctx, cancelFn := context.WithTimeout(context.Background(), time.Duration(pairingTimeout)*time.Millisecond)
+	for _, adapter := range m.getAdapters() {
+		adapter.pairing(timeout)
+	}
+	ctx, cancelFn := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Millisecond)
 	var handlePairingTimeout = func() {
 		for {
 			select {

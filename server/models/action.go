@@ -2,11 +2,16 @@ package models
 
 import (
 	uuid "github.com/satori/go.uuid"
+	"time"
 )
 
-func GetUUID() string {
-	return uuid.NewV4().String()
-}
+const (
+	ActionCompleted = "completed"
+	ActionPending   = "pending"
+	ActionCreated   = "created"
+	ActionError     = "error"
+	ActionDeleted   = "deleted"
+)
 
 type Action struct {
 	ID            string                 `json:"-"`
@@ -15,9 +20,21 @@ type Action struct {
 	Input         map[string]interface{} `json:"input,omitempty"`
 	Href          string                 `json:"href"`
 	TimeRequested string                 `json:"timeRequested,omitempty"`
-	TimeCompleted string                 `json:"timeCompleted,omitempty"`
+	TimeCompleted *time.Time             `json:"timeCompleted,omitempty"`
 	Status        string                 `json:"status"`
 	Error         string                 `json:"error,omitempty"`
+}
+
+func NewActionModel(name string, input map[string]interface{}) *Action {
+	a := &Action{}
+	a.Input = input
+	a.ID = uuid.NewV4().String()
+	a.Status = ActionCreated
+	a.TimeRequested = time.Stamp
+	a.TimeCompleted = nil
+	a.Name = name
+	a.Error = ""
+	return a
 }
 
 //

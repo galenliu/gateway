@@ -2,30 +2,66 @@ package controllers
 
 import (
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
 )
 
 type ActionsController struct {
 	logger logging.Logger
+	model  *models.ActionsModel
 }
 
-func NewActionsController(log logging.Logger) *ActionsController {
+func NewActionsController(model *models.ActionsModel, log logging.Logger) *ActionsController {
 	return &ActionsController{
-
 		logger: log,
+		model:  model,
 	}
 }
 
-func (controller *ActionsController) handleAction(c *fiber.Ctx) error {
+func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 
-	// POST /actions
-	//var thingId = c.Params("thingId")
-	//
-	//action := models.NewAction(c.Body(), thingId)
+	var thingId = c.FormValue("thingId", "")
+	var actionBody map[string]interface{}
+	err := c.BodyParser(&actionBody)
+	if err != nil {
+		return c.SendStatus(fiber.StatusBadRequest)
+	}
+	if len(actionBody) > 1 {
+		return c.SendStatus(fiber.StatusBadRequest)
+	}
+	var actionName string
+	var actionParams interface{}
+	for name, a := range actionBody {
+		actionName = name
+		actionParams = a
+	}
+	if actionName == "" || actionParams == nil {
+		return c.SendStatus(fiber.StatusBadRequest)
+	}
+	var m *models.Action
+	if thingId != "" {
+
+	} else {
+		inputParams, ok := actionParams.(map[string]interface{})
+		if !ok {
+			return c.SendStatus(fiber.StatusBadRequest)
+		}
+		input, ok := inputParams["input"].(map[string]interface{})
+		if !ok {
+			return c.SendStatus(fiber.StatusBadRequest)
+		}
+		m = models.NewActionModel(actionName, input)
+	}
+	err = a.model.Add(m)
+	if err != nil {
+		return err
+	}
+
+	//actionByte := models.NewAction(c.Body(), thingId)
 	//if thingId != "" {
 	//	t := models.NewThingsOnce().GetThing(thingId)
 	//	if t != nil {
-	//		err := plugin.RequestAction(thingId, action.ID, action.Name, action.Input)
+	//		err := plugin.RequestAction(thingId, actionByte.ID, actionByte.Name, actionByte.Input)
 	//		if err != nil {
 	//			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	//		}
@@ -34,12 +70,12 @@ func (controller *ActionsController) handleAction(c *fiber.Ctx) error {
 	//		return c.Status(fiber.StatusBadRequest).SendString("thing id invalid")
 	//	}
 	//}
-	//err := controller.Actions.Add(action)
+	//err := controller.Actions.Add(actionByte)
 	//if err != nil {
 	//	return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	//}
 	//
-	//data, err := json.MarshalIndent(action, "", " ")
+	//data, err := json.MarshalIndent(actionByte, "", " ")
 	//if err != nil {
 	//	return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	//}

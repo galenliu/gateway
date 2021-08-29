@@ -15,6 +15,7 @@ type EventBus interface {
 type Config struct {
 	HttpAddr    string
 	HttpsAddr   string
+	AddonUrls   []string
 	StaticDir   string
 	TemplateDir string
 	UploadDir   string
@@ -28,15 +29,15 @@ type WebServe struct {
 	bus     EventBus
 }
 
-func NewServe(config Config, addonManager controllers.AddonManagerHandler, store controllers.Storage, bus EventBus, log logging.Logger) *WebServe {
+func NewServe(config Config, addonManager controllers.Manager, store controllers.Storage, bus EventBus, log logging.Logger) *WebServe {
 	sev := &WebServe{}
 	sev.options = config
 	sev.logger = log
 	sev.bus = bus
-
 	sev.Router = controllers.NewRouter(controllers.Config{
 		HttpAddr:  sev.options.HttpAddr,
 		HttpsAddr: sev.options.HttpsAddr,
+		AddonUrls: config.AddonUrls,
 	}, addonManager, store, log)
 	bus.SubscribeAsync(constant.AddonManagerStarted, sev.Start)
 	return sev

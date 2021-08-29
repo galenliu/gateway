@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"github.com/gofiber/fiber/v2"
 	"github.com/shiena/ansicolor"
 	"github.com/sirupsen/logrus"
 	"io"
@@ -52,4 +53,12 @@ func (l *logger) Write(p []byte) (n int, err error) {
 
 func (l *logger) NewEntry() *logrus.Entry {
 	return logrus.NewEntry(l.Logger)
+}
+
+func (l *logger) New() fiber.Handler {
+
+	return func(c *fiber.Ctx) error {
+
+		return c.Next()
+	}
 }

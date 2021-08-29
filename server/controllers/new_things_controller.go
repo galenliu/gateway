@@ -7,20 +7,17 @@ import (
 	"sync"
 )
 
-type NewThingAddonHandler interface {
-	GetDevicesBytes() map[string][]byte
-}
-
-type NEWThingsController struct {
+type NewThingsController struct {
 	locker     *sync.Mutex
 	ws         *websocket.Conn
 	foundThing chan string
 	closeChan  chan struct{}
 	logger     logging.Logger
+	model      *models.NewThingsModel
 }
 
-func NewNEWThingsController(log logging.Logger) *NEWThingsController {
-	c := &NEWThingsController{}
+func NewNewThingsController(log logging.Logger) *NewThingsController {
+	c := &NewThingsController{}
 	c.logger = log
 	c.locker = new(sync.Mutex)
 	c.closeChan = make(chan struct{})
@@ -28,9 +25,9 @@ func NewNEWThingsController(log logging.Logger) *NEWThingsController {
 	return c
 }
 
-func (controller *NEWThingsController) handleNewThingsWebsocket(thingsModel models.Container, addonHandler NewThingAddonHandler) func(conn *websocket.Conn) {
+func (c *NewThingsController) handleNewThingsWebsocket(thingsModel models.Container) func(conn *websocket.Conn) {
 	return func(conn *websocket.Conn) {
-		addonDevices := addonHandler.GetDevicesBytes()
+		addonDevices := c.model.Manager.GetDevicesBytes()
 		savedThings := thingsModel.GetMapThings()
 		for id, dev := range addonDevices {
 			_, ok := savedThings[id]

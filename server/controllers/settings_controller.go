@@ -1,34 +1,21 @@
 package controllers
 
 import (
-	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/util"
+	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
 )
 
-type addonInfo struct {
-	Urls          []string `json:"urls"`
-	Architecture  string   `json:"architecture"`
-	Version       string   `json:"version"`
-	NodeVersion   string   `json:"nodeVersion"`
-	PythonVersion []string `json:"pythonVersion"`
-}
-
 type SettingsController struct {
+	model *models.Settings
 }
 
-func NewSettingController(log logging.Logger) *SettingsController {
-	return &SettingsController{}
+func NewSettingController(model *models.Settings, log logging.Logger) *SettingsController {
+	s := &SettingsController{}
+	s.model = model
+	return s
 }
 
-func (settings *SettingsController) handleGetAddonsInfo(c *fiber.Ctx) error {
-	var addonInfo = addonInfo{
-		Urls:          nil,
-		Architecture:  util.GetArch(),
-		Version:       constant.Version,
-		NodeVersion:   util.GetNodeVersion(),
-		PythonVersion: util.GetPythonVersion(),
-	}
-	return c.Status(fiber.StatusOK).JSON(addonInfo)
+func (s *SettingsController) handleGetAddonsInfo(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusOK).JSON(s.model.GetAddonInfo())
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/galenliu/gateway/server/middleware"
 	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -19,11 +20,13 @@ type Storage interface {
 	models.ThingsStorage
 	models.SettingsStore
 	models.JsonwebtokenStore
+	models.AddonStore
 }
 
 type Config struct {
 	HttpAddr  string
 	HttpsAddr string
+	AddonUrls []string
 }
 type Models struct {
 	ThingsModel  *models.Container
@@ -31,10 +34,11 @@ type Models struct {
 	SettingModel *models.Settings
 }
 
-type AddonManagerHandler interface {
-	AddonHandler
-	ThingsHandler
-	NewThingAddonHandler
+type Manager interface {
+	models.AddonManager
+	models.ThingsManager
+	models.ActionsManager
+	models.NewThingsManager
 }
 
 type Router struct {
@@ -43,7 +47,7 @@ type Router struct {
 	config Config
 }
 
-func NewRouter(config Config, addonManager AddonManagerHandler, store Storage, log logging.Logger) *Router {
+func NewRouter(config Config, manager Manager, store Storage, log logging.Logger) *Router {
 
 	//router init
 	app := Router{}
@@ -52,17 +56,19 @@ func NewRouter(config Config, addonManager AddonManagerHandler, store Storage, l
 	app.App = fiber.New()
 	app.Use(recover.New())
 	app.Use(cors.New(cors.ConfigDefault))
+	app.Use(compress.New())
 
 	//models init
-	settingModel := models.NewSettingsModel(store, log)
+	settingModel := models.NewSettingsModel(config.AddonUrls, store, log)
 	jwtMiddleware := middleware.NewJWTMiddleware(store, log)
-	auth := jwtMiddleware.Handler
+	auth := jwtMiddleware.Auth
 	usersModel := models.NewUsersModel(store, log)
+	addonModel := models.NewAddonsModel(manager, store, log)
 	jsonwebtokenModel := models.NewJsonwebtokenModel(settingModel, store, log)
-	thingsModel := models.NewThingsContainer(store, log)
+	thingsModel := models.NewThingsContainerModel(manager, store, log)
+	actionsModel := models.NewActionsModel(manager, log)
 
 	//logger
-	//app.Use(logger.New())
 	app.Use(func(c *fiber.Ctx) error {
 		return logger.New(logger.Config{
 			Format: "\x1b[36m" + "| " + c.IP() + " | \x1b[31m${status} \u001B[32m| -${latency} \u001B[33m| ${method} \u001B[35m| ${path}\n",
@@ -70,7 +76,6 @@ func NewRouter(config Config, addonManager AddonManagerHandler, store Storage, l
 		})(c)
 	})
 
-	//auth := middleware.NewJWTWare(store)
 	app.Use(func(c *fiber.Ctx) error {
 		if c.Protocol() == "https" {
 			c.Response().Header.Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
@@ -103,7 +108,7 @@ func NewRouter(config Config, addonManager AddonManagerHandler, store Storage, l
 		return c.SendStatus(http.StatusNoContent)
 	})
 
-	//root handler
+	//root model
 	app.Use(rootHandler)
 
 	//app.Get("/", controllers.RootHandle())
@@ -112,7 +117,6 @@ func NewRouter(config Config, addonManager AddonManagerHandler, store Storage, l
 	{
 		loginController := NewLoginController(usersModel, jsonwebtokenModel, log)
 		app.Post(constant.LoginPath, loginController.handleLogin)
-
 	}
 
 	// Users Controller
@@ -123,9 +127,10 @@ func NewRouter(config Config, addonManager AddonManagerHandler, store Storage, l
 		usersGroup.Post("/", usersController.createUser)
 	}
 
+	actionsController := NewActionsController(actionsModel, log)
 	//Things Controller
 	{
-		thingsController := NewThingsController(thingsModel, nil, log)
+		thingsController := NewThingsControllerFunc(thingsModel, log)
 		thingsGroup := app.Group(constant.ThingsPath, auth)
 		//set a properties of a thing.
 		thingsGroup.Put("/:thingId/properties/*", thingsController.handleSetProperty)
@@ -141,7 +146,7 @@ func NewRouter(config Config, addonManager AddonManagerHandler, store Storage, l
 		thingsGroup.Get("/", websocket.New(handleWebsocket(thingsModel, log)))
 
 		//Get the properties of a thing
-		thingsGroup.Get(constant.ThingIdParam+constant.PropertiesPath, thingsController.handleGetProperties)
+		thingsGroup.Get("/:thingId"+constant.PropertiesPath, thingsController.handleGetProperties)
 
 		// Modify a ThingInfo.
 		thingsGroup.Put("/:thingId", thingsController.handleSetThing)
@@ -149,14 +154,19 @@ func NewRouter(config Config, addonManager AddonManagerHandler, store Storage, l
 		thingsGroup.Patch("/:thingId", thingsController.handlePatchThing)
 		thingsGroup.Delete("/:thingId", thingsController.handleDeleteThing)
 
-		actionsController := NewActionsController(log)
-		thingsGroup.Get(constant.ThingIdParam+constant.ActionsPath, actionsController.handleGetActions)
-		thingsGroup.Post(constant.ThingIdParam+constant.ActionsPath, actionsController.handleAction)
+		thingsGroup.Get("/:thingId"+constant.ActionsPath, actionsController.handleGetActions)
+		thingsGroup.Post("/:thingId"+constant.ActionsPath, actionsController.handleCreateAction)
+
+		//Actions Controller
+		actionsGroup := app.Group(constant.ActionsPath)
+		actionsGroup.Post("/", actionsController.handleCreateAction)
+		actionsGroup.Get("/", actionsController.handleGetActions)
+		actionsGroup.Delete("/:actionName/:actionId", actionsController.handleDeleteAction)
 	}
 
 	//NewThing Controller
 	{
-		newThingsController := NewNEWThingsController(log)
+		newThingsController := NewNewThingsController(log)
 		newThingsGroup := app.Group(constant.NewThingsPath)
 		newThingsGroup.Use("/", func(c *fiber.Ctx) error {
 			if websocket.IsWebSocketUpgrade(c) {
@@ -165,15 +175,13 @@ func NewRouter(config Config, addonManager AddonManagerHandler, store Storage, l
 			}
 			return fiber.ErrUpgradeRequired
 		})
-
-		newThingsGroup.Get("/", websocket.New(newThingsController.handleNewThingsWebsocket(thingsModel, addonManager)))
+		newThingsGroup.Get("/", websocket.New(newThingsController.handleNewThingsWebsocket(thingsModel)))
 	}
 
 	//Addons Controller
 	{
-		addonController := NewAddonController(addonManager, store, log)
+		addonController := NewAddonController(addonModel, log)
 		addonGroup := app.Group(constant.AddonsPath)
-
 		addonGroup.Get("/", addonController.handlerGetInstallAddons)
 		addonGroup.Get("/:addonId/license", addonController.handlerGetLicense)
 		addonGroup.Post("/", addonController.handlerInstallAddon)
@@ -183,20 +191,11 @@ func NewRouter(config Config, addonManager AddonManagerHandler, store Storage, l
 		addonGroup.Put("/:addonId/config", addonController.handlerSetAddonConfig)
 	}
 
-	//settings Controller
+	//Settings Controller
 	{
-		settingsController := NewSettingController(log)
+		settingsController := NewSettingController(settingModel, log)
 		debugGroup := app.Group(constant.SettingsPath)
 		debugGroup.Get("/addonsInfo", settingsController.handleGetAddonsInfo)
-	}
-
-	//Actions Controller
-	{
-		actionsController := NewActionsController(log)
-		actionsGroup := app.Group(constant.ActionsPath)
-		actionsGroup.Post("/", actionsController.handleAction)
-		actionsGroup.Get("/", actionsController.handleGetActions)
-		actionsGroup.Delete("/:actionName/:actionId", actionsController.handleDeleteAction)
 	}
 
 	return &app

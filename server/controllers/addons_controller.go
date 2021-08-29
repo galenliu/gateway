@@ -8,42 +8,28 @@ import (
 	"net/http"
 )
 
-type AddonHandler interface {
-	GetInstallAddons() []byte
-	EnableAddon(addonId string) error
-	DisableAddon(addonId string) error
-	InstallAddonFromUrl(id, url, checksum string, enabled bool) error
-	UnloadAddon(id string) error
-	LoadAddon(id string) error
-	UninstallAddon(id string, disabled bool) error
-	GetAddonLicense(addonId string) (string, error)
-	AddonEnabled(addonId string) bool
-}
-
 type AddonController struct {
-	handler       AddonHandler
-	settingsStore models.SettingsStore
-	logger        logging.Logger
+	model  *models.AddonsModel
+	logger logging.Logger
 }
 
-func NewAddonController(addonHandler AddonHandler, settingsStore models.SettingsStore, log logging.Logger) *AddonController {
+func NewAddonController(m *models.AddonsModel, log logging.Logger) *AddonController {
 	a := &AddonController{}
-	a.settingsStore = settingsStore
-	a.handler = addonHandler
+	a.model = m
 	a.logger = log
 	return a
 }
 
 //  GET /addons
 func (addon *AddonController) handlerGetInstallAddons(c *fiber.Ctx) error {
-	data := addon.handler.GetInstallAddons()
+	data := addon.model.GetInstallAddons()
 	return c.Status(fiber.StatusOK).Send(data)
 }
 
 // Get addonId/license"
 func (addon *AddonController) handlerGetLicense(c *fiber.Ctx) error {
 	addonId := c.Params("addonId")
-	data, err := addon.handler.GetAddonLicense(addonId)
+	data, err := addon.model.GetAddonLicense(addonId)
 	if err != nil {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
@@ -56,9 +42,9 @@ func (addon *AddonController) handlerSetAddon(c *fiber.Ctx) error {
 	enabled := json.Get(c.Body(), "enabled").ToBool()
 	var err error
 	if enabled {
-		err = addon.handler.EnableAddon(addonId)
+		err = addon.model.EnableAddon(addonId)
 	} else {
-		err = addon.handler.DisableAddon(addonId)
+		err = addon.model.DisableAddon(addonId)
 	}
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
@@ -69,12 +55,10 @@ func (addon *AddonController) handlerSetAddon(c *fiber.Ctx) error {
 //GET /addon/:addonId/config
 func (addon *AddonController) handlerGetAddonConfig(c *fiber.Ctx) error {
 	var addonId = c.Params("addonId")
-	var key = "addons.config." + addonId
 	if addonId == "" {
 		return fiber.NewError(fiber.StatusInternalServerError, "addonId failed")
 	}
-
-	config, err := addon.settingsStore.GetSetting(key)
+	config, err := addon.model.Store.GetAddonsConfig(addonId)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
@@ -87,23 +71,22 @@ func (addon *AddonController) handlerGetAddonConfig(c *fiber.Ctx) error {
 //Put /:addonId/config
 func (addon *AddonController) handlerSetAddonConfig(c *fiber.Ctx) error {
 	var addonId = c.Params("addonId")
-	var key = "addons.config." + addonId
 	config := json.Get(c.Body(), "config").ToString()
 	if config == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "config empty")
 	}
-	err := addon.settingsStore.SetSetting(key, config)
+	err := addon.model.Store.SetAddonsConfig(addonId, config)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to set config for add-on: "+addonId)
 	}
-	err = addon.handler.UnloadAddon(addonId)
-	if addon.handler.AddonEnabled(addonId) {
-		err := addon.handler.LoadAddon(addonId)
+	err = addon.model.UnloadAddon(addonId)
+	if addon.model.AddonEnabled(addonId) {
+		err := addon.model.LoadAddon(addonId)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, "Failed to restart add-on: "+addonId)
 		}
 	}
-	err = addon.handler.LoadAddon(addonId)
+	err = addon.model.LoadAddon(addonId)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to restart add-on: "+addonId)
 	}
@@ -119,15 +102,13 @@ func (addon *AddonController) handlerInstallAddon(c *fiber.Ctx) error {
 	if id == "" || url == "" || checksum == "" {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "Bad Request"})
 	}
-	e := addon.handler.InstallAddonFromUrl(id, url, checksum, true)
+	e := addon.model.InstallAddonFromUrl(id, url, checksum, true)
 	if e != nil {
 
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": e.Error()})
 	}
-	key := "addons." + id
-	setting, ee := addon.settingsStore.GetSetting(key)
+	setting, ee := addon.model.Store.GetAddonsSetting(id)
 	if ee != nil {
-
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": ee.Error()})
 	}
 	return c.Status(fiber.StatusOK).SendString(setting)
@@ -141,12 +122,11 @@ func (addon *AddonController) handlerUpdateAddon(c *fiber.Ctx) error {
 	if id == "" || url == "" || checksum == "" {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "Bad Request"})
 	}
-	e := addon.handler.InstallAddonFromUrl(id, url, checksum, true)
+	e := addon.model.InstallAddonFromUrl(id, url, checksum, true)
 	if e != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": e.Error()})
 	}
-	key := "addons." + id
-	setting, ee := addon.settingsStore.GetSetting(key)
+	setting, ee := addon.model.Store.GetAddonsSetting(id)
 	if ee != nil {
 
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": ee.Error()})
@@ -158,7 +138,7 @@ func (addon *AddonController) handlerUpdateAddon(c *fiber.Ctx) error {
 //Delete /:addonId
 func (addon *AddonController) handlerDeleteAddon(c *fiber.Ctx) error {
 	var addonId = c.Params("addonId")
-	err := addon.handler.UninstallAddon(addonId, true)
+	err := addon.model.UninstallAddon(addonId, true)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
