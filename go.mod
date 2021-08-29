@@ -19,7 +19,6 @@ require (
 	github.com/json-iterator/go v1.1.11
 	github.com/kardianos/service v1.2.0
 	github.com/klauspost/compress v1.13.4 // indirect
-	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mattn/go-sqlite3 v1.14.8
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
@@ -34,7 +33,7 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/savsgio/gotils v0.0.0-20200117113501-90175b0fbe3f // indirect
 	github.com/shiena/ansicolor v0.0.0-20200904210342-c7312218db18
-	github.com/sirupsen/logrus v1.6.0
+	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/afero v1.6.0 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/cobra v1.2.1

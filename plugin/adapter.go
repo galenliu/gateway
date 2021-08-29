@@ -40,20 +40,20 @@ func NewAdapter(m *Manager, plugin *Plugin, adapterId, name, packageName string,
 }
 
 func (adapter *Adapter) pairing(timeout int) {
-	adapter.logger.Infof("adapter: %s start pairing", adapter.ID)
+	adapter.logger.Infof("%s start pairing", adapter.ID)
 	data := make(map[string]interface{})
 	data["timeout"] = timeout
 	adapter.sendMessage(rpc.MessageType_AdapterStartPairingCommand, data)
 }
 
 func (adapter *Adapter) cancelPairing() {
-	adapter.logger.Info(fmt.Sprintf("adapter: %s start pairing", adapter.ID))
+	adapter.logger.Infof("  %s  cancel pairing", adapter.ID)
 	data := make(map[string]interface{})
 	adapter.sendMessage(rpc.MessageType_AdapterCancelPairingCommand, data)
 }
 
 func (adapter *Adapter) removeThing(device *internal.Device) {
-	adapter.logger.Info("adapter delete thing Id: %v", device.ID)
+	adapter.logger.Infof("adapter delete thing Id: %v", device.ID)
 	data := make(map[string]interface{})
 	data["deviceId"] = device.ID
 	adapter.sendMessage(internal.AdapterRemoveDeviceRequest, data)

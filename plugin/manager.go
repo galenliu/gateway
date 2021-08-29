@@ -3,7 +3,6 @@ package plugin
 import (
 	"archive/tar"
 	"compress/gzip"
-	"context"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
@@ -48,10 +47,10 @@ type Manager struct {
 	addonsLoaded bool
 	isPairing    bool
 	running      bool
-
-	locker  *sync.Mutex
-	logger  logging.Logger
-	actions map[string]*wot.ActionAffordance
+	pairTask     chan struct{}
+	locker       *sync.Mutex
+	logger       logging.Logger
+	actions      map[string]*wot.ActionAffordance
 
 	store AddonsStore
 }
@@ -65,6 +64,7 @@ func NewAddonsManager(conf Config, settingStore AddonsStore, bus bus, log loggin
 	am.running = false
 	am.Eventbus = NewEventBus(bus)
 	am.store = settingStore
+
 	am.locker = new(sync.Mutex)
 	bus.SubscribeAsync(constant.GatewayStart, am.Start)
 	return am
@@ -83,21 +83,24 @@ func (m *Manager) GetPropertiesValue(thingId string) (map[string]interface{}, er
 }
 
 func (m *Manager) AddNewThings(timeout int) error {
-	if m.isPairing {
-		return fmt.Errorf("addNewThings already in progress")
+	if m.pairTask != nil {
+		return fmt.Errorf("already in progress")
 	}
-	m.isPairing = true
-	for _, adapter := range m.getAdapters() {
-		adapter.pairing(timeout)
-	}
-	ctx, cancelFn := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Millisecond)
+	m.logger.Info("pairing.....")
+	m.pairTask = make(chan struct{})
+	timeoutChan := time.After(time.Duration(timeout) * time.Millisecond)
 	var handlePairingTimeout = func() {
+		for _, adapter := range m.getAdapters() {
+			adapter.pairing(timeout)
+		}
 		for {
 			select {
-			case <-ctx.Done():
-				cancelFn()
-				m.cancelAddNewThing()
-				//bus.Publish(util.PairingTimeout)
+			case <-timeoutChan:
+				m.logger.Info("pairing timeout")
+				m.Eventbus.bus.Publish(constant.PairingTimeout)
+				m.CancelAddNewThing()
+			case <-m.pairTask:
+				m.logger.Info("pairing cancel")
 				return
 			}
 		}
@@ -106,14 +109,18 @@ func (m *Manager) AddNewThings(timeout int) error {
 	return nil
 }
 
-func (m *Manager) cancelAddNewThing() {
-	if !m.isPairing {
-		return
+func (m *Manager) CancelAddNewThing() {
+	if m.pairTask != nil {
+		select {
+		case m.pairTask <- struct{}{}:
+		default:
+			break
+		}
 	}
 	for _, adapter := range m.getAdapters() {
 		adapter.cancelPairing()
 	}
-	m.isPairing = false
+	m.pairTask = nil
 	return
 }
 

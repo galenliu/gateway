@@ -38,6 +38,7 @@ func New(w io.Writer, level logrus.Level) Logger {
 		ForceColors:   true,
 	}
 	l.SetOutput(ansicolor.NewAnsiColorWriter(w))
+	//l.SetReportCaller(true)
 	metrics := newMetrics()
 	l.AddHook(metrics)
 	return &logger{
@@ -56,9 +57,7 @@ func (l *logger) NewEntry() *logrus.Entry {
 }
 
 func (l *logger) New() fiber.Handler {
-
 	return func(c *fiber.Ctx) error {
-
 		return c.Next()
 	}
 }

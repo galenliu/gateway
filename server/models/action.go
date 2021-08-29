@@ -1,6 +1,8 @@
 package models
 
 import (
+	"github.com/galenliu/gateway/pkg/constant"
+	"github.com/galenliu/gateway/pkg/logging"
 	uuid "github.com/satori/go.uuid"
 	"time"
 )
@@ -20,21 +22,34 @@ type Action struct {
 	Input         map[string]interface{} `json:"input,omitempty"`
 	Href          string                 `json:"href"`
 	TimeRequested string                 `json:"timeRequested,omitempty"`
-	TimeCompleted *time.Time             `json:"timeCompleted,omitempty"`
+	TimeCompleted time.Time              `json:"timeCompleted,omitempty"`
 	Status        string                 `json:"status"`
 	Error         string                 `json:"error,omitempty"`
+	bus           ActionsBus
+	logger        logging.Logger
 }
 
-func NewActionModel(name string, input map[string]interface{}) *Action {
+func NewActionModel(name string, input map[string]interface{}, log logging.Logger) *Action {
 	a := &Action{}
+	a.logger = log
 	a.Input = input
 	a.ID = uuid.NewV4().String()
 	a.Status = ActionCreated
 	a.TimeRequested = time.Stamp
-	a.TimeCompleted = nil
 	a.Name = name
 	a.Error = ""
 	return a
+}
+
+func (action *Action) updateStatus(newStatus string) {
+	if action.Status == newStatus {
+		return
+	}
+	if newStatus == ActionCompleted {
+		action.TimeCompleted = time.Now()
+	}
+	action.Status = newStatus
+	action.bus.Publish(constant.ActionStatus, action)
 }
 
 //
@@ -70,16 +85,7 @@ func NewActionModel(name string, input map[string]interface{}) *Action {
 //	return a
 //}
 //
-//func (action *Action) UpdateStatus(newStatus string) {
-//	if action.Status == newStatus {
-//		return
-//	}
-//	if newStatus == ActionCompleted {
-//		action.TimeCompleted = time.Now().Format("2006-01-02 15:04:05")
-//	}
-//	action.Status = newStatus
-//	event_bus.Publish(constant.ActionStatus, action)
-//}
+
 //
 //func (action *Action) SetError(msg string) {
 //	action.Error = msg

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/server/middleware"
@@ -28,6 +29,7 @@ type Config struct {
 	HttpsAddr string
 	AddonUrls []string
 }
+
 type Models struct {
 	ThingsModel  *models.Container
 	UsersModel   *models.Users
@@ -47,7 +49,7 @@ type Router struct {
 	config Config
 }
 
-func NewRouter(config Config, manager Manager, store Storage, log logging.Logger) *Router {
+func NewRouter(config Config, manager Manager, store Storage, bus *bus.Bus, log logging.Logger) *Router {
 
 	//router init
 	app := Router{}
@@ -66,7 +68,7 @@ func NewRouter(config Config, manager Manager, store Storage, log logging.Logger
 	addonModel := models.NewAddonsModel(manager, store, log)
 	jsonwebtokenModel := models.NewJsonwebtokenModel(settingModel, store, log)
 	thingsModel := models.NewThingsContainerModel(manager, store, log)
-	actionsModel := models.NewActionsModel(manager, log)
+	actionsModel := models.NewActionsModel(manager, bus, log)
 
 	//logger
 	app.Use(func(c *fiber.Ctx) error {

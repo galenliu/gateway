@@ -50,7 +50,7 @@ func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 		if !ok {
 			return c.SendStatus(fiber.StatusBadRequest)
 		}
-		m = models.NewActionModel(actionName, input)
+		m = models.NewActionModel(actionName, input, a.logger)
 	}
 	err = a.model.Add(m)
 	if err != nil {

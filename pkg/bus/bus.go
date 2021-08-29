@@ -18,6 +18,7 @@ func NewBus(log logging.Logger) (*Bus, error) {
 }
 
 func (b *Bus) Subscribe(topic string, fn interface{}) {
+	b.logger.Debugf("subscribe topic:[%s]", topic)
 	err := b.Bus.Subscribe(topic, fn)
 	if err != nil {
 		b.logger.Error("topic:%s subscribe err :%s", topic, err.Error())
@@ -32,14 +33,15 @@ func (b *Bus) Unsubscribe(topic string, fn interface{}) {
 }
 
 func (b *Bus) Publish(topic string, args ...interface{}) {
+	b.logger.Debugf("publish topic:[%s]", topic)
 	if !b.Bus.HasCallback(topic) {
 		return
 	}
-	b.logger.Infof("bus publish topic:[%s]", topic)
 	b.Bus.Publish(topic, args...)
 }
 
 func (b *Bus) SubscribeOnce(topic string, fn interface{}) {
+	b.logger.Debugf("subscribeOnce topic:[%s]", topic)
 	err := b.Bus.SubscribeOnce(topic, fn)
 	if err != nil {
 		b.logger.Error("topic: %s subscribe once err: %s", topic, err.Error())
@@ -47,6 +49,7 @@ func (b *Bus) SubscribeOnce(topic string, fn interface{}) {
 }
 
 func (b *Bus) SubscribeAsync(topic string, fn interface{}) {
+	b.logger.Debugf("SubscribeAsync topic:[%s]", topic)
 	err := b.Bus.SubscribeAsync(topic, fn, false)
 	if err != nil {
 		b.logger.Error("topic: %s subscribe async err: %s", topic, err.Error())
