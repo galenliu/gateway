@@ -51,11 +51,10 @@ type Manager struct {
 	locker       *sync.Mutex
 	logger       logging.Logger
 	actions      map[string]*wot.ActionAffordance
-
-	store AddonsStore
+	storage      AddonsStore
 }
 
-func NewAddonsManager(conf Config, settingStore AddonsStore, bus bus, log logging.Logger) *Manager {
+func NewAddonsManager(conf Config, s AddonsStore, bus bus, log logging.Logger) *Manager {
 	am := &Manager{}
 	am.config = conf
 	am.logger = log
@@ -63,7 +62,7 @@ func NewAddonsManager(conf Config, settingStore AddonsStore, bus bus, log loggin
 	am.isPairing = false
 	am.running = false
 	am.Eventbus = NewEventBus(bus)
-	am.store = settingStore
+	am.storage = s
 
 	am.locker = new(sync.Mutex)
 	bus.SubscribeAsync(constant.GatewayStart, am.Start)
@@ -84,7 +83,7 @@ func (m *Manager) GetPropertiesValue(thingId string) (map[string]interface{}, er
 
 func (m *Manager) AddNewThings(timeout int) error {
 	if m.pairTask != nil {
-		return fmt.Errorf("already in progress")
+		return fmt.Errorf("add new things already in progress")
 	}
 	m.logger.Info("pairing.....")
 	m.pairTask = make(chan struct{})
@@ -266,11 +265,11 @@ func (m *Manager) getInstallAddons() (addons []*AddonInfo) {
 }
 
 //tar package to addon from the temp dir,
-func (m *Manager) installAddon(packageId, packagePath string, enabled bool) error {
+func (m *Manager) installAddon(packageId, packagePath string) error {
 	if !m.addonsLoaded {
 		return fmt.Errorf("cannot install add-on before other add-ons have been loaded")
 	}
-	m.logger.Info("start install package ID: %s ", packageId)
+	m.logger.Infof("start install %s", packageId)
 	f, err := os.Open(packagePath)
 	if err != nil {
 		return err
@@ -308,29 +307,24 @@ func (m *Manager) installAddon(packageId, packagePath string, enabled bool) erro
 		//TODO 给下载的文件增加可执行权限
 		_ = os.Chmod(fi.Name(), 777)
 		_ = fw.Close()
-
 	}
 
-	saved, err := m.store.GetAddonsSetting(packageId)
-	if err == nil && saved != "" {
-		var old AddonInfo
-		ee := json.UnmarshalFromString(saved, &old)
-		if ee != nil {
-			old.Enabled = enabled
-			newAddonInfo, err := json.MarshalToString(old)
-			if err != nil {
-				ee := m.store.SetAddonsSetting(packageId, newAddonInfo)
-				if ee != nil {
-					m.logger.Error(ee.Error())
-				}
-			}
+	return m.loadAddon(packageId, m.config.AddonDirs)
+	//saved, err := m.storage.LoadAddonSetting(packageId)
+	//if err == nil && saved != "" {
+	//	var old AddonInfo
+	//	ee := json.UnmarshalFromString(saved, &old)
+	//	if ee != nil {
+	//		newAddonInfo, err := json.MarshalToString(old)
+	//		if err != nil {
+	//			ee := m.storage.StoreAddonSetting(packageId, newAddonInfo)
+	//			if ee != nil {
+	//				m.logger.Error(ee.Error())
+	//			}
+	//		}
+	//	}
+	//}
 
-		}
-	}
-	if enabled {
-		//return m.loadAddon(packageId)
-	}
-	return nil
 }
 
 func (m *Manager) loadAddons() {
@@ -341,8 +335,7 @@ func (m *Manager) loadAddons() {
 	m.addonsLoaded = true
 	m.pluginServer = NewPluginServer(m)
 	_ = m.pluginServer.Start()
-
-	download := func(dir string) {
+	load := func(dir string) {
 		fs, err := os.ReadDir(dir)
 		if err != nil {
 			m.logger.Warningf("load addon  %s ,err: %s", dir, err.Error())
@@ -357,9 +350,9 @@ func (m *Manager) loadAddons() {
 			}
 		}
 	}
-	download(m.config.AddonDirs)
+	load(m.config.AddonDirs)
 	if m.config.AttachAddonsDir != "" {
-		download(m.config.AttachAddonsDir)
+		load(m.config.AttachAddonsDir)
 	}
 	return
 }
@@ -367,9 +360,18 @@ func (m *Manager) loadAddons() {
 func (m *Manager) loadAddon(packageId string, dir string) error {
 
 	packageDir := path.Join(dir, packageId)
-	addonInfo, obj, err := LoadManifest(packageDir, packageId, m.store)
+	addonInfo, obj, err := LoadManifest(packageDir, packageId, m.storage)
 	if err != nil {
 		return err
+	}
+	saved, err := m.storage.LoadAddonSetting(packageId)
+	if saved != "" && err == nil {
+		if e := json.Get([]byte(saved), "enable").ToBool(); addonInfo.Enabled != e {
+			err := addonInfo.setEnabled(e)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	var cfg string
@@ -380,22 +382,23 @@ func (m *Manager) loadAddon(packageId string, dir string) error {
 			return err
 		}
 	}
+
 	info, err := json.MarshalToString(addonInfo)
-	err = m.store.SetAddonsSetting(addonInfo.ID, info)
+	err = m.storage.StoreAddonSetting(addonInfo.ID, info)
 	if err != nil {
 		return err
 	}
-	savedSetting, e := m.store.GetAddonsSetting(packageId)
+	savedSetting, e := m.storage.LoadAddonSetting(packageId)
 	if e != nil && savedSetting == "" {
 		if cfg != "" {
-			eee := m.store.SetAddonsConfig(packageId, cfg)
+			eee := m.storage.StoreAddonsConfig(packageId, cfg)
 			if eee != nil {
 				m.logger.Error(eee.Error())
 			}
 		}
 	}
 	if savedSetting == "" && cfg != "" {
-		eee := m.store.SetAddonsSetting(packageId, cfg)
+		eee := m.storage.StoreAddonSetting(packageId, cfg)
 		if eee != nil {
 			return eee
 		}

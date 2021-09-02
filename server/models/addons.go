@@ -5,17 +5,17 @@ import (
 )
 
 type AddonStore interface {
-	GetAddonsSetting(id string) (value string, err error)
-	SetAddonsSetting(id, value string) error
-	GetAddonsConfig(id string) (value string, err error)
-	SetAddonsConfig(id, value string) error
+	LoadAddonSetting(id string) (value string, err error)
+	StoreAddonSetting(id, value string) error
+	LoadAddonConfig(id string) (value string, err error)
+	StoreAddonsConfig(id, value string) error
 }
 
 type AddonManager interface {
 	GetInstallAddons() []byte
 	EnableAddon(addonId string) error
 	DisableAddon(addonId string) error
-	InstallAddonFromUrl(id, url, checksum string, enabled bool) error
+	InstallAddonFromUrl(id, url, checksum string) error
 	UnloadAddon(id string) error
 	LoadAddon(id string) error
 	UninstallAddon(id string, disabled bool) error

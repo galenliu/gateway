@@ -52,7 +52,7 @@ func (m *Manager) AddonEnabled(addonId string) bool {
 	return addon.Enabled
 }
 
-func (m *Manager) InstallAddonFromUrl(id, url, checksum string, enabled bool) error {
+func (m *Manager) InstallAddonFromUrl(id, url, checksum string) error {
 
 	destPath := path.Join(os.TempDir(), id+".tar.gz")
 	m.logger.Infof("fetching add-on %s as %s", url, destPath)
@@ -72,12 +72,12 @@ func (m *Manager) InstallAddonFromUrl(id, url, checksum string, enabled bool) er
 	if !util.CheckSum(destPath, checksum) {
 		return fmt.Errorf("checksum err,pakage ID:%s", id)
 	}
-	err = m.installAddon(id, destPath, enabled)
+	m.logger.Infof("download %s successful", id)
+	err = m.installAddon(id, destPath)
 	if err != nil {
 		return err
 	}
 	return nil
-
 }
 
 func (m *Manager) UninstallAddon(addonId string, disable bool) error {

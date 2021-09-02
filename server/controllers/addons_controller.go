@@ -3,7 +3,6 @@ package controllers
 import (
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/server/models"
-	"github.com/gofiber/fiber/v2"
 	json "github.com/json-iterator/go"
 	"net/http"
 )
@@ -58,7 +57,7 @@ func (addon *AddonController) handlerGetAddonConfig(c *fiber.Ctx) error {
 	if addonId == "" {
 		return fiber.NewError(fiber.StatusInternalServerError, "addonId failed")
 	}
-	config, err := addon.model.Store.GetAddonsConfig(addonId)
+	config, err := addon.model.Store.LoadAddonConfig(addonId)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
@@ -75,7 +74,7 @@ func (addon *AddonController) handlerSetAddonConfig(c *fiber.Ctx) error {
 	if config == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "config empty")
 	}
-	err := addon.model.Store.SetAddonsConfig(addonId, config)
+	err := addon.model.Store.StoreAddonsConfig(addonId, config)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to set config for add-on: "+addonId)
 	}
@@ -102,12 +101,11 @@ func (addon *AddonController) handlerInstallAddon(c *fiber.Ctx) error {
 	if id == "" || url == "" || checksum == "" {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "Bad Request"})
 	}
-	e := addon.model.InstallAddonFromUrl(id, url, checksum, true)
+	e := addon.model.InstallAddonFromUrl(id, url, checksum)
 	if e != nil {
-
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": e.Error()})
 	}
-	setting, ee := addon.model.Store.GetAddonsSetting(id)
+	setting, ee := addon.model.Store.LoadAddonSetting(id)
 	if ee != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": ee.Error()})
 	}
@@ -122,11 +120,11 @@ func (addon *AddonController) handlerUpdateAddon(c *fiber.Ctx) error {
 	if id == "" || url == "" || checksum == "" {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "Bad Request"})
 	}
-	e := addon.model.InstallAddonFromUrl(id, url, checksum, true)
+	e := addon.model.InstallAddonFromUrl(id, url, checksum)
 	if e != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": e.Error()})
 	}
-	setting, ee := addon.model.Store.GetAddonsSetting(id)
+	setting, ee := addon.model.Store.LoadAddonSetting(id)
 	if ee != nil {
 
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": ee.Error()})

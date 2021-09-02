@@ -10,10 +10,10 @@ const ManifestVersion = 1
 const FileName = "manifest.json"
 
 type AddonsStore interface {
-	GetAddonsSetting(key string) (string, error)
-	SetAddonsSetting(key, value string) error
-	GetAddonsConfig(key string) (string, error)
-	SetAddonsConfig(key, value string) error
+	LoadAddonSetting(key string) (string, error)
+	StoreAddonSetting(key, value string) error
+	LoadAddonConfig(key string) (string, error)
+	StoreAddonsConfig(key, value string) error
 }
 
 type AddonInfo struct {
@@ -62,7 +62,7 @@ func (a *AddonInfo) setEnabled(disabled bool) error {
 	}
 	a.Enabled = disabled
 	b, err := json.Marshal(a)
-	err = a.store.SetAddonsSetting(a.ID, string(b))
+	err = a.store.StoreAddonSetting(a.ID, string(b))
 	if err != nil {
 		return err
 	}
