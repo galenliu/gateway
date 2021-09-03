@@ -116,8 +116,8 @@ func (c *ThingsModel) handleCreateThing(data []byte) (*Thing, error) {
 	if ok {
 		return nil, fmt.Errorf("thing id: %s is exited", th.GetID())
 	}
-	bytes, err := json.Marshal(th)
-	err = c.store.CreateThing(th.GetID(), bytes)
+
+	err = c.store.CreateThing(th.GetID(), th)
 	if err != nil {
 		return nil, err
 	}
@@ -147,8 +147,7 @@ func (c *ThingsModel) handleUpdateThing(data []byte) error {
 		}
 		if newThing != nil {
 			c.things[newThing.ID.GetID()] = newThing
-			bytes, _ := json.Marshal(newThing)
-			err := c.store.UpdateThing(newThing.GetID(), bytes)
+			err := c.store.UpdateThing(newThing.GetID(), newThing)
 			if err != nil {
 				return err
 			}
