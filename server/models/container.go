@@ -8,14 +8,7 @@ import (
 )
 
 type ThingsContainer interface {
-	ThingsManager
 	Container
-}
-
-type ThingsManager interface {
-	SetPropertyValue(thingId, propertyName string, value interface{}) (interface{}, error)
-	GetPropertyValue(thingId, propertyName string) (interface{}, error)
-	GetPropertiesValue(thingId string) (map[string]interface{}, error)
 }
 
 // ThingsStorage CRUD
@@ -49,13 +42,13 @@ func GetIns() Container {
 type ThingsModel struct {
 	things map[string]*Thing
 	store  ThingsStorage
-	ThingsManager
+
 	logger logging.Logger
 }
 
-func NewThingsContainerModel(m ThingsManager, store ThingsStorage, log logging.Logger) *ThingsModel {
+func NewThingsContainerModel(store ThingsStorage, log logging.Logger) *ThingsModel {
 	t := &ThingsModel{}
-	t.ThingsManager = m
+
 	t.store = store
 	t.logger = log
 	t.things = make(map[string]*Thing)

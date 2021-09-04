@@ -27,6 +27,7 @@ const (
 	AddonsPath       = "/addons"
 	NotifiersPath    = "/notifiers"
 	ActionsPath      = "/actions"
+	ServicesPath     = "/services"
 	EventsPath       = "/events"
 	LoginPath        = "/login"
 	LogOutPath       = "/log-out"

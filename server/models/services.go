@@ -1,17 +1,11 @@
-package services
-
-type ThingsManager interface {
-	SetPropertyValue(thingId, propertyName string, value interface{}) (interface{}, error)
-	GetPropertyValue(thingId, propertyName string) (interface{}, error)
-	GetPropertiesValue(thingId string) (map[string]interface{}, error)
-}
+package models
 
 type Services struct {
 	services map[string]Service
 	manager  ThingsManager
 }
 
-func NewServices(m ThingsManager) *Services {
+func NewServicesModel(m ThingsManager) *Services {
 	s := &Services{}
 	s.manager = m
 	return s

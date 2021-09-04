@@ -37,8 +37,8 @@ type Models struct {
 }
 
 type Manager interface {
-	models.AddonManager
-	models.ThingsManager
+	AddonManager
+	ThingsManager
 	models.ActionsManager
 	models.NewThingsManager
 }
@@ -65,10 +65,11 @@ func NewRouter(config Config, manager Manager, store Storage, bus *bus.Bus, log 
 	jwtMiddleware := middleware.NewJWTMiddleware(store, log)
 	auth := jwtMiddleware.Auth
 	usersModel := models.NewUsersModel(store, log)
-	addonModel := models.NewAddonsModel(manager, store, log)
+	addonModel := models.NewAddonsModel(store, log)
 	jsonwebtokenModel := models.NewJsonwebtokenModel(settingModel, store, log)
-	thingsModel := models.NewThingsContainerModel(manager, store, log)
+	thingsModel := models.NewThingsContainerModel(store, log)
 	actionsModel := models.NewActionsModel(manager, bus, log)
+	serviceModel := models.NewServicesModel(manager)
 
 	//logger
 	app.Use(func(c *fiber.Ctx) error {
@@ -132,7 +133,7 @@ func NewRouter(config Config, manager Manager, store Storage, bus *bus.Bus, log 
 	actionsController := NewActionsController(actionsModel, log)
 	//Things Controller
 	{
-		thingsController := NewThingsControllerFunc(thingsModel, log)
+		thingsController := NewThingsControllerFunc(manager, thingsModel, log)
 		thingsGroup := app.Group(constant.ThingsPath, auth)
 		//set a properties of a thing.
 		thingsGroup.Put("/:thingId/properties/*", thingsController.handleSetProperty)
@@ -182,7 +183,7 @@ func NewRouter(config Config, manager Manager, store Storage, bus *bus.Bus, log 
 
 	//Addons Controller
 	{
-		addonController := NewAddonController(addonModel, log)
+		addonController := NewAddonController(manager, addonModel, log)
 		addonGroup := app.Group(constant.AddonsPath)
 		addonGroup.Get("/", addonController.handlerGetInstallAddons)
 		addonGroup.Get("/:addonId/license", addonController.handlerGetLicense)
@@ -198,6 +199,14 @@ func NewRouter(config Config, manager Manager, store Storage, bus *bus.Bus, log 
 		settingsController := NewSettingController(settingModel, log)
 		debugGroup := app.Group(constant.SettingsPath)
 		debugGroup.Get("/addonsInfo", settingsController.handleGetAddonsInfo)
+	}
+
+	//Services Controller
+	{
+		servicesController := NewServicesController(serviceModel)
+		sGroup := app.Group(constant.ServicesPath, servicesController.handleGetServices)
+		sGroup.Get("/")
+
 	}
 
 	return &app

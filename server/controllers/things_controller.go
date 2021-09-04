@@ -11,13 +11,21 @@ import (
 	"strings"
 )
 
-type thingsController struct {
-	model  models.ThingsContainer
-	logger logging.Logger
+type ThingsManager interface {
+	SetPropertyValue(thingId, propertyName string, value interface{}) (interface{}, error)
+	GetPropertyValue(thingId, propertyName string) (interface{}, error)
+	GetPropertiesValue(thingId string) (map[string]interface{}, error)
 }
 
-func NewThingsControllerFunc(model models.ThingsContainer, log logging.Logger) *thingsController {
+type thingsController struct {
+	model   models.Container
+	logger  logging.Logger
+	manager ThingsManager
+}
+
+func NewThingsControllerFunc(manager ThingsManager, model models.ThingsContainer, log logging.Logger) *thingsController {
 	tc := &thingsController{}
+	tc.manager = manager
 	tc.model = model
 	tc.logger = log
 	return tc
@@ -89,7 +97,7 @@ func (tc *thingsController) handleSetProperty(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid params")
 	}
 	value := c.Body()
-	v, e := tc.model.SetPropertyValue(thingId, propName, value)
+	v, e := tc.manager.SetPropertyValue(thingId, propName, value)
 	if e != nil {
 		tc.logger.Error("Failed set thing(%s) property:(%s) value:(%s),err:(%s)", thingId, propName, value, e.Error())
 		return fiber.NewError(fiber.StatusGatewayTimeout, e.Error())
@@ -101,7 +109,7 @@ func (tc *thingsController) handleSetProperty(c *fiber.Ctx) error {
 func (tc *thingsController) handleGetPropertyValue(c *fiber.Ctx) error {
 	id := c.Params("thingId")
 	propName := c.Params("*")
-	v, err := tc.model.GetPropertyValue(id, propName)
+	v, err := tc.manager.GetPropertyValue(id, propName)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
@@ -110,7 +118,7 @@ func (tc *thingsController) handleGetPropertyValue(c *fiber.Ctx) error {
 
 func (tc *thingsController) handleGetProperties(c *fiber.Ctx) error {
 	id := c.Params("thingId")
-	m, err := tc.model.GetPropertiesValue(id)
+	m, err := tc.manager.GetPropertiesValue(id)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}

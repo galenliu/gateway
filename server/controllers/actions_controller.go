@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/server/models"
+	"github.com/gofiber/fiber/v2"
 )
 
 type ActionsController struct {
