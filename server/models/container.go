@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/logging"
 	json "github.com/json-iterator/go"
+	"sync"
 )
 
 type ThingsContainer interface {
@@ -17,7 +18,15 @@ type ThingsManager interface {
 	GetPropertiesValue(thingId string) (map[string]interface{}, error)
 }
 
-// Container  Things CRUD
+// ThingsStorage CRUD
+type ThingsStorage interface {
+	RemoveThing(id string) error
+	CreateThing(id string, thing interface{}) error
+	UpdateThing(id string, thing interface{}) error
+	GetThings() map[string][]byte
+}
+
+// Container  Things
 type Container interface {
 	GetThing(id string) *Thing
 	GetThings() []*Thing
@@ -27,11 +36,14 @@ type Container interface {
 	UpdateThing(data []byte) error
 }
 
-type ThingsStorage interface {
-	RemoveThing(id string) error
-	CreateThing(id string, thing interface{}) error
-	UpdateThing(id string, thing interface{}) error
-	GetThings() map[string][]byte
+var ins Container
+var once sync.Once
+
+func GetIns() Container {
+	once.Do(func() {
+		ins = &ThingsModel{}
+	})
+	return ins
 }
 
 type ThingsModel struct {

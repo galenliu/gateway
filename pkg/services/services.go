@@ -1,11 +1,28 @@
 package services
 
-type Services struct {
-	services map[string]Service
+type ThingsManager interface {
+	SetPropertyValue(thingId, propertyName string, value interface{}) (interface{}, error)
+	GetPropertyValue(thingId, propertyName string) (interface{}, error)
+	GetPropertiesValue(thingId string) (map[string]interface{}, error)
 }
 
-func NewServices() *Services {
-	return nil
+type Services struct {
+	services map[string]Service
+	manager  ThingsManager
+}
+
+func NewServices(m ThingsManager) *Services {
+	s := &Services{}
+	s.manager = m
+	return s
+}
+
+func (s *Services) AddService(ser Service) {
+	s.services[ser.GetID()] = ser
+}
+
+func (s *Services) RemoveService(ser Service) {
+	delete(s.services, ser.GetID())
 }
 
 func (s *Services) NewThingAdded(data []byte) {
