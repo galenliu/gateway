@@ -1,10 +1,9 @@
-package models
+package container
 
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/logging"
 	json "github.com/json-iterator/go"
-	"sync"
 )
 
 type ThingsContainer interface {
@@ -27,16 +26,6 @@ type Container interface {
 	CreateThing(data []byte) (*Thing, error)
 	RemoveThing(id string) error
 	UpdateThing(data []byte) error
-}
-
-var ins Container
-var once sync.Once
-
-func GetIns() Container {
-	once.Do(func() {
-		ins = &ThingsModel{}
-	})
-	return ins
 }
 
 type ThingsModel struct {

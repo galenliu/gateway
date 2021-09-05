@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/constant"
+	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/server/controllers"
 )
@@ -25,13 +26,15 @@ type Config struct {
 
 type WebServe struct {
 	*controllers.Router
-	logger  logging.Logger
-	options Config
-	bus     EventBus
+	logger    logging.Logger
+	options   Config
+	bus       EventBus
+	container container.Container
 }
 
-func NewServe(config Config, addonManager controllers.Manager, serviceManager controllers.ServiceManager, store controllers.Storage, bus *bus.Bus, log logging.Logger) *WebServe {
+func NewServe(config Config, addonManager controllers.Manager, serviceManager controllers.ServiceManager, container container.Container, store controllers.Storage, bus *bus.Bus, log logging.Logger) *WebServe {
 	sev := &WebServe{}
+	sev.container = container
 	sev.options = config
 	sev.logger = log
 	sev.bus = bus
@@ -39,7 +42,7 @@ func NewServe(config Config, addonManager controllers.Manager, serviceManager co
 		HttpAddr:  sev.options.HttpAddr,
 		HttpsAddr: sev.options.HttpsAddr,
 		AddonUrls: config.AddonUrls,
-	}, addonManager, serviceManager, store, bus, log)
+	}, addonManager, serviceManager, container, store, bus, log)
 	bus.SubscribeAsync(constant.AddonManagerStarted, sev.Start)
 	return sev
 }

@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/server/models"
 	"github.com/galenliu/gateway/server/models/model"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
@@ -24,7 +24,7 @@ type thingsController struct {
 	manager ThingsManager
 }
 
-func NewThingsControllerFunc(manager ThingsManager, model models.ThingsContainer, log logging.Logger) *thingsController {
+func NewThingsControllerFunc(manager ThingsManager, model container.ThingsContainer, log logging.Logger) *thingsController {
 	tc := &thingsController{}
 	tc.manager = manager
 	tc.model = model

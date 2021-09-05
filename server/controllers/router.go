@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/constant"
+	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/server/middleware"
 	"github.com/galenliu/gateway/server/models"
@@ -19,7 +20,7 @@ import (
 
 type Storage interface {
 	models.UsersStore
-	models.ThingsStorage
+	container.ThingsStorage
 	models.SettingsStore
 	models.JsonwebtokenStore
 	models.AddonStore
@@ -50,7 +51,7 @@ type Router struct {
 	config Config
 }
 
-func NewRouter(config Config, manager Manager, serviceManager ServiceManager, store Storage, bus *bus.Bus, log logging.Logger) *Router {
+func NewRouter(config Config, manager Manager, serviceManager ServiceManager, container container.Container, store Storage, bus *bus.Bus, log logging.Logger) *Router {
 
 	//router init
 	app := Router{}
@@ -68,7 +69,7 @@ func NewRouter(config Config, manager Manager, serviceManager ServiceManager, st
 	usersModel := models.NewUsersModel(store, log)
 	addonModel := models.NewAddonsModel(store, log)
 	jsonwebtokenModel := models.NewJsonwebtokenModel(settingModel, store, log)
-	thingsModel := models.NewThingsContainerModel(store, log)
+
 	actionsModel := models.NewActionsModel(manager, bus, log)
 	serviceModel := models.NewServicesModel(manager)
 
@@ -134,7 +135,7 @@ func NewRouter(config Config, manager Manager, serviceManager ServiceManager, st
 	actionsController := NewActionsController(actionsModel, log)
 	//Things Controller
 	{
-		thingsController := NewThingsControllerFunc(manager, thingsModel, log)
+		thingsController := NewThingsControllerFunc(manager, container, log)
 		thingsGroup := app.Group(constant.ThingsPath, auth)
 		//set a properties of a thing.
 		thingsGroup.Put("/:thingId/properties/*", thingsController.handleSetProperty)
@@ -146,8 +147,8 @@ func NewRouter(config Config, manager Manager, serviceManager ServiceManager, st
 		thingsGroup.Get("/:thingId", thingsController.handleGetThing)
 		thingsGroup.Get("/", thingsController.handleGetThings)
 
-		thingsGroup.Get("/:thingId", websocket.New(handleWebsocket(thingsModel, log)))
-		thingsGroup.Get("/", websocket.New(handleWebsocket(thingsModel, log)))
+		thingsGroup.Get("/:thingId", websocket.New(handleWebsocket(container, log)))
+		thingsGroup.Get("/", websocket.New(handleWebsocket(container, log)))
 
 		//Get the properties of a thing
 		thingsGroup.Get("/:thingId"+constant.PropertiesPath, thingsController.handleGetProperties)
@@ -179,7 +180,7 @@ func NewRouter(config Config, manager Manager, serviceManager ServiceManager, st
 			}
 			return fiber.ErrUpgradeRequired
 		})
-		newThingsGroup.Get("/", websocket.New(newThingsController.handleNewThingsWebsocket(thingsModel)))
+		newThingsGroup.Get("/", websocket.New(newThingsController.handleNewThingsWebsocket(container)))
 	}
 
 	//Addons Controller
@@ -204,7 +205,7 @@ func NewRouter(config Config, manager Manager, serviceManager ServiceManager, st
 
 	//Services Controller
 	{
-		servicesController := NewServicesController(serviceModel, serviceManager)
+		servicesController := NewServicesController(serviceModel, serviceManager, container)
 		sGroup := app.Group(constant.ServicesPath)
 		sGroup.Get("/", servicesController.handleGetServices)
 		sGroup.Get("/:serviceId/config", servicesController.handleGetServiceConfig)

@@ -29,7 +29,6 @@ message PluginRegisterRequestMessage {
   message Data{
     string pluginId = 11;
   }
-
 }
 
 message PluginRegisterResponseMessage{

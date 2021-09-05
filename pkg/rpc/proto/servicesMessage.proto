@@ -1,0 +1,56 @@
+syntax = "proto3";
+package plugin;
+import "messageType.proto";
+option go_package = "../../rpc";
+
+message ServiceSetPropertyValueRequestMessage {
+  messageType messageType = 1;
+  Data data = 2;
+  message Data{
+    string pluginId = 11;
+    string adapterId = 12;
+    string thingId = 13;
+    string propertyName = 14;
+    bytes value = 15;
+  }
+}
+
+message ServiceGetThingsRequestMessage {
+  messageType messageType = 1;
+  Data data = 2;
+  message Data{
+    string pluginId = 11;
+    string adapterId = 12;
+    string propertyName = 14;
+  }
+}
+
+message ServiceGetThingsResponseMessage {
+  messageType messageType = 1;
+  Data data = 2;
+  message Data{
+    string pluginId = 11;
+    string adapterId = 12;
+    bytes things = 14;
+  }
+}
+
+message ServiceGetThingRequestMessage {
+  messageType messageType = 1;
+  Data data = 2;
+  message Data{
+    string pluginId = 11;
+    string adapterId = 12;
+    string thingId = 13;
+  }
+}
+
+message ServiceGetThingResponseMessage {
+  messageType messageType = 1;
+  Data data = 2;
+  message Data{
+    string pluginId = 11;
+    string adapterId = 12;
+    bytes thing = 14;
+  }
+}

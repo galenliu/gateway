@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/constant"
+	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/db"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/rpc"
@@ -51,6 +52,7 @@ type Gateway struct {
 	addonManager   *plugin.Manager
 	serviceManager *services.ServiceManager
 	sever          *server.WebServe
+	container      container.Container
 }
 
 func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
@@ -76,6 +78,9 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 		Reset: config.RemoveBeforeOpen,
 	})
 
+	//  container init
+	g.container = container.NewThingsContainerModel(g.storage, g.logger)
+
 	//  EventBus init
 	newBus, err := bus.NewBus(g.logger)
 	if err != nil {
@@ -95,7 +100,7 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 		RPCPort:         config.RPCPort,
 	}, g.storage, newBus, g.logger)
 
-	g.serviceManager = services.NewServiceManager(g.storage, g.logger)
+	g.container = container.NewThingsContainerModel(g.storage, g.logger)
 
 	// Web service init
 	g.sever = server.NewServe(server.Config{
@@ -106,7 +111,7 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 		TemplateDir: path.Join(g.config.BaseDir, "template"),
 		UploadDir:   path.Join(g.config.BaseDir, "upload"),
 		LogDir:      path.Join(g.config.BaseDir, "log"),
-	}, g.addonManager, g.serviceManager, g.storage, newBus, g.logger)
+	}, g.addonManager, g.addonManager, g.container, g.storage, newBus, g.logger)
 
 	g.bus = newBus
 	return g, nil

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/server/models"
 	"github.com/galenliu/gateway/server/models/model"
@@ -33,7 +34,7 @@ func (c *NewThingsController) handleNewThingsWebsocket(thingsModel model.Contain
 		for id, dev := range addonDevices {
 			_, ok := savedThings[id]
 			if !ok {
-				dev, err := models.NewThingFromString(string(dev))
+				dev, err := container.NewThingFromString(string(dev))
 				if err == nil {
 					err := conn.WriteJSON(dev)
 					if err != nil {

@@ -54,4 +54,11 @@ enum messageType{
   OutletNotifyRequest = 16386;
   OutletNotifyResponse = 16387;
   OutletRemovedNotification = 16385;
+
+  ServiceSetPropertyValueRequest = 81000;
+
+  ServiceGetThingsRequest = 81001;
+  ServiceGetThingsResponse = 81002;
+  ServiceGetThingRequest = 81003;
+  ServiceGetThingResponse = 81004;
 }

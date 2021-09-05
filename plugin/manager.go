@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/constant"
+	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/rpc"
 	"github.com/galenliu/gateway/pkg/util"
@@ -42,16 +43,16 @@ type Manager struct {
 	adapters      sync.Map
 	installAddons sync.Map
 	extensions    sync.Map
-
-	Eventbus     *Eventbus
-	addonsLoaded bool
-	isPairing    bool
-	running      bool
-	pairTask     chan struct{}
-	locker       *sync.Mutex
-	logger       logging.Logger
-	actions      map[string]*wot.ActionAffordance
-	storage      AddonsStore
+	container     container.Container
+	Eventbus      *Eventbus
+	addonsLoaded  bool
+	isPairing     bool
+	running       bool
+	pairTask      chan struct{}
+	locker        *sync.Mutex
+	logger        logging.Logger
+	actions       map[string]*wot.ActionAffordance
+	storage       AddonsStore
 }
 
 func NewAddonsManager(conf Config, s AddonsStore, bus bus, log logging.Logger) *Manager {

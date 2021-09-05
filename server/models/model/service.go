@@ -1,6 +1,8 @@
 package model
 
-import "github.com/galenliu/gateway/server/models"
+import (
+	"github.com/galenliu/gateway/pkg/container"
+)
 
 type ThingsManager interface {
 	SetPropertyValue(thingId, propertyName string, value interface{}) (interface{}, error)
@@ -10,10 +12,10 @@ type ThingsManager interface {
 
 // Container  Things
 type Container interface {
-	GetThing(id string) *models.Thing
-	GetThings() []*models.Thing
-	GetMapThings() map[string]*models.Thing
-	CreateThing(data []byte) (*models.Thing, error)
+	GetThing(id string) *container.Thing
+	GetThings() []*container.Thing
+	GetMapThings() map[string]*container.Thing
+	CreateThing(data []byte) (*container.Thing, error)
 	RemoveThing(id string) error
 	UpdateThing(data []byte) error
 }

@@ -158,6 +158,41 @@ func (plugin *Plugin) OnMsg(messageType rpc.MessageType, data []byte) (err error
 		}
 	}
 
+	// services message
+	{
+		switch messageType {
+		case rpc.MessageType_ServiceGetThingsRequest:
+			things := plugin.pluginServer.manager.container.GetThings()
+			bt, err := json.Marshal(things)
+			if err != nil {
+				return err
+			}
+			var d = make(map[string]interface{})
+			d["things"] = bt
+			adapter.sendMessage(rpc.MessageType_ServiceGetThingsResponse, d)
+		case rpc.MessageType_ServiceGetThingRequest:
+			id := json.Get(data, "thingId").ToString()
+			thing := plugin.pluginServer.manager.container.GetThing(id)
+			bt, err := json.Marshal(thing)
+			if err != nil {
+				return err
+			}
+			var d = make(map[string]interface{})
+			d["thing"] = bt
+			adapter.sendMessage(rpc.MessageType_ServiceGetThingResponse, d)
+		case rpc.MessageType_ServiceSetPropertyValueRequest:
+			var message rpc.ServiceSetPropertyValueRequestMessage_Data
+			err = json.Unmarshal(data, &message)
+			if err != nil {
+				return err
+			}
+			_, err := adapter.plugin.pluginServer.manager.SetPropertyValue(message.ThingId, message.PropertyName, message.Value)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 	// device handler
 	{
 		deviceId := json.Get(data, "deviceId").ToString()

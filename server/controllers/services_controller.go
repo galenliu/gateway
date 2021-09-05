@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
 	json "github.com/json-iterator/go"
@@ -13,12 +14,14 @@ type ServiceManager interface {
 }
 
 type ServicesController struct {
-	model   *models.Services
-	manager ServiceManager
+	model     *models.Services
+	manager   ServiceManager
+	container container.Container
 }
 
-func NewServicesController(model *models.Services, s ServiceManager) *ServicesController {
+func NewServicesController(model *models.Services, s ServiceManager, container container.Container) *ServicesController {
 	c := &ServicesController{}
+	c.container = container
 	c.manager = s
 	c.model = model
 	return c
