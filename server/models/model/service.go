@@ -1,4 +1,6 @@
-package models
+package model
+
+import "github.com/galenliu/gateway/server/models"
 
 type ThingsManager interface {
 	SetPropertyValue(thingId, propertyName string, value interface{}) (interface{}, error)
@@ -8,10 +10,10 @@ type ThingsManager interface {
 
 // Container  Things
 type Container interface {
-	GetThing(id string) *Thing
-	GetThings() []*Thing
-	GetMapThings() map[string]*Thing
-	CreateThing(data []byte) (*Thing, error)
+	GetThing(id string) *models.Thing
+	GetThings() []*models.Thing
+	GetMapThings() map[string]*models.Thing
+	CreateThing(data []byte) (*models.Thing, error)
 	RemoveThing(id string) error
 	UpdateThing(data []byte) error
 }
@@ -24,4 +26,10 @@ type Service interface {
 	SetPropertyValue(v interface{})
 
 	NewService(id string, manager ThingsManager, c Container) Service
+}
+
+type ServiceInfo struct {
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Enabled bool   `json:"enabled"`
 }

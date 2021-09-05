@@ -30,7 +30,7 @@ type WebServe struct {
 	bus     EventBus
 }
 
-func NewServe(config Config, addonManager controllers.Manager, store controllers.Storage, bus *bus.Bus, log logging.Logger) *WebServe {
+func NewServe(config Config, addonManager controllers.Manager, serviceManager controllers.ServiceManager, store controllers.Storage, bus *bus.Bus, log logging.Logger) *WebServe {
 	sev := &WebServe{}
 	sev.options = config
 	sev.logger = log
@@ -39,7 +39,7 @@ func NewServe(config Config, addonManager controllers.Manager, store controllers
 		HttpAddr:  sev.options.HttpAddr,
 		HttpsAddr: sev.options.HttpsAddr,
 		AddonUrls: config.AddonUrls,
-	}, addonManager, store, bus, log)
+	}, addonManager, serviceManager, store, bus, log)
 	bus.SubscribeAsync(constant.AddonManagerStarted, sev.Start)
 	return sev
 }

@@ -2,19 +2,19 @@ package controllers
 
 import (
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/server/models"
+	"github.com/galenliu/gateway/server/models/model"
 	"github.com/gofiber/websocket/v2"
 )
 
 type wsClint struct {
 	ws          *websocket.Conn
-	thingsModel models.Container
+	thingsModel model.Container
 	thingId     string
 	readChan    chan []byte
 	logger      logging.Logger
 }
 
-func NewWsClint(ws *websocket.Conn, thingId string, thing models.Container, log logging.Logger) *wsClint {
+func NewWsClint(ws *websocket.Conn, thingId string, thing model.Container, log logging.Logger) *wsClint {
 	c := &wsClint{}
 	c.ws = ws
 	c.thingsModel = thing

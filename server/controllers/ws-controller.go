@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/server/models"
+	"github.com/galenliu/gateway/server/models/model"
 	"github.com/gofiber/websocket/v2"
 )
 
@@ -28,7 +28,7 @@ type Map = map[string]interface{}
 //	return controller
 //}
 
-func handleWebsocket(model models.Container, log logging.Logger) func(conn *websocket.Conn) {
+func handleWebsocket(model model.Container, log logging.Logger) func(conn *websocket.Conn) {
 	handler := func(c *websocket.Conn) {
 		thingId, _ := c.Locals("thingId").(string)
 		clint := NewWsClint(c, thingId, model, log)

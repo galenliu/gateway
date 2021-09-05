@@ -82,7 +82,7 @@ package configs
 //	Ports          Ports        `json:"ports"`
 //	ProfileDir     string       `json:"profile_dir"`
 //	GatewayVersion string       `json:"gateway_version"`
-//	AddonManager   AddonManager `json:"addon_manager"`
+//	addonManager   addonManager `json:"addon_manager"`
 //	Log            Log          `json:"log"`
 //	Database       Database     `json:"database"`
 //
@@ -100,7 +100,7 @@ package configs
 //	HTTP  int `json:"http"`
 //	Ipc   int `json:"ipc"`
 //}
-//type AddonManager struct {
+//type addonManager struct {
 //	NodeLoader string   `json:"node_loader"`
 //	ListUrls   []string `json:"list_urls"`
 //	TestAddons bool     `json:"test_addons"`
@@ -114,7 +114,7 @@ package configs
 //}
 //
 //func GetAddonListUrls() []string {
-//	return instance.AddonManager.ListUrls
+//	return instance.addonManager.ListUrls
 //}
 //
 //// NewConfig 加载配置文件，初始化Log,DataBase,工作目录
@@ -243,7 +243,7 @@ package configs
 //	return instance.UploadDir
 //}
 //func GetNodeLoader() string {
-//	return instance.AddonManager.NodeLoader
+//	return instance.addonManager.NodeLoader
 //}
 //
 //func GetPorts() Ports {

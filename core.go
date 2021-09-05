@@ -9,6 +9,7 @@ import (
 	"github.com/galenliu/gateway/pkg/rpc"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin"
+	"github.com/galenliu/gateway/plugin/services"
 	"github.com/galenliu/gateway/server"
 	"path"
 	"time"
@@ -43,12 +44,13 @@ type Config struct {
 }
 
 type Gateway struct {
-	config       Config
-	storage      *db.Storage
-	bus          BusController
-	logger       logging.Logger
-	AddonManager *plugin.Manager
-	sever        *server.WebServe
+	config         Config
+	storage        *db.Storage
+	bus            BusController
+	logger         logging.Logger
+	addonManager   *plugin.Manager
+	serviceManager *services.ServiceManager
+	sever          *server.WebServe
 }
 
 func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
@@ -73,9 +75,6 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 	g.storage, err = db.NewStorage(u.ConfigDir, logger, db.Config{
 		Reset: config.RemoveBeforeOpen,
 	})
-	if err != nil {
-		return nil, err
-	}
 
 	//  EventBus init
 	newBus, err := bus.NewBus(g.logger)
@@ -84,7 +83,7 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 	}
 
 	//Addon manager init
-	g.AddonManager = plugin.NewAddonsManager(plugin.Config{
+	g.addonManager = plugin.NewAddonsManager(plugin.Config{
 		UserProfile: u,
 		Preferences: &rpc.PluginRegisterResponseMessage_Data_Preferences{
 			Language: "zh-cn",
@@ -96,6 +95,8 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 		RPCPort:         config.RPCPort,
 	}, g.storage, newBus, g.logger)
 
+	g.serviceManager = services.NewServiceManager(g.storage, g.logger)
+
 	// Web service init
 	g.sever = server.NewServe(server.Config{
 		HttpAddr:    g.config.HttpAddr,
@@ -105,7 +106,7 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 		TemplateDir: path.Join(g.config.BaseDir, "template"),
 		UploadDir:   path.Join(g.config.BaseDir, "upload"),
 		LogDir:      path.Join(g.config.BaseDir, "log"),
-	}, g.AddonManager, g.storage, newBus, g.logger)
+	}, g.addonManager, g.serviceManager, g.storage, newBus, g.logger)
 
 	g.bus = newBus
 	return g, nil

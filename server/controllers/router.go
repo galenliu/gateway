@@ -6,6 +6,7 @@ import (
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/server/middleware"
 	"github.com/galenliu/gateway/server/models"
+	"github.com/galenliu/gateway/server/models/model"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -31,7 +32,7 @@ type Config struct {
 }
 
 type Models struct {
-	ThingsModel  *models.Container
+	ThingsModel  *model.Container
 	UsersModel   *models.Users
 	SettingModel *models.Settings
 }
@@ -49,7 +50,7 @@ type Router struct {
 	config Config
 }
 
-func NewRouter(config Config, manager Manager, store Storage, bus *bus.Bus, log logging.Logger) *Router {
+func NewRouter(config Config, manager Manager, serviceManager ServiceManager, store Storage, bus *bus.Bus, log logging.Logger) *Router {
 
 	//router init
 	app := Router{}
@@ -203,10 +204,12 @@ func NewRouter(config Config, manager Manager, store Storage, bus *bus.Bus, log 
 
 	//Services Controller
 	{
-		servicesController := NewServicesController(serviceModel)
-		sGroup := app.Group(constant.ServicesPath, servicesController.handleGetServices)
-		sGroup.Get("/")
-
+		servicesController := NewServicesController(serviceModel, serviceManager)
+		sGroup := app.Group(constant.ServicesPath)
+		sGroup.Get("/", servicesController.handleGetServices)
+		sGroup.Get("/:serviceId/config", servicesController.handleGetServiceConfig)
+		sGroup.Put("/:serviceId", servicesController.handleSetService)
+		sGroup.Put("/:serviceId/config", servicesController.handleSetServiceConfig)
 	}
 
 	return &app

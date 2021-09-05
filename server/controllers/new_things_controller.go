@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/server/models"
+	"github.com/galenliu/gateway/server/models/model"
 	"github.com/gofiber/websocket/v2"
 	"sync"
 )
@@ -25,7 +26,7 @@ func NewNewThingsController(log logging.Logger) *NewThingsController {
 	return c
 }
 
-func (c *NewThingsController) handleNewThingsWebsocket(thingsModel models.Container) func(conn *websocket.Conn) {
+func (c *NewThingsController) handleNewThingsWebsocket(thingsModel model.Container) func(conn *websocket.Conn) {
 	return func(conn *websocket.Conn) {
 		addonDevices := c.model.Manager.GetDevicesBytes()
 		savedThings := thingsModel.GetMapThings()

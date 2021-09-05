@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/server/models"
+	"github.com/galenliu/gateway/server/models/model"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
 	"github.com/tidwall/gjson"
@@ -18,7 +19,7 @@ type ThingsManager interface {
 }
 
 type thingsController struct {
-	model   models.Container
+	model   model.Container
 	logger  logging.Logger
 	manager ThingsManager
 }
