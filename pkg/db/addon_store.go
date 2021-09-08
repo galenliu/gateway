@@ -1,5 +1,7 @@
 package db
 
+import json "github.com/json-iterator/go"
+
 func (s *Storage) LoadAddonSetting(key string) (value string, err error) {
 	return s.GetSetting("addons." + key)
 }
@@ -9,9 +11,13 @@ func (s *Storage) StoreAddonSetting(key, value string) error {
 }
 
 func (s *Storage) LoadAddonConfig(key string) (value string, err error) {
-	return s.GetSetting("addons.config" + key)
+	return s.GetSetting("addons.config." + key)
 }
 
-func (s *Storage) StoreAddonsConfig(key, value string) error {
-	return s.SetSetting("addons.config"+key, value)
+func (s *Storage) StoreAddonsConfig(key string, v interface{}) error {
+	value, err := json.MarshalToString(v)
+	if err != nil {
+		return err
+	}
+	return s.SetSetting("addons.config."+key, value)
 }

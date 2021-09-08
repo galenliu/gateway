@@ -13,10 +13,10 @@ type AddonsStore interface {
 	LoadAddonSetting(key string) (string, error)
 	StoreAddonSetting(key, value string) error
 	LoadAddonConfig(key string) (string, error)
-	StoreAddonsConfig(key, value string) error
+	StoreAddonsConfig(key string, value interface{}) error
 }
 
-type AddonInfo struct {
+type AddonSetting struct {
 	ID                      string `json:"ID"`
 	Name                    string `json:"name"`
 	ShortName               string `json:"short_name"`
@@ -35,8 +35,18 @@ type AddonInfo struct {
 	dir                     string
 }
 
-func NewAddonInfoFromManifest(manifest *ManifestJson, store AddonsStore) *AddonInfo {
-	addonInfo := &AddonInfo{
+func NewAddonSettingFromString(str string, store AddonsStore) *AddonSetting {
+	var a AddonSetting
+	err := json.UnmarshalFromString(str, &a)
+	if err != nil {
+		return nil
+	}
+	a.store = store
+	return &a
+}
+
+func NewAddonSettingFromManifest(manifest *ManifestJson, store AddonsStore) *AddonSetting {
+	addonInfo := &AddonSetting{
 		ID:                      manifest.ID,
 		Name:                    manifest.Name,
 		ShortName:               manifest.ShortName,
@@ -56,7 +66,7 @@ func NewAddonInfoFromManifest(manifest *ManifestJson, store AddonsStore) *AddonI
 	return addonInfo
 }
 
-func (a *AddonInfo) setEnabled(disabled bool) error {
+func (a *AddonSetting) setEnabled(disabled bool) error {
 	if a.Enabled == disabled {
 		return nil
 	}
@@ -68,11 +78,18 @@ func (a *AddonInfo) setEnabled(disabled bool) error {
 	}
 	return nil
 }
+func (a *AddonSetting) Save() error {
+	str, err := json.MarshalToString(a)
+	if err != nil {
+		return err
+	}
+	return a.store.StoreAddonSetting(a.ID, str)
+}
 
-func LoadManifest(destPath, packetId string, store AddonsStore) (*AddonInfo, interface{}, error) {
+func LoadManifest(destPath, packetId string, store AddonsStore) (*AddonSetting, interface{}, error) {
 
 	//load manifest.json\
-	manifest, err := ReadManifestJson(path.Join(destPath, FileName))
+	manifest, err := readManifest(path.Join(destPath, FileName))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -95,8 +112,9 @@ func LoadManifest(destPath, packetId string, store AddonsStore) (*AddonInfo, int
 
 	//TODO :checksum every file.
 	//TODO: Verify that manifest filed schema
-	addonInfo := NewAddonInfoFromManifest(manifest, store)
+	addonInfo := NewAddonSettingFromManifest(manifest, store)
 	addonInfo.dir = destPath
+
 	if !manifest.GatewaySpecificSettings.WebThings.Enable {
 		addonInfo.Enabled = true
 	}

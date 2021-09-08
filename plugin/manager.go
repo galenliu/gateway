@@ -26,7 +26,7 @@ const (
 )
 
 type Config struct {
-	AddonDirs       string
+	AddonsDisr      string
 	AttachAddonsDir string
 	IPCPort         string
 	RPCPort         string
@@ -245,18 +245,18 @@ func (m *Manager) getDevices() (devices []*Device) {
 	return
 }
 
-func (m *Manager) getInstallAddon(addonId string) *AddonInfo {
+func (m *Manager) getInstallAddon(addonId string) *AddonSetting {
 	a, ok := m.installAddons.Load(addonId)
-	addon, ok := a.(*AddonInfo)
+	addon, ok := a.(*AddonSetting)
 	if !ok {
 		return nil
 	}
 	return addon
 }
 
-func (m *Manager) getInstallAddons() (addons []*AddonInfo) {
+func (m *Manager) getInstallAddons() (addons []*AddonSetting) {
 	m.installAddons.Range(func(key, value interface{}) bool {
-		addon, ok := value.(*AddonInfo)
+		addon, ok := value.(*AddonSetting)
 		if ok {
 			addons = append(addons, addon)
 		}
@@ -292,7 +292,7 @@ func (m *Manager) installAddon(packageId, packagePath string) error {
 		fi := hdr.FileInfo()
 		p := strings.Replace(hdr.Name, "package", packageId, 1)
 
-		localPath := m.config.AddonDirs + string(os.PathSeparator) + p
+		localPath := m.config.AddonsDisr + string(os.PathSeparator) + p
 		if fi.IsDir() {
 			_ = os.MkdirAll(localPath, os.ModePerm)
 			continue
@@ -310,10 +310,10 @@ func (m *Manager) installAddon(packageId, packagePath string) error {
 		_ = fw.Close()
 	}
 
-	return m.loadAddon(packageId, m.config.AddonDirs)
+	return m.loadAddon(packageId, m.config.AddonsDisr)
 	//saved, err := m.storage.LoadAddonSetting(packageId)
 	//if err == nil && saved != "" {
-	//	var old AddonInfo
+	//	var old AddonSetting
 	//	ee := json.UnmarshalFromString(saved, &old)
 	//	if ee != nil {
 	//		newAddonInfo, err := json.MarshalToString(old)
@@ -351,7 +351,7 @@ func (m *Manager) loadAddons() {
 			}
 		}
 	}
-	load(m.config.AddonDirs)
+	load(m.config.AddonsDisr)
 	if m.config.AttachAddonsDir != "" {
 		load(m.config.AttachAddonsDir)
 	}
@@ -360,52 +360,37 @@ func (m *Manager) loadAddons() {
 
 func (m *Manager) loadAddon(packageId string, dir string) error {
 
+	var addonInfo *AddonSetting
+	var obj interface{}
+	var err error
+
 	packageDir := path.Join(dir, packageId)
-	addonInfo, obj, err := LoadManifest(packageDir, packageId, m.storage)
+	addonInfo, obj, err = LoadManifest(packageDir, packageId, m.storage)
 	if err != nil {
 		return err
 	}
+
 	saved, err := m.storage.LoadAddonSetting(packageId)
-	if saved != "" && err == nil {
-		if e := json.Get([]byte(saved), "enable").ToBool(); addonInfo.Enabled != e {
-			err := addonInfo.setEnabled(e)
+	if err == nil && saved != "" {
+		addonInfo = NewAddonSettingFromString(saved, m.storage)
+	} else {
+		err = addonInfo.Save()
+		if err != nil {
+			return err
+		}
+	}
+
+	addonConf, err := m.storage.LoadAddonConfig(packageId)
+	if err != nil && addonConf == "" {
+		if obj != nil {
+			err := m.storage.StoreAddonsConfig(packageId, obj)
 			if err != nil {
 				return err
 			}
 		}
 	}
 
-	var cfg string
-	if obj != nil {
-		var ee error
-		cfg, ee = json.MarshalToString(obj)
-		if ee != nil {
-			return err
-		}
-	}
-
-	info, err := json.MarshalToString(addonInfo)
-	err = m.storage.StoreAddonSetting(addonInfo.ID, info)
-	if err != nil {
-		return err
-	}
-	savedSetting, e := m.storage.LoadAddonSetting(packageId)
-	if e != nil && savedSetting == "" {
-		if cfg != "" {
-			eee := m.storage.StoreAddonsConfig(packageId, cfg)
-			if eee != nil {
-				m.logger.Error(eee.Error())
-			}
-		}
-	}
-	if savedSetting == "" && cfg != "" {
-		eee := m.storage.StoreAddonSetting(packageId, cfg)
-		if eee != nil {
-			return eee
-		}
-	}
 	m.installAddons.Store(packageId, addonInfo)
-
 	if !addonInfo.Enabled {
 		return fmt.Errorf("addon disenabled")
 	}
@@ -416,17 +401,19 @@ func (m *Manager) loadAddon(packageId string, dir string) error {
 		}
 		m.extensions.Store(addonInfo.ID, ext)
 	}
+
 	if addonInfo.Exec == "" {
 		return nil
 	}
-
+	if !addonInfo.Enabled {
+		m.logger.Infof("%s disable", addonInfo.ID)
+		return nil
+	}
 	err = util.EnsureDir(path.Join(path.Join(m.config.UserProfile.BaseDir, "data"), addonInfo.ID))
 	if err != nil {
 		return err
 	}
-
 	m.pluginServer.loadPlugin(packageDir, addonInfo.ID, addonInfo.Exec)
-
 	return nil
 }
 
@@ -444,7 +431,7 @@ func (m *Manager) removeAdapter(adapter *Adapter) {
 }
 
 func (m *Manager) findPluginPath(packageId string) string {
-	for _, dir := range []string{m.config.AddonDirs, m.config.AttachAddonsDir} {
+	for _, dir := range []string{m.config.AddonsDisr, m.config.AttachAddonsDir} {
 		if dir == "" {
 			continue
 		}

@@ -39,7 +39,8 @@ type ManifestJson struct {
 	Enable bool `json:"setEnabled"`
 }
 
-func ReadManifestJson(file string) (*ManifestJson, error) {
+func readManifest(file string) (*ManifestJson, error) {
+
 	f, err := ioutil.ReadFile(file)
 	if err != nil {
 		return nil, err

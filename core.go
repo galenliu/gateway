@@ -94,7 +94,7 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 			Language: "zh-cn",
 			Units:    &rpc.PluginRegisterResponseMessage_Data_Preferences_Units{Temperature: "℃"},
 		},
-		AddonDirs:       u.AddonsDir,
+		AddonsDisr:      u.AddonsDir,
 		AttachAddonsDir: g.config.AttachAddonsDir,
 		IPCPort:         config.IPCPort,
 		RPCPort:         config.RPCPort,
