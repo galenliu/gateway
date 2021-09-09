@@ -50,7 +50,7 @@ func (p *Property) SetValue(value interface{}) (interface{}, error) {
 	data["deviceId"] = p.device.ID
 	data["propertyName"] = p.Name
 	data["propertyValue"] = value
-	p.device.adapter.sendMessage(rpc.MessageType_DeviceSetPropertyCommand, data)
+	p.device.adapter.sendMsg(rpc.MessageType_DeviceSetPropertyCommand, data)
 
 	setTimeOut := time.After(time.Duration(1 * time.Second))
 	for {

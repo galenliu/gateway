@@ -41,6 +41,7 @@ type Manager struct {
 
 	devices       sync.Map
 	adapters      sync.Map
+	services      sync.Map
 	installAddons sync.Map
 	extensions    sync.Map
 	container     container.Container
@@ -142,6 +143,12 @@ func (m *Manager) addAdapter(adapter *Adapter) {
 	m.logger.Debug(fmt.Sprintf("adapter：(%s) added", adapter.ID))
 }
 
+func (m *Manager) addService(service *Service) {
+	m.adapters.Store(service.ID, service)
+	m.Eventbus.bus.Publish(constant.ServiceAdded, service)
+	m.logger.Debug(fmt.Sprintf("service：(%s) added", service.ID))
+}
+
 func (m *Manager) handleDeviceAdded(device *Device) {
 	m.devices.Store(device.ID, device)
 	data, err := json.MarshalIndent(device, "", "  ")
@@ -181,7 +188,7 @@ func (m *Manager) handleSetProperty(deviceId, propName string, setValue interfac
 	//data[addon.Did] = device.GetID()
 	//data["propertyName"] = property.GetName()
 	//data["propertyValue"] = newValue
-	go adapter.sendMessage(internal.DeviceSetPropertyCommand, nil)
+	go adapter.sendMsg(internal.DeviceSetPropertyCommand, nil)
 	return nil
 }
 

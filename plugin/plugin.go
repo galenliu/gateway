@@ -16,9 +16,6 @@ import (
 	"sync"
 )
 
-const ExecNode = "{nodeLoader}"
-const ExecPython3 = "{python}"
-
 type Plugin struct {
 	locker        *sync.Mutex
 	pluginId      string
@@ -37,6 +34,7 @@ type Plugin struct {
 	adapters    sync.Map
 	notifiers   sync.Map
 	apiHandlers sync.Map
+	services    sync.Map
 }
 
 func NewPlugin(pluginId string, manager *Manager, s *PluginsServer, log logging.Logger) (plugin *Plugin) {
@@ -67,6 +65,26 @@ func (plugin *Plugin) getAdapters() (adapters []*Adapter) {
 		adapter, ok := value.(*Adapter)
 		if ok {
 			adapters = append(adapters, adapter)
+		}
+		return true
+	})
+	return
+}
+
+func (plugin *Plugin) getService(id string) *Service {
+	a, ok := plugin.services.Load(id)
+	s, ok := a.(*Service)
+	if !ok {
+		return nil
+	}
+	return s
+}
+
+func (plugin *Plugin) getServices() (services []*Service) {
+	plugin.services.Range(func(key, value interface{}) bool {
+		adapter, ok := value.(*Service)
+		if ok {
+			services = append(services, adapter)
 		}
 		return true
 	})
@@ -161,6 +179,16 @@ func (plugin *Plugin) OnMsg(messageType rpc.MessageType, data []byte) (err error
 	// services message
 	{
 		switch messageType {
+		case rpc.MessageType_ServiceAddedNotification:
+			var d rpc.ServiceAddedNotificationMessage_Data
+			err := json.Unmarshal(data, &d)
+			if err != nil {
+				return err
+			}
+			newService := NewServiceProxy(plugin, d.ServiceId, d.Name)
+			plugin.services.Store(newService.ID, newService)
+			plugin.addonManager.addService(newService)
+
 		case rpc.MessageType_ServiceGetThingsRequest:
 			things := plugin.pluginServer.manager.container.GetThings()
 			bt, err := json.Marshal(things)
@@ -169,7 +197,7 @@ func (plugin *Plugin) OnMsg(messageType rpc.MessageType, data []byte) (err error
 			}
 			var d = make(map[string]interface{})
 			d["things"] = bt
-			adapter.sendMessage(rpc.MessageType_ServiceGetThingsResponse, d)
+			adapter.sendMsg(rpc.MessageType_ServiceGetThingsResponse, d)
 		case rpc.MessageType_ServiceGetThingRequest:
 			id := json.Get(data, "thingId").ToString()
 			thing := plugin.pluginServer.manager.container.GetThing(id)
@@ -179,7 +207,7 @@ func (plugin *Plugin) OnMsg(messageType rpc.MessageType, data []byte) (err error
 			}
 			var d = make(map[string]interface{})
 			d["thing"] = bt
-			adapter.sendMessage(rpc.MessageType_ServiceGetThingResponse, d)
+			adapter.sendMsg(rpc.MessageType_ServiceGetThingResponse, d)
 		case rpc.MessageType_ServiceSetPropertyValueRequest:
 			var message rpc.ServiceSetPropertyValueRequestMessage_Data
 			err = json.Unmarshal(data, &message)
@@ -263,7 +291,6 @@ func (plugin *Plugin) OnMsg(messageType rpc.MessageType, data []byte) (err error
 			return nil
 		}
 	}
-
 	return nil
 }
 

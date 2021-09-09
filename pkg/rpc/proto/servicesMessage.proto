@@ -3,6 +3,16 @@ package plugin;
 import "messageType.proto";
 option go_package = "../../rpc";
 
+message  ServiceAddedNotificationMessage{
+  messageType messageType = 1;
+  Data data = 2;
+  message Data{
+    string serviceId = 12;
+    string name = 13;
+    string packageName = 14;
+  }
+}
+
 message ServiceSetPropertyValueRequestMessage {
   messageType messageType = 1;
   Data data = 2;

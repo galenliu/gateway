@@ -49,6 +49,7 @@ const (
 
 	ActionStatus         = "actionStatus"
 	AdapterAdded         = "adapterAdded"
+	ServiceAdded         = "serviceAdded"
 	AddEventSubscription = "addEventSubscription"
 	ApiHandlerAdded      = "apiHandlerAdded"
 	CONNECTED            = "connected"

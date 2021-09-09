@@ -43,20 +43,20 @@ func (adapter *Adapter) pairing(timeout int) {
 	adapter.logger.Infof("%s start pairing", adapter.ID)
 	data := make(map[string]interface{})
 	data["timeout"] = timeout
-	adapter.sendMessage(rpc.MessageType_AdapterStartPairingCommand, data)
+	adapter.sendMsg(rpc.MessageType_AdapterStartPairingCommand, data)
 }
 
 func (adapter *Adapter) cancelPairing() {
 	adapter.logger.Infof("  %s  cancel pairing", adapter.ID)
 	data := make(map[string]interface{})
-	adapter.sendMessage(rpc.MessageType_AdapterCancelPairingCommand, data)
+	adapter.sendMsg(rpc.MessageType_AdapterCancelPairingCommand, data)
 }
 
 func (adapter *Adapter) removeThing(device *internal.Device) {
 	adapter.logger.Infof("adapter delete thing Id: %v", device.ID)
 	data := make(map[string]interface{})
 	data["deviceId"] = device.ID
-	adapter.sendMessage(internal.AdapterRemoveDeviceRequest, data)
+	adapter.sendMsg(internal.AdapterRemoveDeviceRequest, data)
 
 }
 
@@ -64,10 +64,10 @@ func (adapter *Adapter) cancelRemoveThing(deviceId string) {
 	adapter.logger.Info(fmt.Sprintf("adapter: %s start pairing", adapter.ID))
 	data := make(map[string]interface{})
 	data["deviceId"] = deviceId
-	adapter.sendMessage(rpc.MessageType_AdapterCancelRemoveDeviceCommand, data)
+	adapter.sendMsg(rpc.MessageType_AdapterCancelRemoveDeviceCommand, data)
 }
 
-func (adapter *Adapter) sendMessage(messageType rpc.MessageType, data map[string]interface{}) {
+func (adapter *Adapter) sendMsg(messageType rpc.MessageType, data map[string]interface{}) {
 	data["adapterId"] = adapter.ID
 	adapter.plugin.SendMsg(messageType, data)
 }
