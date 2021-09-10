@@ -3,9 +3,8 @@ package plugin
 import "github.com/galenliu/gateway/pkg/rpc"
 
 type Service struct {
-	ID   string
-	Name string
-
+	ID     string
+	Name   string
 	plugin *Plugin
 }
 

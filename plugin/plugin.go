@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/rpc"
-	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
 	"io"
 	"os"
@@ -260,12 +259,12 @@ func (plugin *Plugin) OnMsg(messageType rpc.MessageType, data []byte) (err error
 			return
 
 		case rpc.MessageType_DeviceActionStatusNotification:
-			var action internal.Action
+			var action models.Action
 			json.Get(data, "action").ToVal(&action)
 			return
 
 		case rpc.MessageType_DeviceEventNotification:
-			var event internal.Event
+			var event models.Event
 			json.Get(data, "event").ToVal(&event)
 
 		case rpc.MessageType_DeviceConnectedStateNotification:

@@ -1,4 +1,4 @@
-package internal
+package models
 
 type Outlet struct {
 	ID   string `json:"id"`

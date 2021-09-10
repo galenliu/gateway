@@ -1,7 +1,6 @@
 package plugin
 
 import (
-	"github.com/galenliu/gateway/plugin/internal"
 	"sync"
 )
 
@@ -14,18 +13,18 @@ func (n *Notifier) unload() {
 
 }
 
-func (m *Notifier) getOutlet(outletId string) *internal.Outlet {
+func (m *Notifier) getOutlet(outletId string) *models.Outlet {
 	a, ok := m.outlets.Load(outletId)
-	outlet, ok := a.(*internal.Outlet)
+	outlet, ok := a.(*models.Outlet)
 	if !ok {
 		return nil
 	}
 	return outlet
 }
 
-func (m *Notifier) getOutlets() (outlets []*internal.Outlet) {
+func (m *Notifier) getOutlets() (outlets []*models.Outlet) {
 	m.outlets.Range(func(key, value interface{}) bool {
-		outlet, ok := value.(*internal.Outlet)
+		outlet, ok := value.(*models.Outlet)
 		if ok {
 			outlets = append(outlets, outlet)
 		}

@@ -10,7 +10,6 @@ import (
 	"github.com/galenliu/gateway/pkg/rpc"
 	"github.com/galenliu/gateway/pkg/util"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
-	"github.com/galenliu/gateway/plugin/internal"
 	json "github.com/json-iterator/go"
 	"io"
 	"os"
@@ -125,15 +124,15 @@ func (m *Manager) CancelAddNewThing() {
 	return
 }
 
-func (m *Manager) actionNotify(action *internal.Action) {
+func (m *Manager) actionNotify(action *models.Action) {
 	m.Eventbus.bus.Publish(constant.ActionStatus, nil)
 }
 
-func (m *Manager) eventNotify(event *internal.Event) {
+func (m *Manager) eventNotify(event *models.Event) {
 	m.Eventbus.bus.Publish(constant.EVENT, nil)
 }
 
-func (m *Manager) connectedNotify(device *internal.Device, connected bool) {
+func (m *Manager) connectedNotify(device *models.Device, connected bool) {
 	m.Eventbus.bus.Publish(constant.CONNECTED, connected)
 }
 
@@ -188,7 +187,7 @@ func (m *Manager) handleSetProperty(deviceId, propName string, setValue interfac
 	//data[addon.Did] = device.GetID()
 	//data["propertyName"] = property.GetName()
 	//data["propertyValue"] = newValue
-	go adapter.sendMsg(internal.DeviceSetPropertyCommand, nil)
+	go adapter.sendMsg(models.DeviceSetPropertyCommand, nil)
 	return nil
 }
 
@@ -472,7 +471,7 @@ func (m *Manager) removeNotifier(notifierId string) {
 
 }
 
-func (m *Manager) handleOutletRemoved(device *internal.Outlet) {
+func (m *Manager) handleOutletRemoved(device *models.Outlet) {
 
 }
 

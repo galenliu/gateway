@@ -3,7 +3,7 @@ package plugin
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/rpc"
-	"github.com/galenliu/gateway/plugin/internal"
+	"github.com/galenliu/gateway/plugin/models"
 	json "github.com/json-iterator/go"
 	"time"
 )
@@ -13,7 +13,7 @@ type SetValueFunc func(v interface{}) (interface{}, error)
 type NotifyPropertyChanged func(value interface{})
 
 type Property struct {
-	*internal.Property
+	*models.Property
 
 	device       *Device
 	response     chan interface{}
@@ -23,7 +23,7 @@ type Property struct {
 func NewPropertyFormString(desc string, dev *Device) *Property {
 	p := &Property{}
 	p.device = dev
-	p.Property = internal.NewPropertyFromString(dev, desc)
+	p.Property = models.NewPropertyFromString(dev, desc)
 	return p
 }
 

@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/rpc"
-	"github.com/galenliu/gateway/plugin/internal"
 	"sync"
 )
 
 type pairingFunc func(ctx context.Context, cancelFunc func())
 
 type managerProxy interface {
-	handleDeviceAdded(device *internal.Device)
+	handleDeviceAdded(device *models.Device)
 }
 
 type Adapter struct {
@@ -52,11 +51,11 @@ func (adapter *Adapter) cancelPairing() {
 	adapter.sendMsg(rpc.MessageType_AdapterCancelPairingCommand, data)
 }
 
-func (adapter *Adapter) removeThing(device *internal.Device) {
+func (adapter *Adapter) removeThing(device *models.Device) {
 	adapter.logger.Infof("adapter delete thing Id: %v", device.ID)
 	data := make(map[string]interface{})
 	data["deviceId"] = device.ID
-	adapter.sendMsg(internal.AdapterRemoveDeviceRequest, data)
+	adapter.sendMsg(models.AdapterRemoveDeviceRequest, data)
 
 }
 

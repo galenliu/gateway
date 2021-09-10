@@ -1,4 +1,4 @@
-package internal
+package models
 
 const (
 	TypeString  = "string"

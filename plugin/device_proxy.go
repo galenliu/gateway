@@ -1,14 +1,14 @@
 package plugin
 
 import (
-	"github.com/galenliu/gateway/plugin/internal"
+	"github.com/galenliu/gateway/plugin/models"
 	json "github.com/json-iterator/go"
 )
 
 type Device struct {
 	AdapterId string `json:"adapterId"`
 	adapter   *Adapter
-	*internal.Device
+	*models.Device
 }
 
 func NewDeviceFormString(desc string, adapter *Adapter) *Device {
@@ -16,13 +16,13 @@ func NewDeviceFormString(desc string, adapter *Adapter) *Device {
 	device := &Device{}
 	device.adapter = adapter
 	device.AdapterId = adapter.ID
-	device.Properties = make(map[string]internal.Prop)
+	device.Properties = make(map[string]models.Prop)
 
 	device.AtContext = json.Get(data, "@context").ToString()
 	device.AtType = json.Get(data, "@type").ToString()
 	device.Name = json.Get(data, "name").ToString()
 	device.Description = json.Get(data, "description").ToString()
-	device.Device = internal.NewDeviceFormString(adapter, json.Get(data, "id").ToString())
+	device.Device = models.NewDeviceFormString(adapter, json.Get(data, "id").ToString())
 	if device.Device == nil {
 		return nil
 	}
@@ -40,7 +40,7 @@ func NewDeviceFormString(desc string, adapter *Adapter) *Device {
 	return device
 }
 
-func (device *Device) NotifyValueChanged(property *internal.Property) {
+func (device *Device) NotifyValueChanged(property *models.Property) {
 	data, err := json.Marshal(property)
 	if err != nil {
 		return
