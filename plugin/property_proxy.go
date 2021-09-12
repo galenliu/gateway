@@ -2,9 +2,11 @@ package plugin
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/rpc"
-	"github.com/galenliu/gateway/plugin/models"
-	json "github.com/json-iterator/go"
+	"github.com/galenliu/gateway-addon/properties"
+	"github.com/galenliu/gateway-grpc"
+	"github.com/xiam/to"
+
+	"math"
 	"time"
 )
 
@@ -13,36 +15,77 @@ type SetValueFunc func(v interface{}) (interface{}, error)
 type NotifyPropertyChanged func(value interface{})
 
 type Property struct {
-	*models.Property
-
 	device       *Device
 	response     chan interface{}
 	SetValueFunc SetValueFunc
+	*properties.Property
 }
 
-func NewPropertyFormString(desc string, dev *Device) *Property {
-	p := &Property{}
+func NewPropertyFormString(dev *Device, propertyDesc string) *Property {
+	p := Property{}
 	p.device = dev
-	p.Property = models.NewPropertyFromString(dev, desc)
-	return p
+	p.Property = properties.NerPropertyFormString(propertyDesc)
+	return &p
 }
 
-func (p *Property) DoPropertyChanged(data []byte) {
-	value := json.Get(data, "value").GetInterface()
-	err := p.Property.SetCachedValue(value)
+func (p *Property) setValue(value interface{}) error {
+	if p.ReadOnly {
+		return fmt.Errorf("read-only P")
+	}
+	var numberValue = to.Float64(value)
+	if p.Minimum != nil {
+		if to.Float64(p.Minimum) > numberValue {
+			return fmt.Errorf("value less than minimum: %s", p.Minimum)
+		}
+	}
+	if p.Maximum != nil {
+		if to.Float64(p.Maximum) < numberValue {
+			return fmt.Errorf("value greater than minimum: %s", p.Maximum)
+		}
+	}
+	if p.MultipleOf != nil {
+		if numberValue/to.Float64(p.MultipleOf)-math.Round(numberValue/to.Float64(p.MultipleOf)) != 0 {
+			return fmt.Errorf("value is not a multiple of : %s", p.MultipleOf)
+		}
+	}
+	if len(p.Enum) > 0 {
+		for e := range p.Enum {
+			if e == value {
+				break
+			}
+			return fmt.Errorf("invalid enum value")
+		}
+	}
+	p.setCachedValueAndNotify(value)
+	return nil
+}
+
+func (p *Property) setCachedValueAndNotify(value interface{}) bool {
+	oldValue := p.Value
+	p.SetCachedValue(value)
+	var hasChanged = oldValue != p.Value
+	return hasChanged
+}
+
+func (p *Property) SetCachedValue(value interface{}) {
+	if p.Type == TypeBoolean {
+		p.Value = !!to.Bool(value)
+	} else {
+		p.Value = value
+	}
+}
+
+func (p *Property) doPropertyChanged(property *gateway_grpc.PropertySchema) error {
+	err := p.setValue(property.Value)
 	if err != nil {
-		return
+		return err
 	}
 	select {
-	case p.response <- value:
+	case p.response <- property.Value:
 	}
-	p.Title = json.Get(data, "title").ToString()
-	p.Description = json.Get(data, "description").ToString()
-	bytes, err := json.Marshal(p)
-	if err != nil {
-		return
-	}
-	p.device.adapter.plugin.pluginServer.manager.Eventbus.PublishPropertyChanged(bytes)
+	p.Title = property.Title
+	p.Description = property.Description
+	return nil
 }
 
 func (p *Property) SetValue(value interface{}) (interface{}, error) {
@@ -50,7 +93,7 @@ func (p *Property) SetValue(value interface{}) (interface{}, error) {
 	data["deviceId"] = p.device.ID
 	data["propertyName"] = p.Name
 	data["propertyValue"] = value
-	p.device.adapter.sendMsg(rpc.MessageType_DeviceSetPropertyCommand, data)
+	p.device.adapter.sendMsg(gateway_grpc.MessageType_DeviceSetPropertyCommand, data)
 
 	setTimeOut := time.After(time.Duration(1 * time.Second))
 	for {

@@ -1,9 +1,14 @@
-package models
+package addon
+
+import (
+	"github.com/galenliu/gateway-grpc"
+)
 
 type adapter interface {
 }
-type Prop interface {
-	DoPropertyChanged(property []byte)
+
+type P interface {
+	doPropertyChanged(property *gateway_grpc.PropertySchema)
 }
 
 type Device struct {
@@ -20,7 +25,7 @@ type Device struct {
 	PinRequired         bool     `json:"pinRequired"`
 	CredentialsRequired bool     `json:"credentialsRequired"`
 
-	Properties map[string]Prop `json:"properties"`
+	Properties map[string]P `json:"properties"`
 }
 
 func NewDeviceFormString(adapter adapter, id string) *Device {
@@ -30,10 +35,22 @@ func NewDeviceFormString(adapter adapter, id string) *Device {
 	return device
 }
 
-func (d *Device) GetId() string {
+func (d *Device) GetID() string {
 	return d.ID
 }
 
-func (d *Device) GetProperty(name string) Prop {
+func (d *Device) GetProperty(name string) P {
 	return d.Properties[name]
+}
+
+func (d *Device) GetTitle() string {
+	return d.Title
+}
+
+func (d *Device) GetDescription() string {
+	return d.Description
+}
+
+func (d *Device) GetAtType() string {
+	return d.AtType
 }

@@ -2,12 +2,12 @@ package gateway
 
 import (
 	"context"
+	"github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/db"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/rpc"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/plugin/services"
@@ -19,14 +19,6 @@ import (
 type Component interface {
 	Start() error
 	Stop() error
-}
-
-type BusController interface {
-	Subscribe(topic string, fn interface{})
-	Unsubscribe(topic string, fn interface{})
-	Publish(topic string, args ...interface{})
-	SubscribeOnce(topic string, fn interface{})
-	SubscribeAsync(topic string, fn interface{})
 }
 
 type Config struct {
@@ -47,7 +39,7 @@ type Config struct {
 type Gateway struct {
 	config         Config
 	storage        *db.Storage
-	bus            BusController
+	bus            bus.Controller
 	logger         logging.Logger
 	addonManager   *plugin.Manager
 	serviceManager *services.ServiceManager
@@ -60,7 +52,7 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 	g := &Gateway{}
 	g.logger = logger
 	g.config = config
-	u := &rpc.PluginRegisterResponseMessage_Data_UsrProfile{
+	u := &gateway_grpc.PluginRegisterResponseMessage_Data_UsrProfile{
 		BaseDir:    g.config.BaseDir,
 		DataDir:    path.Join(g.config.BaseDir, "data"),
 		AddonsDir:  path.Join(g.config.BaseDir, "addons"),
@@ -82,7 +74,7 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 	g.container = container.NewThingsContainerModel(g.storage, g.logger)
 
 	//  EventBus init
-	newBus, err := bus.NewBus(g.logger)
+	newBus, err := bus.NewController(g.logger)
 	if err != nil {
 		return nil, err
 	}
@@ -90,11 +82,11 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 	//Addon manager init
 	g.addonManager = plugin.NewAddonsManager(plugin.Config{
 		UserProfile: u,
-		Preferences: &rpc.PluginRegisterResponseMessage_Data_Preferences{
+		Preferences: &gateway_grpc.PluginRegisterResponseMessage_Data_Preferences{
 			Language: "zh-cn",
-			Units:    &rpc.PluginRegisterResponseMessage_Data_Preferences_Units{Temperature: "℃"},
+			Units:    &gateway_grpc.PluginRegisterResponseMessage_Data_Preferences_Units{Temperature: "℃"},
 		},
-		AddonsDisr:      u.AddonsDir,
+		AddonsDir:       u.AddonsDir,
 		AttachAddonsDir: g.config.AttachAddonsDir,
 		IPCPort:         config.IPCPort,
 		RPCPort:         config.RPCPort,

@@ -2,10 +2,10 @@ package plugin
 
 //	plugin server
 import (
-	ipc "github.com/galenliu/gateway/pkg/ipc_server"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/rpc"
-	"github.com/galenliu/gateway/pkg/rpc_server"
+	ipc "github.com/galenliu/gateway/pkg/rpc/ipc_server"
+	"github.com/galenliu/gateway/pkg/rpc/rpc_server"
 	"sync"
 )
 

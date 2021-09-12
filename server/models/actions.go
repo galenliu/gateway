@@ -13,7 +13,7 @@ type ActionsManager interface {
 }
 
 type ActionsBus struct {
-	*bus.Bus
+	bus.Controller
 }
 
 type ActionsModel struct {
@@ -23,7 +23,7 @@ type ActionsModel struct {
 	bus     ActionsBus
 }
 
-func NewActionsModel(m ActionsManager, bus *bus.Bus, log logging.Logger) *ActionsModel {
+func NewActionsModel(m ActionsManager, bus bus.Controller, log logging.Logger) *ActionsModel {
 	return &ActionsModel{
 		logger:  log,
 		manager: m,

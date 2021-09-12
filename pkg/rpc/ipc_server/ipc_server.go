@@ -1,6 +1,7 @@
 package ipc_server
 
 import (
+	"github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/rpc"
@@ -25,12 +26,12 @@ type IPCServer struct {
 	port         string
 	locker       *sync.Mutex
 	pluginServer rpc.PluginServer
-	userProfile  *rpc.PluginRegisterResponseMessage_Data_UsrProfile
-	preferences  *rpc.PluginRegisterResponseMessage_Data_Preferences
+	userProfile  *gateway_grpc.PluginRegisterResponseMessage_Data_UsrProfile
+	preferences  *gateway_grpc.PluginRegisterResponseMessage_Data_Preferences
 	doneChan     chan struct{}
 }
 
-func NewIPCServer(pluginServer rpc.PluginServer, port string, userProfile *rpc.PluginRegisterResponseMessage_Data_UsrProfile, preferences *rpc.PluginRegisterResponseMessage_Data_Preferences, log logging.Logger) *IPCServer {
+func NewIPCServer(pluginServer rpc.PluginServer, port string, userProfile *gateway_grpc.PluginRegisterResponseMessage_Data_UsrProfile, preferences *gateway_grpc.PluginRegisterResponseMessage_Data_Preferences, log logging.Logger) *IPCServer {
 	ipc := &IPCServer{}
 	ipc.pluginServer = pluginServer
 	ipc.logger = log
@@ -69,17 +70,17 @@ func (s *IPCServer) handle(w http.ResponseWriter, r *http.Request) {
 	if conn == nil {
 		return
 	}
-	var message rpc.PluginRegisterRequestMessage
+	var message gateway_grpc.PluginRegisterRequestMessage
 	err = conn.ReadJSON(&message)
 	if err != nil {
 		return
 	}
-	if message.MessageType != rpc.MessageType_PluginRegisterRequest {
+	if message.MessageType != gateway_grpc.MessageType_PluginRegisterRequest {
 		return
 	}
-	responseMessage := &rpc.PluginRegisterResponseMessage{
-		MessageType: rpc.MessageType_PluginRegisterResponse,
-		Data: &rpc.PluginRegisterResponseMessage_Data{
+	responseMessage := &gateway_grpc.PluginRegisterResponseMessage{
+		MessageType: gateway_grpc.MessageType_PluginRegisterResponse,
+		Data: &gateway_grpc.PluginRegisterResponseMessage_Data{
 			PluginId:       message.Data.PluginId,
 			GatewayVersion: constant.Version,
 			UserProfile:    s.userProfile,

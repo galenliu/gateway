@@ -84,7 +84,7 @@ func (m *Manager) GetDevicesBytes() (devices map[string][]byte) {
 		for _, dev := range devs {
 			bt, err := json.Marshal(dev)
 			if err != nil {
-				devicesMap[dev.GetId()] = bt
+				devicesMap[dev.ID] = bt
 			}
 		}
 		return devicesMap

@@ -1,23 +1,16 @@
 package plugin
 
 import (
-	"context"
 	"fmt"
+	"github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/rpc"
 	"sync"
 )
 
-type pairingFunc func(ctx context.Context, cancelFunc func())
-
-type managerProxy interface {
-	handleDeviceAdded(device *models.Device)
-}
-
 type Adapter struct {
-	ID          string
-	name        string
-	manager     *Manager
+	ID   string
+	name string
+
 	looker      *sync.Mutex
 	isPairing   bool
 	devices     sync.Map
@@ -26,14 +19,14 @@ type Adapter struct {
 	plugin      *Plugin
 }
 
-func NewAdapter(m *Manager, plugin *Plugin, adapterId, name, packageName string, log logging.Logger) *Adapter {
+func NewAdapter(plugin *Plugin, adapterId, name, packageName string, log logging.Logger) *Adapter {
 	adapter := &Adapter{}
 	adapter.plugin = plugin
 	adapter.logger = log
 	adapter.ID = adapterId
 	adapter.name = name
 	adapter.packageName = packageName
-	adapter.manager = m
+
 	adapter.looker = new(sync.Mutex)
 	return adapter
 }
@@ -42,31 +35,30 @@ func (adapter *Adapter) pairing(timeout int) {
 	adapter.logger.Infof("%s start pairing", adapter.ID)
 	data := make(map[string]interface{})
 	data["timeout"] = timeout
-	adapter.sendMsg(rpc.MessageType_AdapterStartPairingCommand, data)
+	adapter.sendMsg(gateway_grpc.MessageType_AdapterStartPairingCommand, data)
 }
 
 func (adapter *Adapter) cancelPairing() {
 	adapter.logger.Infof("  %s  cancel pairing", adapter.ID)
 	data := make(map[string]interface{})
-	adapter.sendMsg(rpc.MessageType_AdapterCancelPairingCommand, data)
+	adapter.sendMsg(gateway_grpc.MessageType_AdapterCancelPairingCommand, data)
 }
 
-func (adapter *Adapter) removeThing(device *models.Device) {
+func (adapter *Adapter) removeThing(device *Device) {
 	adapter.logger.Infof("adapter delete thing Id: %v", device.ID)
 	data := make(map[string]interface{})
 	data["deviceId"] = device.ID
-	adapter.sendMsg(models.AdapterRemoveDeviceRequest, data)
-
+	adapter.sendMsg(AdapterRemoveDeviceRequest, data)
 }
 
 func (adapter *Adapter) cancelRemoveThing(deviceId string) {
 	adapter.logger.Info(fmt.Sprintf("adapter: %s start pairing", adapter.ID))
 	data := make(map[string]interface{})
 	data["deviceId"] = deviceId
-	adapter.sendMsg(rpc.MessageType_AdapterCancelRemoveDeviceCommand, data)
+	adapter.sendMsg(gateway_grpc.MessageType_AdapterCancelRemoveDeviceCommand, data)
 }
 
-func (adapter *Adapter) sendMsg(messageType rpc.MessageType, data map[string]interface{}) {
+func (adapter *Adapter) sendMsg(messageType gateway_grpc.MessageType, data map[string]interface{}) {
 	data["adapterId"] = adapter.ID
 	adapter.plugin.SendMsg(messageType, data)
 }

@@ -51,7 +51,7 @@ type Router struct {
 	config Config
 }
 
-func NewRouter(config Config, manager Manager, serviceManager ServiceManager, container container.Container, store Storage, bus *bus.Bus, log logging.Logger) *Router {
+func NewRouter(config Config, manager Manager, serviceManager ServiceManager, container container.Container, store Storage, bus bus.Controller, log logging.Logger) *Router {
 
 	//router init
 	app := Router{}

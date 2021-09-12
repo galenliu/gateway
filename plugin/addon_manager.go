@@ -25,9 +25,9 @@ func (m *Manager) EnableAddon(addonId string) error {
 	if addonInfo == nil {
 		return fmt.Errorf("package not installed")
 	}
-	err := addonInfo.setEnabled(true)
+	err := addonInfo.SetEnabled(true)
 
-	err = m.loadAddon(addonInfo.dir, addonId)
+	err = m.loadAddon(addonInfo.Dir, addonId)
 	if err != nil {
 		return err
 	}
@@ -39,7 +39,7 @@ func (m *Manager) DisableAddon(addonId string) error {
 	if addonInfo == nil {
 		return fmt.Errorf("package not installed")
 	}
-	err := addonInfo.setEnabled(false)
+	err := addonInfo.SetEnabled(false)
 	err = m.unloadAddon(addonId)
 	if err != nil {
 		return err
@@ -95,7 +95,7 @@ func (m *Manager) UninstallAddon(addonId string, disable bool) error {
 	}
 	if disable {
 		addonInfo := m.getInstallAddon(addonId)
-		err := addonInfo.setEnabled(disable)
+		err := addonInfo.SetEnabled(disable)
 		if err != nil {
 			return err
 		}

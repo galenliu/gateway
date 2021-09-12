@@ -1,26 +1,24 @@
-package models
+package plugin
 
 import (
-	"github.com/galenliu/gateway/pkg/rpc"
+	"github.com/galenliu/gateway-grpc"
 )
 
-type Plugin interface {
-	SendMsg(rpc.MessageType, map[string]interface{})
-}
-
 type Bus interface {
-	SubscribePropertyChanged(f func(property *Property))
-	UnsubscribePropertyChanged(f func(property *Property))
+	SubscribePropertyChanged(f func(property *gateway_grpc.DevicePropertyChangedNotificationMessage_Data))
+	UnsubscribePropertyChanged(f func(property *gateway_grpc.DevicePropertyChangedNotificationMessage_Data))
+	SubscribeActionStatus(f func(action *gateway_grpc.ActionDescription))
+	UnsubscribeActionStatus(f func(action *gateway_grpc.ActionDescription))
 }
 
 type Service struct {
 	ID     string
 	Name   string
 	bus    Bus
-	plugin Plugin
+	plugin *Plugin
 }
 
-func NewService(plugin Plugin, bus Bus, id string, name string) *Service {
+func NewService(plugin *Plugin, bus Bus, id string, name string) *Service {
 	s := &Service{}
 	s.bus = bus
 	s.plugin = plugin
@@ -28,22 +26,29 @@ func NewService(plugin Plugin, bus Bus, id string, name string) *Service {
 	s.Name = name
 	s.bus = bus
 	s.bus.SubscribePropertyChanged(s.handlePropertyChanged)
+	s.bus.SubscribeActionStatus(s.handleActionStatus)
 	return s
 }
 
-func (s *Service) handlePropertyChanged(property *Property) {
+func (s *Service) handlePropertyChanged(property *gateway_grpc.DevicePropertyChangedNotificationMessage_Data) {
 	data := make(map[string]interface{})
-	data["thingId"] = property.Device.GetID()
-	data["propertyName"] = property.Name
-	data["value"] = property.Value
-	s.sendMsg(rpc.MessageType_ServicePropertyChangedNotification, data)
+	data["thingId"] = property.DeviceId
+	data["propertyName"] = property.Property.Name
+	data["value"] = property.Property.Value
+	s.sendMsg(gateway_grpc.MessageType_ServicePropertyChangedNotification, data)
 }
 
-func (s *Service) sendMsg(messageType rpc.MessageType, data map[string]interface{}) {
+func (s *Service) handleActionStatus(action *gateway_grpc.ActionDescription) {
+	data := make(map[string]interface{})
+	s.sendMsg(gateway_grpc.MessageType_ServicePropertyChangedNotification, data)
+}
+
+func (s *Service) sendMsg(messageType gateway_grpc.MessageType, data map[string]interface{}) {
 	data["serviceId"] = s.ID
 	s.plugin.SendMsg(messageType, data)
 }
 
 func (s *Service) unload() {
-	s.bus
+	s.bus.UnsubscribePropertyChanged(s.handlePropertyChanged)
+	s.bus.UnsubscribeActionStatus(s.handleActionStatus)
 }

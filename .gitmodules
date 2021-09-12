@@ -1,14 +1,9 @@
 [submodule "gateway-addon"]
 	path = gateway-addon
 	url = https://github.com/galenliu/gateway-addon.git
+[submodule "gateway-grpc"]
+    path = gateway-grpc
+    url = https://github.com/galenliu/gateway-grpc.git
 [submodule "app"]
 	path = app
 	url = https://github.com/galenliu/app.git
-[submodule "yeelight-adapter-python"]
-	path = ./profile/addons/yeelight-adapter-python
-	url = https://github.com/galenliu/yeelight-adapter-python.git
-[submodule "virtual-things-adapter"]
-    path = ./profile/addons/virtual-things-adapter
-    url = https://github.com/galenliu/virtual-things-adapter.git
-
-

@@ -4,11 +4,14 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"fmt"
+	"github.com/galenliu/gateway-grpc"
+	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/container"
-	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/rpc"
 	"github.com/galenliu/gateway/pkg/util"
+	"github.com/galenliu/gateway/plugin/addon"
+
+	"github.com/galenliu/gateway/pkg/logging"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	json "github.com/json-iterator/go"
 	"io"
@@ -25,12 +28,12 @@ const (
 )
 
 type Config struct {
-	AddonsDisr      string
+	AddonsDir       string
 	AttachAddonsDir string
 	IPCPort         string
 	RPCPort         string
-	UserProfile     *rpc.PluginRegisterResponseMessage_Data_UsrProfile
-	Preferences     *rpc.PluginRegisterResponseMessage_Data_Preferences
+	UserProfile     *gateway_grpc.PluginRegisterResponseMessage_Data_UsrProfile
+	Preferences     *gateway_grpc.PluginRegisterResponseMessage_Data_Preferences
 }
 
 type Manager struct {
@@ -52,10 +55,10 @@ type Manager struct {
 	locker        *sync.Mutex
 	logger        logging.Logger
 	actions       map[string]*wot.ActionAffordance
-	storage       AddonsStore
+	storage       addon.AddonsStore
 }
 
-func NewAddonsManager(conf Config, s AddonsStore, bus bus, log logging.Logger) *Manager {
+func NewAddonsManager(conf Config, s addon.AddonsStore, bus bus.Controller, log logging.Logger) *Manager {
 	am := &Manager{}
 	am.config = conf
 	am.logger = log
@@ -124,15 +127,15 @@ func (m *Manager) CancelAddNewThing() {
 	return
 }
 
-func (m *Manager) actionNotify(action *models.Action) {
+func (m *Manager) actionNotify(action *addon.Action) {
 	m.Eventbus.bus.Publish(constant.ActionStatus, nil)
 }
 
-func (m *Manager) eventNotify(event *models.Event) {
+func (m *Manager) eventNotify(event *addon.Event) {
 	m.Eventbus.bus.Publish(constant.EVENT, nil)
 }
 
-func (m *Manager) connectedNotify(device *models.Device, connected bool) {
+func (m *Manager) connectedNotify(device *addon.Device, connected bool) {
 	m.Eventbus.bus.Publish(constant.CONNECTED, connected)
 }
 
@@ -187,7 +190,7 @@ func (m *Manager) handleSetProperty(deviceId, propName string, setValue interfac
 	//data[addon.Did] = device.GetID()
 	//data["propertyName"] = property.GetName()
 	//data["propertyValue"] = newValue
-	go adapter.sendMsg(models.DeviceSetPropertyCommand, nil)
+	go adapter.sendMsg(DeviceSetPropertyCommand, nil)
 	return nil
 }
 
@@ -211,18 +214,18 @@ func (m *Manager) getAdapters() (adapters []*Adapter) {
 	return
 }
 
-func (m *Manager) getExtension(id string) *Extension {
+func (m *Manager) getExtension(id string) *addon.Extension {
 	a, ok := m.extensions.Load(id)
-	ext, ok := a.(*Extension)
+	ext, ok := a.(*addon.Extension)
 	if !ok {
 		return nil
 	}
 	return ext
 }
 
-func (m *Manager) getExtensions() (adapters []*Extension) {
+func (m *Manager) getExtensions() (adapters []*addon.Extension) {
 	m.extensions.Range(func(key, value interface{}) bool {
-		ext, ok := value.(*Extension)
+		ext, ok := value.(*addon.Extension)
 		if ok {
 			adapters = append(adapters, ext)
 		}
@@ -251,18 +254,18 @@ func (m *Manager) getDevices() (devices []*Device) {
 	return
 }
 
-func (m *Manager) getInstallAddon(addonId string) *AddonSetting {
+func (m *Manager) getInstallAddon(addonId string) *addon.AddonSetting {
 	a, ok := m.installAddons.Load(addonId)
-	addon, ok := a.(*AddonSetting)
+	addon, ok := a.(*addon.AddonSetting)
 	if !ok {
 		return nil
 	}
 	return addon
 }
 
-func (m *Manager) getInstallAddons() (addons []*AddonSetting) {
+func (m *Manager) getInstallAddons() (addons []*addon.AddonSetting) {
 	m.installAddons.Range(func(key, value interface{}) bool {
-		addon, ok := value.(*AddonSetting)
+		addon, ok := value.(*addon.AddonSetting)
 		if ok {
 			addons = append(addons, addon)
 		}
@@ -298,7 +301,7 @@ func (m *Manager) installAddon(packageId, packagePath string) error {
 		fi := hdr.FileInfo()
 		p := strings.Replace(hdr.Name, "package", packageId, 1)
 
-		localPath := m.config.AddonsDisr + string(os.PathSeparator) + p
+		localPath := m.config.AddonsDir + string(os.PathSeparator) + p
 		if fi.IsDir() {
 			_ = os.MkdirAll(localPath, os.ModePerm)
 			continue
@@ -316,7 +319,7 @@ func (m *Manager) installAddon(packageId, packagePath string) error {
 		_ = fw.Close()
 	}
 
-	return m.loadAddon(packageId, m.config.AddonsDisr)
+	return m.loadAddon(packageId, m.config.AddonsDir)
 	//saved, err := m.storage.LoadAddonSetting(packageId)
 	//if err == nil && saved != "" {
 	//	var old AddonSetting
@@ -357,7 +360,7 @@ func (m *Manager) loadAddons() {
 			}
 		}
 	}
-	load(m.config.AddonsDisr)
+	load(m.config.AddonsDir)
 	if m.config.AttachAddonsDir != "" {
 		load(m.config.AttachAddonsDir)
 	}
@@ -366,19 +369,19 @@ func (m *Manager) loadAddons() {
 
 func (m *Manager) loadAddon(packageId string, dir string) error {
 
-	var addonInfo *AddonSetting
+	var addonInfo *addon.AddonSetting
 	var obj interface{}
 	var err error
 
 	packageDir := path.Join(dir, packageId)
-	addonInfo, obj, err = LoadManifest(packageDir, packageId, m.storage)
+	addonInfo, obj, err = addon.LoadManifest(packageDir, packageId, m.storage)
 	if err != nil {
 		return err
 	}
 
 	saved, err := m.storage.LoadAddonSetting(packageId)
 	if err == nil && saved != "" {
-		addonInfo = NewAddonSettingFromString(saved, m.storage)
+		addonInfo = addon.NewAddonSettingFromString(saved, m.storage)
 	} else {
 		err = addonInfo.Save()
 		if err != nil {
@@ -401,7 +404,7 @@ func (m *Manager) loadAddon(packageId string, dir string) error {
 		return fmt.Errorf("addon disenabled")
 	}
 	if addonInfo.ContentScripts != "" && addonInfo.WSebAccessibleResources != "" {
-		var ext = Extension{
+		var ext = addon.Extension{
 			Extensions: addonInfo.ContentScripts,
 			Resources:  addonInfo.WSebAccessibleResources,
 		}
@@ -437,7 +440,7 @@ func (m *Manager) removeAdapter(adapter *Adapter) {
 }
 
 func (m *Manager) findPluginPath(packageId string) string {
-	for _, dir := range []string{m.config.AddonsDisr, m.config.AttachAddonsDir} {
+	for _, dir := range []string{m.config.AddonsDir, m.config.AttachAddonsDir} {
 		if dir == "" {
 			continue
 		}
@@ -471,7 +474,7 @@ func (m *Manager) removeNotifier(notifierId string) {
 
 }
 
-func (m *Manager) handleOutletRemoved(device *models.Outlet) {
+func (m *Manager) handleOutletRemoved(device *addon.Outlet) {
 
 }
 

@@ -1,4 +1,4 @@
-package plugin
+package addon
 
 import (
 	"fmt"
@@ -32,7 +32,7 @@ type AddonSetting struct {
 	ContentScripts          string `json:"content_scripts"`
 	WSebAccessibleResources string `json:"web_accessible_resources"`
 	store                   AddonsStore
-	dir                     string
+	Dir                     string
 }
 
 func NewAddonSettingFromString(str string, store AddonsStore) *AddonSetting {
@@ -66,7 +66,7 @@ func NewAddonSettingFromManifest(manifest *ManifestJson, store AddonsStore) *Add
 	return addonInfo
 }
 
-func (a *AddonSetting) setEnabled(disabled bool) error {
+func (a *AddonSetting) SetEnabled(disabled bool) error {
 	if a.Enabled == disabled {
 		return nil
 	}
@@ -113,7 +113,7 @@ func LoadManifest(destPath, packetId string, store AddonsStore) (*AddonSetting, 
 	//TODO :checksum every file.
 	//TODO: Verify that manifest filed schema
 	addonInfo := NewAddonSettingFromManifest(manifest, store)
-	addonInfo.dir = destPath
+	addonInfo.Dir = destPath
 
 	if !manifest.GatewaySpecificSettings.WebThings.Enable {
 		addonInfo.Enabled = true

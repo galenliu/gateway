@@ -1,6 +1,8 @@
 package rpc_server
 
-import "github.com/galenliu/gateway/pkg/rpc"
+import (
+	rpc "github.com/galenliu/gateway-grpc"
+)
 
 type Stream interface {
 	Send(message *rpc.BaseMessage) error

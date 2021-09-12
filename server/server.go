@@ -28,11 +28,11 @@ type WebServe struct {
 	*controllers.Router
 	logger    logging.Logger
 	options   Config
-	bus       EventBus
+	bus       bus.Controller
 	container container.Container
 }
 
-func NewServe(config Config, addonManager controllers.Manager, serviceManager controllers.ServiceManager, container container.Container, store controllers.Storage, bus *bus.Bus, log logging.Logger) *WebServe {
+func NewServe(config Config, addonManager controllers.Manager, serviceManager controllers.ServiceManager, container container.Container, store controllers.Storage, bus bus.Controller, log logging.Logger) *WebServe {
 	sev := &WebServe{}
 	sev.container = container
 	sev.options = config

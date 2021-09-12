@@ -2,6 +2,7 @@ package rpc_server
 
 import (
 	"fmt"
+	"github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/rpc"
@@ -10,17 +11,21 @@ import (
 	"net"
 )
 
+type PluginServer interface {
+	RegisterPlugin(pluginId string, clint rpc.Clint) rpc.PluginHandler
+}
+
 type RPCServer struct {
 	port     string
 	logger   logging.Logger
 	doneChan chan struct{}
-	rpc.UnimplementedPluginServerServer
-	pluginSever rpc.PluginServer
-	userProfile *rpc.PluginRegisterResponseMessage_Data_UsrProfile
-	preferences *rpc.PluginRegisterResponseMessage_Data_Preferences
+	gateway_grpc.UnimplementedPluginServerServer
+	pluginSever PluginServer
+	userProfile *gateway_grpc.PluginRegisterResponseMessage_Data_UsrProfile
+	preferences *gateway_grpc.PluginRegisterResponseMessage_Data_Preferences
 }
 
-func NewRPCServer(pluginServer rpc.PluginServer, port string, userProfile *rpc.PluginRegisterResponseMessage_Data_UsrProfile, preferences *rpc.PluginRegisterResponseMessage_Data_Preferences, log logging.Logger) *RPCServer {
+func NewRPCServer(pluginServer PluginServer, port string, userProfile *gateway_grpc.PluginRegisterResponseMessage_Data_UsrProfile, preferences *gateway_grpc.PluginRegisterResponseMessage_Data_Preferences, log logging.Logger) *RPCServer {
 	s := &RPCServer{}
 	s.pluginSever = pluginServer
 	s.port = port
@@ -31,19 +36,19 @@ func NewRPCServer(pluginServer rpc.PluginServer, port string, userProfile *rpc.P
 	return s
 }
 
-func (s *RPCServer) PluginHandler(p rpc.PluginServer_PluginHandlerServer) error {
+func (s *RPCServer) PluginHandler(p gateway_grpc.PluginServer_PluginHandlerServer) error {
 	r, err := p.Recv()
 	if err != nil {
 		return err
 	}
 	pluginId := json.Get(r.Data, "pluginId").ToString()
-	if r.MessageType != rpc.MessageType_PluginRegisterRequest || pluginId == "" {
+	if r.MessageType != gateway_grpc.MessageType_PluginRegisterRequest || pluginId == "" {
 		return err
 	}
 
-	err = p.SendMsg(rpc.PluginRegisterResponseMessage{
+	err = p.SendMsg(gateway_grpc.PluginRegisterResponseMessage{
 		MessageType: 0,
-		Data: &rpc.PluginRegisterResponseMessage_Data{
+		Data: &gateway_grpc.PluginRegisterResponseMessage_Data{
 			PluginId:       pluginId,
 			GatewayVersion: constant.Version,
 			UserProfile:    s.userProfile,
@@ -84,7 +89,7 @@ func (s *RPCServer) Start() error {
 				return err
 			}
 			sev := grpc.NewServer()
-			rpc.RegisterPluginServerServer(sev, s)
+			gateway_grpc.RegisterPluginServerServer(sev, s)
 			err = sev.Serve(lis)
 			if err != nil {
 				return err

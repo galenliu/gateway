@@ -1,4 +1,4 @@
-package models
+package plugin
 
 const (
 	TypeString  = "string"

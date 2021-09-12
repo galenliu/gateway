@@ -5,12 +5,20 @@ import (
 	"github.com/galenliu/gateway/pkg/logging"
 )
 
+type Controller interface {
+	Subscribe(topic string, fn interface{})
+	Unsubscribe(topic string, fn interface{})
+	Publish(topic string, args ...interface{})
+	SubscribeOnce(topic string, fn interface{})
+	SubscribeAsync(topic string, fn interface{})
+}
+
 type Bus struct {
 	bus.Bus
 	logger logging.Logger
 }
 
-func NewBus(log logging.Logger) (*Bus, error) {
+func NewController(log logging.Logger) (Controller, error) {
 	b := &Bus{}
 	b.logger = log
 	b.Bus = bus.New()
