@@ -4,6 +4,4 @@
 [submodule "app"]
 	path = app
 	url = http://github.com/galenliu/app.git
-[submodule "gateway-grpc1"]
-	path = gateway-grpc1
-	url = http://github.com/galenliu/gateway-grpc
+
