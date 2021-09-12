@@ -1,9 +1,9 @@
+[submodule "gateway-grpc"]
+	path = gateway-grpc
+	url = http://github.com/galenliu/gateway-grpc.git
 [submodule "gateway-addon"]
 	path = gateway-addon
-	url = https://github.com/galenliu/gateway-addon.git
-[submodule "gateway-grpc"]
-    path = gateway-grpc
-    url = https://github.com/galenliu/gateway-grpc.git
+	url = http://github.com/galenliu/gateway-addon.git
 [submodule "app"]
 	path = app
-	url = https://github.com/galenliu/app.git
+	url = http://github.com/galenliu/app.git

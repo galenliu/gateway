@@ -1,7 +1,6 @@
 package gateway
 
 import (
-	"context"
 	"github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/constant"
@@ -14,6 +13,8 @@ import (
 	"github.com/galenliu/gateway/server"
 	"path"
 	"time"
+
+	"context"
 )
 
 type Component interface {
@@ -52,7 +53,7 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 	g := &Gateway{}
 	g.logger = logger
 	g.config = config
-	u := &gateway_grpc.PluginRegisterResponseMessage_Data_UsrProfile{
+	u := &rpc.PluginRegisterResponseMessage_Data_UsrProfile{
 		BaseDir:    g.config.BaseDir,
 		DataDir:    path.Join(g.config.BaseDir, "data"),
 		AddonsDir:  path.Join(g.config.BaseDir, "addons"),
@@ -82,9 +83,9 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 	//Addon manager init
 	g.addonManager = plugin.NewAddonsManager(plugin.Config{
 		UserProfile: u,
-		Preferences: &gateway_grpc.PluginRegisterResponseMessage_Data_Preferences{
+		Preferences: &rpc.PluginRegisterResponseMessage_Data_Preferences{
 			Language: "zh-cn",
-			Units:    &gateway_grpc.PluginRegisterResponseMessage_Data_Preferences_Units{Temperature: "℃"},
+			Units:    &rpc.PluginRegisterResponseMessage_Data_Preferences_Units{Temperature: "℃"},
 		},
 		AddonsDir:       u.AddonsDir,
 		AttachAddonsDir: g.config.AttachAddonsDir,
@@ -118,14 +119,14 @@ func (g *Gateway) Start() error {
 func (g *Gateway) Stop() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
-	err := g.Shutdown(ctx)
+	err := g.shutdown(ctx)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (g *Gateway) Shutdown(ctx context.Context) error {
+func (g *Gateway) shutdown(ctx context.Context) error {
 	go g.bus.Publish(constant.GatewayStop)
 	time.Sleep(1 * time.Second)
 	<-ctx.Done()

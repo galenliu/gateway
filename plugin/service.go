@@ -1,14 +1,14 @@
 package plugin
 
 import (
-	"github.com/galenliu/gateway-grpc"
+	rpc "github.com/galenliu/gateway-grpc"
 )
 
 type Bus interface {
-	SubscribePropertyChanged(f func(property *gateway_grpc.DevicePropertyChangedNotificationMessage_Data))
-	UnsubscribePropertyChanged(f func(property *gateway_grpc.DevicePropertyChangedNotificationMessage_Data))
-	SubscribeActionStatus(f func(action *gateway_grpc.ActionDescription))
-	UnsubscribeActionStatus(f func(action *gateway_grpc.ActionDescription))
+	SubscribePropertyChanged(f func(property *rpc.DevicePropertyChangedNotificationMessage_Data))
+	UnsubscribePropertyChanged(f func(property *rpc.DevicePropertyChangedNotificationMessage_Data))
+	SubscribeActionStatus(f func(action *rpc.ActionDescription))
+	UnsubscribeActionStatus(f func(action *rpc.ActionDescription))
 }
 
 type Service struct {
@@ -30,20 +30,20 @@ func NewService(plugin *Plugin, bus Bus, id string, name string) *Service {
 	return s
 }
 
-func (s *Service) handlePropertyChanged(property *gateway_grpc.DevicePropertyChangedNotificationMessage_Data) {
+func (s *Service) handlePropertyChanged(property *rpc.DevicePropertyChangedNotificationMessage_Data) {
 	data := make(map[string]interface{})
 	data["thingId"] = property.DeviceId
 	data["propertyName"] = property.Property.Name
 	data["value"] = property.Property.Value
-	s.sendMsg(gateway_grpc.MessageType_ServicePropertyChangedNotification, data)
+	s.sendMsg(rpc.MessageType_ServicePropertyChangedNotification, data)
 }
 
-func (s *Service) handleActionStatus(action *gateway_grpc.ActionDescription) {
+func (s *Service) handleActionStatus(action *rpc.ActionDescription) {
 	data := make(map[string]interface{})
-	s.sendMsg(gateway_grpc.MessageType_ServicePropertyChangedNotification, data)
+	s.sendMsg(rpc.MessageType_ServicePropertyChangedNotification, data)
 }
 
-func (s *Service) sendMsg(messageType gateway_grpc.MessageType, data map[string]interface{}) {
+func (s *Service) sendMsg(messageType rpc.MessageType, data map[string]interface{}) {
 	data["serviceId"] = s.ID
 	s.plugin.SendMsg(messageType, data)
 }
