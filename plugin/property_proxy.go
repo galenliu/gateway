@@ -75,7 +75,7 @@ func (p *Property) SetCachedValue(value interface{}) {
 	}
 }
 
-func (p *Property) doPropertyChanged(property *gateway_grpc.PropertySchema) error {
+func (p *Property) doPropertyChanged(property *rpc.Property) error {
 	err := p.setValue(property.Value)
 	if err != nil {
 		return err
@@ -93,7 +93,7 @@ func (p *Property) SetValue(value interface{}) (interface{}, error) {
 	data["deviceId"] = p.device.ID
 	data["propertyName"] = p.Name
 	data["propertyValue"] = value
-	p.device.adapter.sendMsg(gateway_grpc.MessageType_DeviceSetPropertyCommand, data)
+	p.device.adapter.sendMsg(rpc.MessageType_DeviceSetPropertyCommand, data)
 
 	setTimeOut := time.After(time.Duration(1 * time.Second))
 	for {

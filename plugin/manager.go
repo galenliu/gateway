@@ -32,8 +32,8 @@ type Config struct {
 	AttachAddonsDir string
 	IPCPort         string
 	RPCPort         string
-	UserProfile     *gateway_grpc.PluginRegisterResponseMessage_Data_UsrProfile
-	Preferences     *gateway_grpc.PluginRegisterResponseMessage_Data_Preferences
+	UserProfile     *rpc.PluginRegisterResponseMessage_Data_UsrProfile
+	Preferences     *rpc.PluginRegisterResponseMessage_Data_Preferences
 }
 
 type Manager struct {

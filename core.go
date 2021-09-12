@@ -119,14 +119,14 @@ func (g *Gateway) Start() error {
 func (g *Gateway) Stop() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
-	err := g.shutdown(ctx)
+	err := g.Shutdown(ctx)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (g *Gateway) shutdown(ctx context.Context) error {
+func (g *Gateway) Shutdown(ctx context.Context) error {
 	go g.bus.Publish(constant.GatewayStop)
 	time.Sleep(1 * time.Second)
 	<-ctx.Done()

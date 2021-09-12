@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/rpc"
+	"github.com/galenliu/gateway/pkg/server"
 	"github.com/galenliu/gateway/plugin/addon"
 	json "github.com/json-iterator/go"
 	"io"
@@ -27,7 +27,7 @@ type Plugin struct {
 	closeChan     chan struct{}
 	closeExecChan chan struct{}
 	pluginServer  *PluginsServer
-	Clint         rpc.Clint
+	Clint         server.Clint
 	logger        logging.Logger
 	addonManager  *Manager
 	adapters      sync.Map
@@ -112,11 +112,11 @@ func (plugin *Plugin) getApiHandlers() (apiHandlers []*ApiHandler) {
 	return
 }
 
-func (plugin *Plugin) OnMsg(messageType gateway_grpc.MessageType, data []byte) (err error) {
+func (plugin *Plugin) OnMsg(messageType rpc.MessageType, data []byte) (err error) {
 
 	switch messageType {
-	case gateway_grpc.MessageType_AdapterAddedNotification:
-		var message gateway_grpc.AdapterAddedNotificationMessage_Data
+	case rpc.MessageType_AdapterAddedNotification:
+		var message rpc.AdapterAddedNotificationMessage_Data
 		err = json.Unmarshal(data, &message)
 		if err != nil {
 			return err
@@ -126,42 +126,42 @@ func (plugin *Plugin) OnMsg(messageType gateway_grpc.MessageType, data []byte) (
 		plugin.addonManager.addAdapter(adapter)
 		return nil
 
-	case gateway_grpc.MessageType_NotifierAddedNotification:
+	case rpc.MessageType_NotifierAddedNotification:
 		return
 
 	}
 	adapterId := json.Get(data, "adapterId").ToString()
 	adapter := plugin.getAdapter(adapterId)
 	if adapter == nil {
-		return fmt.Errorf("(%s)adapter not found", gateway_grpc.MessageType_name[int32(gateway_grpc.MessageType_AdapterAddedNotification)])
+		return fmt.Errorf("(%s)adapter not found", rpc.MessageType_name[int32(rpc.MessageType_AdapterAddedNotification)])
 	}
 	// adapter handler
 	{
 		switch messageType {
-		case gateway_grpc.MessageType_DeviceRequestActionResponse:
+		case rpc.MessageType_DeviceRequestActionResponse:
 			break
-		case gateway_grpc.MessageType_DeviceRemoveActionResponse:
+		case rpc.MessageType_DeviceRemoveActionResponse:
 			break
-		case gateway_grpc.MessageType_OutletNotifyResponse:
+		case rpc.MessageType_OutletNotifyResponse:
 			break
-		case gateway_grpc.MessageType_AdapterUnloadResponse:
+		case rpc.MessageType_AdapterUnloadResponse:
 			break
-		case gateway_grpc.MessageType_DeviceSetCredentialsResponse:
+		case rpc.MessageType_DeviceSetCredentialsResponse:
 			break
-		case gateway_grpc.MessageType_ApiHandlerApiResponse:
+		case rpc.MessageType_ApiHandlerApiResponse:
 			break
 
-		case gateway_grpc.MessageType_ApiHandlerAddedNotification:
+		case rpc.MessageType_ApiHandlerAddedNotification:
 			return
-		case gateway_grpc.MessageType_ApiHandlerUnloadResponse:
+		case rpc.MessageType_ApiHandlerUnloadResponse:
 			return
-		case gateway_grpc.MessageType_PluginUnloadRequest:
+		case rpc.MessageType_PluginUnloadRequest:
 			return
-		case gateway_grpc.MessageType_PluginErrorNotification:
+		case rpc.MessageType_PluginErrorNotification:
 			return
-		case gateway_grpc.MessageType_DeviceAddedNotification:
+		case rpc.MessageType_DeviceAddedNotification:
 			//messages.DeviceAddedNotification
-			var message gateway_grpc.DeviceAddedNotificationMessage_Data
+			var message rpc.DeviceAddedNotificationMessage_Data
 			err = json.Unmarshal(data, &message)
 			if err != nil {
 				return err
@@ -178,8 +178,8 @@ func (plugin *Plugin) OnMsg(messageType gateway_grpc.MessageType, data []byte) (
 	// services message
 	{
 		switch messageType {
-		case gateway_grpc.MessageType_ServiceAddedNotification:
-			var d gateway_grpc.ServiceAddedNotificationMessage_Data
+		case rpc.MessageType_ServiceAddedNotification:
+			var d rpc.ServiceAddedNotificationMessage_Data
 			err := json.Unmarshal(data, &d)
 			if err != nil {
 				return err
@@ -188,7 +188,7 @@ func (plugin *Plugin) OnMsg(messageType gateway_grpc.MessageType, data []byte) (
 			plugin.services.Store(newService.ID, newService)
 			plugin.addonManager.addService(newService)
 
-		case gateway_grpc.MessageType_ServiceGetThingsRequest:
+		case rpc.MessageType_ServiceGetThingsRequest:
 			things := plugin.pluginServer.manager.container.GetThings()
 			bt, err := json.Marshal(things)
 			if err != nil {
@@ -196,8 +196,8 @@ func (plugin *Plugin) OnMsg(messageType gateway_grpc.MessageType, data []byte) (
 			}
 			var d = make(map[string]interface{})
 			d["things"] = bt
-			adapter.sendMsg(gateway_grpc.MessageType_ServiceGetThingsResponse, d)
-		case gateway_grpc.MessageType_ServiceGetThingRequest:
+			adapter.sendMsg(rpc.MessageType_ServiceGetThingsResponse, d)
+		case rpc.MessageType_ServiceGetThingRequest:
 			id := json.Get(data, "thingId").ToString()
 			thing := plugin.pluginServer.manager.container.GetThing(id)
 			bt, err := json.Marshal(thing)
@@ -206,9 +206,9 @@ func (plugin *Plugin) OnMsg(messageType gateway_grpc.MessageType, data []byte) (
 			}
 			var d = make(map[string]interface{})
 			d["thing"] = bt
-			adapter.sendMsg(gateway_grpc.MessageType_ServiceGetThingResponse, d)
-		case gateway_grpc.MessageType_ServiceSetPropertyValueRequest:
-			var message gateway_grpc.ServiceSetPropertyValueRequestMessage_Data
+			adapter.sendMsg(rpc.MessageType_ServiceGetThingResponse, d)
+		case rpc.MessageType_ServiceSetPropertyValueRequest:
+			var message rpc.ServiceSetPropertyValueRequestMessage_Data
 			err = json.Unmarshal(data, &message)
 			if err != nil {
 				return err
@@ -224,25 +224,25 @@ func (plugin *Plugin) OnMsg(messageType gateway_grpc.MessageType, data []byte) (
 	{
 
 		switch messageType {
-		case gateway_grpc.MessageType_AdapterUnloadResponse:
+		case rpc.MessageType_AdapterUnloadResponse:
 			return
 
-		case gateway_grpc.MessageType_NotifierUnloadResponse:
+		case rpc.MessageType_NotifierUnloadResponse:
 			return
 
-		case gateway_grpc.MessageType_AdapterRemoveDeviceResponse:
+		case rpc.MessageType_AdapterRemoveDeviceResponse:
 			device := adapter.plugin.pluginServer.manager.getDevice(json.Get(data, "deviceId").ToString())
 			adapter.handleDeviceRemoved(device)
 
-		case gateway_grpc.MessageType_OutletAddedNotification:
+		case rpc.MessageType_OutletAddedNotification:
 			return
-		case gateway_grpc.MessageType_OutletRemovedNotification:
+		case rpc.MessageType_OutletRemovedNotification:
 			return
 
-		case gateway_grpc.MessageType_DeviceSetPinResponse:
+		case rpc.MessageType_DeviceSetPinResponse:
 
-		case gateway_grpc.MessageType_DevicePropertyChangedNotification:
-			var message gateway_grpc.DevicePropertyChangedNotificationMessage_Data
+		case rpc.MessageType_DevicePropertyChangedNotification:
+			var message rpc.DevicePropertyChangedNotificationMessage_Data
 			err = json.Unmarshal(data, &message)
 			if err != nil {
 				return err
@@ -257,8 +257,8 @@ func (plugin *Plugin) OnMsg(messageType gateway_grpc.MessageType, data []byte) (
 				plugin.addonManager.Eventbus.PublishPropertyChanged(&message)
 			}
 
-		case gateway_grpc.MessageType_DeviceActionStatusNotification:
-			var message gateway_grpc.DeviceActionStatusNotificationMessage_Data
+		case rpc.MessageType_DeviceActionStatusNotification:
+			var message rpc.DeviceActionStatusNotificationMessage_Data
 			err = json.Unmarshal(data, &message)
 			if err != nil {
 				return err
@@ -266,12 +266,12 @@ func (plugin *Plugin) OnMsg(messageType gateway_grpc.MessageType, data []byte) (
 			device := adapter.plugin.pluginServer.manager.getDevice(message.DeviceId)
 			device.actionNotify(&message)
 
-		case gateway_grpc.MessageType_DeviceEventNotification:
+		case rpc.MessageType_DeviceEventNotification:
 			var event addon.Event
 			json.Get(data, "event").ToVal(&event)
 
-		case gateway_grpc.MessageType_DeviceConnectedStateNotification:
-			var message gateway_grpc.DeviceConnectedStateNotificationMessage_Data
+		case rpc.MessageType_DeviceConnectedStateNotification:
+			var message rpc.DeviceConnectedStateNotificationMessage_Data
 			err = json.Unmarshal(data, &message)
 			if err != nil {
 				return err
@@ -279,15 +279,15 @@ func (plugin *Plugin) OnMsg(messageType gateway_grpc.MessageType, data []byte) (
 			device := adapter.plugin.pluginServer.manager.getDevice(message.DeviceId)
 			device.connectedNotify(message.Connected)
 
-		case gateway_grpc.MessageType_AdapterPairingPromptNotification:
+		case rpc.MessageType_AdapterPairingPromptNotification:
 			return
 
-		case gateway_grpc.MessageType_AdapterUnpairingPromptNotification:
+		case rpc.MessageType_AdapterUnpairingPromptNotification:
 			return
-		case gateway_grpc.MessageType_MockAdapterClearStateResponse:
+		case rpc.MessageType_MockAdapterClearStateResponse:
 			return
 
-		case gateway_grpc.MessageType_MockAdapterRemoveDeviceResponse:
+		case rpc.MessageType_MockAdapterRemoveDeviceResponse:
 			return
 		default:
 			return nil
@@ -296,13 +296,13 @@ func (plugin *Plugin) OnMsg(messageType gateway_grpc.MessageType, data []byte) (
 	return nil
 }
 
-func (plugin *Plugin) SendMsg(mt gateway_grpc.MessageType, message map[string]interface{}) {
+func (plugin *Plugin) SendMsg(mt rpc.MessageType, message map[string]interface{}) {
 	message["pluginId"] = plugin.pluginId
 	data, err := json.Marshal(message)
 	if err != nil {
 		return
 	}
-	err = plugin.Clint.Send(&gateway_grpc.BaseMessage{
+	err = plugin.Clint.Send(&rpc.BaseMessage{
 		MessageType: mt,
 		Data:        data,
 	})
@@ -393,7 +393,7 @@ func (plugin *Plugin) start() {
 func (plugin *Plugin) unload() {
 	plugin.restart = false
 	plugin.unloading = true
-	plugin.SendMsg(gateway_grpc.MessageType_PluginUnloadRequest, map[string]interface{}{})
+	plugin.SendMsg(rpc.MessageType_PluginUnloadRequest, map[string]interface{}{})
 }
 
 func (plugin *Plugin) unloadComponents() {

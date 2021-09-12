@@ -8,7 +8,7 @@ type adapter interface {
 }
 
 type P interface {
-	doPropertyChanged(property *gateway_grpc.PropertySchema)
+	doPropertyChanged(property *rpc.Property)
 }
 
 type Device struct {

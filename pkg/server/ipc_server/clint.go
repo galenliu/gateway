@@ -18,11 +18,11 @@ func NewClint(pluginId string, conn *websocket.Conn) *Clint {
 	return &c
 }
 
-func (c *Clint) Send(message *gateway_grpc.BaseMessage) error {
+func (c *Clint) Send(message *rpc.BaseMessage) error {
 	return c.Conn.WriteJSON(message)
 }
 
-func (c *Clint) Read() (message *gateway_grpc.BaseMessage, err error) {
+func (c *Clint) Read() (message *rpc.BaseMessage, err error) {
 	err = c.ReadJSON(message)
 	if err != nil {
 		return nil, err

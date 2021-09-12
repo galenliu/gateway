@@ -37,7 +37,7 @@ func (device *Device) GetProperty(name string) *Property {
 	return device.Properties[name]
 }
 
-func (device *Device) notifyValueChanged(property *gateway_grpc.DevicePropertyChangedNotificationMessage_Data) {
+func (device *Device) notifyValueChanged(property *rpc.DevicePropertyChangedNotificationMessage_Data) {
 	device.adapter.plugin.pluginServer.manager.Eventbus.PublishPropertyChanged(property)
 }
 
@@ -45,6 +45,6 @@ func (device *Device) connectedNotify(connected bool) {
 	device.adapter.plugin.pluginServer.manager.Eventbus.PublishConnected(device.ID, connected)
 }
 
-func (device *Device) actionNotify(message *gateway_grpc.DeviceActionStatusNotificationMessage_Data) {
+func (device *Device) actionNotify(message *rpc.DeviceActionStatusNotificationMessage_Data) {
 	device.adapter.plugin.pluginServer.manager.Eventbus.PublishActionStatus(message)
 }

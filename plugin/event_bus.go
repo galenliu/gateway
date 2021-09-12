@@ -20,26 +20,26 @@ func (e Eventbus) PublishConnected(deviceId string, connected bool) {
 	e.bus.Publish(constant.CONNECTED, deviceId, connected)
 }
 
-func (e Eventbus) PublishActionStatus(action *gateway_grpc.DeviceActionStatusNotificationMessage_Data) {
+func (e Eventbus) PublishActionStatus(action *rpc.DeviceActionStatusNotificationMessage_Data) {
 	e.bus.Publish(constant.ActionStatus, action)
 }
 
-func (e Eventbus) SubscribeActionStatus(f func(action *gateway_grpc.ActionDescription)) {
+func (e Eventbus) SubscribeActionStatus(f func(action *rpc.ActionDescription)) {
 	e.bus.Subscribe(constant.ActionStatus, f)
 }
 
-func (e Eventbus) UnsubscribeActionStatus(f func(action *gateway_grpc.ActionDescription)) {
+func (e Eventbus) UnsubscribeActionStatus(f func(action *rpc.ActionDescription)) {
 	e.bus.Unsubscribe(constant.ActionStatus, f)
 }
 
-func (e Eventbus) PublishPropertyChanged(property *gateway_grpc.DevicePropertyChangedNotificationMessage_Data) {
+func (e Eventbus) PublishPropertyChanged(property *rpc.DevicePropertyChangedNotificationMessage_Data) {
 	e.bus.Publish(constant.PropertyChanged, property)
 }
 
-func (e Eventbus) SubscribePropertyChanged(f func(property *gateway_grpc.DevicePropertyChangedNotificationMessage_Data)) {
+func (e Eventbus) SubscribePropertyChanged(f func(property *rpc.DevicePropertyChangedNotificationMessage_Data)) {
 	e.bus.Subscribe(constant.PropertyChanged, f)
 }
 
-func (e Eventbus) UnsubscribePropertyChanged(f func(property *gateway_grpc.DevicePropertyChangedNotificationMessage_Data)) {
+func (e Eventbus) UnsubscribePropertyChanged(f func(property *rpc.DevicePropertyChangedNotificationMessage_Data)) {
 	e.bus.Unsubscribe(constant.PropertyChanged, f)
 }

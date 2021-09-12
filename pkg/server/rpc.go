@@ -1,14 +1,14 @@
-package rpc
+package server
 
 import "github.com/galenliu/gateway-grpc"
 
 type Clint interface {
-	Send(message *gateway_grpc.BaseMessage) error
-	Read() (*gateway_grpc.BaseMessage, error)
+	Send(message *rpc.BaseMessage) error
+	Read() (*rpc.BaseMessage, error)
 }
 
 type PluginHandler interface {
-	OnMsg(mt gateway_grpc.MessageType, data []byte) error
+	OnMsg(mt rpc.MessageType, data []byte) error
 }
 
 type PluginServer interface {

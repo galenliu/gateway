@@ -3,9 +3,9 @@ package plugin
 //	plugin server
 import (
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/rpc"
-	ipc "github.com/galenliu/gateway/pkg/rpc/ipc_server"
-	"github.com/galenliu/gateway/pkg/rpc/rpc_server"
+	"github.com/galenliu/gateway/pkg/server"
+	ipc "github.com/galenliu/gateway/pkg/server/ipc_server"
+	"github.com/galenliu/gateway/pkg/server/rpc_server"
 	"sync"
 )
 
@@ -28,7 +28,7 @@ func NewPluginServer(manager *Manager) *PluginsServer {
 	return server
 }
 
-func (s *PluginsServer) RegisterPlugin(pluginId string, clint rpc.Clint) rpc.PluginHandler {
+func (s *PluginsServer) RegisterPlugin(pluginId string, clint server.Clint) server.PluginHandler {
 	plugin := s.getPlugin(pluginId)
 	if plugin == nil {
 		plugin = NewPlugin(pluginId, s.manager, s, s.logger)
