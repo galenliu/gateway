@@ -5,3 +5,6 @@
 	path = app
 	url = http://github.com/galenliu/app.git
 
+[submodule "gateway-grpc"]
+	path = gateway-grpc
+	url = https://github.com/galenliu/gateway-grpc
