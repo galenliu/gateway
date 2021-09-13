@@ -1,6 +1,7 @@
 package gateway
 
 import (
+	"context"
 	"github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/constant"
@@ -9,12 +10,9 @@ import (
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin"
-	"github.com/galenliu/gateway/plugin/services"
 	"github.com/galenliu/gateway/server"
 	"path"
 	"time"
-
-	"context"
 )
 
 type Component interface {
@@ -38,14 +36,14 @@ type Config struct {
 }
 
 type Gateway struct {
-	config         Config
-	storage        *db.Storage
-	bus            bus.Controller
-	logger         logging.Logger
-	addonManager   *plugin.Manager
-	serviceManager *services.ServiceManager
-	sever          *server.WebServe
-	container      container.Container
+	config       Config
+	storage      *db.Storage
+	bus          bus.Controller
+	logger       logging.Logger
+	addonManager *plugin.Manager
+
+	sever     *server.WebServe
+	container container.Container
 }
 
 func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {

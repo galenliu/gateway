@@ -7,3 +7,9 @@
 [submodule "gateway-grpc"]
 	path = gateway-grpc
 	url = https://github.com/galenliu/gateway-grpc.git
+[submodule "virtual-things-service"]
+	path = virtual-things-service
+	url = https://github.com/galenliu/virtual-things-service.git
+[submodule "virtual-things-adapter"]
+	path = virtual-things-adapter
+	url = https://github.com/galenliu/virtual-things-adapter.git
