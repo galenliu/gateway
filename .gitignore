@@ -8,13 +8,7 @@
 /server/static/*.html
 /server/static/*.js
 !/server/static/*.go
-
 /cmd/miot*
 /miot/
-
-
-/profile/
-
-
 ##git submodule updata --init --recursive
 /configs/
