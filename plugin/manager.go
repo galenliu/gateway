@@ -32,8 +32,8 @@ type Config struct {
 	AttachAddonsDir string
 	IPCPort         string
 	RPCPort         string
-	UserProfile     *rpc.PluginRegisterResponseMessage_Data_UsrProfile
-	Preferences     *rpc.PluginRegisterResponseMessage_Data_Preferences
+	UserProfile     *rpc.UsrProfile
+	Preferences     *rpc.Preferences
 }
 
 type Manager struct {
@@ -153,11 +153,7 @@ func (m *Manager) addService(service *Service) {
 
 func (m *Manager) handleDeviceAdded(device *Device) {
 	m.devices.Store(device.ID, device)
-	data, err := json.MarshalIndent(device, "", "  ")
-	if err != nil {
-		m.logger.Info("device marshal err")
-	}
-	m.Eventbus.bus.Publish(constant.DeviceAdded, data)
+	m.Eventbus.bus.Publish(constant.DeviceAdded, device.asThing())
 }
 
 func (m *Manager) handleDeviceRemoved(device *Device) {

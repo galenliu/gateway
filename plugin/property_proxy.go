@@ -21,6 +21,13 @@ type Property struct {
 	*properties.Property
 }
 
+func NewProperty(device *Device, property *properties.Property) *Property {
+	p := &Property{}
+	p.device = device
+	p.Property = property
+	return p
+}
+
 func NewPropertyFormString(dev *Device, propertyDesc string) *Property {
 	p := Property{}
 	p.device = dev

@@ -21,11 +21,11 @@ type RPCServer struct {
 	doneChan chan struct{}
 	rpc.UnimplementedPluginServerServer
 	pluginSever PluginServer
-	userProfile *rpc.PluginRegisterResponseMessage_Data_UsrProfile
-	preferences *rpc.PluginRegisterResponseMessage_Data_Preferences
+	userProfile *rpc.UsrProfile
+	preferences *rpc.Preferences
 }
 
-func NewRPCServer(pluginServer PluginServer, port string, userProfile *rpc.PluginRegisterResponseMessage_Data_UsrProfile, preferences *rpc.PluginRegisterResponseMessage_Data_Preferences, log logging.Logger) *RPCServer {
+func NewRPCServer(pluginServer PluginServer, port string, userProfile *rpc.UsrProfile, preferences *rpc.Preferences, log logging.Logger) *RPCServer {
 	s := &RPCServer{}
 	s.pluginSever = pluginServer
 	s.port = port

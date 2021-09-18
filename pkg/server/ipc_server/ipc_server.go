@@ -26,12 +26,12 @@ type IPCServer struct {
 	port         string
 	locker       *sync.Mutex
 	pluginServer server.PluginServer
-	userProfile  *rpc.PluginRegisterResponseMessage_Data_UsrProfile
-	preferences  *rpc.PluginRegisterResponseMessage_Data_Preferences
+	userProfile  *rpc.UsrProfile
+	preferences  *rpc.Preferences
 	doneChan     chan struct{}
 }
 
-func NewIPCServer(pluginServer server.PluginServer, port string, userProfile *rpc.PluginRegisterResponseMessage_Data_UsrProfile, preferences *rpc.PluginRegisterResponseMessage_Data_Preferences, log logging.Logger) *IPCServer {
+func NewIPCServer(pluginServer server.PluginServer, port string, userProfile *rpc.UsrProfile, preferences *rpc.Preferences, log logging.Logger) *IPCServer {
 	ipc := &IPCServer{}
 	ipc.pluginServer = pluginServer
 	ipc.logger = log

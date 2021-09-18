@@ -166,7 +166,7 @@ func (plugin *Plugin) OnMsg(messageType rpc.MessageType, data []byte) (err error
 			if err != nil {
 				return err
 			}
-			var newDevice = NewDeviceFormString(string(message.Device), adapter)
+			var newDevice = NewDeviceFormMessage(message.Device, adapter)
 			if newDevice == nil {
 				return fmt.Errorf("device add failed")
 			}
