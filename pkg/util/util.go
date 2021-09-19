@@ -14,6 +14,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"sort"
 	"strings"
 )
 
@@ -129,4 +130,13 @@ func JsonIndent(data string) string {
 func IsJson(in []byte) bool {
 	var js map[string]interface{}
 	return json.Unmarshal(in, &js) == nil
+}
+
+func In(target string, strArray []string) bool {
+	sort.Strings(strArray)
+	index := sort.SearchStrings(strArray, target)
+	if index < len(strArray) && strArray[index] == target {
+		return true
+	}
+	return false
 }

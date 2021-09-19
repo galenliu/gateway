@@ -42,7 +42,7 @@ type Thing struct {
 	SchemaDefinitions map[string]dataSchema.DataSchema
 }
 
-func NewThingFromString(description string) (thing *Thing, err error) {
+func NewThingFromString(description string) (thing *Thing) {
 
 	data := []byte(description)
 	t := &Thing{}
@@ -93,7 +93,7 @@ func NewThingFromString(description string) (thing *Thing, err error) {
 		t.Forms = append(t.Forms, controls.Form{ContentType: "text/html", Href: controls.URI(string(t.ID))})
 		t.Forms = append(t.Forms, controls.Form{Href: controls.URI(fmt.Sprintf("wss://localhost/%s", t.ID))})
 	}
-	return t, nil
+	return t
 }
 
 func (t *Thing) GetID() string {

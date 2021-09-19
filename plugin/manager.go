@@ -153,7 +153,7 @@ func (m *Manager) addService(service *Service) {
 
 func (m *Manager) handleDeviceAdded(device *Device) {
 	m.devices.Store(device.ID, device)
-	m.Eventbus.bus.Publish(constant.DeviceAdded, device.asThing())
+	m.Eventbus.bus.Publish(constant.DeviceAdded, device.Device)
 }
 
 func (m *Manager) handleDeviceRemoved(device *Device) {
@@ -170,7 +170,7 @@ func (m *Manager) handleSetProperty(deviceId, propName string, setValue interfac
 	if device == nil {
 		return fmt.Errorf("device ID err")
 	}
-	adapter := m.getAdapter(device.AdapterId)
+	adapter := m.getAdapter(device.ID)
 	if adapter == nil {
 		return fmt.Errorf("adapter ID err")
 	}
@@ -252,18 +252,18 @@ func (m *Manager) getDevices() (devices []*Device) {
 
 func (m *Manager) getInstallAddon(addonId string) *addon.AddonSetting {
 	a, ok := m.installAddons.Load(addonId)
-	addon, ok := a.(*addon.AddonSetting)
+	ad, ok := a.(*addon.AddonSetting)
 	if !ok {
 		return nil
 	}
-	return addon
+	return ad
 }
 
 func (m *Manager) getInstallAddons() (addons []*addon.AddonSetting) {
 	m.installAddons.Range(func(key, value interface{}) bool {
-		addon, ok := value.(*addon.AddonSetting)
+		ad, ok := value.(*addon.AddonSetting)
 		if ok {
-			addons = append(addons, addon)
+			addons = append(addons, ad)
 		}
 		return true
 	})

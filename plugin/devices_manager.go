@@ -108,9 +108,9 @@ func (m *Manager) CancelRemoveThing(deviceId string) {
 	if device == nil {
 		return
 	}
-	adapter := m.getAdapter(device.AdapterId)
-	if adapter != nil {
-		adapter.cancelRemoveThing(deviceId)
+
+	if device.adapter != nil {
+		device.adapter.cancelRemoveThing(deviceId)
 	}
 }
 

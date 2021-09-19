@@ -10,6 +10,8 @@ type Device struct {
 	adapter *Adapter
 	*devices.Device
 	Properties map[string]*Property `json:"properties"`
+	Actions    map[string]*Action   `json:"actions"`
+	Events     map[string]*Event    `json:"events"`
 }
 
 func NewDeviceFormMessage(dev *rpc.Device, adapter *Adapter) *Device {
@@ -20,10 +22,25 @@ func NewDeviceFormMessage(dev *rpc.Device, adapter *Adapter) *Device {
 	}
 	if len(device.Device.Properties) > 0 {
 		device.Properties = make(map[string]*Property)
+		for name, p := range device.Device.Properties {
+			device.Properties[name] = NewProperty(device, p)
+		}
 	}
-	for name, p := range device.Device.Properties {
-		device.Properties[name] = NewProperty(device, p)
+
+	if len(device.Device.Events) > 0 {
+		device.Events = make(map[string]*Event)
+		for name, e := range device.Device.Events {
+			device.Events[name] = NewEvent(device, e)
+		}
 	}
+
+	if len(device.Device.Actions) > 0 {
+		device.Actions = make(map[string]*Action)
+		for name, a := range device.Device.Actions {
+			device.Actions[name] = NewAction(device, a)
+		}
+	}
+
 	device.adapter = adapter
 	return device
 }
@@ -33,7 +50,6 @@ func NewDeviceFormString(desc string, adapter *Adapter) *Device {
 	device := &Device{}
 	device.adapter = adapter
 	device.Device = devices.NewDeviceFormString(desc)
-	device.AdapterId = adapter.ID
 	device.Properties = make(map[string]*Property)
 	var properties map[string]string
 	json.Get(data, "properties").ToVal(&properties)
@@ -46,36 +62,8 @@ func NewDeviceFormString(desc string, adapter *Adapter) *Device {
 			}
 		}
 	}
-	return device
-}
 
-func (device *Device) asThing() *rpc.ThingDescription {
-	thing := &rpc.ThingDescription{
-		Id:                  device.ID,
-		Title:               device.Title,
-		AtContext:           device.AtContext,
-		AtType:              device.AtType,
-		Description:         device.Description,
-		Base:                "",
-		BaseHref:            device.BaseHref,
-		Links:               device.Links,
-		Pin:                 device.Pin,
-		Properties:          nil,
-		Actions:             nil,
-		Events:              nil,
-		CredentialsRequired: false,
-		FloorplanVisibility: false,
-		FloorplanX:          0,
-		FloorplanY:          0,
-		LayoutIndex:         0,
-		SelectedCapability:  "",
-		IconHref:            "",
-		IconData:            nil,
-		Security:            "",
-		SecurityDefinitions: nil,
-		GroupId:             "",
-	}
-	return thing
+	return device
 }
 
 func (device *Device) GetProperty(name string) *Property {
