@@ -10,7 +10,6 @@ import (
 type Adapter struct {
 	ID   string
 	name string
-
 	looker      *sync.Mutex
 	isPairing   bool
 	devices     sync.Map

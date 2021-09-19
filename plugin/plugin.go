@@ -197,6 +197,7 @@ func (plugin *Plugin) OnMsg(messageType rpc.MessageType, data []byte) (err error
 			var d = make(map[string]interface{})
 			d["things"] = bt
 			adapter.sendMsg(rpc.MessageType_ServiceGetThingsResponse, d)
+
 		case rpc.MessageType_ServiceGetThingRequest:
 			id := json.Get(data, "thingId").ToString()
 			thing := plugin.pluginServer.manager.container.GetThing(id)
@@ -207,6 +208,7 @@ func (plugin *Plugin) OnMsg(messageType rpc.MessageType, data []byte) (err error
 			var d = make(map[string]interface{})
 			d["thing"] = bt
 			adapter.sendMsg(rpc.MessageType_ServiceGetThingResponse, d)
+			
 		case rpc.MessageType_ServiceSetPropertyValueRequest:
 			var message rpc.ServiceSetPropertyValueRequestMessage_Data
 			err = json.Unmarshal(data, &message)

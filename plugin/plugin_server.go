@@ -19,13 +19,13 @@ type PluginsServer struct {
 }
 
 func NewPluginServer(manager *Manager) *PluginsServer {
-	server := &PluginsServer{}
-	server.logger = manager.logger
-	server.closeChan = make(chan struct{})
-	server.manager = manager
-	server.ipc = ipc.NewIPCServer(server, manager.config.IPCPort, manager.config.UserProfile, manager.config.Preferences, manager.logger)
-	server.rpc = rpc_server.NewRPCServer(server, manager.config.RPCPort, manager.config.UserProfile, manager.config.Preferences, manager.logger)
-	return server
+	s := &PluginsServer{}
+	s.logger = manager.logger
+	s.closeChan = make(chan struct{})
+	s.manager = manager
+	s.ipc = ipc.NewIPCServer(s, manager.config.IPCPort, manager.config.UserProfile, manager.config.Preferences, manager.logger)
+	s.rpc = rpc_server.NewRPCServer(s, manager.config.RPCPort, manager.config.UserProfile, manager.config.Preferences, manager.logger)
+	return s
 }
 
 func (s *PluginsServer) RegisterPlugin(pluginId string, clint server.Clint) server.PluginHandler {
