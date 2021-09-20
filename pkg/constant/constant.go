@@ -1,6 +1,6 @@
 package constant
 
-// Events
+// events
 const (
 	GatewayStart = "gatewayStart"
 	GatewayStop  = "gatewayStop"

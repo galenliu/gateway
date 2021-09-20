@@ -102,7 +102,8 @@ func (c *ThingsModel) UpdateThing(data []byte) error {
 }
 
 func (c *ThingsModel) handleCreateThing(data []byte) (*Thing, error) {
-	th, err := NewThingFromString(string(data))
+	id := json.Get(data, "id").ToString()
+	th, err := NewThingFromString(id, string(data))
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +136,7 @@ func (c *ThingsModel) handleRemoveThing(thingId string) error {
 func (c *ThingsModel) handleUpdateThing(data []byte) error {
 	thingId := json.Get(data, "id").ToString()
 	if _, ok := c.things[thingId]; ok {
-		newThing, err := NewThingFromString(string(data))
+		newThing, err := NewThingFromString(thingId, string(data))
 		if err != nil {
 			return err
 		}
@@ -153,7 +154,7 @@ func (c *ThingsModel) handleUpdateThing(data []byte) error {
 func (c *ThingsModel) updateThings() {
 	if len(c.things) < 1 {
 		for id, bytes := range c.store.GetThings() {
-			thing, err := NewThingFromString(string(bytes))
+			thing, err := NewThingFromString(id, string(bytes))
 			if err != nil {
 				continue
 			}

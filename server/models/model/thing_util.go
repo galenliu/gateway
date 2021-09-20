@@ -12,17 +12,17 @@ package model
 //		Href:                fmt.Sprintf("/%s", device.Id),
 //		CredentialsRequired: false,
 //		SelectedCapability:  "",
-//		Properties:          nil,
-//		Actions:             nil,
-//		Events:              nil,
+//		properties:          nil,
+//		actions:             nil,
+//		events:              nil,
 //	}
 //	var tps = make(map[string]*thing.Property)
-//	for _, p := range device.Properties {
+//	for _, p := range device.properties {
 //		tp := toThingProperty(p, thing.Id)
 //		tp.ThingId = device.Id
 //		tps[tp.name] = tp
 //	}
-//	thing.Properties = tps
+//	thing.properties = tps
 //	return thing
 //}
 //

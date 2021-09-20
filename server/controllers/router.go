@@ -162,7 +162,7 @@ func NewRouter(config Config, manager Manager, serviceManager ServiceManager, co
 		thingsGroup.Get("/:thingId"+constant.ActionsPath, actionsController.handleGetActions)
 		thingsGroup.Post("/:thingId"+constant.ActionsPath, actionsController.handleCreateAction)
 
-		//Actions Controller
+		//actions Controller
 		actionsGroup := app.Group(constant.ActionsPath)
 		actionsGroup.Post("/", actionsController.handleCreateAction)
 		actionsGroup.Get("/", actionsController.handleGetActions)

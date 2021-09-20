@@ -67,10 +67,10 @@ func (a *ActionsController) handleGetActions(c *fiber.Ctx) error {
 	//var actionName = c.Params("actionName", "")
 
 	if thingId != "" {
-		//actions := a.Actions.GetAction(thingId, actionName)
+		//actions := a.actions.GetAction(thingId, actionName)
 		return c.Status(fiber.StatusOK).JSON("")
 	} else {
-		//actions := a.Actions.GetGatewayActions(actionName)
+		//actions := a.actions.GetGatewayActions(actionName)
 		return c.Status(fiber.StatusOK).JSON("")
 	}
 }
@@ -89,7 +89,7 @@ func (a *ActionsController) handleDeleteAction(c *fiber.Ctx) error {
 	//
 	//	}
 	//}
-	//err := a.Actions.Remove(actionId)
+	//err := a.actions.Remove(actionId)
 	//if err != nil {
 	//	return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	//}
