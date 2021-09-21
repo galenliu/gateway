@@ -18,11 +18,11 @@ type Bus struct {
 	logger logging.Logger
 }
 
-func NewController(log logging.Logger) (Controller, error) {
+func NewController(log logging.Logger) Controller {
 	b := &Bus{}
 	b.logger = log
 	b.Bus = bus.New()
-	return b, nil
+	return b
 }
 
 func (b *Bus) Subscribe(topic string, fn interface{}) {

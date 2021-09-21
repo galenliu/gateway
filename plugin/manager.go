@@ -250,6 +250,19 @@ func (m *Manager) getDevices() (devices []*Device) {
 	return
 }
 
+func (m *Manager) getDevicesMaps() (devices map[string]*Device) {
+	devices = make(map[string]*Device)
+	m.devices.Range(func(key, value interface{}) bool {
+		device, ok := value.(*Device)
+		name, ok1 := key.(string)
+		if ok && ok1 {
+			devices[name] = device
+		}
+		return true
+	})
+	return
+}
+
 func (m *Manager) getInstallAddon(addonId string) *addon.AddonSetting {
 	a, ok := m.installAddons.Load(addonId)
 	ad, ok := a.(*addon.AddonSetting)

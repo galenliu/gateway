@@ -91,3 +91,13 @@ const (
 	PrefUnitsTempCelsius = "degree celsius"
 	ConfDirName          = ".gateway"
 )
+
+const (
+	ZhCn             = "zh-cn"             //简体中文(中国)
+	ZhHk             = "zh-hk"             //繁体中文(香港)
+	ZhTw             = "zh-tw"             //繁体中文(台湾地区)
+	EnUs             = "zh-us"             //英语(美国)
+	EnGb             = "en-gb"             //英语(英国)
+	DegreeCelsius    = "degree celsius"    //摄氏度
+	FahrenheitDegree = "fahrenheit degree" //华氏度
+)

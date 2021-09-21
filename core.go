@@ -73,9 +73,11 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 	g.container = container.NewThingsContainerModel(g.storage, g.logger)
 
 	//  EventBus init
-	newBus, err := bus.NewController(g.logger)
-	if err != nil {
-		return nil, err
+	g.bus = bus.NewController(g.logger)
+
+	s, err := g.storage.GetSetting("preferences")
+	if err != nil || s == ""{
+
 	}
 
 	//Addon manager init
@@ -83,15 +85,13 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 		UserProfile: u,
 		Preferences: &rpc.Preferences{
 			Language: "zh-cn",
-			Units:    &rpc.Preferences_Units{Temperature: "℃"},
+			Units:    &rpc.Preferences_Units{Temperature: constant.DegreeCelsius},
 		},
 		AddonsDir:       u.AddonsDir,
 		AttachAddonsDir: g.config.AttachAddonsDir,
 		IPCPort:         config.IPCPort,
 		RPCPort:         config.RPCPort,
-	}, g.storage, newBus, g.logger)
-
-	g.container = container.NewThingsContainerModel(g.storage, g.logger)
+	}, g.storage, g.bus, g.logger)
 
 	// Web service init
 	g.sever = server.NewServe(server.Config{
@@ -102,9 +102,13 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 		TemplateDir: path.Join(g.config.BaseDir, "template"),
 		UploadDir:   path.Join(g.config.BaseDir, "upload"),
 		LogDir:      path.Join(g.config.BaseDir, "log"),
-	}, g.addonManager, g.addonManager, g.container, g.storage, newBus, g.logger)
+	}, g.addonManager, g.addonManager, g.container, g.storage, g.bus, g.logger)
 
-	g.bus = newBus
+	if err != nil {
+		logger.Error("start err: &s", err.Error())
+		return nil, err
+	}
+
 	return g, nil
 }
 
