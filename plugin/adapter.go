@@ -47,7 +47,7 @@ func (adapter *Adapter) removeThing(device *Device) {
 	adapter.logger.Infof("adapter delete thing Id: %v", device.ID)
 	data := make(map[string]interface{})
 	data["deviceId"] = device.ID
-	adapter.sendMsg(AdapterRemoveDeviceRequest, data)
+	adapter.sendMsg(rpc.MessageType_AdapterRemoveDeviceRequest, data)
 }
 
 func (adapter *Adapter) cancelRemoveThing(deviceId string) {

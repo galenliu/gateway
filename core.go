@@ -51,7 +51,7 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 	g := &Gateway{}
 	g.logger = logger
 	g.config = config
-	u := &rpc.PluginRegisterResponseMessage_Data_UsrProfile{
+	u := &rpc.UsrProfile{
 		BaseDir:    g.config.BaseDir,
 		DataDir:    path.Join(g.config.BaseDir, "data"),
 		AddonsDir:  path.Join(g.config.BaseDir, "addons"),
@@ -81,9 +81,9 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 	//Addon manager init
 	g.addonManager = plugin.NewAddonsManager(plugin.Config{
 		UserProfile: u,
-		Preferences: &rpc.PluginRegisterResponseMessage_Data_Preferences{
+		Preferences: &rpc.Preferences{
 			Language: "zh-cn",
-			Units:    &rpc.PluginRegisterResponseMessage_Data_Preferences_Units{Temperature: "℃"},
+			Units:    &rpc.Preferences_Units{Temperature: "℃"},
 		},
 		AddonsDir:       u.AddonsDir,
 		AttachAddonsDir: g.config.AttachAddonsDir,

@@ -186,7 +186,6 @@ func (m *Manager) handleSetProperty(deviceId, propName string, setValue interfac
 	//data[addon.Did] = device.GetID()
 	//data["propertyName"] = property.GetName()
 	//data["propertyValue"] = newValue
-	go adapter.sendMsg(DeviceSetPropertyCommand, nil)
 	return nil
 }
 

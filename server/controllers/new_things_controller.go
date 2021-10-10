@@ -34,7 +34,7 @@ func (c *NewThingsController) handleNewThingsWebsocket(thingsModel model.Contain
 		for id, dev := range addonDevices {
 			_, ok := savedThings[id]
 			if !ok {
-				dev, err := container.NewThingFromString(string(dev))
+				dev, err := container.NewThingFromString(id, string(dev))
 				if err == nil {
 					err := conn.WriteJSON(dev)
 					if err != nil {

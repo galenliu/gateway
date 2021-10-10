@@ -75,7 +75,7 @@ func (p *Property) setCachedValueAndNotify(value interface{}) bool {
 }
 
 func (p *Property) SetCachedValue(value interface{}) {
-	if p.Type == TypeBoolean {
+	if p.Type == rpc.Type_name[int32(rpc.Type_boolean)] {
 		p.Value = !!to.Bool(value)
 	} else {
 		p.Value = value

@@ -16,6 +16,7 @@ func NewSettingController(model *models.Settings, log logging.Logger) *SettingsC
 	return s
 }
 
+// GET  /settings/addonInfo
 func (s *SettingsController) handleGetAddonsInfo(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(s.model.GetAddonInfo())
 }

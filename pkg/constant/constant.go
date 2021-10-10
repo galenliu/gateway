@@ -84,9 +84,6 @@ const (
 	UploadDirName = "upload"
 	LogDirName    = "logger"
 
-	DbPrefLang = "preferences.language"
-	PrefLangCn = "zh-CN"
-
 	DbPrefUnitsTemp      = "preferences.units.temperature"
 	PrefUnitsTempCelsius = "degree celsius"
 	ConfDirName          = ".gateway"
