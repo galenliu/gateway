@@ -11,7 +11,7 @@ import (
 )
 
 // GetInstallAddons 获取已安装的add-on
-func (m *Manager) GetInstallAddons() []byte {
+func (m *Manager) GetInstallAddonsBytes() []byte {
 	addons := m.getInstallAddons()
 	data, err := json.Marshal(addons)
 	if err != nil {

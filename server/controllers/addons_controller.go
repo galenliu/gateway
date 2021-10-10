@@ -9,7 +9,7 @@ import (
 )
 
 type AddonManager interface {
-	GetInstallAddons() []byte
+	GetInstallAddonsBytes() []byte
 	EnableAddon(addonId string) error
 	DisableAddon(addonId string) error
 	InstallAddonFromUrl(id, url, checksum string) error
@@ -36,7 +36,7 @@ func NewAddonController(manager AddonManager, m *models.AddonsModel, log logging
 
 //  GET /addons
 func (addon *AddonController) handlerGetInstallAddons(c *fiber.Ctx) error {
-	data := addon.manager.GetInstallAddons()
+	data := addon.manager.GetInstallAddonsBytes()
 	return c.Status(fiber.StatusOK).Send(data)
 }
 
@@ -110,9 +110,9 @@ func (addon *AddonController) handlerSetAddonConfig(c *fiber.Ctx) error {
 // Post /addons
 func (addon *AddonController) handlerInstallAddon(c *fiber.Ctx) error {
 
-	id := c.FormValue("id")
-	url := c.FormValue("url")
-	checksum := c.FormValue("checksum")
+	id := json.Get(c.Body(), "id").ToString()
+	url := json.Get(c.Body(), "url").ToString()
+	checksum := json.Get(c.Body(), "checksum").ToString()
 	if id == "" || url == "" || checksum == "" {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "Bad Request"})
 	}

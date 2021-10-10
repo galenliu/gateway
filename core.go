@@ -11,6 +11,7 @@ import (
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server"
+	json "github.com/json-iterator/go"
 	"path"
 	"time"
 )
@@ -41,9 +42,8 @@ type Gateway struct {
 	bus          bus.Controller
 	logger       logging.Logger
 	addonManager *plugin.Manager
-
-	sever     *server.WebServe
-	container container.Container
+	sever        *server.WebServe
+	container    container.Container
 }
 
 func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
@@ -75,18 +75,10 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 	//  EventBus init
 	g.bus = bus.NewController(g.logger)
 
-	s, err := g.storage.GetSetting("preferences")
-	if err != nil || s == ""{
-
-	}
-
 	//Addon manager init
 	g.addonManager = plugin.NewAddonsManager(plugin.Config{
-		UserProfile: u,
-		Preferences: &rpc.Preferences{
-			Language: "zh-cn",
-			Units:    &rpc.Preferences_Units{Temperature: constant.DegreeCelsius},
-		},
+		UserProfile:     u,
+		Preferences:     g.GetPreferences(),
 		AddonsDir:       u.AddonsDir,
 		AttachAddonsDir: g.config.AttachAddonsDir,
 		IPCPort:         config.IPCPort,
@@ -110,6 +102,25 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 	}
 
 	return g, nil
+}
+
+func (g *Gateway) GetPreferences() *rpc.Preferences {
+	s, err := g.storage.GetSetting("preferences")
+	var p rpc.Preferences
+	err = json.Unmarshal([]byte(s), &p)
+	if err == nil {
+		return &p
+	}
+	def := &rpc.Preferences{
+		Language: rpc.Language_name[int32(rpc.Language_zh_cn)],
+		Units:    &rpc.Preferences_Units{Temperature: "°C"},
+	}
+	bt, err := json.Marshal(def)
+	err = g.storage.SetSetting("preferences", string(bt))
+	if err != nil {
+		g.logger.Error("saved preferences filed")
+	}
+	return def
 }
 
 func (g *Gateway) Start() error {
