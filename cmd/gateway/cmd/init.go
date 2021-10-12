@@ -12,7 +12,6 @@ func (c *command) initInitCmd() (err error) {
 			if len(args) > 0 {
 				return cmd.Help()
 			}
-
 			return nil
 		},
 		PreRunE: func(cmd *cobra.Command, args []string) error {

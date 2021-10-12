@@ -1,3 +1,4 @@
+
 package plugin
 
 import (
@@ -8,11 +9,10 @@ import (
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/container"
-	"github.com/galenliu/gateway/pkg/util"
-	"github.com/galenliu/gateway/plugin/addon"
-
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/util"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
+	"github.com/galenliu/gateway/plugin/addon"
 	json "github.com/json-iterator/go"
 	"io"
 	"os"
@@ -40,7 +40,6 @@ type Manager struct {
 	config       Config
 	configPath   string
 	pluginServer *PluginsServer
-
 	devices       sync.Map
 	adapters      sync.Map
 	services      sync.Map
@@ -73,13 +72,9 @@ func NewAddonsManager(conf Config, s addon.AddonsStore, bus bus.Controller, log 
 	return am
 }
 
-func (m *Manager) UnloadAddon(id string) error {
-	panic("implement me")
-}
 
-func (m *Manager) LoadAddon(id string) error {
-	panic("implement me")
-}
+
+
 
 func (m *Manager) GetPropertiesValue(thingId string) (map[string]interface{}, error) {
 	panic("implement me")
@@ -179,13 +174,6 @@ func (m *Manager) handleSetProperty(deviceId, propName string, setValue interfac
 	if property == nil {
 		return fmt.Errorf("property err")
 	}
-
-	//property.SetValue(setValue)
-	//var newValue = property.ToValue(setValue)
-	//data := make(map[string]interface{})
-	//data[addon.Did] = device.GetID()
-	//data["propertyName"] = property.GetName()
-	//data["propertyValue"] = newValue
 	return nil
 }
 
@@ -249,18 +237,18 @@ func (m *Manager) getDevices() (devices []*Device) {
 	return
 }
 
-func (m *Manager) getInstallAddon(addonId string) *addon.AddonSetting {
+func (m *Manager) getInstallAddon(addonId string) *addon.Addon {
 	a, ok := m.installAddons.Load(addonId)
-	ad, ok := a.(*addon.AddonSetting)
+	ad, ok := a.(*addon.Addon)
 	if !ok {
 		return nil
 	}
 	return ad
 }
 
-func (m *Manager) getInstallAddons() (addons []*addon.AddonSetting) {
+func (m *Manager) getInstallAddons() (addons []*addon.Addon) {
 	m.installAddons.Range(func(key, value interface{}) bool {
-		ad, ok := value.(*addon.AddonSetting)
+		ad, ok := value.(*addon.Addon)
 		if ok {
 			addons = append(addons, ad)
 		}
@@ -317,7 +305,7 @@ func (m *Manager) installAddon(packageId, packagePath string) error {
 	return m.loadAddon(packageId, m.config.AddonsDir)
 	//saved, err := m.storage.LoadAddonSetting(packageId)
 	//if err == nil && saved != "" {
-	//	var old AddonSetting
+	//	var old Addon
 	//	ee := json.UnmarshalFromString(saved, &old)
 	//	if ee != nil {
 	//		newAddonInfo, err := json.MarshalToString(old)
@@ -364,7 +352,7 @@ func (m *Manager) loadAddons() {
 
 func (m *Manager) loadAddon(packageId string, dir string) error {
 
-	var addonInfo *addon.AddonSetting
+	var addonInfo *addon.Addon
 	var obj interface{}
 	var err error
 
@@ -425,7 +413,7 @@ func (m *Manager) unloadAddon(pluginId string) error {
 	if !m.addonsLoaded {
 		return nil
 	}
-	plugin := m.pluginServer.getPlugin(pluginId)
+	plugin := m.pluginServer.findPlugin(pluginId)
 	plugin.unloadComponents()
 	return nil
 }
@@ -434,7 +422,7 @@ func (m *Manager) removeAdapter(adapter *Adapter) {
 	m.adapters.Delete(adapter.ID)
 }
 
-func (m *Manager) findPluginPath(packageId string) string {
+func (m *Manager) findAddon(packageId string) string {
 	for _, dir := range []string{m.config.AddonsDir, m.config.AttachAddonsDir} {
 		if dir == "" {
 			continue

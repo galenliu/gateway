@@ -1,3 +1,5 @@
+// Package addon
+// @Description:
 package addon
 
 import (
@@ -7,7 +9,7 @@ import (
 )
 
 const ManifestVersion = 1
-const FileName = "manifest.json"
+const manifestFileName = "manifest.json"
 
 type AddonsStore interface {
 	LoadAddonSetting(key string) (string, error)
@@ -16,7 +18,7 @@ type AddonsStore interface {
 	StoreAddonsConfig(key string, value interface{}) error
 }
 
-type AddonSetting struct {
+type Addon struct {
 	ID                      string `json:"id"`
 	Name                    string `json:"name"`
 	ShortName               string `json:"short_name"`
@@ -32,11 +34,11 @@ type AddonSetting struct {
 	ContentScripts          string `json:"content_scripts"`
 	WSebAccessibleResources string `json:"web_accessible_resources"`
 	store                   AddonsStore
-	Dir                     string
+	Dir                     string `json:"-"`
 }
 
-func NewAddonSettingFromString(str string, store AddonsStore) *AddonSetting {
-	var a AddonSetting
+func NewAddonSettingFromString(str string, store AddonsStore) *Addon {
+	var a Addon
 	err := json.UnmarshalFromString(str, &a)
 	if err != nil {
 		return nil
@@ -45,8 +47,9 @@ func NewAddonSettingFromString(str string, store AddonsStore) *AddonSetting {
 	return &a
 }
 
-func NewAddonSettingFromManifest(manifest *ManifestJson, store AddonsStore) *AddonSetting {
-	addonInfo := &AddonSetting{
+
+func NewAddonSettingFromManifest(manifest *ManifestJson, store AddonsStore) *Addon {
+	addonInfo := &Addon{
 		ID:                      manifest.ID,
 		Name:                    manifest.Name,
 		ShortName:               manifest.ShortName,
@@ -66,7 +69,7 @@ func NewAddonSettingFromManifest(manifest *ManifestJson, store AddonsStore) *Add
 	return addonInfo
 }
 
-func (a *AddonSetting) SetEnabled(disabled bool) error {
+func (a *Addon) SetEnabled(disabled bool) error {
 	if a.Enabled == disabled {
 		return nil
 	}
@@ -78,7 +81,7 @@ func (a *AddonSetting) SetEnabled(disabled bool) error {
 	}
 	return nil
 }
-func (a *AddonSetting) Save() error {
+func (a *Addon) Save() error {
 	str, err := json.MarshalToString(a)
 	if err != nil {
 		return err
@@ -86,10 +89,11 @@ func (a *AddonSetting) Save() error {
 	return a.store.StoreAddonSetting(a.ID, str)
 }
 
-func LoadManifest(destPath, packetId string, store AddonsStore) (*AddonSetting, interface{}, error) {
 
-	//load manifest.json\
-	manifest, err := readManifest(path.Join(destPath, FileName))
+func LoadManifest(destPath, packetId string, store AddonsStore) (*Addon, interface{}, error) {
+
+	//load manifest.json
+	manifest, err := readManifest(path.Join(destPath, manifestFileName))
 	if err != nil {
 		return nil, nil, err
 	}

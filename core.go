@@ -41,7 +41,6 @@ type Gateway struct {
 	bus          bus.Controller
 	logger       logging.Logger
 	addonManager *plugin.Manager
-
 	sever     *server.WebServe
 	container container.Container
 }
@@ -103,7 +102,6 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 		UploadDir:   path.Join(g.config.BaseDir, "upload"),
 		LogDir:      path.Join(g.config.BaseDir, "log"),
 	}, g.addonManager, g.addonManager, g.container, g.storage, newBus, g.logger)
-
 	g.bus = newBus
 	return g, nil
 }

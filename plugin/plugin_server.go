@@ -2,6 +2,7 @@ package plugin
 
 //	plugin server
 import (
+	"fmt"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/server"
 	ipc "github.com/galenliu/gateway/pkg/server/ipc_server"
@@ -29,7 +30,7 @@ func NewPluginServer(manager *Manager) *PluginsServer {
 }
 
 func (s *PluginsServer) RegisterPlugin(pluginId string, clint server.Clint) server.PluginHandler {
-	plugin := s.getPlugin(pluginId)
+	plugin := s.findPlugin(pluginId)
 	if plugin == nil {
 		plugin = NewPlugin(pluginId, s.manager, s, s.logger)
 		s.Plugins.Store(pluginId, plugin)
@@ -41,7 +42,7 @@ func (s *PluginsServer) RegisterPlugin(pluginId string, clint server.Clint) serv
 }
 
 func (s *PluginsServer) loadPlugin(addonPath, id, exec string) {
-	plugin := s.getPlugin(id)
+	plugin := s.findPlugin(id)
 	if plugin == nil {
 		plugin = NewPlugin(id, s.manager, s, s.logger)
 		s.Plugins.Store(id, plugin)
@@ -51,17 +52,17 @@ func (s *PluginsServer) loadPlugin(addonPath, id, exec string) {
 	plugin.start()
 }
 
-func (s *PluginsServer) unloadPlugin(packageId string) {
-	plugin := s.getPlugin(packageId)
+func (s *PluginsServer) unloadPlugin(packageId string) error {
+	plugin := s.findPlugin(packageId)
 	if plugin == nil {
-		s.logger.Error("plugin not exist")
-		return
+		return fmt.Errorf("plugin not exist")
 	}
 	plugin.unload()
 	s.Plugins.Delete(packageId)
+	return nil
 }
 
-func (s *PluginsServer) getPlugin(id string) *Plugin {
+func (s *PluginsServer) findPlugin(id string) *Plugin {
 	p, ok := s.Plugins.Load(id)
 	plugin, ok := p.(*Plugin)
 	if !ok {

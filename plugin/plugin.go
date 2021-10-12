@@ -7,6 +7,7 @@ import (
 	"github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/server"
+	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin/addon"
 	json "github.com/json-iterator/go"
 	"io"
@@ -37,6 +38,10 @@ type Plugin struct {
 }
 
 func NewPlugin(pluginId string, manager *Manager, s *PluginsServer, log logging.Logger) (plugin *Plugin) {
+	execPath := s.manager.findAddon(pluginId)
+	if execPath == "" {
+		return nil
+	}
 	plugin = &Plugin{}
 	plugin.logger = log
 	plugin.locker = new(sync.Mutex)
@@ -46,7 +51,7 @@ func NewPlugin(pluginId string, manager *Manager, s *PluginsServer, log logging.
 	plugin.pluginId = pluginId
 	plugin.restart = false
 	plugin.pluginServer = s
-	plugin.execPath = path.Join(plugin.pluginServer.manager.config.UserProfile.AddonsDir, pluginId)
+	plugin.execPath = execPath
 	return
 }
 
@@ -208,7 +213,7 @@ func (plugin *Plugin) OnMsg(messageType rpc.MessageType, data []byte) (err error
 			var d = make(map[string]interface{})
 			d["thing"] = bt
 			adapter.sendMsg(rpc.MessageType_ServiceGetThingResponse, d)
-			
+
 		case rpc.MessageType_ServiceSetPropertyValueRequest:
 			var message rpc.ServiceSetPropertyValueRequestMessage_Data
 			err = json.Unmarshal(data, &message)
@@ -396,13 +401,22 @@ func (plugin *Plugin) unload() {
 	plugin.restart = false
 	plugin.unloading = true
 	plugin.SendMsg(rpc.MessageType_PluginUnloadRequest, map[string]interface{}{})
+	plugin.unloadComponents()
+	plugin.kill()
+	err := util.RemoveDir(plugin.execPath)
+	if err != nil {
+		plugin.logger.Errorf("delete plugin dir failed err:", err.Error())
+	}
+	err = util.RemoveDir(path.Join(plugin.pluginServer.manager.config.UserProfile.DataDir, plugin.pluginId))
+	if err != nil {
+		plugin.logger.Errorf("delete plugin data dir failed err:", err.Error())
+	}
 }
 
 func (plugin *Plugin) unloadComponents() {
 	adapters := plugin.getAdapters()
 	notifiers := plugin.getNotifiers()
 	apiHandlers := plugin.getApiHandlers()
-
 	var unloadsFunc []func()
 	for _, adapter := range adapters {
 		plugin.addonManager.removeAdapter(adapter)
@@ -424,7 +438,6 @@ func (plugin *Plugin) unloadComponents() {
 		plugin.addonManager.removeApiHandler(id)
 		unloadsFunc = append(unloadsFunc, apiHandler.unload)
 	}
-
 	for _, f := range unloadsFunc {
 		f()
 	}

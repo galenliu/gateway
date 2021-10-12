@@ -148,7 +148,6 @@ func (addon *AddonController) handlerUpdateAddon(c *fiber.Ctx) error {
 
 }
 
-//Delete /:addonId
 func (addon *AddonController) handlerDeleteAddon(c *fiber.Ctx) error {
 	var addonId = c.Params("addonId")
 	err := addon.manager.UninstallAddon(addonId, true)

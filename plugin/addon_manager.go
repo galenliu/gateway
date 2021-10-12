@@ -80,35 +80,28 @@ func (m *Manager) InstallAddonFromUrl(id, url, checksum string) error {
 	return nil
 }
 
-func (m *Manager) UninstallAddon(addonId string, disable bool) error {
+func (m *Manager) UninstallAddon(pluginId string, disable bool) error {
 
-	err := m.unloadAddon(addonId)
+	defer m.installAddons.Delete(pluginId)
+	err := m.pluginServer.unloadPlugin(pluginId)
 	if err != nil {
 		return err
 	}
-	f := m.findPluginPath(addonId)
-	if f != "" {
-		err := util.RemoveDir(f)
-		if err != nil {
-			m.logger.Errorf("remove dir from: %s err :%s", f, err)
-		}
-	}
 	if disable {
-		addonInfo := m.getInstallAddon(addonId)
+		addonInfo := m.getInstallAddon(pluginId)
 		err := addonInfo.SetEnabled(disable)
 		if err != nil {
 			return err
 		}
 	}
-	m.installAddons.Delete(addonId)
-	m.installAddons.Delete(addonId)
 	return nil
 }
 
 func (m *Manager) GetAddonLicense(addonId string) (string, error) {
-	addonDir := m.findPluginPath(addonId)
+	addonDir := m.findAddon(addonId)
+	m.pluginServer.findPlugin(addonId)
 	if addonDir == "" {
-		return "", fmt.Errorf("can not find addon")
+		return "", fmt.Errorf("addon not installed")
 	}
 	data, err := os.ReadFile(path.Join(addonDir, "LICENSE"))
 	if err != nil {
@@ -116,3 +109,20 @@ func (m *Manager) GetAddonLicense(addonId string) (string, error) {
 	}
 	return string(data), nil
 }
+
+func (m *Manager) UnloadAddon(id string) error {
+	plugin := m.pluginServer.findPlugin(id)
+	if plugin == nil {
+		return fmt.Errorf("plugin not exist")
+	}
+	return m.pluginServer.unloadPlugin(id)
+}
+
+func (m *Manager) LoadAddon(id string) error {
+	addon := m.findAddon(id)
+	if addon == "" {
+		return fmt.Errorf("addon not installed")
+	}
+	return m.loadAddon(id, addon)
+}
+
