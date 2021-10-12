@@ -125,4 +125,3 @@ func (m *Manager) LoadAddon(id string) error {
 	}
 	return m.loadAddon(id, addon)
 }
-
