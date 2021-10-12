@@ -11,7 +11,7 @@ import (
 )
 
 // GetInstallAddons 获取已安装的add-on
-func (m *Manager) GetInstallAddons() []byte {
+func (m *Manager) GetInstallAddonsBytes() []byte {
 	addons := m.getInstallAddons()
 	data, err := json.Marshal(addons)
 	if err != nil {
@@ -58,7 +58,7 @@ func (m *Manager) InstallAddonFromUrl(id, url, checksum string) error {
 	m.logger.Infof("fetching add-on %s as %s", url, destPath)
 	resp, err := http.Get(url)
 	if err != nil {
-		return fmt.Errorf("download addon err,pakage ID:%s err:%s", id, err.Error())
+		return fmt.Errorf("http get err: %s", err.Error())
 	}
 	defer func() {
 		_ = resp.Body.Close()

@@ -92,13 +92,13 @@ func (action *Action) updateStatus(newStatus string) {
 //}
 //
 //func (action *Action) Subscribe(typ string, f interface{}) {
-//	_ = event_bus.Subscribe("Actions."+typ, f)
+//	_ = event_bus.Subscribe("actions."+typ, f)
 //}
 //
 //func (action *Action) Unsubscribe(typ string, f interface{}) {
-//	_ = event_bus.Unsubscribe("Actions."+typ, f)
+//	_ = event_bus.Unsubscribe("actions."+typ, f)
 //}
 //
 //func (action *Action) Publish(typ string, args ...interface{}) {
-//	event_bus.Publish("Actions."+typ, args...)
+//	event_bus.Publish("actions."+typ, args...)
 //}

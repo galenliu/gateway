@@ -44,7 +44,7 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 
 //func websocketHandler(c *websocket.Conn, thingId string) {
 //	Things := models.NewThingsOnce()
-//	Actions := models.NewActions()
+//	actions := models.NewActions()
 //	subscribedEventNames := make(map[string]bool)
 //	thingCleanups := map[string]func(){}
 //	var done = make(chan struct{})
@@ -141,7 +141,7 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //		m["id"] = thing.GetID()
 //		m["messageType"] = constant.PropertyStatus
 //		propertyValues := make(map[string]interface{})
-//		for propName, prop := range thing.Properties {
+//		for propName, prop := range thing.properties {
 //			value, err := Manager.GetPropertyValue(thing.GetID(), propName)
 //			prop.SetCachedValue(value)
 //			if err != nil {
@@ -204,11 +204,11 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //
 //	Manager.Subscribe(constant.PropertyChanged, onPropertyChanged)
 //	Things.Subscribe(constant.ThingAdded, onThingAdded)
-//	Actions.Subscribe(constant.ActionStatus, onActionStatus)
+//	actions.Subscribe(constant.ActionStatus, onActionStatus)
 //
 //	clearFunc := func() {
 //		Things.Unsubscribe(constant.ThingAdded, onThingAdded)
-//		Actions.Unsubscribe(constant.ActionStatus, onActionStatus)
+//		actions.Unsubscribe(constant.ActionStatus, onActionStatus)
 //		Manager.Unsubscribe(constant.PropertyChanged, onPropertyChanged)
 //	}
 //
@@ -277,7 +277,7 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //			for actionName := range actionNames {
 //				data := json.Get(bytes, "data").ToString()
 //				action := models.NewAction([]byte(data), id)
-//				err := Things.Actions.Add(action)
+//				err := Things.actions.Add(action)
 //				if err != nil {
 //					return
 //				}
@@ -440,7 +440,7 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //			json.Get(bytes, "data", actionName, "input").ToVal(&actionParams)
 //			th := controller.ThingsModel.GetThing(id)
 //			action := models.NewAction(actionName, actionParams, th)
-//			controller.ThingsModel.Actions.Add(action)
+//			controller.ThingsModel.actions.Add(action)
 //			err := manager.RequestAction(id, action.ID, actionName, actionParams)
 //			if err != nil {
 //				sendError(400, "400 Bad Request", err.Error())
@@ -460,7 +460,7 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //
 //	m := make(map[string]interface{})
 //	m["id"] = id
-//	for propName, _ := range thing.Properties {
+//	for propName, _ := range thing.properties {
 //		value, err := manager.GetPropertyValue(id, propName)
 //		if err != nil {
 //			m["messageType"] = util.PropertyStatus

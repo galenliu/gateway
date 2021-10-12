@@ -3,6 +3,7 @@ package plugin
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/galenliu/gateway-addon/devices"
 )
 
 func (m *Manager) SetPropertyValue(deviceId, propName string, newValue interface{}) (interface{}, error) {
@@ -89,8 +90,30 @@ func (m *Manager) GetDevicesBytes() (devices map[string][]byte) {
 		}
 		return devicesMap
 	}
-	return nil
+	return
 }
+
+func (m *Manager) GetDevices() (devices []*devices.Device) {
+	devs := m.getDevices()
+	if devs != nil {
+		for _, dev := range devs {
+			devices = append(devices, dev.Device)
+		}
+	}
+	return devices
+}
+
+func (m *Manager) GetDevicesMaps() (dms map[string]*devices.Device) {
+	devs := m.getDevicesMaps()
+	if devs != nil {
+		dms = make(map[string]*devices.Device)
+		for name, dev := range devs {
+			dms[name] = dev.Device
+		}
+	}
+	return
+}
+
 
 func (m *Manager) RemoveDevice(deviceId string) error {
 	//

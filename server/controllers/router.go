@@ -72,6 +72,7 @@ func NewRouter(config Config, manager Manager, serviceManager ServiceManager, co
 
 	actionsModel := models.NewActionsModel(manager, bus, log)
 	serviceModel := models.NewServicesModel(manager)
+	newThingsModel := models.NewNewThingsModel(manager, log)
 
 	//logger
 	app.Use(func(c *fiber.Ctx) error {
@@ -162,7 +163,7 @@ func NewRouter(config Config, manager Manager, serviceManager ServiceManager, co
 		thingsGroup.Get("/:thingId"+constant.ActionsPath, actionsController.handleGetActions)
 		thingsGroup.Post("/:thingId"+constant.ActionsPath, actionsController.handleCreateAction)
 
-		//Actions Controller
+		//actions Controller
 		actionsGroup := app.Group(constant.ActionsPath)
 		actionsGroup.Post("/", actionsController.handleCreateAction)
 		actionsGroup.Get("/", actionsController.handleGetActions)
@@ -171,7 +172,7 @@ func NewRouter(config Config, manager Manager, serviceManager ServiceManager, co
 
 	//NewThing Controller
 	{
-		newThingsController := NewNewThingsController(log)
+		newThingsController := NewNewThingsController(newThingsModel, bus, log)
 		newThingsGroup := app.Group(constant.NewThingsPath)
 		newThingsGroup.Use("/", func(c *fiber.Ctx) error {
 			if websocket.IsWebSocketUpgrade(c) {
