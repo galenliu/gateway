@@ -172,7 +172,7 @@ func NewRouter(config Config, manager Manager, serviceManager ServiceManager, co
 
 	//NewThing Controller
 	{
-		newThingsController := NewNewThingsController(newThingsModel, bus, log)
+		newThingsController := NewNewThingsController(newThingsModel, log)
 		newThingsGroup := app.Group(constant.NewThingsPath)
 		newThingsGroup.Use("/", func(c *fiber.Ctx) error {
 			if websocket.IsWebSocketUpgrade(c) {

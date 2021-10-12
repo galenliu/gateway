@@ -18,7 +18,7 @@ type Bus struct {
 	logger logging.Logger
 }
 
-func NewController(log logging.Logger) Controller {
+func NewBusController(log logging.Logger) Controller {
 	b := &Bus{}
 	b.logger = log
 	b.Bus = bus.New()

@@ -303,20 +303,6 @@ func (m *Manager) installAddon(packageId, packagePath string) error {
 	}
 
 	return m.loadAddon(packageId, m.config.AddonsDir)
-	//saved, err := m.storage.LoadAddonSetting(packageId)
-	//if err == nil && saved != "" {
-	//	var old Addon
-	//	ee := json.UnmarshalFromString(saved, &old)
-	//	if ee != nil {
-	//		newAddonInfo, err := json.MarshalToString(old)
-	//		if err != nil {
-	//			ee := m.storage.StoreAddonSetting(packageId, newAddonInfo)
-	//			if ee != nil {
-	//				m.logger.Error(ee.Error())
-	//			}
-	//		}
-	//	}
-	//}
 
 }
 
@@ -406,15 +392,6 @@ func (m *Manager) loadAddon(packageId string, dir string) error {
 		return err
 	}
 	m.pluginServer.loadPlugin(packageDir, addonInfo.ID, addonInfo.Exec)
-	return nil
-}
-
-func (m *Manager) unloadAddon(pluginId string) error {
-	if !m.addonsLoaded {
-		return nil
-	}
-	plugin := m.pluginServer.findPlugin(pluginId)
-	plugin.unloadComponents()
 	return nil
 }
 

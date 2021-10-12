@@ -31,7 +31,6 @@ type Container interface {
 type ThingsModel struct {
 	things map[string]*Thing
 	store  ThingsStorage
-
 	logger logging.Logger
 }
 

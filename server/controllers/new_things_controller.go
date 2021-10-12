@@ -18,7 +18,7 @@ type NewThingsController struct {
 	model      *models.NewThingsModel
 }
 
-func NewNewThingsController(log logging.Logger) *NewThingsController {
+func NewNewThingsController(model *models.NewThingsModel,log logging.Logger) *NewThingsController {
 	c := &NewThingsController{}
 	c.logger = log
 	c.locker = new(sync.Mutex)

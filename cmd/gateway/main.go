@@ -46,7 +46,7 @@ func OnTermination(fn TermFunc) {
 
 func main() {
 	if err := cmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, "Error:", err)
+		_, _ = fmt.Fprintln(os.Stderr, "Error:", err)
 		os.Exit(1)
 	}
 }

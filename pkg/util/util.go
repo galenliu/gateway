@@ -23,7 +23,7 @@ func EnsureDir(baseDir string, dirs ...string) error {
 	if os.IsNotExist(err) {
 		e := os.MkdirAll(baseDir, os.ModePerm)
 		if e != nil {
-			return e
+			return fmt.Errorf("create dir %s err: %s", baseDir, err.Error())
 		}
 	}
 	for _, dir := range dirs {
@@ -31,7 +31,7 @@ func EnsureDir(baseDir string, dirs ...string) error {
 		if os.IsNotExist(err) {
 			e := os.MkdirAll(dir, os.ModePerm)
 			if e != nil {
-				return e
+				return fmt.Errorf("create dir %s err: %s", dir, err.Error())
 			}
 		}
 	}

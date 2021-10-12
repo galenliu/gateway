@@ -398,19 +398,23 @@ func (plugin *Plugin) start() {
 }
 
 func (plugin *Plugin) unload() {
-	plugin.restart = false
-	plugin.unloading = true
-	plugin.SendMsg(rpc.MessageType_PluginUnloadRequest, map[string]interface{}{})
-	plugin.unloadComponents()
-	plugin.kill()
+	plugin.disable()
 	err := util.RemoveDir(plugin.execPath)
 	if err != nil {
 		plugin.logger.Errorf("delete plugin dir failed err:", err.Error())
 	}
 	err = util.RemoveDir(path.Join(plugin.pluginServer.manager.config.UserProfile.DataDir, plugin.pluginId))
 	if err != nil {
-		plugin.logger.Errorf("delete plugin data dir failed err:", err.Error())
+		plugin.logger.Errorf("delete plugin dir failed err:", err.Error())
 	}
+}
+
+func (plugin *Plugin) disable() {
+	plugin.restart = false
+	plugin.unloading = true
+	plugin.SendMsg(rpc.MessageType_PluginUnloadRequest, map[string]interface{}{})
+	plugin.unloadComponents()
+	plugin.kill()
 }
 
 func (plugin *Plugin) unloadComponents() {

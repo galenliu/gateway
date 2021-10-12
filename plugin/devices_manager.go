@@ -104,16 +104,15 @@ func (m *Manager) GetDevices() (devices []*devices.Device) {
 }
 
 func (m *Manager) GetDevicesMaps() (dms map[string]*devices.Device) {
-	devs := m.getDevicesMaps()
+	devs := m.getDevices()
 	if devs != nil {
 		dms = make(map[string]*devices.Device)
-		for name, dev := range devs {
-			dms[name] = dev.Device
+		for _, dev := range devs {
+			dms[dev.ID] = dev.Device
 		}
 	}
 	return
 }
-
 
 func (m *Manager) RemoveDevice(deviceId string) error {
 	//

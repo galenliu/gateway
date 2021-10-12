@@ -74,13 +74,13 @@ func (a *Addon) SetEnabled(disabled bool) error {
 		return nil
 	}
 	a.Enabled = disabled
-	b, err := json.Marshal(a)
-	err = a.store.StoreAddonSetting(a.ID, string(b))
+	err := a.Save()
 	if err != nil {
 		return err
 	}
 	return nil
 }
+
 func (a *Addon) Save() error {
 	str, err := json.MarshalToString(a)
 	if err != nil {

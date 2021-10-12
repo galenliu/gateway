@@ -10,7 +10,7 @@ import (
 	"path"
 )
 
-// GetInstallAddons 获取已安装的add-on
+// GetInstallAddonsBytes  获取已安装的add-on
 func (m *Manager) GetInstallAddonsBytes() []byte {
 	addons := m.getInstallAddons()
 	data, err := json.Marshal(addons)
@@ -40,10 +40,14 @@ func (m *Manager) DisableAddon(addonId string) error {
 		return fmt.Errorf("package not installed")
 	}
 	err := addonInfo.SetEnabled(false)
-	err = m.unloadAddon(addonId)
 	if err != nil {
 		return err
 	}
+	plugin:=m.pluginServer.findPlugin(addonId)
+	if plugin==nil{
+		return nil
+	}
+	plugin.disable()
 	return nil
 }
 

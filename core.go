@@ -41,8 +41,8 @@ type Gateway struct {
 	bus          bus.Controller
 	logger       logging.Logger
 	addonManager *plugin.Manager
-	sever     *server.WebServe
-	container container.Container
+	sever        *server.WebServe
+	container    container.Container
 }
 
 func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
@@ -62,20 +62,25 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 
 	//检查Gateway运行需要的文件目录
 	err := util.EnsureDir(u.BaseDir, u.DataDir, u.ConfigDir, u.AddonsDir, u.ConfigDir, u.MediaDir, u.LogDir)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, err
+	}
 
 	// 数据化初始化
 	g.storage, err = db.NewStorage(u.ConfigDir, logger, db.Config{
 		Reset: config.RemoveBeforeOpen,
 	})
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, err
+	}
 
-	//  container init
+	//  Things container init
 	g.container = container.NewThingsContainerModel(g.storage, g.logger)
 
 	//  EventBus init
-	newBus, err := bus.NewController(g.logger)
-	if err != nil {
-		return nil, err
-	}
+	newBus := bus.NewBusController(g.logger)
 
 	//Addon manager init
 	g.addonManager = plugin.NewAddonsManager(plugin.Config{
@@ -89,8 +94,6 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 		IPCPort:         config.IPCPort,
 		RPCPort:         config.RPCPort,
 	}, g.storage, newBus, g.logger)
-
-	g.container = container.NewThingsContainerModel(g.storage, g.logger)
 
 	// Web service init
 	g.sever = server.NewServe(server.Config{
