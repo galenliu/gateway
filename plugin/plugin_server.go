@@ -103,3 +103,13 @@ func (s *PluginsServer) Stop() error {
 	}
 	return nil
 }
+
+func (s *PluginsServer)shutdown(){
+	_=s.ipc.Stop()
+	_=s.rpc.Stop()
+}
+
+
+func (s *PluginsServer) unregisterPlugin(id string) {
+	s.Plugins.Delete(id)
+}

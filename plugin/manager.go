@@ -72,10 +72,6 @@ func NewAddonsManager(conf Config, s addon.AddonsStore, bus bus.Controller, log 
 	return am
 }
 
-
-
-
-
 func (m *Manager) GetPropertiesValue(thingId string) (map[string]interface{}, error) {
 	panic("implement me")
 }
@@ -121,6 +117,7 @@ func (m *Manager) CancelAddNewThing() {
 	m.pairTask = nil
 	return
 }
+
 
 func (m *Manager) actionNotify(action *addon.Action) {
 	m.Eventbus.bus.Publish(constant.ActionStatus, nil)

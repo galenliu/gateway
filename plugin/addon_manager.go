@@ -43,8 +43,8 @@ func (m *Manager) DisableAddon(addonId string) error {
 	if err != nil {
 		return err
 	}
-	plugin:=m.pluginServer.findPlugin(addonId)
-	if plugin==nil{
+	plugin := m.pluginServer.findPlugin(addonId)
+	if plugin == nil {
 		return nil
 	}
 	plugin.disable()
@@ -85,21 +85,32 @@ func (m *Manager) InstallAddonFromUrl(id, url, checksum string) error {
 }
 
 func (m *Manager) UninstallAddon(pluginId string, disable bool) error {
-
+    // delete addon form manager
 	defer m.installAddons.Delete(pluginId)
-	err := m.pluginServer.unloadPlugin(pluginId)
+
+	err := m.UnloadAddon(pluginId)
 	if err != nil {
-		return err
+		m.logger.Errorf("failed to unload %s properly: %s",pluginId,err.Error())
 	}
-	if disable {
-		addonInfo := m.getInstallAddon(pluginId)
-		err := addonInfo.SetEnabled(disable)
-		if err != nil {
-			return err
-		}
+	err = util.RemoveDir(plugin.execPath)
+	if err != nil {
+		m.logger.Errorf("delete plugin dir failed err:", err.Error())
+	}
+	err = util.RemoveDir(path.Join(plugin.pluginServer.manager.config.UserProfile.DataDir, plugin.pluginId))
+	if err != nil {
+		plugin.logger.Errorf("delete plugin dir failed err:", err.Error())
 	}
 	return nil
 }
+
+func (m *Manager) UnloadAddon(id string) error {
+	plugin := m.pluginServer.findPlugin(id)
+	if plugin == nil {
+		return fmt.Errorf("plugin not exist")
+	}
+	return m.pluginServer.unloadPlugin(id)
+}
+
 
 func (m *Manager) GetAddonLicense(addonId string) (string, error) {
 	addonDir := m.findAddon(addonId)
@@ -112,14 +123,6 @@ func (m *Manager) GetAddonLicense(addonId string) (string, error) {
 		return "", err
 	}
 	return string(data), nil
-}
-
-func (m *Manager) UnloadAddon(id string) error {
-	plugin := m.pluginServer.findPlugin(id)
-	if plugin == nil {
-		return fmt.Errorf("plugin not exist")
-	}
-	return m.pluginServer.unloadPlugin(id)
 }
 
 func (m *Manager) LoadAddon(id string) error {

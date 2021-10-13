@@ -13,11 +13,11 @@ type AddonManager interface {
 	EnableAddon(addonId string) error
 	DisableAddon(addonId string) error
 	InstallAddonFromUrl(id, url, checksum string) error
-	UnloadAddon(id string) error
 	LoadAddon(id string) error
 	UninstallAddon(id string, disabled bool) error
 	GetAddonLicense(addonId string) (string, error)
 	AddonEnabled(addonId string) bool
+	UnloadAddon(id string) error
 }
 
 type AddonController struct {

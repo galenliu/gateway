@@ -37,6 +37,7 @@ type Addon struct {
 	Dir                     string `json:"-"`
 }
 
+
 func NewAddonSettingFromString(str string, store AddonsStore) *Addon {
 	var a Addon
 	err := json.UnmarshalFromString(str, &a)

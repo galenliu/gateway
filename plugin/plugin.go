@@ -1,4 +1,4 @@
-// 处理plugin的消息，完成plugin生命周期状态管理
+
 package plugin
 
 import (
@@ -161,6 +161,8 @@ func (plugin *Plugin) OnMsg(messageType rpc.MessageType, data []byte) (err error
 		case rpc.MessageType_ApiHandlerUnloadResponse:
 			return
 		case rpc.MessageType_PluginUnloadRequest:
+			plugin.shutdown()
+			plugin.pluginServer.unregisterPlugin(plugin.pluginId)
 			return
 		case rpc.MessageType_PluginErrorNotification:
 			return
@@ -320,6 +322,7 @@ func (plugin *Plugin) SendMsg(mt rpc.MessageType, message map[string]interface{}
 }
 
 func (plugin *Plugin) start() {
+
 	plugin.exec = strings.Replace(plugin.exec, "\\", string(os.PathSeparator), -1)
 	plugin.exec = strings.Replace(plugin.exec, "/", string(os.PathSeparator), -1)
 
@@ -398,6 +401,7 @@ func (plugin *Plugin) start() {
 }
 
 func (plugin *Plugin) unload() {
+
 	plugin.disable()
 	err := util.RemoveDir(plugin.execPath)
 	if err != nil {
@@ -454,4 +458,8 @@ func (plugin *Plugin) kill() {
 	select {
 	case plugin.closeExecChan <- struct{}{}:
 	}
+}
+
+func (plugin *Plugin) shutdown() {
+
 }
