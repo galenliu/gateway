@@ -330,7 +330,7 @@ func (plugin *Plugin) start() {
 	command := strings.Replace(plugin.exec, "{path}", plugin.execPath, 1)
 	//command = strings.Replace(command, "{nodeLoader}", configs.GetNodeLoader(), 1)
 	if !strings.HasPrefix(command, "python") {
-		plugin.logger.Error("now only support plugin with python lang")
+		plugin.logger.Errorf("plugin %s not run,only support plugin with python lang now",plugin.pluginId)
 		return
 	}
 	ctx, cancelFunc := context.WithCancel(context.Background())

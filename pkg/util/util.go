@@ -28,7 +28,7 @@ func EnsureDir(log logging.Logger, baseDir string, dirs ...string) {
 		}
 		log.Infof("create dir: %s", baseDir)
 	} else {
-		log.Infof(" dir existed: %s", baseDir)
+		log.Debugf("dir existed: %s", baseDir)
 	}
 	for _, dir := range dirs {
 		_, err := ioutil.ReadDir(dir)
@@ -39,7 +39,7 @@ func EnsureDir(log logging.Logger, baseDir string, dirs ...string) {
 			}
 			log.Infof("create dir: %s", dir)
 		} else {
-			log.Infof(" dir existed: %s", dir)
+			log.Debugf("dir existed: %s", dir)
 		}
 	}
 }

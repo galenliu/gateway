@@ -7,12 +7,12 @@ require (
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
-	github.com/fasthttp/websocket v0.0.0-20200320073529-1554a54587ab // indirect
+	github.com/fasthttp/websocket v1.4.3-rc.9 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/galenliu/gateway-addon v0.0.0-00010101000000-000000000000
 	github.com/galenliu/gateway-grpc v0.0.0-20210912114221-553dee80328d
-	github.com/gofiber/fiber/v2 v2.18.0
-	github.com/gofiber/websocket/v2 v2.0.8
+	github.com/gofiber/fiber/v2 v2.20.2
+	github.com/gofiber/websocket/v2 v2.0.12
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/gorilla/websocket v1.4.2
@@ -33,7 +33,7 @@ require (
 	github.com/prometheus/common v0.26.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
 	github.com/satori/go.uuid v1.2.0
-	github.com/savsgio/gotils v0.0.0-20200117113501-90175b0fbe3f // indirect
+	github.com/savsgio/gotils v0.0.0-20210921075833-21a6215cb0e4 // indirect
 	github.com/shiena/ansicolor v0.0.0-20200904210342-c7312218db18
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/afero v1.6.0 // indirect
@@ -47,7 +47,7 @@ require (
 	github.com/tidwall/match v1.0.3 // indirect
 	github.com/tidwall/pretty v1.1.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.29.0 // indirect
+	github.com/valyala/fasthttp v1.30.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	github.com/xiam/to v0.0.0-20200126224905-d60d31e03561
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
