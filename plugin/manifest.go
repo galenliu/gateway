@@ -1,4 +1,4 @@
-package addon
+package plugin
 
 import (
 	json "github.com/json-iterator/go"

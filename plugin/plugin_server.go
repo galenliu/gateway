@@ -2,7 +2,7 @@ package plugin
 
 //	plugin server
 import (
-	"fmt"
+	rpc "github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/server"
 	ipc "github.com/galenliu/gateway/pkg/server/ipc_server"
@@ -24,13 +24,17 @@ func NewPluginServer(manager *Manager) *PluginsServer {
 	s.logger = manager.logger
 	s.closeChan = make(chan struct{})
 	s.manager = manager
-	s.ipc = ipc.NewIPCServer(s, manager.config.IPCPort, manager.config.UserProfile, manager.config.Preferences, manager.logger)
-	s.rpc = rpc_server.NewRPCServer(s, manager.config.RPCPort, manager.config.UserProfile, manager.config.Preferences, manager.logger)
+	s.ipc = ipc.NewIPCServer(s, manager.config.IPCPort, manager.config.UserProfile, manager.logger)
+	s.rpc = rpc_server.NewRPCServer(s, manager.config.RPCPort, manager.config.UserProfile, manager.logger)
+	err := s.Start()
+	if err != nil {
+		s.logger.Errorf("plugin server run failed: %s", err.Error())
+	}
 	return s
 }
 
 func (s *PluginsServer) RegisterPlugin(pluginId string, clint server.Clint) server.PluginHandler {
-	plugin := s.findPlugin(pluginId)
+	plugin := s.getPlugin(pluginId)
 	if plugin == nil {
 		plugin = NewPlugin(pluginId, s.manager, s, s.logger)
 		s.Plugins.Store(pluginId, plugin)
@@ -41,28 +45,33 @@ func (s *PluginsServer) RegisterPlugin(pluginId string, clint server.Clint) serv
 	return plugin
 }
 
-func (s *PluginsServer) loadPlugin(addonPath, id, exec string) {
-	plugin := s.findPlugin(id)
-	if plugin == nil {
-		plugin = NewPlugin(id, s.manager, s, s.logger)
-		s.Plugins.Store(id, plugin)
-	}
+func (s *PluginsServer) unregisterPlugin(id string) {
+	s.Plugins.Delete(id)
+}
+
+// loadPlugin
+//  @Description:
+//  @receiver s
+//  @param addonPath   package所以的目录
+//  @param id
+//  @param exec
+func (s *PluginsServer) loadPlugin(pluginId,packagePath, exec string) {
+	plugin := s.registerPlugin(pluginId)
 	plugin.exec = exec
-	plugin.execPath = addonPath
+	plugin.execPath = packagePath
 	plugin.start()
 }
 
-func (s *PluginsServer) unloadPlugin(packageId string) error {
-	plugin := s.findPlugin(packageId)
-	if plugin == nil {
-		return fmt.Errorf("plugin not exist")
+func (s *PluginsServer)registerPlugin(pluginId string)*Plugin{
+	plugin := s.getPlugin(pluginId)
+	if plugin == nil{
+		plugin = NewPlugin(pluginId,s.manager,s,s.logger)
 	}
-	plugin.unload()
-	s.Plugins.Delete(packageId)
-	return nil
+	s.Plugins.Store(pluginId,plugin)
+	return plugin
 }
 
-func (s *PluginsServer) findPlugin(id string) *Plugin {
+func (s *PluginsServer) getPlugin(id string) *Plugin {
 	p, ok := s.Plugins.Load(id)
 	plugin, ok := p.(*Plugin)
 	if !ok {
@@ -89,27 +98,19 @@ func (s *PluginsServer) Start() error {
 	return nil
 }
 
-// Stop if server stop, also need to stop all of package
-func (s *PluginsServer) Stop() error {
-	err := s.ipc.Stop()
-	err = s.rpc.Stop()
+func (s *PluginsServer) GetPreferences() *rpc.Preferences {
+	r := &rpc.Preferences{Language: "en-US", Units: &rpc.Preferences_Units{Temperature: "degree celsius"}}
+	lang, err := s.manager.storage.GetSetting("localization.language")
 	if err != nil {
-		return err
+		r.Language = lang
 	}
-	s.closeChan <- struct{}{}
-	s.logger.Info("Plugin server stopped")
-	for _, p := range s.getPlugins() {
-		p.unload()
+	temp, err := s.manager.storage.GetSetting("llocalization.units.temperature")
+	if err != nil {
+		r.Units.Temperature = temp
 	}
-	return nil
+	return r
 }
 
-func (s *PluginsServer)shutdown(){
-	_=s.ipc.Stop()
-	_=s.rpc.Stop()
-}
+func (s *PluginsServer) shutdown() {
 
-
-func (s *PluginsServer) unregisterPlugin(id string) {
-	s.Plugins.Delete(id)
 }

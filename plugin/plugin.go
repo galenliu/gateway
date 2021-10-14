@@ -1,4 +1,3 @@
-
 package plugin
 
 import (
@@ -7,13 +6,11 @@ import (
 	"github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/server"
-	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin/addon"
 	json "github.com/json-iterator/go"
 	"io"
 	"os"
 	"os/exec"
-	"path"
 	"strings"
 	"sync"
 )
@@ -38,7 +35,7 @@ type Plugin struct {
 }
 
 func NewPlugin(pluginId string, manager *Manager, s *PluginsServer, log logging.Logger) (plugin *Plugin) {
-	execPath := s.manager.findAddon(pluginId)
+	execPath := s.manager.getAddonPath(pluginId)
 	if execPath == "" {
 		return nil
 	}
@@ -116,6 +113,7 @@ func (plugin *Plugin) getApiHandlers() (apiHandlers []*ApiHandler) {
 	})
 	return
 }
+
 
 func (plugin *Plugin) OnMsg(messageType rpc.MessageType, data []byte) (err error) {
 
@@ -401,24 +399,10 @@ func (plugin *Plugin) start() {
 }
 
 func (plugin *Plugin) unload() {
-
-	plugin.disable()
-	err := util.RemoveDir(plugin.execPath)
-	if err != nil {
-		plugin.logger.Errorf("delete plugin dir failed err:", err.Error())
-	}
-	err = util.RemoveDir(path.Join(plugin.pluginServer.manager.config.UserProfile.DataDir, plugin.pluginId))
-	if err != nil {
-		plugin.logger.Errorf("delete plugin dir failed err:", err.Error())
-	}
-}
-
-func (plugin *Plugin) disable() {
+	plugin.logger.Info("unloading plugin %s", plugin.pluginId)
 	plugin.restart = false
 	plugin.unloading = true
 	plugin.SendMsg(rpc.MessageType_PluginUnloadRequest, map[string]interface{}{})
-	plugin.unloadComponents()
-	plugin.kill()
 }
 
 func (plugin *Plugin) unloadComponents() {
@@ -449,8 +433,13 @@ func (plugin *Plugin) unloadComponents() {
 	for _, f := range unloadsFunc {
 		f()
 	}
+	if len(adapters) == 0 && len(notifiers) == 0 && len(apiHandlers) == 0 {
+		plugin.unload()
+	}
 }
 
+// kill
+//  @Description:  kill the process
 func (plugin *Plugin) kill() {
 	select {
 	case plugin.closeChan <- struct{}{}:

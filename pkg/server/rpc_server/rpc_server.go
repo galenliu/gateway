@@ -11,26 +11,21 @@ import (
 	"net"
 )
 
-type PluginServer interface {
-	RegisterPlugin(pluginId string, clint server.Clint) server.PluginHandler
-}
-
 type RPCServer struct {
 	port     string
 	logger   logging.Logger
 	doneChan chan struct{}
 	rpc.UnimplementedPluginServerServer
-	pluginSever PluginServer
+	pluginSever server.PluginServer
 	userProfile *rpc.UsrProfile
-	preferences *rpc.Preferences
 }
 
-func NewRPCServer(pluginServer PluginServer, port string, userProfile *rpc.UsrProfile, preferences *rpc.Preferences, log logging.Logger) *RPCServer {
+func NewRPCServer(pluginServer server.PluginServer, port string, userProfile *rpc.UsrProfile, log logging.Logger) *RPCServer {
 	s := &RPCServer{}
 	s.pluginSever = pluginServer
 	s.port = port
 	s.userProfile = userProfile
-	s.preferences = preferences
+
 	s.doneChan = make(chan struct{})
 	s.logger = log
 	return s
@@ -52,7 +47,7 @@ func (s *RPCServer) PluginHandler(p rpc.PluginServer_PluginHandlerServer) error 
 			PluginId:       pluginId,
 			GatewayVersion: constant.Version,
 			UserProfile:    s.userProfile,
-			Preferences:    s.preferences,
+			Preferences:    s.pluginSever.GetPreferences(),
 		},
 	})
 	if err != nil {

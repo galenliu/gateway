@@ -2,7 +2,9 @@ package constant
 
 // events
 const (
-	GatewayStart = "gatewayStart"
+
+	UnloadPluginKillDelay = 3000
+	GatewayStart          = "gatewayStart"
 	GatewayStop  = "gatewayStop"
 
 	ThingAdded    = "thingAdded"

@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/constant"
+	"github.com/galenliu/gateway/pkg/logging"
 	"io"
 	"io/ioutil"
 	"math"
@@ -18,24 +19,29 @@ import (
 	"strings"
 )
 
-func EnsureDir(baseDir string, dirs ...string) error {
+func EnsureDir(log logging.Logger, baseDir string, dirs ...string) {
 	_, err := ioutil.ReadDir(baseDir)
 	if os.IsNotExist(err) {
 		e := os.MkdirAll(baseDir, os.ModePerm)
 		if e != nil {
-			return fmt.Errorf("create dir %s err: %s", baseDir, err.Error())
+			log.Errorf("create dir %s err: %s", baseDir, err.Error())
 		}
+		log.Infof("create dir: %s", baseDir)
+	} else {
+		log.Infof(" dir existed: %s", baseDir)
 	}
 	for _, dir := range dirs {
 		_, err := ioutil.ReadDir(dir)
 		if os.IsNotExist(err) {
 			e := os.MkdirAll(dir, os.ModePerm)
 			if e != nil {
-				return fmt.Errorf("create dir %s err: %s", dir, err.Error())
+				log.Errorf("create dir %s err: %s", dir, err.Error())
 			}
+			log.Infof("create dir: %s", dir)
+		} else {
+			log.Infof(" dir existed: %s", dir)
 		}
 	}
-	return nil
 }
 
 func RemoveDir(dir string) error {
@@ -78,11 +84,7 @@ func CheckSum(file string, checksum string) bool {
 }
 
 func GetArch() string {
-	arch := runtime.GOARCH
-	if arch == "amd64" {
-		arch = "x64"
-	}
-	return "linux" + "-" + arch
+	return runtime.GOOS + "-" + runtime.GOARCH
 }
 
 func GetPythonVersion() []string {

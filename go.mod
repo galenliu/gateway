@@ -60,11 +60,9 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-require (
-	github.com/owenthereal/goup v0.2.1 // indirect
-	golang.org/dl v0.0.0-20211007222857-6589945b0d11 // indirect
-	google.golang.org/protobuf v1.27.1 // indirect
-)
+require github.com/robfig/cron v1.2.0
+
+require google.golang.org/protobuf v1.27.1 // indirect
 
 replace github.com/galenliu/gateway-addon => ../gateway/gateway-addon
 

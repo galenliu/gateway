@@ -225,7 +225,7 @@ func (app *Router) Start() error {
 			return
 		}
 	}()
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(2 * time.Millisecond)
 	go func() {
 		err := app.Listen(app.config.HttpsAddr)
 		if err != nil {

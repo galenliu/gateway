@@ -75,10 +75,6 @@ func (c *command) initStartCmd() (err error) {
 
 			p := &program{
 				start: func() {
-					err := gw.Start()
-					if err != nil {
-						return
-					}
 					// Block main goroutine until it is interrupted
 					sig := <-interruptChannel
 					logger.Debugf("received signal: %v", sig)

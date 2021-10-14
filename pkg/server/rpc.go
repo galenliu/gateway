@@ -12,5 +12,6 @@ type PluginHandler interface {
 }
 
 type PluginServer interface {
+	GetPreferences()*rpc.Preferences
 	RegisterPlugin(pluginId string, clint Clint) PluginHandler
 }

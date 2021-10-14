@@ -11,14 +11,10 @@ import (
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server"
+	json "github.com/json-iterator/go"
 	"path"
 	"time"
 )
-
-type Component interface {
-	Start() error
-	Stop() error
-}
 
 type Config struct {
 	BaseDir          string
@@ -59,15 +55,14 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 		LogDir:     path.Join(g.config.BaseDir, "log"),
 		GatewayDir: g.config.BaseDir,
 	}
+	s, _ := json.MarshalIndent(u,"","   ")
+	g.logger.Infof("userprofile: %v ", string(s))
 
 	//检查Gateway运行需要的文件目录
-	err := util.EnsureDir(u.BaseDir, u.DataDir, u.ConfigDir, u.AddonsDir, u.ConfigDir, u.MediaDir, u.LogDir)
-	if err != nil {
-		logger.Error(err.Error())
-		return nil, err
-	}
+	util.EnsureDir(logger, u.BaseDir, u.DataDir, u.ConfigDir, u.AddonsDir, u.ConfigDir, u.MediaDir, u.LogDir)
 
 	// 数据化初始化
+	var err error
 	g.storage, err = db.NewStorage(u.ConfigDir, logger, db.Config{
 		Reset: config.RemoveBeforeOpen,
 	})
@@ -75,25 +70,25 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 		logger.Error(err.Error())
 		return nil, err
 	}
+	g.logger.Infof("database init.")
 
 	//  Things container init
 	g.container = container.NewThingsContainerModel(g.storage, g.logger)
+	g.logger.Infof("things container init.")
 
 	//  EventBus init
 	newBus := bus.NewBusController(g.logger)
+	g.logger.Infof("event bus init.")
 
 	//Addon manager init
 	g.addonManager = plugin.NewAddonsManager(plugin.Config{
 		UserProfile: u,
-		Preferences: &rpc.Preferences{
-			Language: "zh-cn",
-			Units:    &rpc.Preferences_Units{Temperature: "℃"},
-		},
 		AddonsDir:       u.AddonsDir,
 		AttachAddonsDir: g.config.AttachAddonsDir,
 		IPCPort:         config.IPCPort,
 		RPCPort:         config.RPCPort,
 	}, g.storage, newBus, g.logger)
+	g.logger.Infof("addon manager init.")
 
 	// Web service init
 	g.sever = server.NewServe(server.Config{
@@ -106,13 +101,8 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 		LogDir:      path.Join(g.config.BaseDir, "log"),
 	}, g.addonManager, g.addonManager, g.container, g.storage, newBus, g.logger)
 	g.bus = newBus
+	g.logger.Infof("gateway web server running.")
 	return g, nil
-}
-
-func (g *Gateway) Start() error {
-	// 向总线发送启运信号
-	go g.bus.Publish(constant.GatewayStart)
-	return nil
 }
 
 func (g *Gateway) Stop() error {

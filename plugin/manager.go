@@ -1,4 +1,3 @@
-
 package plugin
 
 import (
@@ -14,6 +13,7 @@ import (
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	"github.com/galenliu/gateway/plugin/addon"
 	json "github.com/json-iterator/go"
+	"github.com/robfig/cron"
 	"io"
 	"os"
 	"path"
@@ -27,19 +27,23 @@ const (
 	ActionUnpair = "unpair"
 )
 
+type managerStore interface {
+	AddonsStore
+	GetSetting(key string) (string, error)
+}
+
 type Config struct {
 	AddonsDir       string
 	AttachAddonsDir string
 	IPCPort         string
 	RPCPort         string
 	UserProfile     *rpc.UsrProfile
-	Preferences     *rpc.Preferences
 }
 
 type Manager struct {
-	config       Config
-	configPath   string
-	pluginServer *PluginsServer
+	config        Config
+	configPath    string
+	pluginServer  *PluginsServer
 	devices       sync.Map
 	adapters      sync.Map
 	services      sync.Map
@@ -54,10 +58,10 @@ type Manager struct {
 	locker        *sync.Mutex
 	logger        logging.Logger
 	actions       map[string]*wot.ActionAffordance
-	storage       addon.AddonsStore
+	storage       managerStore
 }
 
-func NewAddonsManager(conf Config, s addon.AddonsStore, bus bus.Controller, log logging.Logger) *Manager {
+func NewAddonsManager(conf Config, s managerStore, bus bus.Controller, log logging.Logger) *Manager {
 	am := &Manager{}
 	am.config = conf
 	am.logger = log
@@ -66,9 +70,8 @@ func NewAddonsManager(conf Config, s addon.AddonsStore, bus bus.Controller, log 
 	am.running = false
 	am.Eventbus = NewEventBus(bus)
 	am.storage = s
-
 	am.locker = new(sync.Mutex)
-	bus.SubscribeAsync(constant.GatewayStart, am.Start)
+	am.loadAddons()
 	return am
 }
 
@@ -117,7 +120,6 @@ func (m *Manager) CancelAddNewThing() {
 	m.pairTask = nil
 	return
 }
-
 
 func (m *Manager) actionNotify(action *addon.Action) {
 	m.Eventbus.bus.Publish(constant.ActionStatus, nil)
@@ -234,18 +236,25 @@ func (m *Manager) getDevices() (devices []*Device) {
 	return
 }
 
-func (m *Manager) getInstallAddon(addonId string) *addon.Addon {
+func (m *Manager) getInstallAddon(addonId string) *Addon {
 	a, ok := m.installAddons.Load(addonId)
-	ad, ok := a.(*addon.Addon)
+	ad, ok := a.(*Addon)
 	if !ok {
 		return nil
 	}
 	return ad
 }
 
-func (m *Manager) getInstallAddons() (addons []*addon.Addon) {
+func (m *Manager) getPlugin(packetId string) *Plugin {
+	if m.pluginServer != nil {
+		return m.pluginServer.getPlugin(packetId)
+	}
+	return nil
+}
+
+func (m *Manager) getInstallAddons() (addons []*Addon) {
 	m.installAddons.Range(func(key, value interface{}) bool {
-		ad, ok := value.(*addon.Addon)
+		ad, ok := value.(*Addon)
 		if ok {
 			addons = append(addons, ad)
 		}
@@ -298,19 +307,17 @@ func (m *Manager) installAddon(packageId, packagePath string) error {
 		_ = os.Chmod(fi.Name(), 777)
 		_ = fw.Close()
 	}
-
-	return m.loadAddon(packageId, m.config.AddonsDir)
-
+	m.loadAddon(packageId)
+	return nil
 }
 
 func (m *Manager) loadAddons() {
 	if m.addonsLoaded {
 		return
 	}
-	m.logger.Infof("starting loading addons.")
+	m.logger.Info("starting loading addons.")
 	m.addonsLoaded = true
 	m.pluginServer = NewPluginServer(m)
-	_ = m.pluginServer.Start()
 	load := func(dir string) {
 		fs, err := os.ReadDir(dir)
 		if err != nil {
@@ -319,10 +326,8 @@ func (m *Manager) loadAddons() {
 		}
 		for _, fi := range fs {
 			if fi.IsDir() {
-				err = m.loadAddon(fi.Name(), dir)
-				if err != nil {
-					m.logger.Error("load addon ID:%s failed err:%s", fi.Name(), err.Error())
-				}
+				m.loadAddon(fi.Name())
+
 			}
 		}
 	}
@@ -330,45 +335,48 @@ func (m *Manager) loadAddons() {
 	if m.config.AttachAddonsDir != "" {
 		load(m.config.AttachAddonsDir)
 	}
+	//每天的23：00更新一次Add-on
+	c := cron.New()
+	m.logger.Infof("time task for update addons every day 23:00")
+	_ = c.AddFunc("\"0 0 23 * * ?\"", func() {
+		m.updateAddons()
+	})
+	c.Start()
 	return
 }
 
-func (m *Manager) loadAddon(packageId string, dir string) error {
-
-	var addonInfo *addon.Addon
+func (m *Manager) loadAddon(packageId string) {
+	m.logger.Infof("starting loading addon %s.", packageId)
+	var addonInfo *Addon
 	var obj interface{}
 	var err error
-
-	packageDir := path.Join(dir, packageId)
-	addonInfo, obj, err = addon.LoadManifest(packageDir, packageId, m.storage)
+	packageDir := m.getAddonPath(packageId)
+	addonInfo, obj, err = LoadManifest(packageDir, packageId, m.storage)
 	if err != nil {
-		return err
+		m.logger.Errorf("load file %s%s"+"manifest.json  err:", os.PathSeparator, packageId)
+		return
 	}
-
 	saved, err := m.storage.LoadAddonSetting(packageId)
 	if err == nil && saved != "" {
-		addonInfo = addon.NewAddonSettingFromString(saved, m.storage)
+		addonInfo = NewAddonSettingFromString(saved, m.storage)
 	} else {
 		err = addonInfo.Save()
 		if err != nil {
-			return err
+			m.logger.Errorf("addon save err: %s", err.Error())
 		}
 	}
-
 	addonConf, err := m.storage.LoadAddonConfig(packageId)
 	if err != nil && addonConf == "" {
 		if obj != nil {
 			err := m.storage.StoreAddonsConfig(packageId, obj)
 			if err != nil {
-				return err
+				m.logger.Errorf("store addon config err: %s", err.Error())
 			}
 		}
 	}
 
 	m.installAddons.Store(packageId, addonInfo)
-	if !addonInfo.Enabled {
-		return fmt.Errorf("addon disenabled")
-	}
+
 	if addonInfo.ContentScripts != "" && addonInfo.WSebAccessibleResources != "" {
 		var ext = addon.Extension{
 			Extensions: addonInfo.ContentScripts,
@@ -376,27 +384,24 @@ func (m *Manager) loadAddon(packageId string, dir string) error {
 		}
 		m.extensions.Store(addonInfo.ID, ext)
 	}
-
+	util.EnsureDir(m.logger, path.Join(m.config.UserProfile.DataDir,packageId))
 	if addonInfo.Exec == "" {
-		return nil
+		m.logger.Errorf("addon %s has not exec", addonInfo.ID)
+		return
 	}
+
 	if !addonInfo.Enabled {
-		m.logger.Infof("%s disable", addonInfo.ID)
-		return nil
+		m.logger.Errorf("addon %s disabled", packageId)
+		return
 	}
-	err = util.EnsureDir(path.Join(path.Join(m.config.UserProfile.BaseDir, "data"), addonInfo.ID))
-	if err != nil {
-		return err
-	}
-	m.pluginServer.loadPlugin(packageDir, addonInfo.ID, addonInfo.Exec)
-	return nil
+	m.pluginServer.loadPlugin(addonInfo.ID,packageDir, addonInfo.Exec)
 }
 
 func (m *Manager) removeAdapter(adapter *Adapter) {
 	m.adapters.Delete(adapter.ID)
 }
 
-func (m *Manager) findAddon(packageId string) string {
+func (m *Manager) getAddonPath(packageId string) string {
 	for _, dir := range []string{m.config.AddonsDir, m.config.AttachAddonsDir} {
 		if dir == "" {
 			continue
@@ -410,23 +415,6 @@ func (m *Manager) findAddon(packageId string) string {
 	return ""
 }
 
-func (m *Manager) Start() error {
-	m.running = true
-	m.loadAddons()
-	m.Eventbus.bus.Publish(constant.AddonManagerStarted)
-	return nil
-}
-
-func (m *Manager) Stop() error {
-	err := m.pluginServer.Stop()
-	if err != nil {
-		return err
-	}
-	m.Eventbus.bus.Publish(constant.AddonManagerStopped)
-	m.running = false
-	return nil
-}
-
 func (m *Manager) removeNotifier(notifierId string) {
 
 }
@@ -437,4 +425,9 @@ func (m *Manager) handleOutletRemoved(device *addon.Outlet) {
 
 func (m *Manager) removeApiHandler(id int) {
 
+}
+
+// 定时任务，更新Add-on
+func (m *Manager) updateAddons() {
+	m.logger.Infof("time task: checking addons update time:", time.Now().String())
 }

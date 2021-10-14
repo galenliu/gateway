@@ -27,18 +27,17 @@ type IPCServer struct {
 	locker       *sync.Mutex
 	pluginServer server.PluginServer
 	userProfile  *rpc.UsrProfile
-	preferences  *rpc.Preferences
 	doneChan     chan struct{}
 }
 
-func NewIPCServer(pluginServer server.PluginServer, port string, userProfile *rpc.UsrProfile, preferences *rpc.Preferences, log logging.Logger) *IPCServer {
+func NewIPCServer(pluginServer server.PluginServer, port string, userProfile *rpc.UsrProfile, log logging.Logger) *IPCServer {
 	ipc := &IPCServer{}
 	ipc.pluginServer = pluginServer
 	ipc.logger = log
 	ipc.doneChan = make(chan struct{})
 	ipc.port = port
 	ipc.userProfile = userProfile
-	ipc.preferences = preferences
+
 	return ipc
 }
 
@@ -60,10 +59,7 @@ func (s *IPCServer) Start() error {
 	return nil
 }
 
-func (s *IPCServer) Stop() error {
-	return nil
-}
-
+//处理IPC客户端请求
 func (s *IPCServer) handle(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrade.Upgrade(w, r, nil)
 	s.logger.Debug("accept new connection")
@@ -84,7 +80,7 @@ func (s *IPCServer) handle(w http.ResponseWriter, r *http.Request) {
 			PluginId:       message.Data.PluginId,
 			GatewayVersion: constant.Version,
 			UserProfile:    s.userProfile,
-			Preferences:    s.preferences,
+			Preferences:    s.pluginServer.GetPreferences(),
 		},
 	}
 	err = conn.WriteJSON(responseMessage)
@@ -110,3 +106,4 @@ func (s *IPCServer) handle(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+

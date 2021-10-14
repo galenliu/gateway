@@ -2,12 +2,14 @@ package plugin
 
 import (
 	"fmt"
+	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/util"
 	json "github.com/json-iterator/go"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
+	"time"
 )
 
 // GetInstallAddonsBytes  获取已安装的add-on
@@ -20,34 +22,29 @@ func (m *Manager) GetInstallAddonsBytes() []byte {
 	return data
 }
 
-func (m *Manager) EnableAddon(addonId string) error {
-	addonInfo := m.getInstallAddon(addonId)
+func (m *Manager) EnableAddon(packageId string) error {
+	addonInfo := m.getInstallAddon(packageId)
 	if addonInfo == nil {
 		return fmt.Errorf("package not installed")
 	}
 	err := addonInfo.SetEnabled(true)
-
-	err = m.loadAddon(addonInfo.Dir, addonId)
+	m.loadAddon(packageId)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (m *Manager) DisableAddon(addonId string) error {
-	addonInfo := m.getInstallAddon(addonId)
-	if addonInfo == nil {
+func (m *Manager) DisableAddon(packageId string) error {
+	addon := m.getInstallAddon(packageId)
+	if addon == nil {
 		return fmt.Errorf("package not installed")
 	}
-	err := addonInfo.SetEnabled(false)
+	err := addon.SetEnabled(false)
 	if err != nil {
 		return err
 	}
-	plugin := m.pluginServer.findPlugin(addonId)
-	if plugin == nil {
-		return nil
-	}
-	plugin.disable()
+	m.UnloadAddon(packageId)
 	return nil
 }
 
@@ -84,37 +81,46 @@ func (m *Manager) InstallAddonFromUrl(id, url, checksum string) error {
 	return nil
 }
 
-func (m *Manager) UninstallAddon(pluginId string, disable bool) error {
-    // delete addon form manager
-	defer m.installAddons.Delete(pluginId)
-
-	err := m.UnloadAddon(pluginId)
+func (m *Manager) UninstallAddon(packetId string, disable bool) error {
+	// delete addon form manager
+	defer m.installAddons.Delete(packetId)
+	m.UnloadAddon(packetId)
+	err := util.RemoveDir(m.getAddonPath(packetId))
 	if err != nil {
-		m.logger.Errorf("failed to unload %s properly: %s",pluginId,err.Error())
+		m.logger.Errorf("delete plugin addon dir failed err:", err.Error())
 	}
-	err = util.RemoveDir(plugin.execPath)
+	err = util.RemoveDir(path.Join(m.config.UserProfile.DataDir, packetId))
 	if err != nil {
-		m.logger.Errorf("delete plugin dir failed err:", err.Error())
-	}
-	err = util.RemoveDir(path.Join(plugin.pluginServer.manager.config.UserProfile.DataDir, plugin.pluginId))
-	if err != nil {
-		plugin.logger.Errorf("delete plugin dir failed err:", err.Error())
+		m.logger.Errorf("delete plugin data dir failed err:", err.Error())
 	}
 	return nil
 }
 
-func (m *Manager) UnloadAddon(id string) error {
-	plugin := m.pluginServer.findPlugin(id)
-	if plugin == nil {
-		return fmt.Errorf("plugin not exist")
-	}
-	return m.pluginServer.unloadPlugin(id)
+func (m *Manager) LoadAddon(packageId string)error {
+	m.loadAddon(packageId)
+	return nil
 }
 
+func (m *Manager) UnloadAddon(packageId string) {
+	if !m.addonsLoaded {
+		m.logger.Info("The add-ons are not currently loaded, no need to unload.")
+		return
+	}
+	_, _ = m.extensions.LoadAndDelete(packageId)
+	plugin := m.getPlugin(packageId)
+	if plugin == nil {
+		m.logger.Info("The add-ons are not  register.")
+	}
+	plugin.unloadComponents()
+	time.AfterFunc(time.Duration(constant.UnloadPluginKillDelay)*time.Millisecond, func() {
+		plugin.kill()
+		_, _ = m.extensions.LoadAndDelete(packageId)
+	})
+}
 
 func (m *Manager) GetAddonLicense(addonId string) (string, error) {
-	addonDir := m.findAddon(addonId)
-	m.pluginServer.findPlugin(addonId)
+	addonDir := m.getAddonPath(addonId)
+	m.pluginServer.getPlugin(addonId)
 	if addonDir == "" {
 		return "", fmt.Errorf("addon not installed")
 	}
@@ -123,12 +129,4 @@ func (m *Manager) GetAddonLicense(addonId string) (string, error) {
 		return "", err
 	}
 	return string(data), nil
-}
-
-func (m *Manager) LoadAddon(id string) error {
-	addon := m.findAddon(id)
-	if addon == "" {
-		return fmt.Errorf("addon not installed")
-	}
-	return m.loadAddon(id, addon)
 }

@@ -43,16 +43,15 @@ func NewServe(config Config, addonManager controllers.Manager, serviceManager co
 		HttpsAddr: sev.options.HttpsAddr,
 		AddonUrls: config.AddonUrls,
 	}, addonManager, serviceManager, container, store, bus, log)
-	bus.SubscribeAsync(constant.AddonManagerStarted, sev.Start)
+	sev.start()
 	return sev
 }
 
-func (serve *WebServe) Start() error {
+func (serve *WebServe) start() {
 	go func() {
 		_ = serve.Router.Start()
 	}()
 	serve.bus.Publish(constant.WebServerStarted)
-	return nil
 }
 
 func (serve *WebServe) Stop() error {

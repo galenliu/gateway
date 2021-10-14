@@ -14,6 +14,7 @@ type Clint struct {
 
 func NewClint(pluginId string, conn *websocket.Conn) *Clint {
 	c := Clint{}
+	c.pluginId=pluginId
 	c.Conn = conn
 	return &c
 }
