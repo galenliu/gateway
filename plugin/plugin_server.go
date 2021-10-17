@@ -24,12 +24,9 @@ func NewPluginServer(manager *Manager) *PluginsServer {
 	s.logger = manager.logger
 	s.closeChan = make(chan struct{})
 	s.manager = manager
-	s.ipc = ipc.NewIPCServer(s, manager.config.IPCPort, manager.config.UserProfile, manager.logger)
+	s.ipc = ipc.NewIPCServer(s, manager.config.IPCPort, manager.config.UserProfile, s.logger)
 	s.rpc = rpc_server.NewRPCServer(s, manager.config.RPCPort, manager.config.UserProfile, manager.logger)
-	err := s.Start()
-	if err != nil {
-		s.logger.Errorf("plugin server run failed: %s", err.Error())
-	}
+	s.Start()
 	return s
 }
 
@@ -55,19 +52,19 @@ func (s *PluginsServer) unregisterPlugin(id string) {
 //  @param addonPath   package所以的目录
 //  @param id
 //  @param exec
-func (s *PluginsServer) loadPlugin(pluginId,packagePath, exec string) {
+func (s *PluginsServer) loadPlugin(pluginId, packagePath, exec string) {
 	plugin := s.registerPlugin(pluginId)
 	plugin.exec = exec
 	plugin.execPath = packagePath
 	plugin.start()
 }
 
-func (s *PluginsServer)registerPlugin(pluginId string)*Plugin{
+func (s *PluginsServer) registerPlugin(pluginId string) *Plugin {
 	plugin := s.getPlugin(pluginId)
-	if plugin == nil{
-		plugin = NewPlugin(pluginId,s.manager,s,s.logger)
+	if plugin == nil {
+		plugin = NewPlugin(pluginId, s.manager, s, s.logger)
 	}
-	s.Plugins.Store(pluginId,plugin)
+	s.Plugins.Store(pluginId, plugin)
 	return plugin
 }
 
@@ -92,10 +89,20 @@ func (s *PluginsServer) getPlugins() (plugins []*Plugin) {
 }
 
 // Start create goroutines handle ipc massage
-func (s *PluginsServer) Start() error {
-	_ = s.rpc.Start()
-	_ = s.ipc.Start()
-	return nil
+func (s *PluginsServer) Start() {
+	go func() {
+		err := s.rpc.Run()
+		if err != nil {
+			s.logger.Errorf("rpc server err:", err.Error())
+		}
+	}()
+	go func() {
+		err := s.ipc.Run()
+		if err != nil {
+			s.logger.Errorf("ipc server err:", err.Error())
+		}
+	}()
+	return
 }
 
 func (s *PluginsServer) GetPreferences() *rpc.Preferences {

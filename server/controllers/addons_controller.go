@@ -114,6 +114,7 @@ func (addon *AddonController) handlerInstallAddon(c *fiber.Ctx) error {
 	id := json.Get(c.Body(), "id").ToString()
 	url := json.Get(c.Body(), "url").ToString()
 	checksum := json.Get(c.Body(), "checksum").ToString()
+
 	if id == "" || url == "" || checksum == "" {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "Bad Request"})
 	}

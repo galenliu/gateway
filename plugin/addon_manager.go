@@ -96,7 +96,7 @@ func (m *Manager) UninstallAddon(packetId string, disable bool) error {
 	return nil
 }
 
-func (m *Manager) LoadAddon(packageId string)error {
+func (m *Manager) LoadAddon(packageId string) error {
 	m.loadAddon(packageId)
 	return nil
 }

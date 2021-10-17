@@ -114,7 +114,6 @@ func (plugin *Plugin) getApiHandlers() (apiHandlers []*ApiHandler) {
 	return
 }
 
-
 func (plugin *Plugin) OnMsg(messageType rpc.MessageType, data []byte) (err error) {
 
 	switch messageType {
@@ -330,7 +329,7 @@ func (plugin *Plugin) start() {
 	command := strings.Replace(plugin.exec, "{path}", plugin.execPath, 1)
 	//command = strings.Replace(command, "{nodeLoader}", configs.GetNodeLoader(), 1)
 	if !strings.HasPrefix(command, "python") {
-		plugin.logger.Errorf("plugin %s not run,only support plugin with python lang now",plugin.pluginId)
+		plugin.logger.Warningf("plugin %s not run,only support plugin with python lang now", plugin.pluginId)
 		return
 	}
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -348,7 +347,7 @@ func (plugin *Plugin) start() {
 					strNum, err := reader.Read(buf)
 					if strNum > 0 {
 						outputByte := buf[:strNum]
-						plugin.logger.Infof("%s out:[ %s ]", plugin.pluginId, string(outputByte))
+						plugin.logger.Infof("++ %s out:[ %s ]", plugin.pluginId, string(outputByte))
 					}
 					if err != nil {
 						//读到结尾
@@ -362,6 +361,30 @@ func (plugin *Plugin) start() {
 
 	}
 
+	//var syncLogBuf = func(buf *bytes.Buffer) {
+	//	for {
+	//		select {
+	//		case <-plugin.closeChan:
+	//			return
+	//		default:
+	//
+	//			for {
+	//				message, err := ioutil.ReadAll(buf)
+	//				if len(message) > 0 {
+	//					plugin.logger.Infof("%s out:[ %s ]", plugin.pluginId, string(message))
+	//				}
+	//				if err != nil {
+	//					//读到结尾
+	//					if err == io.EOF || strings.Contains(err.Error(), "file already closed") {
+	//						err = nil
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
+	//
+	//}
+
 	var cmd *exec.Cmd
 	var args = commands[1:]
 	if len(args) > 0 {
@@ -369,13 +392,25 @@ func (plugin *Plugin) start() {
 	} else {
 		cmd = exec.CommandContext(ctx, commands[0])
 	}
-	stdout, _ := cmd.StdoutPipe()
-	stderr, _ := cmd.StderrPipe()
+
+	//var stdOutBuf bytes.Buffer
+	//var stdErrBuf bytes.Buffer//
+
+	//cmd.Stdout = &stdOutBuf
+	//cmd.Stderr = &stdErrBuf
+ 	stdout, _ := cmd.StdoutPipe()
+ 	stderr, _ := cmd.StderrPipe()
+
+	//go syncLogBuf(&stdOutBuf)
+	//go syncLogBuf(&stdErrBuf)
+
+ go syncLog(stdout)
+ go syncLog(stderr)
 
 	go func() {
-		err := cmd.Start()
+		err := cmd.Run()
 		if err != nil {
-			plugin.logger.Infof("%s run err: %s", plugin.pluginId, err.Error())
+			plugin.logger.Errorf("%s run err: %s", plugin.pluginId, err.Error())
 			return
 		}
 	}()
@@ -393,9 +428,6 @@ func (plugin *Plugin) start() {
 	}
 	go closeExec()
 
-	//stdOut, err := cmd.StdoutPipe()
-	go syncLog(stdout)
-	go syncLog(stderr)
 }
 
 func (plugin *Plugin) unload() {

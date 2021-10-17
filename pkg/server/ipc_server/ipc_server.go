@@ -6,14 +6,15 @@ import (
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/server"
 	"github.com/gorilla/websocket"
+	json "github.com/json-iterator/go"
 	"net/http"
 	"sync"
 	"time"
 )
 
 var upgrade = websocket.Upgrader{
-	ReadBufferSize:   1024,
-	WriteBufferSize:  1024,
+	//ReadBufferSize:   1024,
+	//WriteBufferSize:  1024,
 	HandshakeTimeout: 5 * time.Second,
 	CheckOrigin: func(r *http.Request) bool {
 		return true
@@ -37,37 +38,47 @@ func NewIPCServer(pluginServer server.PluginServer, port string, userProfile *rp
 	ipc.doneChan = make(chan struct{})
 	ipc.port = port
 	ipc.userProfile = userProfile
-
 	return ipc
 }
 
-func (s *IPCServer) Start() error {
-	go func() {
-		err := func() error {
-			http.HandleFunc("/", s.handle)
-			s.logger.Infof("IPC server run addr: %s", s.port)
-			err := http.ListenAndServe(s.port, nil)
-			if err != nil {
-				return err
-			}
-			return nil
-		}()
-		if err != nil {
-			s.logger.Errorf("ipc start err : %s", err.Error())
-		}
-	}()
+func (s *IPCServer) Run() error {
+	http.HandleFunc("/", s.handle)
+	http.HandleFunc("/ws", s.handle)
+
+	s.logger.Infof("IPC server run addr: %s", s.port)
+	err := http.ListenAndServe(s.port, nil)
+	if err != nil {
+		return err
+	}
+	if err != nil {
+		s.logger.Errorf("ipc start err : %s", err.Error())
+	}
 	return nil
 }
 
 //处理IPC客户端请求
 func (s *IPCServer) handle(w http.ResponseWriter, r *http.Request) {
+	var b []byte
+	_,_=r.Body.Read(b)
 	conn, err := upgrade.Upgrade(w, r, nil)
-	s.logger.Debug("accept new connection")
-	if conn == nil {
+	s.logger.Info("ipc new connection:", conn.RemoteAddr().String())
+	if err != nil {
+		s.logger.Errorf("升级为websocket失败", err.Error())
 		return
 	}
+	go s.readLoop(conn)
+}
+
+func (s *IPCServer) readLoop(conn *websocket.Conn) {
+	defer func(conn *websocket.Conn) {
+		err := conn.Close()
+		if err != nil {
+			s.logger.Infof("ipc disconnection:", conn.RemoteAddr().String())
+		}
+	}(conn)
 	var message rpc.PluginRegisterRequestMessage
-	err = conn.ReadJSON(&message)
+	_, data, _ := conn.ReadMessage()
+	err := json.Unmarshal(data, &message)
 	if err != nil {
 		return
 	}
@@ -106,4 +117,3 @@ func (s *IPCServer) handle(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
-

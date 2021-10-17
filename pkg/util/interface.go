@@ -8,7 +8,7 @@ type Program struct {
 }
 
 func (p *Program) Start(s service.Service) error {
-	// Start should not block. Do the actual work async.
+	// Run should not block. Do the actual work async.
 	go p.start()
 	return nil
 }

@@ -23,7 +23,7 @@ func (c *command) initStartCmd() (err error) {
 
 	cmd := &cobra.Command{
 		Use:   "start",
-		Short: "Start WebThings gateway",
+		Short: "Run WebThings gateway",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			if len(args) > 0 {
 				return cmd.Help()
@@ -139,7 +139,7 @@ type program struct {
 }
 
 func (p *program) Start(s service.Service) error {
-	// Start should not block. Do the actual work async.
+	// Run should not block. Do the actual work async.
 	go p.start()
 	return nil
 }

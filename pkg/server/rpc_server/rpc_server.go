@@ -25,7 +25,6 @@ func NewRPCServer(pluginServer server.PluginServer, port string, userProfile *rp
 	s.pluginSever = pluginServer
 	s.port = port
 	s.userProfile = userProfile
-
 	s.doneChan = make(chan struct{})
 	s.logger = log
 	return s
@@ -75,26 +74,24 @@ func (s *RPCServer) PluginHandler(p rpc.PluginServer_PluginHandlerServer) error 
 
 }
 
-func (s *RPCServer) Start() error {
-	go func() {
-		err := func() error {
-			lis, err := net.Listen("tcp", s.port)
-			s.logger.Infof("RPC server run addr: %s", s.port)
-			if err != nil {
-				return err
-			}
-			sev := grpc.NewServer()
-			rpc.RegisterPluginServerServer(sev, s)
-			err = sev.Serve(lis)
-			if err != nil {
-				return err
-			}
-			return nil
-		}()
+func (s *RPCServer) Run() error {
+	err := func() error {
+		lis, err := net.Listen("tcp", s.port)
+		s.logger.Infof("RPC server run addr: %s", s.port)
 		if err != nil {
-			s.logger.Errorf("RPC Start err: %s", err)
+			return err
 		}
+		sev := grpc.NewServer()
+		rpc.RegisterPluginServerServer(sev, s)
+		err = sev.Serve(lis)
+		if err != nil {
+			return err
+		}
+		return nil
 	}()
+	if err != nil {
+		s.logger.Errorf("RPC Run err: %s", err)
+	}
 	return nil
 }
 
