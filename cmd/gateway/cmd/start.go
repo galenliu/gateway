@@ -23,7 +23,7 @@ func (c *command) initStartCmd() (err error) {
 
 	cmd := &cobra.Command{
 		Use:   "start",
-		Short: "Run WebThings gateway",
+		Short: "Start WebThings gateway",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			if len(args) > 0 {
 				return cmd.Help()
@@ -50,7 +50,8 @@ func (c *command) initStartCmd() (err error) {
 
 			logger.Infof("gateway version: %v", constant.Version)
 
-			gw, err := gateway.NewGateway(gateway.Config{
+			ctx, cancelFunc := context.WithCancel(context.Background())
+			gw, err := gateway.NewGateway(ctx, gateway.Config{
 				BaseDir:          c.config.GetString(optionNameDataDir),
 				AttachAddonsDir:  c.config.GetString(optionNameAttachAddonDirs),
 				RemoveBeforeOpen: c.config.GetBool(optionNameDBRemoveBeforeOpen),
@@ -65,6 +66,7 @@ func (c *command) initStartCmd() (err error) {
 				HomeKitEnable:    c.config.GetBool(optionHomeKitEnable),
 			}, logger)
 			if err != nil {
+				cancelFunc()
 				return err
 			}
 
@@ -82,13 +84,11 @@ func (c *command) initStartCmd() (err error) {
 				},
 				stop: func() {
 					// Shutdown
-					done := make(chan struct{})
+
 					go func() {
-						defer close(done)
 
-						ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+						ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
 						defer cancel()
-
 						if err := gw.Shutdown(ctx); err != nil {
 							logger.Errorf("shutdown: %v", err)
 						}
@@ -98,8 +98,10 @@ func (c *command) initStartCmd() (err error) {
 					// allow process termination by receiving another signal.
 					select {
 					case sig := <-interruptChannel:
+						cancelFunc()
 						logger.Debugf("received signal: %v", sig)
-					case <-done:
+					case <-ctx.Done():
+						cancelFunc()
 					}
 				},
 			}
@@ -139,7 +141,7 @@ type program struct {
 }
 
 func (p *program) Start(s service.Service) error {
-	// Run should not block. Do the actual work async.
+	// Start should not block. Do the actual work async.
 	go p.start()
 	return nil
 }

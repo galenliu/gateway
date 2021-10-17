@@ -28,3 +28,5 @@ func (c *Clint) Send(message *rpc.BaseMessage) error {
 func (c *Clint) Read() (message *rpc.BaseMessage, err error) {
 	return c.stream.Recv()
 }
+
+

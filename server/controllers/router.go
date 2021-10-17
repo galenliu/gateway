@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"context"
+	"fmt"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/container"
@@ -47,16 +49,18 @@ type Manager interface {
 
 type Router struct {
 	*fiber.App
+	ctx    context.Context
 	logger logging.Logger
 	config Config
 }
 
-func NewRouter(config Config, manager Manager, serviceManager ServiceManager, container container.Container, store Storage, bus bus.Controller, log logging.Logger) *Router {
+func NewRouter(ctx context.Context, config Config, manager Manager, serviceManager ServiceManager, container container.Container, store Storage, bus bus.Controller, log logging.Logger) *Router {
 
 	//router init
 	app := Router{}
 	app.logger = log
 	app.config = config
+	app.ctx = ctx
 	app.App = fiber.New()
 	app.Use(recover.New())
 	app.Use(cors.New(cors.ConfigDefault))
@@ -74,10 +78,23 @@ func NewRouter(config Config, manager Manager, serviceManager ServiceManager, co
 	serviceModel := models.NewServicesModel(manager)
 	newThingsModel := models.NewNewThingsModel(manager, log)
 
+	// Color values
+	const (
+		cBlack   = "\u001b[90m"
+		cRed     = "\u001b[91m"
+		cGreen   = "\u001b[92m"
+		cYellow  = "\u001b[93m"
+		cBlue    = "\u001b[94m"
+		cMagenta = "\u001b[95m"
+		cCyan    = "\u001b[96m"
+		cWhite   = "\u001b[97m"
+		cReset   = "\u001b[0m"
+	)
 	//logger
 	app.Use(func(c *fiber.Ctx) error {
 		return logger.New(logger.Config{
-			Format: "\x1b[36m" + "| " + c.IP() + " | \x1b[31m${status} \u001B[32m| -${latency} \u001B[33m| ${method} \u001B[35m| ${path}\n",
+			Format: fmt.Sprintf("%s| %s  %s|${status} %s| -${latency} %s| ${method} %s| ${path}\n",
+				cBlue, c.IP(), cRed, cMagenta, cCyan, cGreen),
 			Output: log,
 		})(c)
 	})
@@ -213,29 +230,44 @@ func NewRouter(config Config, manager Manager, serviceManager ServiceManager, co
 		sGroup.Put("/:serviceId", servicesController.handleSetService)
 		sGroup.Put("/:serviceId/config", servicesController.handleSetServiceConfig)
 	}
-
+	app.Start()
 	return &app
 }
 
-func (app *Router) Start() error {
+func (app *Router) Start() {
 	go func() {
-		err := app.Listen(app.config.HttpAddr)
-		if err != nil {
-			app.logger.Errorf("http server err:%s", err.Error())
-			return
+		c, cancelFunc := context.WithCancel(app.ctx)
+		select {
+		case <-c.Done():
+			cancelFunc()
+			_ = app.Shutdown()
+		default:
+			err := app.Listen(app.config.HttpAddr)
+			if err != nil {
+				app.logger.Errorf("http server err:%s", err.Error())
+				cancelFunc()
+				return
+			}
 		}
+		cancelFunc()
 	}()
-	time.Sleep(2 * time.Millisecond)
-	go func() {
-		err := app.Listen(app.config.HttpsAddr)
-		if err != nil {
-			app.logger.Errorf("https server err:%s", err.Error())
-			return
-		}
-	}()
-	return nil
-}
+	time.Sleep(1 * time.Millisecond)
 
-func (app *Router) Stop() error {
-	return app.App.Shutdown()
+	go func() {
+		c, cancelFunc := context.WithCancel(app.ctx)
+		select {
+		case <-c.Done():
+			cancelFunc()
+			_ = app.Shutdown()
+		default:
+			err := app.Listen(app.config.HttpsAddr)
+			if err != nil {
+				app.logger.Errorf("https server err:%s", err.Error())
+				cancelFunc()
+				return
+			}
+		}
+		cancelFunc()
+	}()
+
 }

@@ -48,7 +48,7 @@ func New(w io.Writer, level logrus.Level) Logger {
 }
 
 func (l *logger) Write(p []byte) (n int, err error) {
-	l.Logger.Infof(string(p))
+	l.Logger.Infof("\u001B[35m"+"web:" + string(p))
 	return len(p), nil
 }
 

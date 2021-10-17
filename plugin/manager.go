@@ -3,6 +3,7 @@ package plugin
 import (
 	"archive/tar"
 	"compress/gzip"
+	"context"
 	"fmt"
 	"github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/bus"
@@ -59,11 +60,13 @@ type Manager struct {
 	logger        logging.Logger
 	actions       map[string]*wot.ActionAffordance
 	storage       managerStore
+	ctx           context.Context
 }
 
-func NewAddonsManager(conf Config, s managerStore, bus bus.Controller, log logging.Logger) *Manager {
+func NewAddonsManager(ctx context.Context, conf Config, s managerStore, bus bus.Controller, log logging.Logger) *Manager {
 	am := &Manager{}
 	am.config = conf
+	am.ctx = ctx
 	am.logger = log
 	am.addonsLoaded = false
 	am.isPairing = false
@@ -317,7 +320,9 @@ func (m *Manager) loadAddons() {
 	}
 	m.logger.Info("starting loading addons.")
 	m.addonsLoaded = true
-	m.pluginServer = NewPluginServer(m)
+	if m.pluginServer == nil {
+		m.pluginServer = NewPluginServer(m.ctx,m)
+	}
 	load := func(dir string) {
 		fs, err := os.ReadDir(dir)
 		if err != nil {
@@ -384,7 +389,7 @@ func (m *Manager) loadAddon(packageId string) {
 		}
 		m.extensions.Store(addonInfo.ID, ext)
 	}
-	util.EnsureDir(m.logger, path.Join(m.config.UserProfile.DataDir,packageId))
+	util.EnsureDir(m.logger, path.Join(m.config.UserProfile.DataDir, packageId))
 	if addonInfo.Exec == "" {
 		m.logger.Errorf("addon %s has not exec", addonInfo.ID)
 		return
@@ -394,7 +399,7 @@ func (m *Manager) loadAddon(packageId string) {
 		m.logger.Errorf("addon %s disabled", packageId)
 		return
 	}
-	m.pluginServer.loadPlugin(addonInfo.ID,packageDir, addonInfo.Exec)
+	m.pluginServer.loadPlugin(addonInfo.ID, packageDir, addonInfo.Exec)
 }
 
 func (m *Manager) removeAdapter(adapter *Adapter) {

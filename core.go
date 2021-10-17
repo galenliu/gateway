@@ -41,7 +41,7 @@ type Gateway struct {
 	container    container.Container
 }
 
-func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
+func NewGateway(ctx context.Context,config Config, logger logging.Logger) (*Gateway, error) {
 
 	g := &Gateway{}
 	g.logger = logger
@@ -81,7 +81,7 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 	g.logger.Infof("event bus init.")
 
 	//Addon manager init
-	g.addonManager = plugin.NewAddonsManager(plugin.Config{
+	g.addonManager = plugin.NewAddonsManager(ctx,plugin.Config{
 		UserProfile: u,
 		AddonsDir:       u.AddonsDir,
 		AttachAddonsDir: g.config.AttachAddonsDir,
@@ -91,7 +91,7 @@ func NewGateway(config Config, logger logging.Logger) (*Gateway, error) {
 	g.logger.Infof("addon manager init.")
 
 	// Web service init
-	g.sever = server.NewServe(server.Config{
+	g.sever = server.NewServe(ctx,server.Config{
 		HttpAddr:    g.config.HttpAddr,
 		HttpsAddr:   g.config.HttpsAddr,
 		AddonUrls:   g.config.AddonUrls,

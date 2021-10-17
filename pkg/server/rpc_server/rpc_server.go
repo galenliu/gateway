@@ -1,6 +1,7 @@
 package rpc_server
 
 import (
+	"context"
 	"fmt"
 	"github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/constant"
@@ -12,21 +13,22 @@ import (
 )
 
 type RPCServer struct {
-	port     string
-	logger   logging.Logger
-	doneChan chan struct{}
+	port   string
+	logger logging.Logger
+	ctx    context.Context
 	rpc.UnimplementedPluginServerServer
 	pluginSever server.PluginServer
 	userProfile *rpc.UsrProfile
 }
 
-func NewRPCServer(pluginServer server.PluginServer, port string, userProfile *rpc.UsrProfile, log logging.Logger) *RPCServer {
+func NewRPCServer(ctx context.Context, pluginServer server.PluginServer, port string, userProfile *rpc.UsrProfile, log logging.Logger) *RPCServer {
 	s := &RPCServer{}
 	s.pluginSever = pluginServer
 	s.port = port
 	s.userProfile = userProfile
-	s.doneChan = make(chan struct{})
+	s.ctx = ctx
 	s.logger = log
+	go s.Run()
 	return s
 }
 
@@ -66,7 +68,8 @@ func (s *RPCServer) PluginHandler(p rpc.PluginServer_PluginHandlerServer) error 
 			return err
 		}
 		select {
-		case <-s.doneChan:
+		case <-s.ctx.Done():
+
 			return fmt.Errorf("rpc server stopped")
 		}
 
@@ -74,28 +77,29 @@ func (s *RPCServer) PluginHandler(p rpc.PluginServer_PluginHandlerServer) error 
 
 }
 
-func (s *RPCServer) Run() error {
-	err := func() error {
-		lis, err := net.Listen("tcp", s.port)
-		s.logger.Infof("RPC server run addr: %s", s.port)
-		if err != nil {
-			return err
-		}
-		sev := grpc.NewServer()
-		rpc.RegisterPluginServerServer(sev, s)
+func (s *RPCServer) Run() {
+
+	lis, err := net.Listen("tcp", s.port)
+	s.logger.Infof("RPC server run addr: %s", s.port)
+	if err != nil {
+		s.logger.Error(err.Error())
+	}
+	sev := grpc.NewServer()
+	rpc.RegisterPluginServerServer(sev, s)
+	for {
 		err = sev.Serve(lis)
 		if err != nil {
-			return err
+			s.logger.Error(err.Error())
 		}
-		return nil
-	}()
-	if err != nil {
-		s.logger.Errorf("RPC Run err: %s", err)
-	}
-	return nil
-}
 
-func (s *RPCServer) Stop() error {
-	s.doneChan <- struct{}{}
-	return nil
+		if err != nil {
+			s.logger.Errorf("RPC Start err: %s", err)
+		}
+		select {
+		case <-s.ctx.Done():
+			sev.Stop()
+		}
+
+	}
+
 }

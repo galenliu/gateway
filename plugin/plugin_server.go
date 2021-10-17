@@ -2,6 +2,7 @@ package plugin
 
 //	plugin server
 import (
+	"context"
 	rpc "github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/server"
@@ -16,17 +17,18 @@ type PluginsServer struct {
 	ipc       *ipc.IPCServer
 	rpc       *rpc_server.RPCServer
 	closeChan chan struct{}
+	ctx  context.Context
 	logger    logging.Logger
 }
 
-func NewPluginServer(manager *Manager) *PluginsServer {
+func NewPluginServer(ctx context.Context,manager *Manager) *PluginsServer {
 	s := &PluginsServer{}
+	s.ctx = ctx
 	s.logger = manager.logger
 	s.closeChan = make(chan struct{})
 	s.manager = manager
-	s.ipc = ipc.NewIPCServer(s, manager.config.IPCPort, manager.config.UserProfile, s.logger)
-	s.rpc = rpc_server.NewRPCServer(s, manager.config.RPCPort, manager.config.UserProfile, manager.logger)
-	s.Start()
+	s.ipc = ipc.NewIPCServer(ctx,s, manager.config.IPCPort, manager.config.UserProfile, s.logger)
+	s.rpc = rpc_server.NewRPCServer(ctx,s, manager.config.RPCPort, manager.config.UserProfile, manager.logger)
 	return s
 }
 
@@ -85,23 +87,6 @@ func (s *PluginsServer) getPlugins() (plugins []*Plugin) {
 		}
 		return true
 	})
-	return
-}
-
-// Start create goroutines handle ipc massage
-func (s *PluginsServer) Start() {
-	go func() {
-		err := s.rpc.Run()
-		if err != nil {
-			s.logger.Errorf("rpc server err:", err.Error())
-		}
-	}()
-	go func() {
-		err := s.ipc.Run()
-		if err != nil {
-			s.logger.Errorf("ipc server err:", err.Error())
-		}
-	}()
 	return
 }
 
