@@ -11,4 +11,9 @@
 /cmd/miot*
 /miot/
 ##git submodule updata --init --recursive
-/configs/
+/configs/addons
+/configs/config
+/configs/log
+/configs/media
+/configs/data
+

@@ -1,13 +1,10 @@
-package rpc_server
+package ipc
 
 import (
 	"context"
 	"fmt"
 	"github.com/galenliu/gateway-grpc"
-	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/server"
-	json "github.com/json-iterator/go"
 	"google.golang.org/grpc"
 	"net"
 )
@@ -17,11 +14,11 @@ type RPCServer struct {
 	logger logging.Logger
 	ctx    context.Context
 	rpc.UnimplementedPluginServerServer
-	pluginSever server.PluginServer
+	pluginSever PluginServer
 	userProfile *rpc.UsrProfile
 }
 
-func NewRPCServer(ctx context.Context, pluginServer server.PluginServer, port string, userProfile *rpc.UsrProfile, log logging.Logger) *RPCServer {
+func NewRPCServer(ctx context.Context, pluginServer PluginServer, port string, userProfile *rpc.UsrProfile, log logging.Logger) *RPCServer {
 	s := &RPCServer{}
 	s.pluginSever = pluginServer
 	s.port = port
@@ -33,33 +30,17 @@ func NewRPCServer(ctx context.Context, pluginServer server.PluginServer, port st
 }
 
 func (s *RPCServer) PluginHandler(p rpc.PluginServer_PluginHandlerServer) error {
-	r, err := p.Recv()
-	if err != nil {
-		return err
-	}
-	pluginId := json.Get(r.Data, "pluginId").ToString()
-	if r.MessageType != rpc.MessageType_PluginRegisterRequest || pluginId == "" {
-		return err
-	}
 
-	err = p.SendMsg(rpc.PluginRegisterResponseMessage{
-		MessageType: 0,
-		Data: &rpc.PluginRegisterResponseMessage_Data{
-			PluginId:       pluginId,
-			GatewayVersion: constant.Version,
-			UserProfile:    s.userProfile,
-			Preferences:    s.pluginSever.GetPreferences(),
-		},
-	})
+	clint := &rpcClint{p}
+
+	pluginHandler, err := s.pluginSever.RegisterPlugin(clint)
+
 	if err != nil {
 		return err
 	}
-	clint := NewClint(pluginId, p)
-	var pluginHandler server.PluginHandler
-	pluginHandler = s.pluginSever.RegisterPlugin(pluginId, clint)
 
 	for {
-		baseMessage, err := clint.Read()
+		baseMessage, err := clint.ReadMessage()
 		if err != nil {
 			return err
 		}
@@ -99,7 +80,18 @@ func (s *RPCServer) Run() {
 		case <-s.ctx.Done():
 			sev.Stop()
 		}
-
 	}
 
+}
+
+type rpcClint struct {
+	rpc.PluginServer_PluginHandlerServer
+}
+
+func (r *rpcClint) WriteMessage(message *rpc.BaseMessage) error {
+	return r.PluginServer_PluginHandlerServer.Send(message)
+}
+
+func (r *rpcClint) ReadMessage() (*rpc.BaseMessage, error) {
+	return r.Recv()
 }

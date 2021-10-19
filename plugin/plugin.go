@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/galenliu/gateway-grpc"
+	"github.com/galenliu/gateway/pkg/ipc"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/server"
 	"github.com/galenliu/gateway/plugin/addon"
 	json "github.com/json-iterator/go"
 	"io"
@@ -25,7 +25,7 @@ type Plugin struct {
 	closeChan     chan struct{}
 	closeExecChan chan struct{}
 	pluginServer  *PluginsServer
-	Clint         server.Clint
+	clint         ipc.Clint
 	logger        logging.Logger
 	addonManager  *Manager
 	adapters      sync.Map
@@ -308,7 +308,7 @@ func (plugin *Plugin) SendMsg(mt rpc.MessageType, message map[string]interface{}
 	if err != nil {
 		return
 	}
-	err = plugin.Clint.Send(&rpc.BaseMessage{
+	err = plugin.clint.WriteMessage(&rpc.BaseMessage{
 		MessageType: mt,
 		Data:        data,
 	})
@@ -361,30 +361,6 @@ func (plugin *Plugin) start() {
 
 	}
 
-	//var syncLogBuf = func(buf *bytes.Buffer) {
-	//	for {
-	//		select {
-	//		case <-plugin.closeChan:
-	//			return
-	//		default:
-	//
-	//			for {
-	//				message, err := ioutil.ReadAll(buf)
-	//				if len(message) > 0 {
-	//					plugin.logger.Infof("%s out:[ %s ]", plugin.pluginId, string(message))
-	//				}
-	//				if err != nil {
-	//					//读到结尾
-	//					if err == io.EOF || strings.Contains(err.Error(), "file already closed") {
-	//						err = nil
-	//					}
-	//				}
-	//			}
-	//		}
-	//	}
-	//
-	//}
-
 	var cmd *exec.Cmd
 	var args = commands[1:]
 	if len(args) > 0 {
@@ -398,14 +374,14 @@ func (plugin *Plugin) start() {
 
 	//cmd.Stdout = &stdOutBuf
 	//cmd.Stderr = &stdErrBuf
- 	stdout, _ := cmd.StdoutPipe()
- 	stderr, _ := cmd.StderrPipe()
+	stdout, _ := cmd.StdoutPipe()
+	stderr, _ := cmd.StderrPipe()
 
 	//go syncLogBuf(&stdOutBuf)
 	//go syncLogBuf(&stdErrBuf)
 
- go syncLog(stdout)
- go syncLog(stderr)
+	go syncLog(stdout)
+	go syncLog(stderr)
 
 	go func() {
 		err := cmd.Run()
