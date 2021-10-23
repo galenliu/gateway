@@ -2,10 +2,10 @@ package ipc
 
 import (
 	"context"
-	"fmt"
 	"github.com/fasthttp/websocket"
 	"github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/logging"
+	json "github.com/json-iterator/go"
 	"net/http"
 	"sync"
 	"time"
@@ -16,10 +16,8 @@ var upgrade = websocket.Upgrader{
 	WriteBufferSize:  1024,
 	HandshakeTimeout: 1 * time.Second,
 	CheckOrigin: func(r *http.Request) bool {
-		fmt.Printf("method: %s, url: %s , path: %s\n", r.Method, r.URL.String(), r.Host)
 		return true
 	},
-	EnableCompression: true,
 }
 
 type IPC struct {
@@ -101,7 +99,7 @@ func (s *IPC) readLoop(conn *websocket.Conn) {
 				cancelFunc()
 				return
 			}
-			s.logger.Debugf("ipc server rev: &s", message)
+			s.logger.Debugf("ipc server rev: %+v", message)
 			err = pluginHandler.OnMsg(message.MessageType, message.Data)
 			if err != nil {
 				cancelFunc()
@@ -116,13 +114,26 @@ type ipcConnection struct {
 }
 
 func (c *ipcConnection) WriteMessage(message *rpc.BaseMessage) error {
-	return c.WriteJSON(message)
+	baseMessage := BaseMessage{MessageType: int(message.MessageType)}
+	err := json.Unmarshal(message.Data, &baseMessage.Data)
+	if err != nil {
+		return err
+	}
+	return c.WriteJSON(baseMessage)
 }
+
 func (c *ipcConnection) ReadMessage() (*rpc.BaseMessage, error) {
-	var msg rpc.BaseMessage
+	//var msg rpc.BaseMessage
+	var msg BaseMessage
 	err := c.ReadJSON(&msg)
+	data, err := json.Marshal(msg.Data)
 	if err != nil {
 		return nil, err
 	}
-	return &msg, nil
+	return &rpc.BaseMessage{MessageType: rpc.MessageType(msg.MessageType), Data: data}, nil
+}
+
+type BaseMessage struct {
+	MessageType int                    `json:"messageType"`
+	Data        map[string]interface{} `json:"data"`
 }

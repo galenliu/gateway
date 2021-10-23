@@ -35,12 +35,13 @@ func NewPluginServer(ctx context.Context, manager *Manager) *PluginsServer {
 
 func (s *PluginsServer) RegisterPlugin(clint ipc.Clint) (ipc.PluginHandler, error) {
 	message, err := clint.ReadMessage()
-	if message.MessageType != rpc.MessageType_PluginRegisterRequest {
-		return nil, fmt.Errorf("MessageType need PluginRegisterRequest")
-	}
 	if err != nil {
 		return nil, err
 	}
+	if message.MessageType != rpc.MessageType_PluginRegisterRequest {
+		return nil, fmt.Errorf("MessageType need PluginRegisterRequest")
+	}
+
 	var registerMessage rpc.PluginRegisterRequestMessage_Data
 	err = json.Unmarshal(message.Data, &registerMessage)
 	if err != nil {
@@ -52,7 +53,7 @@ func (s *PluginsServer) RegisterPlugin(clint ipc.Clint) (ipc.PluginHandler, erro
 			PluginId:       registerMessage.PluginId,
 			GatewayVersion: constant.Version,
 			UserProfile:    s.manager.config.UserProfile,
-			Preferences:    s.GetPreferences(),
+			Preferences:    s.getPreferences(),
 		}
 	data, _ := json.Marshal(responseMessage)
 	err = clint.WriteMessage(&rpc.BaseMessage{MessageType: rpc.MessageType_PluginRegisterResponse, Data: data})
@@ -111,14 +112,14 @@ func (s *PluginsServer) getPlugins() (plugins []*Plugin) {
 	return
 }
 
-func (s *PluginsServer) GetPreferences() *rpc.Preferences {
+func (s *PluginsServer) getPreferences() *rpc.Preferences {
 	r := &rpc.Preferences{Language: "en-US", Units: &rpc.Preferences_Units{Temperature: "degree celsius"}}
 	lang, err := s.manager.storage.GetSetting("localization.language")
-	if err != nil {
+	if err == nil {
 		r.Language = lang
 	}
 	temp, err := s.manager.storage.GetSetting("localization.units.temperature")
-	if err != nil {
+	if err == nil {
 		r.Units.Temperature = temp
 	}
 	return r

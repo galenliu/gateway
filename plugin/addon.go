@@ -72,14 +72,14 @@ func (a *Addon) SetEnabled(disabled bool) error {
 		return nil
 	}
 	a.Enabled = disabled
-	err := a.Save()
+	err := a.save()
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (a *Addon) Save() error {
+func (a *Addon) save() error {
 	str, err := json.MarshalToString(a)
 	if err != nil {
 		return err

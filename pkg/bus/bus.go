@@ -34,6 +34,7 @@ func (b *Bus) Subscribe(topic string, fn interface{}) {
 }
 
 func (b *Bus) Unsubscribe(topic string, fn interface{}) {
+	b.logger.Debugf("unsubscribe topic:[%s]", topic)
 	err := b.Bus.Unsubscribe(topic, fn)
 	if err != nil {
 		b.logger.Error("topic: %s unsubscribe err: %s", topic, err.Error())

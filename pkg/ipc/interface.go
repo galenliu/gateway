@@ -12,6 +12,5 @@ type PluginHandler interface {
 }
 
 type PluginServer interface {
-	GetPreferences() *rpc.Preferences
 	RegisterPlugin(clint Clint) (PluginHandler, error)
 }

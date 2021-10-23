@@ -139,13 +139,11 @@ func (m *Manager) connectedNotify(device *addon.Device, connected bool) {
 func (m *Manager) addAdapter(adapter *Adapter) {
 	m.adapters.Store(adapter.ID, adapter)
 	m.Eventbus.bus.Publish(constant.AdapterAdded, adapter)
-	m.logger.Debug(fmt.Sprintf("adapter：(%s) added", adapter.ID))
 }
 
 func (m *Manager) addService(service *Service) {
 	m.adapters.Store(service.ID, service)
 	m.Eventbus.bus.Publish(constant.ServiceAdded, service)
-	m.logger.Debug(fmt.Sprintf("service：(%s) added", service.ID))
 }
 
 func (m *Manager) handleDeviceAdded(device *Device) {
@@ -321,7 +319,7 @@ func (m *Manager) loadAddons() {
 	m.logger.Info("starting loading addons.")
 	m.addonsLoaded = true
 	if m.pluginServer == nil {
-		m.pluginServer = NewPluginServer(m.ctx,m)
+		m.pluginServer = NewPluginServer(m.ctx, m)
 	}
 	load := func(dir string) {
 		fs, err := os.ReadDir(dir)
@@ -365,7 +363,7 @@ func (m *Manager) loadAddon(packageId string) {
 	if err == nil && saved != "" {
 		addonInfo = NewAddonSettingFromString(saved, m.storage)
 	} else {
-		err = addonInfo.Save()
+		err = addonInfo.save()
 		if err != nil {
 			m.logger.Errorf("addon save err: %s", err.Error())
 		}
@@ -434,5 +432,5 @@ func (m *Manager) removeApiHandler(id int) {
 
 // 定时任务，更新Add-on
 func (m *Manager) updateAddons() {
-	m.logger.Infof("time task: checking addons update time:", time.Now().String())
+	m.logger.Infof("time task: addons upgrade %s", time.Now().String())
 }
