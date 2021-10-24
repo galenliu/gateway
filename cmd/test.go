@@ -2,13 +2,13 @@ package main
 
 import (
 	"flag"
+	"github.com/galenliu/gateway-grpc"
+	"github.com/gorilla/websocket"
 	"log"
 	"net/url"
 	"os"
 	"os/signal"
 	"time"
-
-	"github.com/gorilla/websocket"
 )
 
 var addr = flag.String("addr", "localhost:9500", "http service address")
@@ -50,8 +50,12 @@ func main() {
 		select {
 		case <-done:
 			return
-		case t := <-ticker.C:
-			err := c.WriteMessage(websocket.TextMessage, []byte(t.String()))
+		case _ = <-ticker.C:
+			var d = rpc.PluginRegisterRequestMessage{
+				MessageType: rpc.MessageType_PluginRegisterRequest,
+				Data:        &rpc.PluginRegisterRequestMessage_Data{PluginId: "TestAdapter"},
+			}
+			err := c.WriteJSON(&d)
 			if err != nil {
 				log.Println("write:", err)
 				return

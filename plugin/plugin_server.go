@@ -15,7 +15,7 @@ import (
 type PluginsServer struct {
 	Plugins   sync.Map
 	manager   *Manager
-	ipc       *ipc.IPC
+	ipc       *ipc.IPCServer
 	rpc       *ipc.RPCServer
 	closeChan chan struct{}
 	ctx       context.Context
