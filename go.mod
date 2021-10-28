@@ -27,9 +27,6 @@ require (
 	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1
 	google.golang.org/grpc v1.40.0
 	gopkg.in/yaml.v2 v2.4.0
-)
-
-require (
 	github.com/andybalholm/brotli v1.0.2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
@@ -66,5 +63,4 @@ require (
 )
 
 replace github.com/galenliu/gateway-addon => ../gateway/gateway-addon
-
 replace github.com/galenliu/gateway-grpc => ../gateway/gateway-grpc
