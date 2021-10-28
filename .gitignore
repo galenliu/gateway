@@ -16,4 +16,4 @@
 /configs/log
 /configs/media
 /configs/data
-
+.DS_Store
