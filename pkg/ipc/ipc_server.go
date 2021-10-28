@@ -8,12 +8,14 @@ import (
 	json "github.com/json-iterator/go"
 	"net/http"
 	"sync"
+	"time"
 )
 
 var upgrade = websocket.Upgrader{
-	//ReadBufferSize:   1024,
-	//WriteBufferSize:  1024,
-	//HandshakeTimeout: 1 * time.Second,
+	ReadBufferSize:   1024,
+	WriteBufferSize:  1024,
+	HandshakeTimeout: 1 * time.Second,
+	Subprotocols:     []string{"websocket"},
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
@@ -41,8 +43,9 @@ func NewIPCServer(ctx context.Context, pluginServer PluginServer, port string, u
 }
 
 func (s *IPCServer) Run() {
+
 	http.HandleFunc("/", s.handle)
-	//http.HandleFunc("/ws", s.handle)
+	http.HandleFunc("/ws", s.handle)
 	s.logger.Infof("ipc listen addr: %s", s.port)
 	err := http.ListenAndServe("127.0.0.1"+s.port, nil)
 	if err != nil {
@@ -66,8 +69,9 @@ func (s *IPCServer) handle(w http.ResponseWriter, r *http.Request) {
 
 func (s *IPCServer) readLoop(conn *websocket.Conn) {
 
+	defer conn.Close()
 	conn.SetPongHandler(func(appData string) error {
-		s.logger.Info("ping request: %s",appData)
+		s.logger.Info("ping request: %s", appData)
 		return conn.WriteMessage(websocket.PongMessage, nil)
 	})
 	clint := &connection{conn}
