@@ -85,9 +85,7 @@ const (
 	UploadDirName = "upload"
 	LogDirName    = "logger"
 
-	DbPrefUnitsTemp      = "preferences.units.temperature"
 	PrefUnitsTempCelsius = "degree celsius"
-	ConfDirName          = ".gateway"
 
 	DegreeCelsius    = "degree celsius"    //摄氏度
 	FahrenheitDegree = "fahrenheit degree" //华氏度

@@ -22,13 +22,13 @@ type PluginsServer struct {
 	logger    logging.Logger
 }
 
-func NewPluginServer(ctx context.Context, manager *Manager) *PluginsServer {
+func NewPluginServer(manager *Manager) *PluginsServer {
 	s := &PluginsServer{}
-	s.ctx = ctx
+
 	s.logger = manager.logger
 	s.closeChan = make(chan struct{})
 	s.manager = manager
-	s.ipc = ipc.NewIPCServer(ctx, s, manager.config.IPCPort, manager.config.UserProfile, s.logger)
+	s.ipc = ipc.NewIPCServer(s, manager.config.IPCPort, manager.config.UserProfile, s.logger)
 	//s.rpc = ipc.NewRPCServer(ctx, s, manager.config.RPCPort, manager.config.UserProfile, manager.logger)
 	return s
 }
@@ -50,7 +50,7 @@ func (s *PluginsServer) RegisterPlugin(clint ipc.Clint) (ipc.PluginHandler, erro
 
 	responseMessage :=
 		&rpc.PluginRegisterResponseMessage_Data{
-			PluginId:       registerMessage.PluginId,
+			PluginId:       json.Get(message.Data, "pluginId").ToString(),
 			GatewayVersion: constant.Version,
 			UserProfile:    s.manager.config.UserProfile,
 			Preferences:    s.getPreferences(),
@@ -80,13 +80,15 @@ func (s *PluginsServer) loadPlugin(pluginId, packagePath, exec string) {
 	plugin := s.registerPlugin(pluginId)
 	plugin.exec = exec
 	plugin.execPath = packagePath
-	plugin.start()
+	go plugin.run()
 }
 
 func (s *PluginsServer) registerPlugin(pluginId string) *Plugin {
 	plugin := s.getPlugin(pluginId)
 	if plugin == nil {
 		plugin = NewPlugin(pluginId, s.manager, s, s.logger)
+	} else {
+		return plugin
 	}
 	s.Plugins.Store(pluginId, plugin)
 	return plugin

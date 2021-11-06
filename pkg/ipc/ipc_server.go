@@ -28,14 +28,12 @@ type IPCServer struct {
 	locker       *sync.Mutex
 	pluginServer PluginServer
 	userProfile  *rpc.UsrProfile
-	ctx          context.Context
 }
 
-func NewIPCServer(ctx context.Context, pluginServer PluginServer, port string, userProfile *rpc.UsrProfile, log logging.Logger) *IPCServer {
+func NewIPCServer(pluginServer PluginServer, port string, userProfile *rpc.UsrProfile, log logging.Logger) *IPCServer {
 	ipc := &IPCServer{}
 	ipc.pluginServer = pluginServer
 	ipc.logger = log
-	ipc.ctx = ctx
 	ipc.port = port
 	ipc.userProfile = userProfile
 	go ipc.Run()
@@ -64,46 +62,41 @@ func (s *IPCServer) handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.logger.Infof("ipc connection addr: %s", conn.RemoteAddr().String())
-	s.readLoop(conn)
+	go s.readLoop(conn)
 }
 
+
+// g
 func (s *IPCServer) readLoop(conn *websocket.Conn) {
 
-	defer conn.Close()
 	conn.SetPongHandler(func(appData string) error {
 		s.logger.Info("ping request: %s", appData)
 		return conn.WriteMessage(websocket.PongMessage, nil)
 	})
-	clint := &connection{conn}
-	_, data, err := conn.ReadMessage()
-	s.logger.Info(string(data))
-
+	clint := &connection{conn, s.logger}
 	pluginHandler, err := s.pluginServer.RegisterPlugin(clint)
 	if err != nil {
 		s.logger.Infof("register err: %s", err.Error())
 		return
 	}
-
-	ctx, cancelFunc := context.WithCancel(s.ctx)
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	defer conn.Close()
+	defer cancelFunc()
 	for {
 		select {
 		case <-ctx.Done():
 			s.logger.Infof("ipc server exit")
 			_ = conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, "ipc exit"))
 			_ = clint.Close()
-			cancelFunc()
 			return
 
 		default:
 			message, err := clint.ReadMessage()
 			if err != nil {
-				cancelFunc()
 				return
 			}
-			s.logger.Debugf("ipc server rev: %+v", message)
 			err = pluginHandler.OnMsg(message.MessageType, message.Data)
 			if err != nil {
-				cancelFunc()
 				return
 			}
 		}
@@ -112,6 +105,7 @@ func (s *IPCServer) readLoop(conn *websocket.Conn) {
 
 type connection struct {
 	*websocket.Conn
+	logger logging.Logger
 }
 
 func (c *connection) WriteMessage(message *rpc.BaseMessage) error {
@@ -131,7 +125,12 @@ func (c *connection) ReadMessage() (*rpc.BaseMessage, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &rpc.BaseMessage{MessageType: rpc.MessageType(msg.MessageType), Data: data}, nil
+	c.logger.Debugf("ipc rev: %s", string(data))
+	marshal, err := json.Marshal(msg.Data)
+	if err != nil {
+		return nil, err
+	}
+	return &rpc.BaseMessage{MessageType: rpc.MessageType(msg.MessageType), Data: marshal}, nil
 }
 
 type BaseMessage struct {

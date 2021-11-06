@@ -48,7 +48,7 @@ func (c *command) initStartCmd() (err error) {
 				}
 			}
 
-			logger.Infof("gateway version: %v", constant.Version)
+			logger.Infof("gateway version %v", constant.Version)
 
 			ctx, cancelFunc := context.WithCancel(context.Background())
 			gw, err := gateway.NewGateway(ctx, gateway.Config{
@@ -81,6 +81,7 @@ func (c *command) initStartCmd() (err error) {
 					sig := <-interruptChannel
 					logger.Debugf("received signal: %v", sig)
 					logger.Info("shutting down")
+					return
 				},
 				stop: func() {
 					// Shutdown
@@ -100,6 +101,7 @@ func (c *command) initStartCmd() (err error) {
 					case sig := <-interruptChannel:
 						cancelFunc()
 						logger.Debugf("received signal: %v", sig)
+						return
 					case <-ctx.Done():
 						cancelFunc()
 					}

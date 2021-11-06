@@ -9,7 +9,7 @@ import (
 )
 
 type AddonManager interface {
-	GetInstallAddonsBytes() []byte
+	GetInstallAddons() interface{}
 	EnableAddon(addonId string) error
 	DisableAddon(addonId string) error
 	InstallAddonFromUrl(id, url, checksum string) error
@@ -34,13 +34,17 @@ func NewAddonController(manager AddonManager, m *models.AddonsModel, log logging
 	return a
 }
 
-//  GET /addons
-func (addon *AddonController) handlerGetInstallAddons(c *fiber.Ctx) error {
-	data := addon.manager.GetInstallAddonsBytes()
+// GET /addons
+func (addon *AddonController) handlerGetInstalledAddons(c *fiber.Ctx) error {
+	addons := addon.manager.GetInstallAddons()
+	data, err := json.Marshal(addons)
+	if err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
 	return c.Status(fiber.StatusOK).Send(data)
 }
 
-// Get addonId/license"
+// Get addons/addonId/license"
 func (addon *AddonController) handlerGetLicense(c *fiber.Ctx) error {
 	addonId := c.Params("addonId")
 	data, err := addon.manager.GetAddonLicense(addonId)
@@ -50,9 +54,9 @@ func (addon *AddonController) handlerGetLicense(c *fiber.Ctx) error {
 	return c.Type("text/plain").Status(fiber.StatusOK).SendString(data)
 }
 
-// PUT /addons/:id
+// PUT /addons/:addonId
 func (addon *AddonController) handlerSetAddon(c *fiber.Ctx) error {
-	addonId := c.FormValue("addonId")
+	addonId := c.Params("addonId")
 	enabled := json.Get(c.Body(), "enabled").ToBool()
 	var err error
 	if enabled {
@@ -66,7 +70,7 @@ func (addon *AddonController) handlerSetAddon(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(enabled)
 }
 
-//GET /addon/:addonId/config
+//GET /addons/:addonId/config
 func (addon *AddonController) handlerGetAddonConfig(c *fiber.Ctx) error {
 	var addonId = c.Params("addonId")
 	if addonId == "" {
@@ -82,7 +86,7 @@ func (addon *AddonController) handlerGetAddonConfig(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).SendString(config)
 }
 
-//Put /:addonId/config
+//Put addons/:addonId/config
 func (addon *AddonController) handlerSetAddonConfig(c *fiber.Ctx) error {
 
 	var addonId = c.Params("addonId")
@@ -129,7 +133,7 @@ func (addon *AddonController) handlerInstallAddon(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).SendString(setting)
 }
 
-// Patch /:addonId
+// Patch addons/:addonId
 func (addon *AddonController) handlerUpdateAddon(c *fiber.Ctx) error {
 	id := c.Params("addonId")
 	url := json.Get(c.Body(), "url").ToString()
@@ -150,6 +154,7 @@ func (addon *AddonController) handlerUpdateAddon(c *fiber.Ctx) error {
 
 }
 
+// Delete addons/:addonId
 func (addon *AddonController) handlerDeleteAddon(c *fiber.Ctx) error {
 	var addonId = c.Params("addonId")
 	err := addon.manager.UninstallAddon(addonId, true)

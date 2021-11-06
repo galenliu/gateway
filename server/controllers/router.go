@@ -205,7 +205,8 @@ func NewRouter(ctx context.Context, config Config, manager Manager, serviceManag
 	{
 		addonController := NewAddonController(manager, addonModel, log)
 		addonGroup := app.Group(constant.AddonsPath)
-		addonGroup.Get("/", addonController.handlerGetInstallAddons)
+		addonGroup.Get("/", addonController.handlerGetInstalledAddons)
+		addonGroup.Delete("/:addonId", addonController.handlerDeleteAddon)
 		addonGroup.Get("/:addonId/license", addonController.handlerGetLicense)
 		addonGroup.Post("/", addonController.handlerInstallAddon)
 		addonGroup.Put("/:addonId", addonController.handlerSetAddon)

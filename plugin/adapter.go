@@ -31,7 +31,7 @@ func NewAdapter(plugin *Plugin, adapterId, name, packageName string, log logging
 }
 
 func (adapter *Adapter) pairing(timeout int) {
-	adapter.logger.Infof("%s start pairing", adapter.ID)
+	adapter.logger.Infof("%s run pairing", adapter.ID)
 	data := make(map[string]interface{})
 	data["timeout"] = timeout
 	adapter.sendMsg(rpc.MessageType_AdapterStartPairingCommand, data)
@@ -51,7 +51,7 @@ func (adapter *Adapter) removeThing(device *Device) {
 }
 
 func (adapter *Adapter) cancelRemoveThing(deviceId string) {
-	adapter.logger.Info(fmt.Sprintf("adapter: %s start pairing", adapter.ID))
+	adapter.logger.Info(fmt.Sprintf("adapter: %s run pairing", adapter.ID))
 	data := make(map[string]interface{})
 	data["deviceId"] = deviceId
 	adapter.sendMsg(rpc.MessageType_AdapterCancelRemoveDeviceCommand, data)

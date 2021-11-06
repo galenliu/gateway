@@ -16,39 +16,35 @@ import (
 )
 
 type Plugin struct {
-	locker        *sync.Mutex
-	pluginId      string
-	exec          string
-	execPath      string
-	restart       bool
-	unloading     bool
-	closeChan     chan struct{}
-	closeExecChan chan struct{}
-	pluginServer  *PluginsServer
-	clint         ipc.Clint
-	logger        logging.Logger
-	addonManager  *Manager
-	adapters      sync.Map
-	notifiers     sync.Map
-	apiHandlers   sync.Map
-	services      sync.Map
+	locker       *sync.Mutex
+	pluginId     string
+	exec         string
+	execPath     string
+	restart      bool
+	unloading    bool
+	closeChan    chan struct{}
+	pluginServer *PluginsServer
+	clint        ipc.Clint
+	logger       logging.Logger
+	addonManager *Manager
+	adapters     sync.Map
+	notifiers    sync.Map
+	apiHandlers  sync.Map
+	services     sync.Map
 }
 
 func NewPlugin(pluginId string, manager *Manager, s *PluginsServer, log logging.Logger) (plugin *Plugin) {
 	execPath := s.manager.getAddonPath(pluginId)
-	if execPath == "" {
-		return nil
-	}
 	plugin = &Plugin{}
+	if execPath != "" {
+		plugin.execPath = execPath
+	}
 	plugin.logger = log
 	plugin.locker = new(sync.Mutex)
 	plugin.addonManager = manager
-	plugin.closeChan = make(chan struct{})
-	plugin.closeExecChan = make(chan struct{})
 	plugin.pluginId = pluginId
 	plugin.restart = false
 	plugin.pluginServer = s
-	plugin.execPath = execPath
 	return
 }
 
@@ -158,7 +154,6 @@ func (plugin *Plugin) OnMsg(messageType rpc.MessageType, data []byte) (err error
 		case rpc.MessageType_ApiHandlerUnloadResponse:
 			return
 		case rpc.MessageType_PluginUnloadRequest:
-			plugin.shutdown()
 			plugin.pluginServer.unregisterPlugin(plugin.pluginId)
 			return
 		case rpc.MessageType_PluginErrorNotification:
@@ -318,28 +313,27 @@ func (plugin *Plugin) SendMsg(mt rpc.MessageType, message map[string]interface{}
 	}
 }
 
-func (plugin *Plugin) start() {
-
+func (plugin *Plugin) run() {
+	plugin.closeChan = make(chan struct{})
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	defer cancelFunc()
 	plugin.exec = strings.Replace(plugin.exec, "\\", string(os.PathSeparator), -1)
 	plugin.exec = strings.Replace(plugin.exec, "/", string(os.PathSeparator), -1)
-
 	plugin.execPath = strings.Replace(plugin.execPath, "\\", string(os.PathSeparator), -1)
 	plugin.execPath = strings.Replace(plugin.execPath, "/", string(os.PathSeparator), -1)
-
 	command := strings.Replace(plugin.exec, "{path}", plugin.execPath, 1)
 	//command = strings.Replace(command, "{nodeLoader}", configs.GetNodeLoader(), 1)
 	if !strings.HasPrefix(command, "python") {
 		plugin.logger.Warningf("plugin %s not run,only support plugin with python lang now", plugin.pluginId)
 		return
 	}
-	ctx, cancelFunc := context.WithCancel(context.Background())
-
 	commands := strings.Split(command, " ")
-
 	var syncLog = func(reader io.ReadCloser) {
+		ctx1, f := context.WithCancel(ctx)
 		for {
 			select {
-			case <-plugin.closeChan:
+			case <-ctx1.Done():
+				f()
 				return
 			default:
 				buf := make([]byte, 1024)
@@ -347,7 +341,7 @@ func (plugin *Plugin) start() {
 					strNum, err := reader.Read(buf)
 					if strNum > 0 {
 						outputByte := buf[:strNum]
-						plugin.logger.Infof("++ %s out:[ %s ]", plugin.pluginId, string(outputByte))
+						plugin.logger.Debugf("%s out: %s", plugin.pluginId, string(outputByte))
 					}
 					if err != nil {
 						//读到结尾
@@ -360,7 +354,6 @@ func (plugin *Plugin) start() {
 		}
 
 	}
-
 	var cmd *exec.Cmd
 	var args = commands[1:]
 	if len(args) > 0 {
@@ -368,42 +361,26 @@ func (plugin *Plugin) start() {
 	} else {
 		cmd = exec.CommandContext(ctx, commands[0])
 	}
-
-	//var stdOutBuf bytes.Buffer
-	//var stdErrBuf bytes.Buffer//
-
-	//cmd.Stdout = &stdOutBuf
-	//cmd.Stderr = &stdErrBuf
 	stdout, _ := cmd.StdoutPipe()
 	stderr, _ := cmd.StderrPipe()
-
-	//go syncLogBuf(&stdOutBuf)
-	//go syncLogBuf(&stdErrBuf)
-
 	go syncLog(stdout)
 	go syncLog(stderr)
+	plugin.logger.Infof("%s run", plugin.pluginId)
 
 	go func() {
 		err := cmd.Run()
 		if err != nil {
-			plugin.logger.Errorf("%s run err: %s", plugin.pluginId, err.Error())
+			plugin.logger.Errorf("%s closed: %s", plugin.pluginId, err.Error())
 			return
 		}
 	}()
 
-	plugin.logger.Infof("%s start", plugin.pluginId)
-
-	closeExec := func() {
-		for {
-			select {
-			case <-plugin.closeExecChan:
-				ctx.Done()
-				cancelFunc()
-			}
+	for {
+		select {
+		case <-plugin.closeChan:
+			return
 		}
 	}
-	go closeExec()
-
 }
 
 func (plugin *Plugin) unload() {
@@ -452,11 +429,4 @@ func (plugin *Plugin) kill() {
 	select {
 	case plugin.closeChan <- struct{}{}:
 	}
-	select {
-	case plugin.closeExecChan <- struct{}{}:
-	}
-}
-
-func (plugin *Plugin) shutdown() {
-
 }

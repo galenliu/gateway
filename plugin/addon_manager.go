@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/util"
-	json "github.com/json-iterator/go"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -12,14 +11,9 @@ import (
 	"time"
 )
 
-// GetInstallAddonsBytes  获取已安装的add-on
-func (m *Manager) GetInstallAddonsBytes() []byte {
-	addons := m.getInstallAddons()
-	data, err := json.Marshal(addons)
-	if err != nil {
-		return nil
-	}
-	return data
+// GetInstallAddons  获取已安装的add-on
+func (m *Manager) GetInstallAddons() interface{} {
+	return  m.getInstallAddons()
 }
 
 func (m *Manager) EnableAddon(packageId string) error {
@@ -106,7 +100,6 @@ func (m *Manager) UnloadAddon(packageId string) {
 		m.logger.Info("The add-ons are not currently loaded, no need to unload.")
 		return
 	}
-	_, _ = m.extensions.LoadAndDelete(packageId)
 	plugin := m.getPlugin(packageId)
 	if plugin == nil {
 		m.logger.Info("The add-ons are not  register.")

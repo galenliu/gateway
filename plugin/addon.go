@@ -23,16 +23,16 @@ type Addon struct {
 	Name                    string `json:"name"`
 	ShortName               string `json:"short_name"`
 	Author                  string `json:"author"`
-	Description             string `json:"description"`
-	License                 string `json:"license"`
+	Description             string `json:"description，omitempty"`
+	License                 string `json:"license,omitempty"`
 	HomepageUrl             string `json:"homepage_url"`
 	Version                 string `json:"version"`
 	Schema                  Schema `json:"schema,omitempty"`
 	Exec                    string `json:"exec"`
 	Enabled                 bool   `json:"enabled"`
 	PrimaryType             string `json:"primary_type"`
-	ContentScripts          string `json:"content_scripts"`
-	WSebAccessibleResources string `json:"web_accessible_resources"`
+	ContentScripts          string `json:"content_scripts,omitempty"`
+	WSebAccessibleResources string `json:"web_accessible_resources,omitempty"`
 	store                   AddonsStore
 }
 

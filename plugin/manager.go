@@ -269,7 +269,7 @@ func (m *Manager) installAddon(packageId, packagePath string) error {
 	if !m.addonsLoaded {
 		return fmt.Errorf("cannot install add-on before other add-ons have been loaded")
 	}
-	m.logger.Infof("start install %s", packageId)
+	m.logger.Infof("run install %s", packageId)
 	f, err := os.Open(packagePath)
 	if err != nil {
 		return err
@@ -319,7 +319,7 @@ func (m *Manager) loadAddons() {
 	m.logger.Info("starting loading addons.")
 	m.addonsLoaded = true
 	if m.pluginServer == nil {
-		m.pluginServer = NewPluginServer(m.ctx, m)
+		m.pluginServer = NewPluginServer(  m)
 	}
 	load := func(dir string) {
 		fs, err := os.ReadDir(dir)

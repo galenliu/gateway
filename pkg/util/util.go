@@ -7,13 +7,11 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"fmt"
-	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
 	"io"
 	"io/ioutil"
 	"math"
 	"os"
-	"path"
 	"runtime"
 	"sort"
 	"strings"
@@ -95,11 +93,7 @@ func GetNodeVersion() string {
 	return "57"
 }
 
-func GetDefaultConfigDir() string {
-	dir, _ := os.UserHomeDir()
-	dirPath := path.Join(dir, constant.ConfDirName)
-	return dirPath
-}
+
 
 func ByteToFloat64(bytes []byte) float64 {
 	bits := binary.LittleEndian.Uint64(bytes)
