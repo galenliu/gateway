@@ -1,13 +1,12 @@
 package models
 
 import (
-	"github.com/galenliu/gateway-addon/devices"
+	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/logging"
 )
 
 type NewThingsManager interface {
-	GetDevicesBytes() map[string][]byte
-	GetDevicesMaps() map[string]*devices.Device
+	GetDeviceMaps() map[string]*addon.Device
 }
 
 type NewThingsModel struct {

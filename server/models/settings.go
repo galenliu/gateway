@@ -36,6 +36,7 @@ func NewSettingsModel(addonUrl []string, storage SettingsStore, logger logging.L
 		NodeVersion:   util.GetNodeVersion(),
 		PythonVersion: util.GetPythonVersion(),
 	}
+	logger.Debugf("settings model: %s", util.JsonIndent(s.addonInfo))
 	s.storage = storage
 	s.logger = logger
 	return &s

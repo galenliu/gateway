@@ -6,14 +6,13 @@ import (
 	"context"
 	"fmt"
 	"github.com/galenliu/gateway-grpc"
+	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
-	"github.com/galenliu/gateway/plugin/addon"
-	json "github.com/json-iterator/go"
 	"github.com/robfig/cron"
 	"io"
 	"os"
@@ -147,30 +146,21 @@ func (m *Manager) addService(service *Service) {
 }
 
 func (m *Manager) handleDeviceAdded(device *Device) {
-	m.devices.Store(device.ID, device)
-	m.Eventbus.bus.Publish(constant.DeviceAdded, device.Device)
+	m.devices.Store(device.GetId(), device)
+	m.Eventbus.PublishDeviceAdded(device.Device)
 }
 
 func (m *Manager) handleDeviceRemoved(device *Device) {
-	m.devices.Delete(device.ID)
-	data, err := json.MarshalIndent(device, "", "  ")
-	if err != nil {
-		m.logger.Info("device marshal err")
-	}
-	m.Eventbus.bus.Publish(constant.DeviceAdded, data)
+	m.devices.Delete(device.GetId())
+	m.Eventbus.PublishDeviceRemoved(device.Device)
 }
 
 func (m *Manager) handleSetProperty(deviceId, propName string, setValue interface{}) error {
 	device := m.getDevice(deviceId)
 	if device == nil {
-		return fmt.Errorf("device ID err")
-	}
-	adapter := m.getAdapter(device.ID)
-	if adapter == nil {
-		return fmt.Errorf("adapter ID err")
+		return fmt.Errorf("addon Id err")
 	}
 	property := device.GetProperty(propName)
-
 	if property == nil {
 		return fmt.Errorf("property err")
 	}
@@ -197,18 +187,18 @@ func (m *Manager) getAdapters() (adapters []*Adapter) {
 	return
 }
 
-func (m *Manager) getExtension(id string) *addon.Extension {
+func (m *Manager) getExtension(id string) *Extension {
 	a, ok := m.extensions.Load(id)
-	ext, ok := a.(*addon.Extension)
+	ext, ok := a.(*Extension)
 	if !ok {
 		return nil
 	}
 	return ext
 }
 
-func (m *Manager) getExtensions() (adapters []*addon.Extension) {
+func (m *Manager) getExtensions() (adapters []*Extension) {
 	m.extensions.Range(func(key, value interface{}) bool {
-		ext, ok := value.(*addon.Extension)
+		ext, ok := value.(*Extension)
 		if ok {
 			adapters = append(adapters, ext)
 		}
@@ -319,7 +309,7 @@ func (m *Manager) loadAddons() {
 	m.logger.Info("starting loading addons.")
 	m.addonsLoaded = true
 	if m.pluginServer == nil {
-		m.pluginServer = NewPluginServer(  m)
+		m.pluginServer = NewPluginServer(m)
 	}
 	load := func(dir string) {
 		fs, err := os.ReadDir(dir)
@@ -381,7 +371,7 @@ func (m *Manager) loadAddon(packageId string) {
 	m.installAddons.Store(packageId, addonInfo)
 
 	if addonInfo.ContentScripts != "" && addonInfo.WSebAccessibleResources != "" {
-		var ext = addon.Extension{
+		var ext = Extension{
 			Extensions: addonInfo.ContentScripts,
 			Resources:  addonInfo.WSebAccessibleResources,
 		}
@@ -422,7 +412,7 @@ func (m *Manager) removeNotifier(notifierId string) {
 
 }
 
-func (m *Manager) handleOutletRemoved(device *addon.Outlet) {
+func (m *Manager) handleOutletRemoved(outlet *Outlet) {
 
 }
 

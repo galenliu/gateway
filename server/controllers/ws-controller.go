@@ -32,14 +32,10 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 	handler := func(c *websocket.Conn) {
 		thingId, _ := c.Locals("thingId").(string)
 		clint := NewWsClint(c, thingId, model, log)
-		err := clint.handler()
-		if err != nil {
-			log.Errorf("clint lost")
-			return
-		}
+		defer clint.close()
+		clint.handle()
 	}
 	return handler
-
 }
 
 //func websocketHandler(c *websocket.Conn, thingId string) {
@@ -95,28 +91,28 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //
 //		onConnected := func(connected bool) {
 //			m := make(map[string]interface{})
-//			m["id"] = thing.GetID()
+//			m["id"] = thing.GetId()
 //			m["messageType"] = constant.CONNECTED
 //			m["data"] = connected
 //			sendMessage(m)
 //		}
 //
 //		onRemoved := func() {
-//			f, ok := thingCleanups[thing.GetID()]
+//			f, ok := thingCleanups[thing.GetId()]
 //			if ok {
 //				f()
-//				delete(thingCleanups, thing.GetID())
+//				delete(thingCleanups, thing.GetId())
 //			}
 //			m := make(map[string]interface{})
 //			m["messageType"] = constant.ThingRemoved
-//			m["id"] = thing.GetID()
+//			m["id"] = thing.GetId()
 //			m["data"] = struct{}{}
 //			sendMessage(m)
 //		}
 //
 //		onModified := func() {
 //			m := make(map[string]interface{})
-//			m["id"] = thing.GetID()
+//			m["id"] = thing.GetId()
 //			m["messageType"] = constant.ThingModified
 //			m["data"] = struct{}{}
 //			sendMessage(m)
@@ -135,14 +131,14 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //			thing.Unsubscribe(constant.EVENT, onEvent)
 //		}
 //
-//		thingCleanups[thing.GetID()] = thingCleanup
+//		thingCleanups[thing.GetId()] = thingCleanup
 //
 //		m := make(map[string]interface{})
-//		m["id"] = thing.GetID()
+//		m["id"] = thing.GetId()
 //		m["messageType"] = constant.PropertyStatus
 //		propertyValues := make(map[string]interface{})
 //		for propName, prop := range thing.properties {
-//			value, err := Manager.GetPropertyValue(thing.GetID(), propName)
+//			value, err := Manager.GetPropertyValue(thing.GetId(), propName)
 //			prop.SetCachedValue(value)
 //			if err != nil {
 //				continue
@@ -156,7 +152,7 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //
 //	onThingAdded := func(thing *models.Thing) {
 //		m := make(map[string]interface{})
-//		m["id"] = thing.GetID()
+//		m["id"] = thing.GetId()
 //		m["messageType"] = constant.ThingAdded
 //		m["data"] = struct{}{}
 //		sendMessage(m)
@@ -230,14 +226,14 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //		if id == "" {
 //			id = thingId
 //		}
-//		device := Manager.GetDevice(id)
+//		addon := Manager.GetDevice(id)
 //		messageType := json.Get(bytes, "messageType").ToString()
 //		if id == "" {
 //			sendError(400, "400 Bed Request", "Missing thing id")
 //			return
 //		}
-//		if device == nil {
-//			sendError(400, "400 Bed Request", "device can not found")
+//		if addon == nil {
+//			sendError(400, "400 Bed Request", "addon can not found")
 //			return
 //		}
 //		if messageType == "" {
@@ -251,7 +247,7 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //			var propertyMap map[string]interface{}
 //			json.Get(bytes, "data").ToVal(&propertyMap)
 //			for propName, value := range propertyMap {
-//				_, setErr := Manager.SetProperty(device.GetID(), propName, value)
+//				_, setErr := Manager.SetProperty(addon.GetId(), propName, value)
 //				if setErr != nil {
 //					m["messageType"] = constant.ERROR
 //					m["bytes"] = map[string]interface{}{
@@ -281,7 +277,7 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //				if err != nil {
 //					return
 //				}
-//				err = Manager.RequestAction(id, action.ID, actionName, actionNames)
+//				err = Manager.RequestAction(id, action.Id, actionName, actionNames)
 //				if err != nil {
 //					sendError(400, "400 Bad Request", err.Error())
 //				}
@@ -390,7 +386,7 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //	if id == "" {
 //		id = controller.thingId
 //	}
-//	device := manager.GetDevice(id)
+//	addon := manager.GetDevice(id)
 //	messageType := json.Get(bytes, "messageType").ToString()
 //	m := make(map[string]interface{})
 //
@@ -398,8 +394,8 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //		sendError(400, "400 Bed Request", "Missing thing id")
 //		return
 //	}
-//	if device == nil {
-//		sendError(400, "400 Bed Request", "device can not found")
+//	if addon == nil {
+//		sendError(400, "400 Bed Request", "addon can not found")
 //		return
 //	}
 //	if messageType == "" {
@@ -412,7 +408,7 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //		var propertyMap map[string]interface{}
 //		json.Get(bytes, "data").ToVal(&propertyMap)
 //		for propName, value := range propertyMap {
-//			_, setErr := manager.SetProperty(device.GetID(), propName, value)
+//			_, setErr := manager.SetProperty(addon.GetId(), propName, value)
 //			if setErr != nil {
 //				m["messageType"] = util.ERROR
 //				m["bytes"] = map[string]interface{}{
@@ -441,7 +437,7 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //			th := controller.ThingsModel.GetThing(id)
 //			action := models.NewAction(actionName, actionParams, th)
 //			controller.ThingsModel.actions.Add(action)
-//			err := manager.RequestAction(id, action.ID, actionName, actionParams)
+//			err := manager.RequestAction(id, action.Id, actionName, actionParams)
 //			if err != nil {
 //				sendError(400, "400 Bad Request", err.Error())
 //			}
@@ -454,7 +450,7 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //
 //func (controller *WsHandler) addThing(thing *models.Thing) {
 //
-//	sl := strings.Split(thing.ID, "/")
+//	sl := strings.Split(thing.Id, "/")
 //	id := sl[len(sl)-1]
 //	controller.subscriptionThings[id] = thing
 //
@@ -477,7 +473,7 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //
 //func (controller *WsHandler) onThingAdded(thing *models.Thing) {
 //
-//	sl := strings.Split(thing.ID, "/")
+//	sl := strings.Split(thing.Id, "/")
 //	id := sl[len(sl)-1]
 //	m := make(map[string]interface{})
 //	m["id"] = id
@@ -502,14 +498,14 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //
 //func (controller *WsHandler) onModified(thing *models.Thing) {
 //
-//	sl := strings.Split(thing.ID, "/")
+//	sl := strings.Split(thing.Id, "/")
 //	id := sl[len(sl)-1]
 //	t := controller.subscriptionThings[id]
 //	if t == nil {
 //		return
 //	}
 //	m := make(map[string]interface{})
-//	m["id"] = t.ID
+//	m["id"] = t.Id
 //	m["messageType"] = util.ThingModified
 //	controller.sendMessage(m)
 //}
@@ -519,7 +515,7 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //		return
 //	}
 //	for _, th := range controller.subscriptionThings {
-//		if th.ID == action.ThingId {
+//		if th.Id == action.ThingId {
 //			m := make(map[string]interface{})
 //			m["id"] = action.ThingId
 //			m["messageType"] = util.ActionStatus
@@ -545,7 +541,7 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //
 //func (controller *WsHandler) onRemoved(thing *models.Thing) {
 //
-//	sl := strings.Split(thing.ID, "/")
+//	sl := strings.Split(thing.Id, "/")
 //	id := sl[len(sl)-1]
 //	t := controller.subscriptionThings[id]
 //	if t == nil {

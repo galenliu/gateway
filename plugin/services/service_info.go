@@ -17,7 +17,7 @@ type ServiceStorage interface {
 }
 
 type ServiceInfo struct {
-	ID                      string `json:"ID"`
+	ID                      string `json:"Id"`
 	Name                    string `json:"name"`
 	ShortName               string `json:"short_name"`
 	Author                  string `json:"author"`
@@ -83,7 +83,7 @@ func LoadManifest(destPath, packetId string, store ServiceStorage) (*ServiceInfo
 		return nil, nil, err
 	}
 
-	//verify that ID in packet matches packetId
+	//verify that Id in packet matches packetId
 	if manifest.ID != packetId {
 		err = fmt.Errorf("Id:%s from the manfest file,doesn't match Id for packetId: %s ",
 			manifest.ID, packetId)

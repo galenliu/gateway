@@ -16,7 +16,7 @@ type Thing struct {
 	AtContext    []string          `json:"@context"` //mandatory
 	Title        string            `json:"title"`    //mandatory
 	Titles       map[string]string `json:"titles,omitempty"`
-	ID           controls.URI      `json:"id"`
+	Id           controls.URI      `json:"id"`
 	AtType       []string          `json:"@type"`
 	Description  string            `json:"description,omitempty"`
 	Descriptions map[string]string `json:"descriptions,omitempty"`
@@ -35,7 +35,7 @@ type Thing struct {
 	Links []controls.Link `json:"links,omitempty"`
 	Forms []controls.Form `json:"forms,omitempty"`
 
-	Security            []string                                 `json:"security,omitempty"`  //mandatory
+	Security            controls.ArrayOfString                   `json:"security,omitempty"`  //mandatory
 	SecurityDefinitions map[string]securityScheme.SecurityScheme `json:"securityDefinitions"` //mandatory
 
 	Profile           []controls.URI `json:"profile,omitempty"`
@@ -46,14 +46,13 @@ func NewThingFromString(description string) (thing *Thing) {
 
 	data := []byte(description)
 	t := &Thing{}
-
-	t.ID = controls.URI(controls.JSONGetString(data, "id", ""))
+	t.Id = controls.URI(controls.JSONGetString(data, "id", ""))
 	t.Title = controls.JSONGetString(data, "title", "")
-	if t.ID == "" {
-		t.ID = controls.URI(t.Title)
+	if t.Id == "" {
+		t.Id = controls.URI(t.Title)
 	}
 	t.AtContext = controls.JSONGetArray(data, "@context")
-	t.Security = controls.JSONGetArray(data, "security")
+	t.Security = controls.NewArrayOfString(json.Get(data, "security").ToString())
 	t.Description = controls.JSONGetString(data, "description", "")
 
 	var m map[string]securityScheme.SecurityScheme
@@ -68,7 +67,7 @@ func NewThingFromString(description string) (thing *Thing) {
 			prop := NewPropertyAffordanceFromString(d)
 			t.Properties[name] = prop
 		}
-		t.Forms = append(t.Forms, controls.Form{Op: []string{controls.ReadallProperties, controls.WriteAllProperties}, Href: controls.URI(string(t.ID + constant.PropertiesPath)), ContentType: dataSchema.ApplicationJson})
+		t.Forms = append(t.Forms, controls.Form{Op: controls.ReadallProperties + controls.WriteAllProperties, Href: controls.URI(string(t.Id + constant.PropertiesPath)), ContentType: dataSchema.ApplicationJson})
 	}
 
 	if actionMap := controls.JSONGetMap(data, "properties"); len(actionMap) > 0 {
@@ -77,7 +76,7 @@ func NewThingFromString(description string) (thing *Thing) {
 			action := NewActionAffordanceFromString(data)
 			t.Actions[name] = action
 		}
-		t.Forms = append(t.Forms, controls.Form{Href: controls.URI(string(t.ID + constant.ActionsPath))})
+		t.Forms = append(t.Forms, controls.Form{Href: controls.URI(string(t.Id + constant.ActionsPath))})
 	}
 
 	if eventMap := controls.JSONGetMap(data, "events"); len(eventMap) > 0 {
@@ -86,20 +85,20 @@ func NewThingFromString(description string) (thing *Thing) {
 			event := NewEventAffordanceFromString(data)
 			t.Events[name] = event
 		}
-		t.Forms = append(t.Forms, controls.Form{Href: controls.URI(string(t.ID + constant.ActionsPath))})
+		t.Forms = append(t.Forms, controls.Form{Href: controls.URI(string(t.Id + constant.ActionsPath))})
 	}
 
 	if t.Forms == nil {
-		t.Forms = append(t.Forms, controls.Form{ContentType: "text/html", Href: controls.URI(string(t.ID))})
-		t.Forms = append(t.Forms, controls.Form{Href: controls.URI(fmt.Sprintf("wss://localhost/%s", t.ID))})
+		t.Forms = append(t.Forms, controls.Form{ContentType: "text/html", Href: controls.URI(string(t.Id))})
+		t.Forms = append(t.Forms, controls.Form{Href: controls.URI(fmt.Sprintf("wss://localhost/%s", t.Id))})
 	}
 	return t
 }
 
-func (t *Thing) GetID() string {
-	return t.ID.GetID()
+func (t *Thing) GetId() string {
+	return t.Id.GetId()
 }
 
 func (t *Thing) GetURI() string {
-	return t.ID.GetURI()
+	return t.Id.GetURI()
 }

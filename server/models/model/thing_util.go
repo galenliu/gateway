@@ -1,15 +1,15 @@
 package model
 
-//func toThing(device *addon.Device) *thing.Thing {
+//func toThing(addon *addon.Device) *thing.Thing {
 //	thing := &thing.Thing{
-//		Id:                  device.Id,
-//		AtContext:           device.AtContext,
-//		AtType:              device.AtType,
-//		Title:               device.Title,
-//		Description:         device.Description,
+//		Id:                  addon.Id,
+//		AtContext:           addon.AtContext,
+//		AtType:              addon.AtType,
+//		Title:               addon.Title,
+//		Description:         addon.Description,
 //		Links:               nil,
 //		BaseHref:            "",
-//		Href:                fmt.Sprintf("/%s", device.Id),
+//		Href:                fmt.Sprintf("/%s", addon.Id),
 //		CredentialsRequired: false,
 //		SelectedCapability:  "",
 //		properties:          nil,
@@ -17,9 +17,9 @@ package model
 //		events:              nil,
 //	}
 //	var tps = make(map[string]*thing.Property)
-//	for _, p := range device.properties {
+//	for _, p := range addon.properties {
 //		tp := toThingProperty(p, thing.Id)
-//		tp.ThingId = device.Id
+//		tp.ThingId = addon.Id
 //		tps[tp.name] = tp
 //	}
 //	thing.properties = tps

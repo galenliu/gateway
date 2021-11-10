@@ -41,7 +41,6 @@ func (s *PluginsServer) RegisterPlugin(clint ipc.Clint) (ipc.PluginHandler, erro
 	if message.MessageType != rpc.MessageType_PluginRegisterRequest {
 		return nil, fmt.Errorf("MessageType need PluginRegisterRequest")
 	}
-
 	var registerMessage rpc.PluginRegisterRequestMessage_Data
 	err = json.Unmarshal(message.Data, &registerMessage)
 	if err != nil {
@@ -56,6 +55,7 @@ func (s *PluginsServer) RegisterPlugin(clint ipc.Clint) (ipc.PluginHandler, erro
 			Preferences:    s.getPreferences(),
 		}
 	data, _ := json.Marshal(responseMessage)
+	clint.SetPluginId(registerMessage.PluginId)
 	err = clint.WriteMessage(&rpc.BaseMessage{MessageType: rpc.MessageType_PluginRegisterResponse, Data: data})
 	if err != nil {
 		return nil, err

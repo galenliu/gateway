@@ -76,8 +76,8 @@ func (action *Action) updateStatus(newStatus string) {
 //		a.Input = input
 //	}
 //	a.TimeRequested = time.Now().Format("2006-01-02 15:04:05")
-//	a.ID = GetUUID()
-//	a.Href = fmt.Sprintf("%s/%s/%s", constant.ActionsPath, a.Name, a.ID)
+//	a.Id = GetUUID()
+//	a.Href = fmt.Sprintf("%s/%s/%s", constant.ActionsPath, a.Name, a.Id)
 //	if a.ThingId != "" {
 //		a.Href = fmt.Sprintf("%s/%s%s", constant.ThingsPath, a.ThingId, a.Href)
 //	}

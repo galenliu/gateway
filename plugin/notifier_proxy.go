@@ -1,7 +1,6 @@
 package plugin
 
 import (
-	"github.com/galenliu/gateway/plugin/addon"
 	"sync"
 )
 
@@ -14,18 +13,18 @@ func (n *Notifier) unload() {
 
 }
 
-func (m *Notifier) getOutlet(outletId string) *addon.Outlet {
+func (m *Notifier) getOutlet(outletId string) *Outlet {
 	a, ok := m.outlets.Load(outletId)
-	outlet, ok := a.(*addon.Outlet)
+	outlet, ok := a.(*Outlet)
 	if !ok {
 		return nil
 	}
 	return outlet
 }
 
-func (m *Notifier) getOutlets() (outlets []*addon.Outlet) {
+func (m *Notifier) getOutlets() (outlets []*Outlet) {
 	m.outlets.Range(func(key, value interface{}) bool {
-		outlet, ok := value.(*addon.Outlet)
+		outlet, ok := value.(*Outlet)
 		if ok {
 			outlets = append(outlets, outlet)
 		}

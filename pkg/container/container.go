@@ -36,7 +36,6 @@ type ThingsModel struct {
 
 func NewThingsContainerModel(store ThingsStorage, log logging.Logger) *ThingsModel {
 	t := &ThingsModel{}
-
 	t.store = store
 	t.logger = log
 	t.things = make(map[string]*Thing)
@@ -66,7 +65,7 @@ func (c *ThingsModel) GetMapThings() map[string]*Thing {
 	}
 	var thingsMap = make(map[string]*Thing)
 	for _, th := range things {
-		thingsMap[th.GetID()] = th
+		thingsMap[th.GetId()] = th
 	}
 	return thingsMap
 }
@@ -76,14 +75,17 @@ func (c *ThingsModel) CreateThing(data []byte) (*Thing, error) {
 	if err != nil {
 		return nil, err
 	}
+	c.things[t.GetId()] = t
 	return t, nil
 }
 
 func (c *ThingsModel) RemoveThing(thingId string) error {
-	err := c.handleRemoveThing(thingId)
+	t, err := c.handleRemoveThing(thingId)
 	if err != nil {
 		return err
 	}
+	t.remove()
+	delete(c.things, thingId)
 	return nil
 }
 
@@ -106,30 +108,27 @@ func (c *ThingsModel) handleCreateThing(data []byte) (*Thing, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, ok := c.things[th.GetID()]
+	_, ok := c.things[th.GetId()]
 	if ok {
-		return nil, fmt.Errorf("thing id: %s is exited", th.GetID())
+		return nil, fmt.Errorf("thing id: %s is exited", th.GetId())
 	}
-
-	err = c.store.CreateThing(th.GetID(), th)
+	err = c.store.CreateThing(th.GetId(), th)
 	if err != nil {
 		return nil, err
 	}
-	c.things[th.GetID()] = th
-	return c.things[th.GetID()], nil
+	return th, nil
 }
 
-func (c *ThingsModel) handleRemoveThing(thingId string) error {
+func (c *ThingsModel) handleRemoveThing(thingId string) (*Thing, error) {
 	err := c.store.RemoveThing(thingId)
 	if err != nil {
 		c.logger.Error("remove thing id: %s from Store err: %s", thingId, err.Error())
 	}
-	_, ok := c.things[thingId]
+	t, ok := c.things[thingId]
 	if !ok {
-		c.logger.Info("container has not thing id: %s", thingId)
+		return nil, fmt.Errorf("container has not thing id: %s", thingId)
 	}
-	delete(c.things, thingId)
-	return nil
+	return t, nil
 }
 
 func (c *ThingsModel) handleUpdateThing(data []byte) error {
@@ -140,8 +139,8 @@ func (c *ThingsModel) handleUpdateThing(data []byte) error {
 			return err
 		}
 		if newThing != nil {
-			c.things[newThing.ID.GetID()] = newThing
-			err := c.store.UpdateThing(newThing.GetID(), newThing)
+			c.things[newThing.Id.GetId()] = newThing
+			err := c.store.UpdateThing(newThing.GetId(), newThing)
 			if err != nil {
 				return err
 			}

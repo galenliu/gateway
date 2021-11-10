@@ -1,4 +1,4 @@
-package addon
+package plugin
 
 type Extension struct {
 	Extensions string

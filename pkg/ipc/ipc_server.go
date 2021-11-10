@@ -5,6 +5,7 @@ import (
 	"github.com/fasthttp/websocket"
 	"github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/util"
 	json "github.com/json-iterator/go"
 	"net/http"
 	"sync"
@@ -65,23 +66,28 @@ func (s *IPCServer) handle(w http.ResponseWriter, r *http.Request) {
 	go s.readLoop(conn)
 }
 
-
 // g
 func (s *IPCServer) readLoop(conn *websocket.Conn) {
-
 	conn.SetPongHandler(func(appData string) error {
 		s.logger.Info("ping request: %s", appData)
 		return conn.WriteMessage(websocket.PongMessage, nil)
 	})
-	clint := &connection{conn, s.logger}
+	clint := &connection{Conn: conn, logger: s.logger}
 	pluginHandler, err := s.pluginServer.RegisterPlugin(clint)
 	if err != nil {
 		s.logger.Infof("register err: %s", err.Error())
 		return
 	}
 	ctx, cancelFunc := context.WithCancel(context.Background())
-	defer conn.Close()
-	defer cancelFunc()
+	defer func() {
+		cancelFunc()
+		err := conn.Close()
+		s.logger.Errorf("clint %s closed", clint.GetPluginId())
+		if err != nil {
+			s.logger.Errorf("clint %s close err: %s", clint.pluginId, err.Error())
+			return
+		}
+	}()
 	for {
 		select {
 		case <-ctx.Done():
@@ -93,19 +99,18 @@ func (s *IPCServer) readLoop(conn *websocket.Conn) {
 		default:
 			message, err := clint.ReadMessage()
 			if err != nil {
+				s.logger.Errorf("clint %s read err : %s", clint.GetPluginId(), err.Error())
 				return
 			}
-			err = pluginHandler.OnMsg(message.MessageType, message.Data)
-			if err != nil {
-				return
-			}
+			pluginHandler.OnMsg(message.MessageType, message.Data)
 		}
 	}
 }
 
 type connection struct {
 	*websocket.Conn
-	logger logging.Logger
+	logger   logging.Logger
+	pluginId string
 }
 
 func (c *connection) WriteMessage(message *rpc.BaseMessage) error {
@@ -114,7 +119,16 @@ func (c *connection) WriteMessage(message *rpc.BaseMessage) error {
 	if err != nil {
 		return err
 	}
-	return c.WriteJSON(baseMessage)
+	err = c.Conn.WriteJSON(baseMessage)
+	if err != nil {
+		return err
+	}
+	if c.GetPluginId() == "" {
+		c.logger.Debugf("Plugin send :%s", util.JsonIndent(baseMessage))
+	} else {
+		c.logger.Debugf("Plugin %s send :%s", c.GetPluginId(), util.JsonIndent(baseMessage))
+	}
+	return nil
 }
 
 func (c *connection) ReadMessage() (*rpc.BaseMessage, error) {
@@ -125,12 +139,25 @@ func (c *connection) ReadMessage() (*rpc.BaseMessage, error) {
 	if err != nil {
 		return nil, err
 	}
-	c.logger.Debugf("ipc rev: %s", string(data))
+	if c.GetPluginId() == "" {
+		c.logger.Debugf("Plugin register message :%s", util.JsonIndent(msg))
+	} else {
+		c.logger.Debugf("Plugin %s read: %s", c.GetPluginId(), util.JsonIndent(msg))
+	}
+
 	marshal, err := json.Marshal(msg.Data)
 	if err != nil {
 		return nil, err
 	}
 	return &rpc.BaseMessage{MessageType: rpc.MessageType(msg.MessageType), Data: marshal}, nil
+}
+
+func (c *connection) SetPluginId(id string) {
+	c.pluginId = id
+}
+
+func (c *connection) GetPluginId() string {
+	return c.pluginId
 }
 
 type BaseMessage struct {

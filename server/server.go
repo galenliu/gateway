@@ -32,18 +32,16 @@ type WebServe struct {
 	container container.Container
 }
 
-func NewServe(ctx context.Context,config Config, addonManager controllers.Manager, serviceManager controllers.ServiceManager, container container.Container, store controllers.Storage, bus bus.Controller, log logging.Logger) *WebServe {
+func NewServe(ctx context.Context, config Config, addonManager controllers.Manager, container container.Container, store controllers.Storage, bus bus.Controller, log logging.Logger) *WebServe {
 	sev := &WebServe{}
 	sev.container = container
 	sev.options = config
 	sev.logger = log
 	sev.bus = bus
-	sev.Router = controllers.NewRouter(ctx,controllers.Config{
+	sev.Router = controllers.NewRouter(ctx, controllers.Config{
 		HttpAddr:  sev.options.HttpAddr,
 		HttpsAddr: sev.options.HttpsAddr,
 		AddonUrls: config.AddonUrls,
-	}, addonManager, serviceManager, container, store, bus, log)
+	}, addonManager, container, store, bus, log)
 	return sev
 }
-
-

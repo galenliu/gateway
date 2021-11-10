@@ -31,7 +31,7 @@ func NewRPCServer(ctx context.Context, pluginServer PluginServer, port string, u
 
 func (s *RPCServer) PluginHandler(p rpc.PluginServer_PluginHandlerServer) error {
 
-	clint := &rpcClint{p}
+	clint := &clint{PluginServer_PluginHandlerServer: p}
 
 	pluginHandler, err := s.pluginSever.RegisterPlugin(clint)
 
@@ -44,18 +44,13 @@ func (s *RPCServer) PluginHandler(p rpc.PluginServer_PluginHandlerServer) error 
 		if err != nil {
 			return err
 		}
-		err = pluginHandler.OnMsg(baseMessage.MessageType, baseMessage.Data)
-		if err != nil {
-			return err
-		}
+		pluginHandler.OnMsg(baseMessage.MessageType, baseMessage.Data)
 		select {
 		case <-s.ctx.Done():
-
 			return fmt.Errorf("rpc server stopped")
 		}
 
 	}
-
 }
 
 func (s *RPCServer) Run() {
@@ -81,17 +76,25 @@ func (s *RPCServer) Run() {
 			sev.Stop()
 		}
 	}
-
 }
 
-type rpcClint struct {
+type clint struct {
 	rpc.PluginServer_PluginHandlerServer
+	pluginId string
 }
 
-func (r *rpcClint) WriteMessage(message *rpc.BaseMessage) error {
+func (r *clint) WriteMessage(message *rpc.BaseMessage) error {
 	return r.PluginServer_PluginHandlerServer.Send(message)
 }
 
-func (r *rpcClint) ReadMessage() (*rpc.BaseMessage, error) {
+func (r *clint) ReadMessage() (*rpc.BaseMessage, error) {
 	return r.Recv()
+}
+
+func (r *clint) SetPluginId(id string) {
+	r.pluginId = id
+}
+
+func (r *clint) GetPluginId() string {
+	return r.pluginId
 }

@@ -44,7 +44,7 @@ func NewActionAffordanceFromString(description string) *actionAffordance {
 	if a.Forms == nil {
 		a.Forms = append(a.Forms, controls.Form{
 			Href: "",
-			Op:   []string{controls.InvokeAction},
+			Op:   controls.NewArrayOfString(controls.InvokeAction),
 		})
 	}
 	return &a

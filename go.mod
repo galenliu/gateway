@@ -5,7 +5,6 @@ go 1.17
 require (
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/fasthttp/websocket v1.4.3-rc.9
-	github.com/galenliu/gateway-addon v0.0.0-00010101000000-000000000000
 	github.com/galenliu/gateway-grpc v0.0.0-20210912114221-553dee80328d
 	github.com/gofiber/fiber/v2 v2.21.0
 	github.com/gofiber/websocket/v2 v2.0.12
@@ -24,8 +23,8 @@ require (
 	github.com/tidwall/gjson v1.7.4
 	github.com/xiam/to v0.0.0-20200126224905-d60d31e03561
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
-	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1
-	google.golang.org/grpc v1.40.0
+	golang.org/x/sys v0.0.0-20211106132015-ebca88c72f68
+	google.golang.org/grpc v1.42.0
 	gopkg.in/yaml.v2 v2.4.0
 	github.com/andybalholm/brotli v1.0.2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -55,12 +54,11 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.31.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
-	golang.org/x/net v0.0.0-20210510120150-4163338589ed // indirect
-	golang.org/x/text v0.3.6 // indirect
-	google.golang.org/genproto v0.0.0-20210602131652-f16073e35f0c // indirect
+	golang.org/x/net v0.0.0-20211105192438-b53810dc28af // indirect
+	golang.org/x/text v0.3.7 // indirect
+	google.golang.org/genproto v0.0.0-20211104193956-4c6863e31247 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 )
 
-replace github.com/galenliu/gateway-addon => ../gateway/gateway-addon
 replace github.com/galenliu/gateway-grpc => ../gateway/gateway-grpc

@@ -6,13 +6,9 @@ type SecurityScheme interface {
 }
 
 type securityScheme struct {
-	AtType       string `json:"@type"`
-	Description  string
-	Descriptions []string
+	AtType       string   `json:"@type"`
+	Description  string   `json:"description"`
+	Descriptions []string `json:"descriptions"`
 	Proxy        hypermedia_controls.URI
 	Scheme       interface{}
-}
-
-func NewSecuritySchemeFormString(description string) SecurityScheme {
-	return ""
 }

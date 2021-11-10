@@ -9,7 +9,18 @@ type UnsignedInt uint
 type Integer uint
 type Number float64
 type URI string
+type ArrayOfString string
 type Double float64
+
+func NewArrayOfString(args ...string) ArrayOfString {
+	var array = ""
+	for _, str := range args {
+		if str != "" {
+			array = array + " " + str
+		}
+	}
+	return ArrayOfString(array)
+}
 
 const (
 	TypeNumber  = "number"
@@ -71,7 +82,7 @@ func (i UnsignedInt) Compare(value UnsignedInt) int {
 	return -1
 }
 
-func (u URI) GetID() string {
+func (u URI) GetId() string {
 	l := strings.Split(string(u), "/")
 	return l[len(l)-1]
 }

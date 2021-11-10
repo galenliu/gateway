@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/server/models"
 	"github.com/galenliu/gateway/server/models/model"
 	"github.com/gofiber/websocket/v2"
@@ -18,7 +19,7 @@ type NewThingsController struct {
 	model      *models.NewThingsModel
 }
 
-func NewNewThingsController(model *models.NewThingsModel,log logging.Logger) *NewThingsController {
+func NewNewThingsController(model *models.NewThingsModel, log logging.Logger) *NewThingsController {
 	c := &NewThingsController{}
 	c.logger = log
 	c.locker = new(sync.Mutex)
@@ -29,12 +30,13 @@ func NewNewThingsController(model *models.NewThingsModel,log logging.Logger) *Ne
 
 func (c *NewThingsController) handleNewThingsWebsocket(thingsModel model.Container) func(conn *websocket.Conn) {
 	return func(conn *websocket.Conn) {
-		addonDevices := c.model.Manager.GetDevicesBytes()
+		addonDevices := c.model.Manager.GetDeviceMaps()
 		savedThings := thingsModel.GetMapThings()
 		for id, dev := range addonDevices {
 			_, ok := savedThings[id]
 			if !ok {
-				dev, err := container.NewThingFromString(id, string(dev))
+				str := util.JsonIndent(dev)
+				dev, err := container.NewThingFromString(id, str)
 				if err == nil {
 					err := conn.WriteJSON(dev)
 					if err != nil {

@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"math"
 	"os"
+	"os/exec"
 	"runtime"
 	"sort"
 	"strings"
@@ -58,10 +59,14 @@ func RemoveDir(dir string) error {
 }
 
 func CheckSum(file string, checksum string) bool {
-
 	h := sha256.New()
 	f, _ := os.Open(file)
-	defer f.Close()
+	defer func(f *os.File) {
+		err := f.Close()
+		if err != nil {
+			fmt.Printf("file colse err: %s", err.Error())
+		}
+	}(f)
 	buf := make([]byte, 1<<20)
 	for {
 		n, err := io.ReadFull(f, buf)
@@ -75,9 +80,7 @@ func CheckSum(file string, checksum string) bool {
 		}
 	}
 	r := h.Sum(nil)
-
 	sumCode := fmt.Sprintf("%x", r)
-
 	return sumCode == strings.ToLower(checksum)
 }
 
@@ -85,15 +88,33 @@ func GetArch() string {
 	return runtime.GOOS + "-" + runtime.GOARCH
 }
 
-func GetPythonVersion() []string {
-	return []string{"3.5", "3,7", "3.8"}
+func GetPythonVersion() (version []string) {
+	cmd := exec.Command("python3", "--version")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		return
+	}
+	v := strings.SplitAfter(strings.Split(out.String(), " ")[1], ".")
+	version = append(version, strings.TrimSuffix(v[0]+v[1], "."))
+	return version
 }
 
-func GetNodeVersion() string {
-	return "57"
+func GetNodeVersion() (version string) {
+	cmd := exec.Command("node", "--version")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		return
+	}
+	v := strings.SplitAfter(out.String(), ".")
+	if len(v) < 2 {
+		return ""
+	}
+	return strings.TrimPrefix(strings.TrimSuffix(v[0]+v[1], "."), "v")
 }
-
-
 
 func ByteToFloat64(bytes []byte) float64 {
 	bits := binary.LittleEndian.Uint64(bytes)
@@ -110,22 +131,12 @@ func GetBytes(key interface{}) []byte {
 	return buf.Bytes()
 }
 
-func InterfaceToFloat64(data interface{}) float64 {
-	return ByteToFloat64(GetBytes(data))
-}
-
-func JsonIndent(data string) string {
-	var bf bytes.Buffer
-	err := json.Indent(&bf, []byte(data), "", " ")
+func JsonIndent(in interface{}) string {
+	d, err := json.MarshalIndent(&in, "", "   ")
 	if err != nil {
 		return ""
 	}
-	return bf.String()
-}
-
-func IsJson(in []byte) bool {
-	var js map[string]interface{}
-	return json.Unmarshal(in, &js) == nil
+	return string(d)
 }
 
 func In(target string, strArray []string) bool {

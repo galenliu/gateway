@@ -13,7 +13,7 @@ import (
 
 // GetInstallAddons  获取已安装的add-on
 func (m *Manager) GetInstallAddons() interface{} {
-	return  m.getInstallAddons()
+	return m.getInstallAddons()
 }
 
 func (m *Manager) EnableAddon(packageId string) error {
@@ -65,7 +65,7 @@ func (m *Manager) InstallAddonFromUrl(id, url, checksum string) error {
 	data, _ := ioutil.ReadAll(resp.Body)
 	_ = ioutil.WriteFile(destPath, data, 777)
 	if !util.CheckSum(destPath, checksum) {
-		return fmt.Errorf("checksum err,pakage ID:%s", id)
+		return fmt.Errorf("checksum err,pakage Id:%s", id)
 	}
 	m.logger.Infof("download %s successful", id)
 	err = m.installAddon(id, destPath)

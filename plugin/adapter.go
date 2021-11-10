@@ -3,6 +3,7 @@ package plugin
 import (
 	"fmt"
 	"github.com/galenliu/gateway-grpc"
+	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/logging"
 	"sync"
 )
@@ -43,10 +44,10 @@ func (adapter *Adapter) cancelPairing() {
 	adapter.sendMsg(rpc.MessageType_AdapterCancelPairingCommand, data)
 }
 
-func (adapter *Adapter) removeThing(device *Device) {
-	adapter.logger.Infof("adapter delete thing Id: %v", device.ID)
+func (adapter *Adapter) removeThing(device *addon.Device) {
+	adapter.logger.Infof("adapter delete thing Id: %v", device.GetId())
 	data := make(map[string]interface{})
-	data["deviceId"] = device.ID
+	data["deviceId"] = device.GetId()
 	adapter.sendMsg(rpc.MessageType_AdapterRemoveDeviceRequest, data)
 }
 
@@ -63,12 +64,12 @@ func (adapter *Adapter) sendMsg(messageType rpc.MessageType, data map[string]int
 }
 
 func (adapter *Adapter) handleDeviceRemoved(d *Device) {
-	adapter.devices.Delete(d.ID)
+	adapter.devices.Delete(d.GetId())
 	adapter.plugin.pluginServer.manager.handleDeviceRemoved(d)
 }
 
 func (adapter *Adapter) handleDeviceAdded(device *Device) {
-	adapter.devices.Store(device.ID, device)
+	adapter.devices.Store(device.GetId(), device)
 	adapter.plugin.pluginServer.manager.handleDeviceAdded(device)
 }
 

@@ -54,7 +54,7 @@ type Router struct {
 	config Config
 }
 
-func NewRouter(ctx context.Context, config Config, manager Manager, serviceManager ServiceManager, container container.Container, store Storage, bus bus.Controller, log logging.Logger) *Router {
+func NewRouter(ctx context.Context, config Config, manager Manager, container container.Container, store Storage, bus bus.Controller, log logging.Logger) *Router {
 
 	//router init
 	app := Router{}
@@ -75,7 +75,7 @@ func NewRouter(ctx context.Context, config Config, manager Manager, serviceManag
 	jsonwebtokenModel := models.NewJsonwebtokenModel(settingModel, store, log)
 
 	actionsModel := models.NewActionsModel(manager, bus, log)
-	serviceModel := models.NewServicesModel(manager)
+	//serviceModel := models.NewServicesModel(manager)
 	newThingsModel := models.NewNewThingsModel(manager, log)
 
 	// Color values
@@ -154,7 +154,7 @@ func NewRouter(ctx context.Context, config Config, manager Manager, serviceManag
 	//Things Controller
 	{
 		thingsController := NewThingsControllerFunc(manager, container, log)
-		thingsGroup := app.Group(constant.ThingsPath, auth)
+		thingsGroup := app.Group(constant.ThingsPath)
 		//set a properties of a thing.
 		thingsGroup.Put("/:thingId/properties/*", thingsController.handleSetProperty)
 		thingsGroup.Get("/:thingId/properties/*", thingsController.handleGetPropertyValue)
@@ -223,14 +223,14 @@ func NewRouter(ctx context.Context, config Config, manager Manager, serviceManag
 	}
 
 	//Services Controller
-	{
-		servicesController := NewServicesController(serviceModel, serviceManager, container)
-		sGroup := app.Group(constant.ServicesPath)
-		sGroup.Get("/", servicesController.handleGetServices)
-		sGroup.Get("/:serviceId/config", servicesController.handleGetServiceConfig)
-		sGroup.Put("/:serviceId", servicesController.handleSetService)
-		sGroup.Put("/:serviceId/config", servicesController.handleSetServiceConfig)
-	}
+	//{
+	//	servicesController := NewServicesController(serviceModel, serviceManager, container)
+	//	sGroup := app.Group(constant.ServicesPath)
+	//	sGroup.Get("/", servicesController.handleGetServices)
+	//	sGroup.Get("/:serviceId/config", servicesController.handleGetServiceConfig)
+	//	sGroup.Put("/:serviceId", servicesController.handleSetService)
+	//	sGroup.Put("/:serviceId/config", servicesController.handleSetServiceConfig)
+	//}
 	app.Start()
 	return &app
 }

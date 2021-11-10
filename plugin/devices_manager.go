@@ -1,18 +1,17 @@
 package plugin
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/galenliu/gateway-addon/devices"
+	"github.com/galenliu/gateway/pkg/addon"
 )
 
 func (m *Manager) SetPropertyValue(deviceId, propName string, newValue interface{}) (interface{}, error) {
 
-	//device, ok := m.devices[deviceId]
+	//addon, ok := m.devices[deviceId]
 	//if !ok {
-	//	return nil, fmt.Errorf("device not found")
+	//	return nil, fmt.Errorf("addon not found")
 	//}
-	//prop := device.GetProperty(propName)
+	//prop := addon.GetProperty(propName)
 	//if prop == nil {
 	//	return nil, fmt.Errorf("property not found")
 	//}
@@ -31,10 +30,10 @@ func (m *Manager) SetPropertyValue(deviceId, propName string, newValue interface
 	//	closeChan <- struct{}{}
 	//})
 	//changed := func(data []byte) {
-	//	ID := json.Get(data, "deviceId").ToString()
+	//	Id := json.Get(data, "deviceId").ToString()
 	//	name := json.Get(data, "name").ToString()
 	//	value := json.Get(data, "value").GetInterface()
-	//	if ID == deviceId && name == propName {
+	//	if Id == deviceId && name == propName {
 	//		propChan <- value
 	//	}
 	//}
@@ -53,11 +52,11 @@ func (m *Manager) SetPropertyValue(deviceId, propName string, newValue interface
 }
 
 func (m *Manager) GetPropertyValue(deviceId, propName string) (interface{}, error) {
-	//device, ok := m.devices[deviceId]
+	//addon, ok := m.devices[deviceId]
 	//if !ok {
 	//	return nil, fmt.Errorf("deviceId (%s)invaild", deviceId)
 	//}
-	//prop := device.GetProperty(propName)
+	//prop := addon.GetProperty(propName)
 	//if prop == nil {
 	//	return nil, fmt.Errorf("propName(%s)invaild", propName)
 	//}
@@ -66,11 +65,11 @@ func (m *Manager) GetPropertyValue(deviceId, propName string) (interface{}, erro
 }
 
 //func (m *Manager)GetPropertiesValue(deviceId string)(map[string]interface{},error){
-//	device, ok := m.devices[deviceId]
+//	addon, ok := m.devices[deviceId]
 //	if !ok {
 //		return nil, fmt.Errorf("deviceId (%s)invaild", deviceId)
 //	}
-//	device.GetPropertyValue()
+//	addon.GetPropertyValue()
 //
 //}
 
@@ -78,48 +77,34 @@ func (m *Manager) GetDevice(deviceId string) *Device {
 	return nil
 }
 
-func (m *Manager) GetDevicesBytes() (devices map[string][]byte) {
+func (m *Manager) GetDeviceMaps() (devices map[string]*addon.Device) {
 	devs := m.getDevices()
-	var devicesMap = make(map[string][]byte)
+	var devicesMap = make(map[string]*addon.Device)
 	if devs != nil {
 		for _, dev := range devs {
-			bt, err := json.Marshal(dev)
-			if err != nil {
-				devicesMap[dev.ID] = bt
-			}
+			devicesMap[dev.GetId()] = dev.Device
 		}
 		return devicesMap
 	}
 	return
 }
 
-func (m *Manager) GetDevices() (devices []*devices.Device) {
+func (m *Manager) GetDevices() (devices []*Device) {
 	devs := m.getDevices()
 	if devs != nil {
 		for _, dev := range devs {
-			devices = append(devices, dev.Device)
+			devices = append(devices, dev)
 		}
 	}
 	return devices
 }
 
-func (m *Manager) GetDevicesMaps() (dms map[string]*devices.Device) {
-	devs := m.getDevices()
-	if devs != nil {
-		dms = make(map[string]*devices.Device)
-		for _, dev := range devs {
-			dms[dev.ID] = dev.Device
-		}
-	}
-	return
-}
-
 func (m *Manager) RemoveDevice(deviceId string) error {
 	//
-	//device := m.getDevice(deviceId)
-	//adapter := m.getAdapter(device.AdapterId)
+	//addon := m.getDevice(deviceId)
+	//adapter := m.getAdapter(addon.AdapterId)
 	//if adapter != nil {
-	//	adapter.removeThing(device)
+	//	adapter.removeThing(addon)
 	//	return nil
 	//}
 	return fmt.Errorf("can not find thing")
@@ -139,9 +124,9 @@ func (m *Manager) CancelRemoveThing(deviceId string) {
 func (m *Manager) SetPIN(thingId string, pin interface{}) error {
 	device := m.getDevice(thingId)
 	if device == nil {
-		return fmt.Errorf("con not finid device:" + thingId)
+		return fmt.Errorf("con not finid addon:" + thingId)
 	}
-	//err := device.SetPin(pin)
+	//err := addon.SetPin(pin)
 	//if err != nil {
 	//	return err
 	//}

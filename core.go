@@ -41,7 +41,7 @@ type Gateway struct {
 	container    container.Container
 }
 
-func NewGateway(ctx context.Context,config Config, logger logging.Logger) (*Gateway, error) {
+func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gateway, error) {
 
 	g := &Gateway{}
 	g.logger = logger
@@ -55,7 +55,7 @@ func NewGateway(ctx context.Context,config Config, logger logging.Logger) (*Gate
 		LogDir:     path.Join(g.config.BaseDir, "log"),
 		GatewayDir: g.config.BaseDir,
 	}
-	s, _ := json.MarshalIndent(u,"","   ")
+	s, _ := json.MarshalIndent(u, "", "   ")
 	g.logger.Infof("userprofile: %v ", string(s))
 
 	//检查Gateway运行需要的文件目录
@@ -81,8 +81,8 @@ func NewGateway(ctx context.Context,config Config, logger logging.Logger) (*Gate
 	g.logger.Infof("event bus init.")
 
 	//Addon manager init
-	g.addonManager = plugin.NewAddonsManager(ctx,plugin.Config{
-		UserProfile: u,
+	g.addonManager = plugin.NewAddonsManager(ctx, plugin.Config{
+		UserProfile:     u,
 		AddonsDir:       u.AddonsDir,
 		AttachAddonsDir: g.config.AttachAddonsDir,
 		IPCPort:         config.IPCPort,
@@ -91,7 +91,7 @@ func NewGateway(ctx context.Context,config Config, logger logging.Logger) (*Gate
 	g.logger.Infof("addon manager init.")
 
 	// Web service init
-	g.sever = server.NewServe(ctx,server.Config{
+	g.sever = server.NewServe(ctx, server.Config{
 		HttpAddr:    g.config.HttpAddr,
 		HttpsAddr:   g.config.HttpsAddr,
 		AddonUrls:   g.config.AddonUrls,
@@ -99,7 +99,7 @@ func NewGateway(ctx context.Context,config Config, logger logging.Logger) (*Gate
 		TemplateDir: path.Join(g.config.BaseDir, "template"),
 		UploadDir:   path.Join(g.config.BaseDir, "upload"),
 		LogDir:      path.Join(g.config.BaseDir, "log"),
-	}, g.addonManager, g.addonManager, g.container, g.storage, newBus, g.logger)
+	}, g.addonManager, g.container, g.storage, newBus, g.logger)
 	g.bus = newBus
 	g.logger.Infof("gateway web server running.")
 	return g, nil

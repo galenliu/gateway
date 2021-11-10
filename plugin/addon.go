@@ -109,7 +109,7 @@ func LoadManifest(destPath, packetId string, store AddonsStore) (*Addon, interfa
 		return nil, nil, err
 	}
 
-	//verify that ID in packet matches packetId
+	//verify that Id in packet matches packetId
 	if manifest.ID != packetId {
 		err = fmt.Errorf("Id:%s from the manfest file,doesn't match Id for packetId: %s ",
 			manifest.ID, packetId)

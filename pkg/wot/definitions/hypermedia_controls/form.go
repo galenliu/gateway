@@ -3,24 +3,15 @@ package hypermedia_controls
 import json "github.com/json-iterator/go"
 
 type Form struct {
-	Href                URI                  `json:"href,omitempty"`
-	ContentType         string               `json:"contentType,omitempty"`
-	ContentCoding       string               `json:"contentCoding,omitempty"`
-	Security            []string             `json:"security,omitempty"`
-	Scopes              []string             `json:"scopes,omitempty"`
-	Response            *Response            `json:"response,omitempty"`
-	AdditionalResponses *AdditionalResponses `json:"additionalResponses,omitempty"`
-	SubProtocol         string               `json:"subprotocol,omitempty"`
-	Op                  []string             `json:"op,omitempty"`
-}
-
-type Response struct {
-	ContentType []string `json:"contentType,omitempty"`
-}
-type AdditionalResponses struct {
-	ContentType []string    `json:"contentType,omitempty"`
-	Success     bool        `json:"success,omitempty"`
-	Schema      interface{} `json:"schema,omitempty"` //TODO :dataSchema
+	Href                URI                          `json:"href"`
+	ContentType         string                       `json:"contentType,omitempty"`
+	ContentCoding       string                       `json:"contentCoding,omitempty"`
+	Security            ArrayOfString                `json:"security,omitempty"`
+	Scopes              ArrayOfString                `json:"scopes,omitempty"`
+	Response            *ExpectedResponse            `json:"response,omitempty"`
+	AdditionalResponses []AdditionalExpectedResponse `json:"additionalResponses,omitempty"`
+	Subprotocol         string                       `json:"subprotocol,omitempty"`
+	Op                  ArrayOfString                `json:"op,omitempty"`
 }
 
 func NewFormFormString(description string) *Form {
@@ -32,24 +23,22 @@ func NewFormFormString(description string) *Form {
 	f.ContentType = JSONGetString(data, "contentType", "")
 	f.ContentCoding = JSONGetString(data, "contentType", "")
 
-	f.Security = JSONGetArray(data, "security")
-	f.Scopes = JSONGetArray(data, "scopes")
-	f.SubProtocol = JSONGetString(data, "subprotocol", "")
+	f.Security = NewArrayOfString(json.Get(data, "security").ToString())
+	f.Scopes = NewArrayOfString(json.Get(data, "scopes").ToString())
+	f.Subprotocol = JSONGetString(data, "subprotocol", "")
 
-	var r Response
+	var r ExpectedResponse
 	json.Get(data, "response").ToVal(&r)
 	if &r != nil {
 		f.Response = &r
 	}
 
-	var ar AdditionalResponses
+	var ar []AdditionalExpectedResponse
 	json.Get(data, "additionalResponses").ToVal(&r)
 	if &ar != nil {
-		f.AdditionalResponses = &ar
+		f.AdditionalResponses = ar
 	}
-
-	f.Op = JSONGetArray(data, "op")
-
+	f.Op = ArrayOfString(json.Get(data, "op").ToString())
 	return f
 }
 

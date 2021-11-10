@@ -71,6 +71,7 @@ func (tc *thingsController) handleGetThing(c *fiber.Ctx) error {
 //GET /things
 func (tc *thingsController) handleGetThings(c *fiber.Ctx) error {
 	if websocket.IsWebSocketUpgrade(c) {
+		c.Locals("thingId", "")
 		return c.Next()
 	}
 	ts := tc.model.GetThings()
