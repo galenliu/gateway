@@ -2,7 +2,7 @@ package addon
 
 type Device struct {
 	AtContext           string               `protobuf:"bytes,1,opt,name=atContext,json=@context,proto3" json:"@context,omitempty"`
-	AtType              string               `protobuf:"bytes,2,opt,name=atType,json=@type,proto3" json:"@type,omitempty"`
+	AtType              []string             `protobuf:"bytes,2,opt,name=atType,json=@type,proto3" json:"@type,omitempty"`
 	Id                  string               `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
 	Title               string               `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`
 	Description         string               `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
@@ -22,8 +22,8 @@ type Link struct {
 }
 
 type DevicePin struct {
-	Required bool   `protobuf:"varint,1,opt,name=required,proto3" json:"required,omitempty"`
-	Pattern  string `protobuf:"bytes,2,opt,name=pattern,proto3" json:"pattern,omitempty"`
+	Required bool   `protobuf:"varint,1,opt,name=required,proto3" json:"required"`
+	Pattern  string `protobuf:"bytes,2,opt,name=pattern,proto3" json:"pattern"`
 }
 
 func (d Device) GetId() string {
@@ -34,7 +34,7 @@ func (d Device) GetAtContext() string {
 	return d.AtContext
 }
 
-func (d Device) GetAtType() string {
+func (d Device) GetAtType() []string {
 	return d.AtType
 }
 

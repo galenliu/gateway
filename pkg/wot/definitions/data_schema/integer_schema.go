@@ -7,7 +7,7 @@ import (
 
 type IntegerSchema struct {
 	*DataSchema
-	Minimum          controls.Integer `json:"minimum"`
+	Minimum          controls.Integer `json:"minimum,,omitempty"`
 	ExclusiveMinimum controls.Integer `json:"exclusiveMinimum,omitempty"`
 	Maximum          controls.Integer `json:"maximum,omitempty"`
 	ExclusiveMaximum controls.Integer `json:"exclusiveMaximum,omitempty"`
@@ -43,8 +43,4 @@ func (i *IntegerSchema) clamp(value controls.Integer) controls.Integer {
 		return i.Minimum
 	}
 	return value
-}
-
-func (i IntegerSchema) MarshalJSON() ([]byte, error) {
-	return json.Marshal(i)
 }

@@ -37,10 +37,6 @@ func NewObjectSchemaFromString(description string) *ObjectSchema {
 	return &schema
 }
 
-func (o *ObjectSchema) MarshalJSON() ([]byte, error) {
-	return json.Marshal(o)
-}
-
 func (o *ObjectSchema) Convert(v interface{}) interface{} {
 	return v
 }

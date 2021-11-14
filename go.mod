@@ -26,6 +26,9 @@ require (
 	golang.org/x/sys v0.0.0-20211106132015-ebca88c72f68
 	google.golang.org/grpc v1.42.0
 	gopkg.in/yaml.v2 v2.4.0
+)
+
+require (
 	github.com/andybalholm/brotli v1.0.2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect

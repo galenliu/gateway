@@ -7,7 +7,7 @@ import (
 )
 
 func (s *Storage) CreateThing(id string, thing interface{}) error {
-	bytes, _ := json.Marshal(thing)
+	bytes, _ := json.MarshalIndent(thing, "", "  ")
 	stmt, err := s.db.Prepare("INSERT INTO things(id, description) values(?,?)")
 	if err != nil {
 		return err

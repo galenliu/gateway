@@ -4,22 +4,13 @@ import (
 	ia "github.com/galenliu/gateway/pkg/wot/definitions/core/interaction_affordance"
 	schema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
-	json "github.com/json-iterator/go"
 )
 
 type NumberPropertyAffordance struct {
 	*ia.InteractionAffordance
 	*schema.NumberSchema
-	Observable bool    `json:"observable"`
-	Value      float64 `json:"value"`
-}
-
-func (p NumberPropertyAffordance) MarshalJSON() ([]byte, error) {
-	return json.MarshalIndent(&p, "", "   ")
-}
-
-func (p NumberPropertyAffordance) UnmarshalJSON(data []byte) error {
-	return json.Unmarshal(data, &p)
+	Observable bool            `json:"observable,omitempty"`
+	Value      controls.Double `json:"value,omitempty"`
 }
 
 func NewNumberPropertyAffordanceFormString(description string) *NumberPropertyAffordance {

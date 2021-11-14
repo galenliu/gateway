@@ -2,13 +2,10 @@ package container
 
 import (
 	"fmt"
+	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/logging"
 	json "github.com/json-iterator/go"
 )
-
-type ThingsContainer interface {
-	Container
-}
 
 // ThingsStorage CRUD
 type ThingsStorage interface {
@@ -22,27 +19,38 @@ type ThingsStorage interface {
 type Container interface {
 	GetThing(id string) *Thing
 	GetThings() []*Thing
-	GetMapThings() map[string]*Thing
+	GetMapOfThings() map[string]*Thing
 	CreateThing(data []byte) (*Thing, error)
 	RemoveThing(id string) error
 	UpdateThing(data []byte) error
 }
 
-type ThingsModel struct {
+type ThingsContainer struct {
 	things map[string]*Thing
 	store  ThingsStorage
 	logger logging.Logger
+	bus    containerBus
 }
 
-func NewThingsContainerModel(store ThingsStorage, log logging.Logger) *ThingsModel {
-	t := &ThingsModel{}
+type containerBus interface {
+	AddDeviceRemovedSubscription(fn func(deviceId string)) func()
+	AddDeviceAddedSubscription(fn func(device *addon.Device)) func()
+
+	PublishThingConnected(thingId string, connected bool)
+	PublishThingRemoved(thingId string)
+}
+
+func NewThingsContainerModel(store ThingsStorage, bus containerBus, log logging.Logger) *ThingsContainer {
+	t := &ThingsContainer{}
 	t.store = store
 	t.logger = log
 	t.things = make(map[string]*Thing)
+	_ = bus.AddDeviceRemovedSubscription(t.handleDeviceRemoved)
+	_ = bus.AddDeviceAddedSubscription(t.handleDeviceAdded)
 	return t
 }
 
-func (c *ThingsModel) GetThing(id string) *Thing {
+func (c *ThingsContainer) GetThing(id string) *Thing {
 	t, ok := c.things[id]
 	if !ok {
 		return nil
@@ -50,7 +58,7 @@ func (c *ThingsModel) GetThing(id string) *Thing {
 	return t
 }
 
-func (c *ThingsModel) GetThings() (ts []*Thing) {
+func (c *ThingsContainer) GetThings() (ts []*Thing) {
 	c.updateThings()
 	for _, t := range c.things {
 		ts = append(ts, t)
@@ -58,7 +66,7 @@ func (c *ThingsModel) GetThings() (ts []*Thing) {
 	return
 }
 
-func (c *ThingsModel) GetMapThings() map[string]*Thing {
+func (c *ThingsContainer) GetMapOfThings() map[string]*Thing {
 	things := c.GetThings()
 	if things == nil {
 		return nil
@@ -70,16 +78,17 @@ func (c *ThingsModel) GetMapThings() map[string]*Thing {
 	return thingsMap
 }
 
-func (c *ThingsModel) CreateThing(data []byte) (*Thing, error) {
+func (c *ThingsContainer) CreateThing(data []byte) (*Thing, error) {
 	t, err := c.handleCreateThing(data)
 	if err != nil {
 		return nil, err
 	}
+	t.container = c
 	c.things[t.GetId()] = t
 	return t, nil
 }
 
-func (c *ThingsModel) RemoveThing(thingId string) error {
+func (c *ThingsContainer) RemoveThing(thingId string) error {
 	t, err := c.handleRemoveThing(thingId)
 	if err != nil {
 		return err
@@ -89,7 +98,7 @@ func (c *ThingsModel) RemoveThing(thingId string) error {
 	return nil
 }
 
-func (c *ThingsModel) UpdateThing(data []byte) error {
+func (c *ThingsContainer) UpdateThing(data []byte) error {
 	id := json.Get(data, "id")
 	if id.ValueType() != json.StringValue {
 		return fmt.Errorf("thing id invaild")
@@ -98,28 +107,28 @@ func (c *ThingsModel) UpdateThing(data []byte) error {
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
-func (c *ThingsModel) handleCreateThing(data []byte) (*Thing, error) {
+func (c *ThingsContainer) handleCreateThing(data []byte) (*Thing, error) {
 	thingId := json.Get(data, "id").ToString()
-	th, err := NewThingFromString(thingId, string(data))
+	var thing Thing
+	err := json.Unmarshal(data, &thing)
+	if err != nil || thingId == "" {
+		return nil, err
+	}
+	t := c.GetThing(thingId)
+	if t != nil {
+		return nil, fmt.Errorf("thing id: %s is exited", t.GetId())
+	}
+	err = c.store.CreateThing(thingId, thing)
 	if err != nil {
 		return nil, err
 	}
-	_, ok := c.things[th.GetId()]
-	if ok {
-		return nil, fmt.Errorf("thing id: %s is exited", th.GetId())
-	}
-	err = c.store.CreateThing(th.GetId(), th)
-	if err != nil {
-		return nil, err
-	}
-	return th, nil
+	return &thing, nil
 }
 
-func (c *ThingsModel) handleRemoveThing(thingId string) (*Thing, error) {
+func (c *ThingsContainer) handleRemoveThing(thingId string) (*Thing, error) {
 	err := c.store.RemoveThing(thingId)
 	if err != nil {
 		c.logger.Error("remove thing id: %s from Store err: %s", thingId, err.Error())
@@ -131,7 +140,7 @@ func (c *ThingsModel) handleRemoveThing(thingId string) (*Thing, error) {
 	return t, nil
 }
 
-func (c *ThingsModel) handleUpdateThing(data []byte) error {
+func (c *ThingsContainer) handleUpdateThing(data []byte) error {
 	thingId := json.Get(data, "id").ToString()
 	if _, ok := c.things[thingId]; ok {
 		newThing, err := NewThingFromString(thingId, string(data))
@@ -149,14 +158,30 @@ func (c *ThingsModel) handleUpdateThing(data []byte) error {
 	return nil
 }
 
-func (c *ThingsModel) updateThings() {
+func (c *ThingsContainer) updateThings() {
 	if len(c.things) < 1 {
 		for id, bytes := range c.store.GetThings() {
-			thing, err := NewThingFromString(id, string(bytes))
+			var thing Thing
+			err := json.Unmarshal(bytes, &thing)
 			if err != nil {
 				continue
 			}
-			c.things[id] = thing
+			thing.container = c
+			c.things[id] = &thing
 		}
+	}
+}
+
+func (c *ThingsContainer) handleDeviceRemoved(deviceId string) {
+	t := c.GetThing(deviceId)
+	if t != nil {
+		t.setConnected(false)
+	}
+}
+
+func (c *ThingsContainer) handleDeviceAdded(device *addon.Device) {
+	t := c.GetThing(device.GetId())
+	if t != nil {
+		t.setConnected(true)
 	}
 }

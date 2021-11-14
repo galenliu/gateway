@@ -4,22 +4,13 @@ import (
 	"github.com/galenliu/gateway/pkg/wot/definitions/core/interaction_affordance"
 	schema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
-	json "github.com/json-iterator/go"
 )
 
 type ObjectPropertyAffordance struct {
 	*interaction_affordance.InteractionAffordance
 	*schema.ObjectSchema
-	Observable bool        `json:"observable"`
-	Value      interface{} `json:"value"`
-}
-
-func (p ObjectPropertyAffordance) MarshalJSON() ([]byte, error) {
-	return json.MarshalIndent(&p, "", "   ")
-}
-
-func (p ObjectPropertyAffordance) UnmarshalJSON(data []byte) error {
-	return json.Unmarshal(data, &p)
+	Observable bool        `json:"observable,omitempty"`
+	Value      interface{} `json:"value,omitempty"`
 }
 
 func NewObjectPropertyAffordanceFormString(description string) *ObjectPropertyAffordance {

@@ -28,10 +28,10 @@ type Map = map[string]interface{}
 //	return controller
 //}
 
-func handleWebsocket(model model.Container, log logging.Logger) func(conn *websocket.Conn) {
+func handleWebsocket(model model.Container, bus controllerBus, log logging.Logger) func(conn *websocket.Conn) {
 	handler := func(c *websocket.Conn) {
 		thingId, _ := c.Locals("thingId").(string)
-		clint := NewWsClint(c, thingId, model, log)
+		clint := NewWsClint(c, bus, thingId, model, log)
 		defer clint.close()
 		clint.handle()
 	}
@@ -386,7 +386,7 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //	if id == "" {
 //		id = controller.thingId
 //	}
-//	addon := manager.GetDevice(id)
+//	addon := deviceManager.GetDevice(id)
 //	messageType := json.Get(bytes, "messageType").ToString()
 //	m := make(map[string]interface{})
 //
@@ -408,7 +408,7 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //		var propertyMap map[string]interface{}
 //		json.Get(bytes, "data").ToVal(&propertyMap)
 //		for propName, value := range propertyMap {
-//			_, setErr := manager.SetProperty(addon.GetId(), propName, value)
+//			_, setErr := deviceManager.SetProperty(addon.GetId(), propName, value)
 //			if setErr != nil {
 //				m["messageType"] = util.ERROR
 //				m["bytes"] = map[string]interface{}{
@@ -437,7 +437,7 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //			th := controller.ThingsModel.GetThing(id)
 //			action := models.NewAction(actionName, actionParams, th)
 //			controller.ThingsModel.actions.Add(action)
-//			err := manager.RequestAction(id, action.Id, actionName, actionParams)
+//			err := deviceManager.RequestAction(id, action.Id, actionName, actionParams)
 //			if err != nil {
 //				sendError(400, "400 Bad Request", err.Error())
 //			}
@@ -457,7 +457,7 @@ func handleWebsocket(model model.Container, log logging.Logger) func(conn *webso
 //	m := make(map[string]interface{})
 //	m["id"] = id
 //	for propName, _ := range thing.properties {
-//		value, err := manager.GetPropertyValue(id, propName)
+//		value, err := deviceManager.GetPropertyValue(id, propName)
 //		if err != nil {
 //			m["messageType"] = util.PropertyStatus
 //			m["data"] = map[string]interface{}{"message": "property set err"}

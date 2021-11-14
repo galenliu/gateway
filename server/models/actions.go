@@ -1,7 +1,6 @@
 package models
 
 import (
-	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/plugin"
 	"github.com/xiam/to"
@@ -12,8 +11,7 @@ type ActionsManager interface {
 	AddNewThings(timeOut int) error
 }
 
-type ActionsBus struct {
-	bus.Controller
+type ActionsBus interface {
 }
 
 type ActionsModel struct {
@@ -23,11 +21,11 @@ type ActionsModel struct {
 	bus     ActionsBus
 }
 
-func NewActionsModel(m ActionsManager, bus bus.Controller, log logging.Logger) *ActionsModel {
+func NewActionsModel(m ActionsManager, bus ActionsBus, log logging.Logger) *ActionsModel {
 	return &ActionsModel{
 		logger:  log,
 		manager: m,
-		bus:     ActionsBus{bus},
+		bus:     bus,
 	}
 }
 

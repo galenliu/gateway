@@ -89,13 +89,13 @@ func (device *Device) notifyValueChanged(property *addon.Property) {
 	p.Value = property.Value
 	p.Title = property.Title
 	p.Description = property.Description
-	device.adapter.plugin.pluginServer.manager.Eventbus.PublishPropertyChanged(property)
+	device.adapter.plugin.pluginServer.manager.bus.PublishPropertyChanged(device.GetId(), property)
 }
 
 func (device *Device) connectedNotify(connected bool) {
-	device.adapter.plugin.pluginServer.manager.Eventbus.PublishConnected(device.GetId(), connected)
+	device.adapter.plugin.pluginServer.manager.bus.PublishConnected(device.GetId(), connected)
 }
 
-func (device *Device) actionNotify(actionDescription *addon.ActionDescription) {
-	device.adapter.plugin.pluginServer.manager.Eventbus.PublishActionStatus(actionDescription)
+func (device *Device) actionNotify(actionDescription *addon.Action) {
+	device.adapter.plugin.pluginServer.manager.bus.PublishActionStatus(actionDescription)
 }

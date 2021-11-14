@@ -132,7 +132,7 @@ func GetBytes(key interface{}) []byte {
 }
 
 func JsonIndent(in interface{}) string {
-	d, err := json.MarshalIndent(&in, "", "   ")
+	d, err := json.MarshalIndent(&in, "", "  ")
 	if err != nil {
 		return ""
 	}

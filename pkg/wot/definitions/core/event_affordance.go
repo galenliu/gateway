@@ -4,9 +4,9 @@ import (
 	ia "github.com/galenliu/gateway/pkg/wot/definitions/core/interaction_affordance"
 	schema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
+	"github.com/tidwall/gjson"
 
 	json "github.com/json-iterator/go"
-	"github.com/tidwall/gjson"
 )
 
 type EventAffordance interface {
@@ -20,7 +20,7 @@ type eventAffordance struct {
 }
 
 func NewEventAffordanceFromString(data string) *eventAffordance {
-	var affordance = ia.InteractionAffordance{}
+	var affordance = ia.NewInteractionAffordanceFromString(data)
 	err := json.Unmarshal([]byte(data), &affordance)
 	if err != nil {
 		return nil
@@ -35,21 +35,18 @@ func NewEventAffordanceFromString(data string) *eventAffordance {
 		}
 	}
 
-	if gjson.Get(data, "data").Exists() {
-		s := gjson.Get(data, "data").String()
-		d := schema.NewDataSchemaFromString(s)
-		if d != nil {
-			e.Subscription = d
-		}
+	s := json.Get([]byte(data), "data").ToString()
+	d := schema.NewDataSchemaFromString(s)
+	if d != nil {
+		e.Subscription = d
 	}
 
-	if gjson.Get(data, "cancellation").Exists() {
-		s := gjson.Get(data, "cancellation").String()
-		d := schema.NewDataSchemaFromString(s)
-		if d != nil {
-			e.Subscription = d
-		}
+	s = json.Get([]byte(data), "cancellation").ToString()
+	d = schema.NewDataSchemaFromString(s)
+	if d != nil {
+		e.Subscription = d
 	}
+
 	if e.Forms == nil {
 		e.Forms = append(e.Forms, controls.Form{
 			Href:        "",
@@ -57,6 +54,6 @@ func NewEventAffordanceFromString(data string) *eventAffordance {
 			Op:          controls.NewArrayOfString(controls.SubscribeEvent),
 		})
 	}
-	e.InteractionAffordance = &affordance
+	e.InteractionAffordance = affordance
 	return &e
 }

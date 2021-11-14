@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/server/models/model"
@@ -16,6 +17,7 @@ type ThingsManager interface {
 	SetPropertyValue(thingId, propertyName string, value interface{}) (interface{}, error)
 	GetPropertyValue(thingId, propertyName string) (interface{}, error)
 	GetPropertiesValue(thingId string) (map[string]interface{}, error)
+	GetMapOfDevices() map[string]*addon.Device
 }
 
 type thingsController struct {
@@ -24,7 +26,7 @@ type thingsController struct {
 	manager ThingsManager
 }
 
-func NewThingsControllerFunc(manager ThingsManager, model container.ThingsContainer, log logging.Logger) *thingsController {
+func NewThingsControllerFunc(manager ThingsManager, model container.Container, log logging.Logger) *thingsController {
 	tc := &thingsController{}
 	tc.manager = manager
 	tc.model = model

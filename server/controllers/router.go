@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/container"
@@ -19,6 +20,24 @@ import (
 	"net/http"
 	"time"
 )
+
+type controllerBus interface {
+	AddThingAddedSubscription(func(thing *container.Thing)) func()
+	AddRemovedSubscription(thingId string, fn func()) func()
+
+	AddDeviceRemovedSubscription(fn func(deviceId string)) func()
+	AddDeviceAddedSubscription(fn func(device *addon.Device)) func()
+
+	AddConnectedSubscription(thingId string, fn func(b bool)) func()
+
+	AddModifiedSubscription(thingId string, fn func()) func()
+
+	AddPropertyChangedSubscription(thingId string, fn func(p *addon.Property)) func()
+
+	AddActionStatusSubscription(func(action *addon.Action)) func()
+
+	AddThingEventSubscription(func(event *addon.Event)) func()
+}
 
 type Storage interface {
 	models.UsersStore
@@ -44,7 +63,6 @@ type Manager interface {
 	AddonManager
 	ThingsManager
 	models.ActionsManager
-	models.NewThingsManager
 }
 
 type Router struct {
@@ -54,7 +72,7 @@ type Router struct {
 	config Config
 }
 
-func NewRouter(ctx context.Context, config Config, manager Manager, container container.Container, store Storage, bus bus.Controller, log logging.Logger) *Router {
+func NewRouter(ctx context.Context, config Config, manager Manager, store Storage, bus *bus.Bus, log logging.Logger) *Router {
 
 	//router init
 	app := Router{}
@@ -68,6 +86,7 @@ func NewRouter(ctx context.Context, config Config, manager Manager, container co
 
 	//models init
 	settingModel := models.NewSettingsModel(config.AddonUrls, store, log)
+	containerModel := container.NewThingsContainerModel(store, bus, log)
 	jwtMiddleware := middleware.NewJWTMiddleware(store, log)
 	auth := jwtMiddleware.Auth
 	usersModel := models.NewUsersModel(store, log)
@@ -75,8 +94,8 @@ func NewRouter(ctx context.Context, config Config, manager Manager, container co
 	jsonwebtokenModel := models.NewJsonwebtokenModel(settingModel, store, log)
 
 	actionsModel := models.NewActionsModel(manager, bus, log)
-	//serviceModel := models.NewServicesModel(manager)
-	newThingsModel := models.NewNewThingsModel(manager, log)
+	//serviceModel := models.NewServicesModel(deviceManager)
+	//newThingsModel := models.NewNewThingsModel(deviceManager, log)
 
 	// Color values
 	const (
@@ -153,7 +172,7 @@ func NewRouter(ctx context.Context, config Config, manager Manager, container co
 	actionsController := NewActionsController(actionsModel, log)
 	//Things Controller
 	{
-		thingsController := NewThingsControllerFunc(manager, container, log)
+		thingsController := NewThingsControllerFunc(manager, containerModel, log)
 		thingsGroup := app.Group(constant.ThingsPath)
 		//set a properties of a thing.
 		thingsGroup.Put("/:thingId/properties/*", thingsController.handleSetProperty)
@@ -165,8 +184,8 @@ func NewRouter(ctx context.Context, config Config, manager Manager, container co
 		thingsGroup.Get("/:thingId", thingsController.handleGetThing)
 		thingsGroup.Get("/", thingsController.handleGetThings)
 
-		thingsGroup.Get("/:thingId", websocket.New(handleWebsocket(container, log)))
-		thingsGroup.Get("/", websocket.New(handleWebsocket(container, log)))
+		thingsGroup.Get("/:thingId", websocket.New(handleWebsocket(containerModel, bus, log)))
+		thingsGroup.Get("/", websocket.New(handleWebsocket(containerModel, bus, log)))
 
 		//Get the properties of a thing
 		thingsGroup.Get("/:thingId"+constant.PropertiesPath, thingsController.handleGetProperties)
@@ -189,7 +208,7 @@ func NewRouter(ctx context.Context, config Config, manager Manager, container co
 
 	//NewThing Controller
 	{
-		newThingsController := NewNewThingsController(newThingsModel, log)
+		newThingsController := NewNewThingsController(log)
 		newThingsGroup := app.Group(constant.NewThingsPath)
 		newThingsGroup.Use("/", func(c *fiber.Ctx) error {
 			if websocket.IsWebSocketUpgrade(c) {
@@ -198,7 +217,7 @@ func NewRouter(ctx context.Context, config Config, manager Manager, container co
 			}
 			return fiber.ErrUpgradeRequired
 		})
-		newThingsGroup.Get("/", websocket.New(newThingsController.handleNewThingsWebsocket(container)))
+		newThingsGroup.Get("/", websocket.New(newThingsController.handleNewThingsWebsocket(manager, containerModel, bus)))
 	}
 
 	//Addons Controller
@@ -224,7 +243,7 @@ func NewRouter(ctx context.Context, config Config, manager Manager, container co
 
 	//Services Controller
 	//{
-	//	servicesController := NewServicesController(serviceModel, serviceManager, container)
+	//	servicesController := NewServicesController(serviceModel, serviceManager, containerModel)
 	//	sGroup := app.Group(constant.ServicesPath)
 	//	sGroup.Get("/", servicesController.handleGetServices)
 	//	sGroup.Get("/:serviceId/config", servicesController.handleGetServiceConfig)

@@ -38,10 +38,6 @@ func NewStringSchemaFromString(description string) *StringSchema {
 	return &schema
 }
 
-func (s *StringSchema) MarshalJSON() ([]byte, error) {
-	return json.Marshal(s)
-}
-
 func (s *StringSchema) Convert(v interface{}) interface{} {
 	return s.clamp(controls.ToString(v))
 }

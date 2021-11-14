@@ -2,7 +2,6 @@ package data_schema
 
 import (
 	"github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
-	json "github.com/json-iterator/go"
 )
 
 type NullSchema struct {
@@ -16,10 +15,6 @@ func NewNullSchemaFromString(description string) *NullSchema {
 		return nil
 	}
 	return &schema
-}
-
-func (n NullSchema) MarshalJSON() ([]byte, error) {
-	return json.Marshal(n)
 }
 
 func (n *NullSchema) Convert(v interface{}) interface{} {

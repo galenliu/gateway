@@ -5,7 +5,6 @@ import (
 	"github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/constant"
-	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/db"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
@@ -33,18 +32,15 @@ type Config struct {
 
 type Gateway struct {
 	config       Config
-	storage      *db.Storage
-	bus          bus.Controller
-	logger       logging.Logger
+	bus          *bus.Bus
 	addonManager *plugin.Manager
 	sever        *server.WebServe
-	container    container.Container
 }
 
 func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gateway, error) {
 
 	g := &Gateway{}
-	g.logger = logger
+
 	g.config = config
 	u := &rpc.UsrProfile{
 		BaseDir:    g.config.BaseDir,
@@ -56,29 +52,25 @@ func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gat
 		GatewayDir: g.config.BaseDir,
 	}
 	s, _ := json.MarshalIndent(u, "", "   ")
-	g.logger.Infof("userprofile: %v ", string(s))
+	logger.Infof("userprofile: %v ", string(s))
 
 	//检查Gateway运行需要的文件目录
 	util.EnsureDir(logger, u.BaseDir, u.DataDir, u.ConfigDir, u.AddonsDir, u.ConfigDir, u.MediaDir, u.LogDir)
 
-	// 数据化初始化
-	var err error
-	g.storage, err = db.NewStorage(u.ConfigDir, logger, db.Config{
+	// 数据初始化
+
+	storage, err := db.NewStorage(u.ConfigDir, logger, db.Config{
 		Reset: config.RemoveBeforeOpen,
 	})
 	if err != nil {
 		logger.Error(err.Error())
 		return nil, err
 	}
-	g.logger.Infof("database init.")
-
-	//  Things container init
-	g.container = container.NewThingsContainerModel(g.storage, g.logger)
-	g.logger.Infof("things container init.")
+	logger.Infof("database init.")
 
 	//  EventBus init
-	newBus := bus.NewBusController(g.logger)
-	g.logger.Infof("event bus init.")
+	newBus := bus.NewBusController(logger)
+	logger.Infof("event bus init.")
 
 	//Addon manager init
 	g.addonManager = plugin.NewAddonsManager(ctx, plugin.Config{
@@ -87,8 +79,8 @@ func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gat
 		AttachAddonsDir: g.config.AttachAddonsDir,
 		IPCPort:         config.IPCPort,
 		RPCPort:         config.RPCPort,
-	}, g.storage, newBus, g.logger)
-	g.logger.Infof("addon manager init.")
+	}, storage, newBus, logger)
+	logger.Infof("addon manager init.")
 
 	// Web service init
 	g.sever = server.NewServe(ctx, server.Config{
@@ -99,9 +91,9 @@ func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gat
 		TemplateDir: path.Join(g.config.BaseDir, "template"),
 		UploadDir:   path.Join(g.config.BaseDir, "upload"),
 		LogDir:      path.Join(g.config.BaseDir, "log"),
-	}, g.addonManager, g.container, g.storage, newBus, g.logger)
+	}, g.addonManager, storage, newBus, logger)
 	g.bus = newBus
-	g.logger.Infof("gateway web server running.")
+	logger.Infof("gateway web server running.")
 	return g, nil
 }
 

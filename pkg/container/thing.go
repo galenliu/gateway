@@ -2,7 +2,7 @@ package container
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/constant"
+	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/util"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	json "github.com/json-iterator/go"
@@ -10,51 +10,20 @@ import (
 
 type Thing struct {
 	*wot.Thing
-
-	bus EventBus
-
-	//The configuration  of the addon
-	Pin                 *PIN `json:"pin,omitempty"`
-	CredentialsRequired bool `json:"credentialsRequired,omitempty"`
+	Pin                 *addon.DevicePin `json:"pin,omitempty"`
+	CredentialsRequired bool             `json:"credentialsRequired,omitempty"`
 
 	//The state  of the thing
-	SelectedCapability string `json:"selectedCapability"`
-	Connected          bool   `json:"connected"`
-	IconHref           string `json:"iconHref,omitempty"`
+	SelectedCapability string `json:"selectedCapability,omitempty"`
+	Connected          bool   `json:"connected,,omitempty"`
 
-	FloorplanVisibility bool `json:"floorplanVisibility"`
-	FloorplanX          uint `json:"floorplanX"`
-	FloorplanY          uint `json:"floorplanY"`
-	LayoutIndex         uint `json:"layoutIndex"`
+	//FloorplanVisibility bool `json:"floorplanVisibility"`
+	//FloorplanX          uint `json:"floorplanX"`
+	//FloorplanY          uint `json:"floorplanY"`
+	//LayoutIndex         uint `json:"layoutIndex"`
+	GroupId string `json:"groupId,omitempty"`
 
-	Security            string             `json:"security"`
-	SecurityDefinitions SecurityDefinition `json:"securityDefinitions"`
-	GroupId             string             `json:"group_id"`
-}
-
-func (t Thing) AddConnectedSubscription(f func(bool)) func() {
-	topic := t.Id.GetId() + "." + constant.CONNECTED
-	t.bus.bus.Subscribe(topic, f)
-	return func() {
-		t.bus.bus.Unsubscribe(topic, f)
-	}
-}
-
-func (t Thing) AddSubscription(topi string, f interface{}) func() {
-	topic := t.Id.GetId() + "." + topi
-	t.bus.bus.Subscribe(topic, f)
-	return func() {
-		t.bus.bus.Unsubscribe(topic, f)
-	}
-}
-
-func (t Thing) setConnected(connected bool) {
-	t.Connected = connected
-	t.bus.PublishConnected(connected)
-}
-
-func (t Thing) remove() {
-	t.bus.PublishRemoved()
+	container *ThingsContainer
 }
 
 // NewThingFromString 把传入description组装成一个thing对象
@@ -63,22 +32,13 @@ func NewThingFromString(id string, description string) (thing *Thing, err error)
 		return nil, fmt.Errorf("id or description err")
 	}
 	data := []byte(description)
-	var p PIN
-	json.Get(data, "pin").ToVal(&p)
 
 	t := Thing{
 		Thing:               wot.NewThingFromString(description),
-		Pin:                 &p,
+		Pin:                 nil,
 		CredentialsRequired: json.Get(data, "credentialsRequired").ToBool(),
 		SelectedCapability:  json.Get(data, "selectedCapability").ToString(),
 		Connected:           json.Get(data, "connected").ToBool(),
-		IconHref:            json.Get(data, "iconHref").ToString(),
-		FloorplanVisibility: false,
-		FloorplanX:          0,
-		FloorplanY:          0,
-		LayoutIndex:         0,
-		Security:            "",
-		SecurityDefinitions: SecurityDefinition{},
 		GroupId:             "",
 	}
 
@@ -94,4 +54,13 @@ func NewThingFromString(id string, description string) (thing *Thing, err error)
 		return nil, fmt.Errorf("selectedCapability err")
 	}
 	return &t, nil
+}
+
+func (t *Thing) setConnected(connected bool) {
+	t.Connected = connected
+	t.container.bus.PublishThingConnected(t.GetId(), connected)
+}
+
+func (t *Thing) remove() {
+	t.container.bus.PublishThingRemoved(t.GetId())
 }

@@ -76,7 +76,7 @@ func (c *command) initStartCmd() (err error) {
 			signal.Notify(interruptChannel, syscall.SIGINT, syscall.SIGTERM)
 
 			p := &program{
-				start: func() {
+				run: func() {
 					// Block main goroutine until it is interrupted
 					sig := <-interruptChannel
 					logger.Debugf("received signal: %v", sig)
@@ -122,7 +122,7 @@ func (c *command) initStartCmd() (err error) {
 				}
 			} else {
 				// start blocks until some interrupt is received
-				p.start()
+				p.run()
 				p.stop()
 			}
 			return nil
@@ -138,13 +138,13 @@ func (c *command) initStartCmd() (err error) {
 }
 
 type program struct {
-	start func()
-	stop  func()
+	run  func()
+	stop func()
 }
 
 func (p *program) Start(s service.Service) error {
 	// Start should not block. Do the actual work async.
-	go p.start()
+	go p.run()
 	return nil
 }
 

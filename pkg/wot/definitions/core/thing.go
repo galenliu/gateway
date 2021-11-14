@@ -13,8 +13,8 @@ type ThingInterface interface {
 }
 
 type Thing struct {
-	AtContext    []string          `json:"@context"` //mandatory
-	Title        string            `json:"title"`    //mandatory
+	AtContext    controls.URI      `json:"@context,omitempty"` //mandatory
+	Title        string            `json:"title,omitempty"`    //mandatory
 	Titles       map[string]string `json:"titles,omitempty"`
 	Id           controls.URI      `json:"id"`
 	AtType       []string          `json:"@type"`
@@ -22,11 +22,11 @@ type Thing struct {
 	Descriptions map[string]string `json:"descriptions,omitempty"`
 
 	Support controls.URI `json:"support,omitempty"`
-	Base    controls.URI `json:"base"`
+	Base    controls.URI `json:"base,omitempty"`
 
-	Version  VersionInfo       `json:"version,omitempty"`
-	Created  controls.DataTime `json:"created,omitempty"`
-	Modified controls.DataTime `json:"modified,omitempty"`
+	Version  *VersionInfo       `json:"version,omitempty"`
+	Created  *controls.DataTime `json:"created,omitempty"`
+	Modified *controls.DataTime `json:"modified,omitempty"`
 
 	Properties map[string]PropertyAffordance `json:"properties,omitempty"`
 	Actions    map[string]ActionAffordance   `json:"actions,omitempty"`
@@ -35,11 +35,11 @@ type Thing struct {
 	Links []controls.Link `json:"links,omitempty"`
 	Forms []controls.Form `json:"forms,omitempty"`
 
-	Security            controls.ArrayOfString                   `json:"security,omitempty"`  //mandatory
-	SecurityDefinitions map[string]securityScheme.SecurityScheme `json:"securityDefinitions"` //mandatory
+	Security            controls.ArrayOfString                    `json:"security,omitempty"`            //mandatory
+	SecurityDefinitions map[string]*securityScheme.SecurityScheme `json:"securityDefinitions,omitempty"` //mandatory
 
-	Profile           []controls.URI `json:"profile,omitempty"`
-	SchemaDefinitions map[string]dataSchema.DataSchema
+	Profile           []controls.URI                    `json:"profile,omitempty"`
+	SchemaDefinitions map[string]*dataSchema.DataSchema `json:"schemaDefinitions,omitempty"`
 }
 
 func NewThingFromString(description string) (thing *Thing) {
@@ -51,13 +51,13 @@ func NewThingFromString(description string) (thing *Thing) {
 	if t.Id == "" {
 		t.Id = controls.URI(t.Title)
 	}
-	t.AtContext = controls.JSONGetArray(data, "@context")
+	t.AtContext = controls.URI(json.Get(data, "@context").ToString())
 	t.Security = controls.NewArrayOfString(json.Get(data, "security").ToString())
 	t.Description = controls.JSONGetString(data, "description", "")
 
-	var m map[string]securityScheme.SecurityScheme
+	var m map[string]*securityScheme.SecurityScheme
 	json.Get(data, "securityDefinitions").ToVal(&m)
-	if &m != nil {
+	if m != nil {
 		t.SecurityDefinitions = m
 	}
 

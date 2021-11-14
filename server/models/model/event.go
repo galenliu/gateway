@@ -22,7 +22,7 @@ func NewEventFromString(data string) *Event {
 		aa.Forms = append(aa.Forms, hypermedia_controls.Form{
 			Href:        "",
 			ContentType: schema.ApplicationJson,
-			Op:          []string{hypermedia_controls.SubscribeEvent},
+			Op:          hypermedia_controls.NewArrayOfString(hypermedia_controls.SubscribeEvent),
 		})
 	}
 	this.EventAffordance = aa

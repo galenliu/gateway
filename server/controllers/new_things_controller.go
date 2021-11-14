@@ -1,14 +1,19 @@
 package controllers
 
 import (
+	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/util"
-	"github.com/galenliu/gateway/server/models"
-	"github.com/galenliu/gateway/server/models/model"
 	"github.com/gofiber/websocket/v2"
 	"sync"
 )
+
+type deviceManager interface {
+	GetMapOfDevices() map[string]*addon.Device
+}
+type thingContainer interface {
+	GetMapOfThings() map[string]*container.Thing
+}
 
 type NewThingsController struct {
 	locker     *sync.Mutex
@@ -16,10 +21,9 @@ type NewThingsController struct {
 	foundThing chan string
 	closeChan  chan struct{}
 	logger     logging.Logger
-	model      *models.NewThingsModel
 }
 
-func NewNewThingsController(model *models.NewThingsModel, log logging.Logger) *NewThingsController {
+func NewNewThingsController(log logging.Logger) *NewThingsController {
 	c := &NewThingsController{}
 	c.logger = log
 	c.locker = new(sync.Mutex)
@@ -28,22 +32,36 @@ func NewNewThingsController(model *models.NewThingsModel, log logging.Logger) *N
 	return c
 }
 
-func (c *NewThingsController) handleNewThingsWebsocket(thingsModel model.Container) func(conn *websocket.Conn) {
+func (c *NewThingsController) handleNewThingsWebsocket(m deviceManager, t thingContainer, bus controllerBus) func(conn *websocket.Conn) {
 	return func(conn *websocket.Conn) {
-		addonDevices := c.model.Manager.GetDeviceMaps()
-		savedThings := thingsModel.GetMapThings()
+
+		addonDevices := m.GetMapOfDevices()
+		removeFunc := bus.AddDeviceAddedSubscription(func(device *addon.Device) {
+			_ = c.handlerNewDevice(conn, device)
+		})
+		defer func() {
+			removeFunc()
+			_ = conn.Close()
+		}()
+		savedThings := t.GetMapOfThings()
 		for id, dev := range addonDevices {
 			_, ok := savedThings[id]
 			if !ok {
-				str := util.JsonIndent(dev)
-				dev, err := container.NewThingFromString(id, str)
-				if err == nil {
-					err := conn.WriteJSON(dev)
-					if err != nil {
-						return
-					}
+				err := c.handlerNewDevice(conn, dev)
+				if err != nil {
+					return
 				}
 			}
 		}
+		for {
+			_, _, err := conn.ReadMessage()
+			if err != nil {
+				return
+			}
+		}
 	}
+}
+
+func (c *NewThingsController) handlerNewDevice(conn *websocket.Conn, device *addon.Device) error {
+	return conn.WriteJSON(container.AsWebOfThing(device))
 }

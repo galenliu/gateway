@@ -1,7 +1,6 @@
 package models
 
 import (
-	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
 	uuid "github.com/satori/go.uuid"
 	"time"
@@ -49,7 +48,7 @@ func (action *Action) updateStatus(newStatus string) {
 		action.TimeCompleted = time.Now()
 	}
 	action.Status = newStatus
-	action.bus.Publish(constant.ActionStatus, action)
+	//action.bus(constant.ActionStatus, action)
 }
 
 //

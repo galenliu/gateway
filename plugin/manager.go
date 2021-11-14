@@ -5,10 +5,8 @@ import (
 	"compress/gzip"
 	"context"
 	"fmt"
-	"github.com/galenliu/gateway-grpc"
+	rpc "github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/addon"
-	"github.com/galenliu/gateway/pkg/bus"
-	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
@@ -50,7 +48,7 @@ type Manager struct {
 	installAddons sync.Map
 	extensions    sync.Map
 	container     container.Container
-	Eventbus      *Eventbus
+	bus           addonBus
 	addonsLoaded  bool
 	isPairing     bool
 	running       bool
@@ -62,7 +60,17 @@ type Manager struct {
 	ctx           context.Context
 }
 
-func NewAddonsManager(ctx context.Context, conf Config, s managerStore, bus bus.Controller, log logging.Logger) *Manager {
+type addonBus interface {
+	PublishDeviceAdded(device *addon.Device)
+	PublishDeviceRemoved(deviceId string)
+	PublishPairingTimeout()
+	PublishActionStatus(action *addon.Action)
+	PublishConnected(thingId string, connected bool)
+	PublishEvent(event *addon.Event)
+	PublishPropertyChanged(thingId string, property *addon.Property)
+}
+
+func NewAddonsManager(ctx context.Context, conf Config, s managerStore, bus addonBus, log logging.Logger) *Manager {
 	am := &Manager{}
 	am.config = conf
 	am.ctx = ctx
@@ -70,7 +78,7 @@ func NewAddonsManager(ctx context.Context, conf Config, s managerStore, bus bus.
 	am.addonsLoaded = false
 	am.isPairing = false
 	am.running = false
-	am.Eventbus = NewEventBus(bus)
+	am.bus = bus
 	am.storage = s
 	am.locker = new(sync.Mutex)
 	am.loadAddons()
@@ -96,7 +104,7 @@ func (m *Manager) AddNewThings(timeout int) error {
 			select {
 			case <-timeoutChan:
 				m.logger.Info("pairing timeout")
-				m.Eventbus.bus.Publish(constant.PairingTimeout)
+				m.bus.PublishPairingTimeout()
 				m.CancelAddNewThing()
 			case <-m.pairTask:
 				m.logger.Info("pairing cancel")
@@ -124,35 +132,26 @@ func (m *Manager) CancelAddNewThing() {
 }
 
 func (m *Manager) actionNotify(action *addon.Action) {
-	m.Eventbus.bus.Publish(constant.ActionStatus, nil)
+	m.bus.PublishActionStatus(action)
 }
 
 func (m *Manager) eventNotify(event *addon.Event) {
-	m.Eventbus.bus.Publish(constant.EVENT, nil)
-}
-
-func (m *Manager) connectedNotify(device *addon.Device, connected bool) {
-	m.Eventbus.bus.Publish(constant.CONNECTED, connected)
+	m.bus.PublishEvent(event)
 }
 
 func (m *Manager) addAdapter(adapter *Adapter) {
 	m.adapters.Store(adapter.ID, adapter)
-	m.Eventbus.bus.Publish(constant.AdapterAdded, adapter)
-}
-
-func (m *Manager) addService(service *Service) {
-	m.adapters.Store(service.ID, service)
-	m.Eventbus.bus.Publish(constant.ServiceAdded, service)
 }
 
 func (m *Manager) handleDeviceAdded(device *Device) {
 	m.devices.Store(device.GetId(), device)
-	m.Eventbus.PublishDeviceAdded(device.Device)
+	m.logger.Infof("Device added: %s", util.JsonIndent(container.AsWebOfThing(device.Device)))
+	go m.bus.PublishDeviceAdded(device.Device)
 }
 
 func (m *Manager) handleDeviceRemoved(device *Device) {
 	m.devices.Delete(device.GetId())
-	m.Eventbus.PublishDeviceRemoved(device.Device)
+	m.bus.PublishDeviceRemoved(device.GetId())
 }
 
 func (m *Manager) handleSetProperty(deviceId, propName string, setValue interface{}) error {

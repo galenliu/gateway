@@ -26,7 +26,6 @@ func NewActionFromString(data string) *Action {
 	if aa.Forms == nil {
 		aa.Forms = append(aa.Forms, hypermedia_controls.Form{
 			Href: "",
-			Op:   []string{hypermedia_controls.InvokeAction},
 		})
 	}
 

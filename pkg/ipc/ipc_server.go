@@ -1,7 +1,6 @@
 package ipc
 
 import (
-	"context"
 	"github.com/fasthttp/websocket"
 	"github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/logging"
@@ -63,7 +62,7 @@ func (s *IPCServer) handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.logger.Infof("ipc connection addr: %s", conn.RemoteAddr().String())
-	go s.readLoop(conn)
+	s.readLoop(conn)
 }
 
 // g
@@ -78,32 +77,22 @@ func (s *IPCServer) readLoop(conn *websocket.Conn) {
 		s.logger.Infof("register err: %s", err.Error())
 		return
 	}
-	ctx, cancelFunc := context.WithCancel(context.Background())
+
 	defer func() {
-		cancelFunc()
 		err := conn.Close()
 		s.logger.Errorf("clint %s closed", clint.GetPluginId())
 		if err != nil {
-			s.logger.Errorf("clint %s close err: %s", clint.pluginId, err.Error())
+			s.logger.Errorf("clint %s close err: %s", clint.GetPluginId(), err.Error())
 			return
 		}
 	}()
 	for {
-		select {
-		case <-ctx.Done():
-			s.logger.Infof("ipc server exit")
-			_ = conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, "ipc exit"))
-			_ = clint.Close()
+		message, err := clint.ReadMessage()
+		if err != nil {
+			s.logger.Errorf("%s read err : %s", clint.GetPluginId(), err.Error())
 			return
-
-		default:
-			message, err := clint.ReadMessage()
-			if err != nil {
-				s.logger.Errorf("clint %s read err : %s", clint.GetPluginId(), err.Error())
-				return
-			}
-			pluginHandler.OnMsg(message.MessageType, message.Data)
 		}
+		pluginHandler.OnMsg(message.MessageType, message.Data)
 	}
 }
 
@@ -124,9 +113,9 @@ func (c *connection) WriteMessage(message *rpc.BaseMessage) error {
 		return err
 	}
 	if c.GetPluginId() == "" {
-		c.logger.Debugf("Plugin send :%s", util.JsonIndent(baseMessage))
+		c.logger.Debugf("PluginServer send :%s", util.JsonIndent(baseMessage))
 	} else {
-		c.logger.Debugf("Plugin %s send :%s", c.GetPluginId(), util.JsonIndent(baseMessage))
+		c.logger.Debugf("PluginServer send to &s:%s", c.GetPluginId(), util.JsonIndent(baseMessage))
 	}
 	return nil
 }
@@ -140,9 +129,9 @@ func (c *connection) ReadMessage() (*rpc.BaseMessage, error) {
 		return nil, err
 	}
 	if c.GetPluginId() == "" {
-		c.logger.Debugf("Plugin register message :%s", util.JsonIndent(msg))
+		c.logger.Debugf("IPC register :%s", util.JsonIndent(msg))
 	} else {
-		c.logger.Debugf("Plugin %s read: %s", c.GetPluginId(), util.JsonIndent(msg))
+		c.logger.Debugf("IPC server read %s: %s", c.GetPluginId(), util.JsonIndent(msg))
 	}
 
 	marshal, err := json.Marshal(msg.Data)

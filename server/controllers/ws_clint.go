@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
@@ -9,15 +10,20 @@ import (
 )
 
 type wsClint struct {
-	ws            *websocket.Conn
-	container     model.Container
-	thingId       string
-	thingCleanups map[string]func()
-	logger        logging.Logger
+	ws                   *websocket.Conn
+	bus                  controllerBus
+	container            model.Container
+	thingId              string
+	thingCleanups        map[string]func()
+	logger               logging.Logger
+	subscribedEventNames map[string]bool
 }
 
-func NewWsClint(ws *websocket.Conn, thingId string, container model.Container, log logging.Logger) *wsClint {
+func NewWsClint(ws *websocket.Conn, bus controllerBus, thingId string, container model.Container, log logging.Logger) *wsClint {
 	c := &wsClint{}
+	c.bus = bus
+	c.subscribedEventNames = make(map[string]bool)
+	c.thingCleanups = make(map[string]func())
 	c.ws = ws
 	c.container = container
 	c.logger = log
@@ -26,13 +32,21 @@ func NewWsClint(ws *websocket.Conn, thingId string, container model.Container, l
 }
 
 func (c *wsClint) handle() {
-
+	var unsubscribe func()
 	if c.thingId == "" {
 		things := c.container.GetThings()
 		for _, t := range things {
 			c.addThing(t)
 		}
+	} else {
+		t := c.container.GetThing(c.thingId)
+		unsubscribe = c.bus.AddThingAddedSubscription(c.onThingAdded)
+		if t == nil {
+			return
+		}
+		c.addThing(t)
 	}
+
 	for {
 		mt, data, err := c.ws.ReadMessage()
 		if mt == websocket.CloseMessage {
@@ -40,6 +54,7 @@ func (c *wsClint) handle() {
 			return
 		}
 		if err != nil {
+			unsubscribe()
 			return
 		}
 		go c.handleMessage(data)
@@ -63,8 +78,16 @@ func (c *wsClint) sendMessage(messageType string, data map[string]interface{}) {
 	}
 }
 
-func (c *wsClint) onThingAdded() {
-
+func (c *wsClint) onThingAdded(t *container.Thing) {
+	err := c.ws.WriteJSON(map[string]interface{}{
+		"id":          t.GetId(),
+		"messageType": constant.ThingAdded,
+		"data":        struct{}{},
+	})
+	c.addThing(t)
+	if err != nil {
+		c.logger.Error("websocket send %s message err : %s", constant.Connected, err.Error())
+	}
 }
 
 func (c *wsClint) close() {
@@ -76,64 +99,93 @@ func (c *wsClint) close() {
 }
 
 func (c *wsClint) addThing(t *container.Thing) {
-	var thingCleanup []func()
 
-	thingCleanup = append(thingCleanup, t.AddSubscription(constant.CONNECTED, func(b bool) {
+	onConnected := func(connected bool) {
 		err := c.ws.WriteJSON(map[string]interface{}{
 			"id":          t.GetId(),
-			"messageType": constant.CONNECTED,
-			"data":        b,
+			"messageType": constant.Connected,
+			"data":        connected,
 		})
 		if err != nil {
+			c.logger.Error("websocket send %s message err : %s", constant.Connected, err.Error())
 		}
-		c.logger.Error("websocket send connected message err : %s", err.Error())
-	}))
+	}
+	removeConnectedFunc := c.bus.AddConnectedSubscription(t.GetId(), onConnected)
 
-	thingCleanup = append(thingCleanup, t.AddSubscription(constant.ThingRemoved, func() {
+	onThingRemoved := func() {
 		f, ok := c.thingCleanups[t.GetId()]
 		if ok {
 			f()
 		}
-		if c.thingId == "" {
-			_ = c.ws.Close()
-		} else {
-			err := c.ws.WriteJSON(map[string]interface{}{
-				"id":          t.GetId(),
-				"messageType": constant.ThingRemoved,
-				"data":        struct{}{},
-			})
-			if err != nil {
-			}
-			c.logger.Error("websocket send ThingRemoved message err : %s", err.Error())
-		}
-	}))
-
-	thingCleanup = append(thingCleanup, t.AddSubscription(constant.ThingModified, func() {
 		err := c.ws.WriteJSON(map[string]interface{}{
 			"id":          t.GetId(),
-			"messageType": constant.ThingModified,
+			"messageType": constant.ThingRemoved,
 			"data":        struct{}{},
 		})
 		if err != nil {
-			c.logger.Error("websocket send ThingModified message err : %s", err.Error())
 		}
-	}))
-
-	thingCleanup = append(thingCleanup, t.AddSubscription(constant.EVENT, func() {
-		err := c.ws.WriteJSON(map[string]interface{}{
-			"id":          t.GetId(),
-			"messageType": constant.ThingModified,
-			"data":        struct{}{},
-		})
-		if err != nil {
-			c.logger.Error("websocket send ThingModified message err : %s", err.Error())
-		}
-	}))
-
-	thingCleanups := func() {
-		for _, f := range thingCleanup {
-			f()
-		}
+		c.logger.Error("websocket send %s message err : %s", constant.ThingRemoved, err.Error())
 	}
-	c.thingCleanups[t.GetId()] = thingCleanups
+	removeRemovedFunc := c.bus.AddRemovedSubscription(t.GetId(), onThingRemoved)
+
+	onThingModified := func() {
+		err := c.ws.WriteJSON(map[string]interface{}{
+			"id":          t.GetId(),
+			"messageType": constant.ThingModified,
+			"data":        struct{}{},
+		})
+		if err != nil {
+		}
+		c.logger.Error("websocket send %s message err : %s", constant.ThingRemoved, err.Error())
+	}
+	removeModifiedFunc := c.bus.AddModifiedSubscription(t.GetId(), onThingModified)
+
+	onEvent := func(event *addon.Event) {
+		err := c.ws.WriteJSON(map[string]interface{}{
+			"id":          t.GetId(),
+			"messageType": constant.Event,
+			"data": struct {
+				Name  string
+				Event *addon.Event
+			}{Name: event.GetName(), Event: event},
+		})
+		if err != nil {
+		}
+		c.logger.Error("websocket send %s message err : %s", constant.Event, err.Error())
+	}
+	removeThingEventStatusFunc := c.bus.AddThingEventSubscription(onEvent)
+
+	onPropertyChanged := func(property *addon.Property) {
+		err := c.ws.WriteJSON(map[string]interface{}{
+			"id":          t.GetId(),
+			"messageType": constant.Event,
+			"data":        map[string]interface{}{property.GetName(): property.GetValue()},
+		})
+		if err != nil {
+		}
+		c.logger.Error("websocket send %s message err : %s", constant.Event, err.Error())
+	}
+	removePropertyChangedFunc := c.bus.AddPropertyChangedSubscription(t.GetId(), onPropertyChanged)
+
+	onActionStatus := func(action *addon.Action) {
+		err := c.ws.WriteJSON(map[string]interface{}{
+			"id":          t.GetId(),
+			"messageType": constant.Event,
+			"data":        map[string]interface{}{action.GetName(): action.GetDescription()},
+		})
+		if err != nil {
+		}
+		c.logger.Error("websocket send %s message err : %s", constant.Event, err.Error())
+	}
+	removeActionStatusFunc := c.bus.AddActionStatusSubscription(onActionStatus)
+
+	thingCleanup := func() {
+		removeConnectedFunc()
+		removeRemovedFunc()
+		removeModifiedFunc()
+		removePropertyChangedFunc()
+		removeActionStatusFunc()
+		removeThingEventStatusFunc()
+	}
+	c.thingCleanups[t.GetId()] = thingCleanup
 }

@@ -67,26 +67,6 @@ func (plugin *Plugin) getAdapters() (adapters []*Adapter) {
 	return
 }
 
-func (plugin *Plugin) getService(id string) *Service {
-	a, ok := plugin.services.Load(id)
-	s, ok := a.(*Service)
-	if !ok {
-		return nil
-	}
-	return s
-}
-
-func (plugin *Plugin) getServices() (services []*Service) {
-	plugin.services.Range(func(key, value interface{}) bool {
-		adapter, ok := value.(*Service)
-		if ok {
-			services = append(services, adapter)
-		}
-		return true
-	})
-	return
-}
-
 func (plugin *Plugin) getNotifiers() (notifiers []*Notifier) {
 	plugin.notifiers.Range(func(key, value interface{}) bool {
 		notifier, ok := value.(*Notifier)
@@ -172,76 +152,7 @@ func (plugin *Plugin) OnMsg(messageType rpc.MessageType, data []byte) {
 
 	// services message
 	{
-		switch messageType {
-		case rpc.MessageType_ServiceAddedNotification:
-			var d rpc.ServiceAddedNotificationMessage_Data
-			err := json.Unmarshal(data, &d)
-			if err != nil {
-				return
-			}
-			newService := NewService(plugin, plugin.addonManager.Eventbus, d.ServiceId, d.Name)
-			plugin.services.Store(newService.ID, newService)
-			plugin.addonManager.addService(newService)
 
-		case rpc.MessageType_ServiceGetThingsRequest:
-			things := plugin.pluginServer.manager.container.GetThings()
-			bt, err := json.Marshal(things)
-			if err != nil {
-				return
-			}
-			var d = make(map[string]interface{})
-			d["things"] = bt
-			adapter.sendMsg(rpc.MessageType_ServiceGetThingsResponse, d)
-
-		case rpc.MessageType_ServiceGetThingRequest:
-			id := json.Get(data, "thingId").ToString()
-			thing := plugin.pluginServer.manager.container.GetThing(id)
-			bt, err := json.Marshal(thing)
-			if err != nil {
-				return
-			}
-			var d = make(map[string]interface{})
-			d["thing"] = bt
-			adapter.sendMsg(rpc.MessageType_ServiceGetThingResponse, d)
-
-		case rpc.MessageType_ServiceSetPropertyValueRequest:
-			var message rpc.ServiceSetPropertyValueRequestMessage_Data
-			err := json.Unmarshal(data, &message)
-			if err != nil {
-				return
-			}
-			_, err = adapter.plugin.pluginServer.manager.SetPropertyValue(message.ThingId, message.PropertyName, message.Value)
-			if err != nil {
-				return
-			}
-		}
-	}
-
-	// addon handler
-	{
-		switch messageType {
-		case rpc.MessageType_AdapterUnloadResponse:
-			return
-		case rpc.MessageType_NotifierUnloadResponse:
-			return
-
-		case rpc.MessageType_OutletAddedNotification:
-			return
-		case rpc.MessageType_OutletRemovedNotification:
-			return
-
-		case rpc.MessageType_AdapterPairingPromptNotification:
-			return
-
-		case rpc.MessageType_AdapterUnpairingPromptNotification:
-			return
-		case rpc.MessageType_MockAdapterClearStateResponse:
-			return
-
-		case rpc.MessageType_MockAdapterRemoveDeviceResponse:
-			return
-
-		}
 	}
 
 	//device handler
@@ -250,6 +161,10 @@ func (plugin *Plugin) OnMsg(messageType rpc.MessageType, data []byte) {
 		return
 	}
 	switch messageType {
+	case rpc.MessageType_DeviceConnectedStateNotification:
+		connected := json.Get(data, "connected").ToBool()
+		device.connectedNotify(connected)
+
 	case rpc.MessageType_DeviceRequestActionResponse:
 		break
 	case rpc.MessageType_DeviceRemoveActionResponse:

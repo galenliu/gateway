@@ -44,6 +44,10 @@ func ToBool(v interface{}) bool {
 	return to.Bool(v)
 }
 
+func ToDouble(v interface{}) Double {
+	return Double(to.Float64(v))
+}
+
 func ToNumber(v interface{}) Number {
 	return Number(to.Float64(v))
 }

@@ -77,7 +77,7 @@ func (m *Manager) GetDevice(deviceId string) *Device {
 	return nil
 }
 
-func (m *Manager) GetDeviceMaps() (devices map[string]*addon.Device) {
+func (m *Manager) GetMapOfDevices() (devices map[string]*addon.Device) {
 	devs := m.getDevices()
 	var devicesMap = make(map[string]*addon.Device)
 	if devs != nil {

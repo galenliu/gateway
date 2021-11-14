@@ -31,7 +31,7 @@ type DataSchema struct {
 	ReadOnly     bool              `json:"readOnly,omitempty"`
 	WriteOnly    bool              `json:"writeOnly,omitempty"`
 	Format       string            `json:"format,omitempty"`
-	Type         string            `json:"type"`
+	Type         string            `json:"type,,omitempty"`
 }
 
 func NewDataSchemaFromString(description string) *DataSchema {

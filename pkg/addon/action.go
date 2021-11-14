@@ -16,3 +16,11 @@ type ActionDescription struct {
 	TimeRequested string        `protobuf:"bytes,5,opt,name=timeRequested,proto3" json:"timeRequested,omitempty"`
 	TimeCompleted string        `protobuf:"bytes,6,opt,name=timeCompleted,proto3" json:"timeCompleted,omitempty"`
 }
+
+func (a *Action) GetDescription() string {
+	return ""
+}
+
+func (a *Action) GetName() string {
+	return ""
+}
