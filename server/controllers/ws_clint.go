@@ -35,12 +35,12 @@ func (c *wsClint) handle() {
 	var unsubscribe func()
 	if c.thingId == "" {
 		things := c.container.GetThings()
+		unsubscribe = c.bus.AddThingAddedSubscription(c.onThingAdded)
 		for _, t := range things {
 			c.addThing(t)
 		}
 	} else {
 		t := c.container.GetThing(c.thingId)
-		unsubscribe = c.bus.AddThingAddedSubscription(c.onThingAdded)
 		if t == nil {
 			return
 		}
@@ -54,7 +54,9 @@ func (c *wsClint) handle() {
 			return
 		}
 		if err != nil {
-			unsubscribe()
+			if unsubscribe != nil {
+				unsubscribe()
+			}
 			return
 		}
 		go c.handleMessage(data)
