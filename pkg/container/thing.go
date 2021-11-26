@@ -48,14 +48,34 @@ func NewThingFromString(id string, description string) (thing *Thing, err error)
 	if t.SelectedCapability == "" {
 		t.SelectedCapability = t.AtType[0]
 	}
-
 	if !util.In(t.SelectedCapability, t.AtType) {
 		return nil, fmt.Errorf("selectedCapability err")
 	}
 	return &t, nil
 }
 
+func (t *Thing) SetSelectedCapability(selectedCapability string) bool {
+	for _, s := range t.AtType {
+		if s == selectedCapability {
+			t.SelectedCapability = selectedCapability
+			return true
+		}
+	}
+	return false
+}
+
+func (t *Thing) SetTitle(title string) bool {
+	if t.Title == title {
+		return false
+	}
+	t.Title = title
+	return true
+}
+
 func (t *Thing) setConnected(connected bool) {
+	if t.Connected == connected {
+		return
+	}
 	t.Connected = connected
 	t.container.bus.PublishThingConnected(t.GetId(), connected)
 }

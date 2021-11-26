@@ -8,8 +8,6 @@
 /server/static/*.html
 /server/static/*.js
 !/server/static/*.go
-/cmd/miot*
-/miot/
 ##git submodule updata --init --recursive
 /configs/addons
 /configs/config

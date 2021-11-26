@@ -6,7 +6,7 @@ import (
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
-	"github.com/tidwall/gjson"
+	json "github.com/json-iterator/go"
 	"net/http"
 	"strings"
 )
@@ -129,15 +129,14 @@ func (tc *thingsController) handleSetThing(c *fiber.Ctx) error {
 	if thing == nil {
 		return fiber.NewError(http.StatusInternalServerError, "Failed to retrieve thing(%s)", thingId)
 	}
-
-	title := strings.Trim(gjson.GetBytes(c.Body(), "title").String(), " ")
+	title := strings.Trim(json.Get(c.Body(), "title").ToString(), " ")
 	if len(title) == 0 || title == "" {
 		return fiber.NewError(http.StatusInternalServerError, "Invalid title")
 	}
-
-	selectedCapability := strings.Trim(gjson.GetBytes(c.Body(), "selectedCapability").String(), " ")
+	thing.SetTitle(title)
+	selectedCapability := strings.Trim(json.Get(c.Body(), "selectedCapability").ToString(), " ")
 	if selectedCapability != "" {
-		thing.SelectedCapability = selectedCapability
+		thing.SetSelectedCapability(selectedCapability)
 	}
 	return c.Status(fiber.StatusOK).SendString("")
 }
