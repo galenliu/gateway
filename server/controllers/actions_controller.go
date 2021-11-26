@@ -1,62 +1,80 @@
 package controllers
 
 import (
+	"fmt"
+	"github.com/galenliu/gateway/pkg/bus"
+	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
 )
 
 type ActionsController struct {
-	logger logging.Logger
-	model  *models.ActionsModel
+	logger         logging.Logger
+	thingContainer *container.ThingsContainer
+	model          *models.ActionsModel
+	manager        models.ActionsManager
+	bus            *bus.Bus
 }
 
-func NewActionsController(model *models.ActionsModel, log logging.Logger) *ActionsController {
+func NewActionsController(model *models.ActionsModel, thing *container.ThingsContainer, manager models.ActionsManager, bus *bus.Bus, log logging.Logger) *ActionsController {
 	return &ActionsController{
-		logger: log,
-		model:  model,
+		logger:         log,
+		manager:        manager,
+		thingContainer: thing,
+		model:          model,
+		bus:            bus,
 	}
 }
 
 func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 
 	var thingId = c.FormValue("thingId", "")
-	var actionBody map[string]interface{}
+	var actionBody map[string]map[string]interface{}
 	err := c.BodyParser(&actionBody)
-	if err != nil {
-		return c.SendStatus(fiber.StatusBadRequest)
+
+	if err != nil || len(actionBody) != 1 {
+		err := fmt.Errorf("incorrect number of parameters. body:  %s", c.Body())
+		a.logger.Error(err.Error())
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
-	if len(actionBody) > 1 {
-		return c.SendStatus(fiber.StatusBadRequest)
-	}
+
 	var actionName string
-	var actionParams interface{}
-	for name, a := range actionBody {
-		actionName = name
-		actionParams = a
+	var actionParams map[string]interface{}
+	for a, params := range actionBody {
+		actionName = a
+		actionParams = params
 	}
-	if actionName == "" || actionParams == nil {
+
+	i, ok := actionParams["input"]
+	if actionName == "" || actionParams == nil || !ok {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
-	var m *models.Action
+	input, ok := i.(map[string]interface{})
+	if !ok {
+		return c.SendStatus(fiber.StatusBadRequest)
+	}
+
+	var thing *container.Thing
 	if thingId != "" {
-
-	} else {
-		inputParams, ok := actionParams.(map[string]interface{})
-		if !ok {
-			return c.SendStatus(fiber.StatusBadRequest)
+		thing = a.thingContainer.GetThing(thingId)
+		if thing == nil {
+			err := fmt.Errorf("thing does not exist: %s", thingId)
+			a.logger.Error(err.Error())
+			return fiber.NewError(fiber.StatusNotFound, err.Error())
 		}
-		input, ok := inputParams["input"].(map[string]interface{})
-		if !ok {
-			return c.SendStatus(fiber.StatusBadRequest)
-		}
-		m = models.NewActionModel(actionName, input, a.logger)
 	}
-	err = a.model.Add(m)
+	actionModel := models.NewActionModel(actionName, input, thing, a.bus, a.logger)
+	if thing != nil {
+		err := a.manager.RequestAction(thing.GetId(), actionModel.GetName(), input)
+		if err != nil {
+			return fiber.NewError(fiber.StatusNotFound, err.Error())
+		}
+	}
+	err = a.model.Add(actionModel)
 	if err != nil {
-		return err
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
 	}
-
 	return c.Status(fiber.StatusCreated).Send(nil)
 }
 

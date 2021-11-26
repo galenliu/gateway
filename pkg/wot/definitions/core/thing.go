@@ -12,6 +12,10 @@ import (
 type ThingInterface interface {
 }
 
+type ThingProperties map[string]PropertyAffordance
+type ThingActions map[string]ActionAffordance
+type ThingEvents map[string]EventAffordance
+
 type Thing struct {
 	AtContext    controls.URI      `json:"@context,omitempty"` //mandatory
 	Title        string            `json:"title,omitempty"`    //mandatory
@@ -28,9 +32,9 @@ type Thing struct {
 	Created  *controls.DataTime `json:"created,omitempty"`
 	Modified *controls.DataTime `json:"modified,omitempty"`
 
-	Properties map[string]PropertyAffordance `json:"properties,omitempty"`
-	Actions    map[string]ActionAffordance   `json:"actions,omitempty"`
-	Events     map[string]EventAffordance    `json:"events,omitempty"`
+	Properties ThingProperties `json:"properties,omitempty"`
+	Actions    ThingActions    `json:"actions,omitempty"`
+	Events     ThingEvents     `json:"events,omitempty"`
 
 	Links []controls.Link `json:"links,omitempty"`
 	Forms []controls.Form `json:"forms,omitempty"`
@@ -74,7 +78,7 @@ func NewThingFromString(description string) (thing *Thing) {
 		t.Actions = make(map[string]ActionAffordance)
 		for name, data := range actionMap {
 			action := NewActionAffordanceFromString(data)
-			t.Actions[name] = action
+			t.Actions[name] = *action
 		}
 		t.Forms = append(t.Forms, controls.Form{Href: controls.URI(string(t.Id + constant.ActionsPath))})
 	}
@@ -83,7 +87,7 @@ func NewThingFromString(description string) (thing *Thing) {
 		t.Events = make(map[string]EventAffordance)
 		for name, data := range eventMap {
 			event := NewEventAffordanceFromString(data)
-			t.Events[name] = event
+			t.Events[name] = *event
 		}
 		t.Forms = append(t.Forms, controls.Form{Href: controls.URI(string(t.Id + constant.ActionsPath))})
 	}
@@ -100,5 +104,9 @@ func (t *Thing) GetId() string {
 }
 
 func (t *Thing) GetURI() string {
+	return t.Id.GetURI()
+}
+
+func (t *Thing) GetHref() string {
 	return t.Id.GetURI()
 }

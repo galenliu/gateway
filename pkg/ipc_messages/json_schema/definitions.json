@@ -1,0 +1,706 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/WebThingsIO/gateway-addon-ipc-schema/master/messages/definitions.json",
+  "definitions": {
+    "NotificationLevel": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2
+      ]
+    },
+    "any": {
+      "title": "Any",
+      "oneOf": [
+        {"type": "null"},
+        {"type": "boolean"},
+        {"type": "object"},
+        {"type": "array"},
+        {"type": "number"},
+        {"type": "string"}
+      ]
+    },
+    "device": {
+      "type": "object",
+      "title": "Device",
+      "description": "Description of the device",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "@context": {
+          "type": "string",
+          "title": "Device context",
+          "description": "Context of the device"
+        },
+        "@type": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "title": "Device types",
+            "description": "Types of the device"
+          }
+        },
+        "id": {
+          "type": "string",
+          "title": "Device ID",
+          "description": "ID of the device"
+        },
+        "title": {
+          "type": "string",
+          "title": "Device title",
+          "description": "Title of the Device"
+        },
+        "description": {
+          "type": "string",
+          "title": "Device Description",
+          "description": "Description of the device"
+        },
+        "properties": {
+          "type": "object",
+          "patternProperties": {
+            ".*": {
+              "$ref": "#/definitions/property"
+            }
+          }
+        },
+        "actions": {
+          "type": "object",
+          "patternProperties": {
+            ".*": {
+              "$ref": "#/definitions/action"
+            }
+          }
+        },
+        "events": {
+          "type": "object",
+          "patternProperties": {
+            ".*": {
+              "$ref": "#/definitions/event"
+            }
+          }
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/link"
+          }
+        },
+        "baseHref": {
+          "type": "string",
+          "title": "Device base href",
+          "description": "The base href of the device"
+        },
+        "pin": {
+          "$ref": "#/definitions/pin"
+        },
+        "credentialsRequired": {
+          "type": "boolean",
+          "title": "Device credentials required",
+          "description": "If credentials are required"
+        }
+      }
+    },
+    "deviceWithoutId": {
+      "type": "object",
+      "title": "Device without id",
+      "description": "Description of the device",
+      "properties": {
+        "@context": {
+          "type": "string",
+          "title": "Device context",
+          "description": "Context of the device"
+        },
+        "@type": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "title": "Device types",
+            "description": "Types of the device"
+          }
+        },
+        "title": {
+          "type": "string",
+          "title": "Device title",
+          "description": "Title of the Device"
+        },
+        "description": {
+          "type": "string",
+          "title": "Device Description",
+          "description": "Description of the device"
+        },
+        "properties": {
+          "type": "object",
+          "patternProperties": {
+            ".*": {
+              "$ref": "#/definitions/property"
+            }
+          }
+        },
+        "actions": {
+          "type": "object",
+          "patternProperties": {
+            ".*": {
+              "$ref": "#/definitions/action"
+            }
+          }
+        },
+        "events": {
+          "type": "object",
+          "patternProperties": {
+            ".*": {
+              "$ref": "#/definitions/event"
+            }
+          }
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/link"
+          }
+        },
+        "baseHref": {
+          "type": "string",
+          "title": "Device base href",
+          "description": "The base href of the device"
+        },
+        "pin": {
+          "$ref": "#/definitions/pin"
+        },
+        "credentialsRequired": {
+          "type": "boolean",
+          "title": "Device credentials required",
+          "description": "If credentials are required"
+        }
+      }
+    },
+    "property": {
+      "type": "object",
+      "title": "Property",
+      "description": "Description of the Property",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "@type": {
+          "type": "string",
+          "title": "Property type",
+          "description": "The type of the property"
+        },
+        "name": {
+          "type": "string",
+          "title": "Property name",
+          "description": "The name of the property"
+        },
+        "title": {
+          "type": "string",
+          "title": "Property title",
+          "description": "The title of the property"
+        },
+        "description": {
+          "type": "string",
+          "title": "Property Description",
+          "description": "Description of the property"
+        },
+        "forms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/form_element_property"
+          }
+        },
+        "type": {
+          "type": "string",
+          "title": "Property value type",
+          "description": "The type of the property value",
+          "enum": [
+            "null",
+            "boolean",
+            "object",
+            "array",
+            "number",
+            "integer",
+            "string"
+          ]
+        },
+        "unit": {
+          "type": "string",
+          "title": "Property unit",
+          "description": "The unit of the property"
+        },
+        "minimum": {
+          "type": "number",
+          "title": "Property minimum value",
+          "description": "The minimum value of the property"
+        },
+        "maximum": {
+          "type": "number",
+          "title": "Property maximum value",
+          "description": "The maximum value of the property"
+        },
+        "multipleOf": {
+          "type": "number",
+          "title": "Property value precision",
+          "description": "The precision of the value"
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "title": "Property values enum",
+            "description": "The possible values of the property",
+            "$ref": "#/definitions/any"
+          }
+        },
+        "readOnly": {
+          "type": "boolean",
+          "title": "Property read-only",
+          "description": "If the property is read-only"
+        },
+        "value": {
+          "$ref": "definitions.json#/definitions/any",
+          "title": "Property value",
+          "description": "The value of the property"
+        }
+      }
+    },
+    "link": {
+      "type": "object",
+      "title": "Link",
+      "description": "A link",
+      "required": [
+        "href"
+      ],
+      "properties": {
+        "href": {
+          "type": "string",
+          "title": "Link href",
+          "description": "The href of the link"
+        },
+        "rel": {
+          "type": "string",
+          "title": "Link rel",
+          "description": "The type of the relationship"
+        },
+        "mediaType": {
+          "type": "string",
+          "title": "Link media type",
+          "description": "The media type of the link"
+        }
+      }
+    },
+    "pin": {
+      "type": "object",
+      "title": "Device Pin",
+      "description": "The pin of the device",
+      "required": [
+        "required"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean",
+          "title": "Pin required",
+          "description": "If the pin is required"
+        },
+        "pattern": {
+          "type": "string",
+          "title": "Pin pattern",
+          "description": "The pattern of the pin"
+        }
+      }
+    },
+    "action": {
+      "type": "object",
+      "title": "Action",
+      "description": "Description of the Action",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "title": "Action type",
+          "description": "The type of the action"
+        },
+        "title": {
+          "type": "string",
+          "title": "Action title",
+          "description": "The title of the Action"
+        },
+        "description": {
+          "type": "string",
+          "title": "Action Description",
+          "description": "Description of the Action"
+        },
+        "forms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/form_element_action"
+          }
+        },
+        "input": {
+          "$ref": "#/definitions/actionInput"
+        }
+      }
+    },
+    "actionInput": {
+      "title": "Action input",
+      "anyOf": [
+        {
+          "type": "object",
+          "title": "Object action input",
+          "description": "An object action input",
+          "required": [
+            "type",
+            "properties"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "title": "Object input type",
+              "description": "The type of the input",
+              "enum": [
+                "object"
+              ]
+            },
+            "properties": {
+              "type": "object",
+              "title": "Action input properties",
+              "description": "A map of action input properties",
+              "patternProperties": {
+                ".*": {
+                  "$ref": "#/definitions/actionInputProperty"
+                }
+              }
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/actionInputProperty"
+        }
+      ]
+    },
+    "actionInputProperty": {
+      "type": "object",
+      "title": "Action input property",
+      "description": "An action input property",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "title": "Input property type",
+          "description": "The type of the input property"
+        },
+        "type": {
+          "type": "string",
+          "title": "Input property value type",
+          "description": "The type of the input property value",
+          "enum": [
+            "null",
+            "boolean",
+            "object",
+            "array",
+            "number",
+            "integer",
+            "string"
+          ]
+        },
+        "unit": {
+          "type": "string",
+          "title": "Input property unit",
+          "description": "The unit of the input property"
+        },
+        "minimum": {
+          "type": "number",
+          "title": "Input property minimum value",
+          "description": "The minimum value of the input property"
+        },
+        "maximum": {
+          "type": "number",
+          "title": "Input property maximum value",
+          "description": "The maximum value of the input property"
+        },
+        "multipleOf": {
+          "type": "number",
+          "title": "Input property value precision",
+          "description": "The precision of the value"
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "title": "Property values enum",
+            "description": "The possible values of the input property",
+            "$ref": "#/definitions/any"
+          }
+        }
+      }
+    },
+    "event": {
+      "type": "object",
+      "title": "Event",
+      "description": "Description of the event",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "title": "Event type",
+          "description": "The type of the event"
+        },
+        "name": {
+          "type": "string",
+          "title": "Event name",
+          "description": "The name of the event"
+        },
+        "title": {
+          "type": "string",
+          "title": "Event title",
+          "description": "The title of the event"
+        },
+        "description": {
+          "type": "string",
+          "title": "Event Description",
+          "description": "Description of the event"
+        },
+        "forms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/form_element_event"
+          }
+        },
+        "type": {
+          "type": "string",
+          "title": "Event value type",
+          "description": "The type of the event value",
+          "enum": [
+            "null",
+            "boolean",
+            "object",
+            "array",
+            "number",
+            "integer",
+            "string"
+          ]
+        },
+        "unit": {
+          "type": "string",
+          "title": "Event unit",
+          "description": "The unit of the event"
+        },
+        "minimum": {
+          "type": "number",
+          "title": "Event minimum value",
+          "description": "The minimum value of the event"
+        },
+        "maximum": {
+          "type": "number",
+          "title": "Event maximum value",
+          "description": "The maximum value of the event"
+        },
+        "multipleOf": {
+          "type": "number",
+          "title": "Event value precision",
+          "description": "The precision of the value"
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "title": "Property values enum",
+            "description": "The possible values of the property",
+            "$ref": "#/definitions/any"
+          }
+        }
+      }
+    },
+    "anyUri": {
+      "type": "string"
+    },
+    "security": {
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "scopes": {
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "form_element":{
+      "title": "Form",
+      "type":"object",
+      "properties": {
+        "href": {
+          "$ref": "#/definitions/anyUri"
+        },
+        "contentType": {
+          "type": "string"
+        },
+        "contentCoding": {
+          "type": "string"
+        },
+        "subprotocol": {
+          "type": "string"
+        },
+        "security": {
+          "$ref": "#/definitions/security"
+        },
+        "scopes": {
+          "$ref": "#/definitions/scopes"
+        },
+        "response": {
+          "type": "object",
+          "properties": {
+            "contentType": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": [
+        "href"
+      ]
+    },
+    "form_element_property": {
+      "title": "PropertyForm",
+      "allOf":[
+        { "$ref": "#/definitions/form_element" },
+        {
+          "properties": {
+            "op": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "readproperty",
+                    "writeproperty",
+                    "observeproperty",
+                    "unobserveproperty"
+                  ]
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "readproperty",
+                      "writeproperty",
+                      "observeproperty",
+                      "unobserveproperty"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "form_element_action": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/form_element"
+        },
+        {
+          "properties": {
+            "op": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "invokeaction"
+                  ]
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "invokeaction"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "form_element_event": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/form_element"
+        },
+        {
+          "properties": {
+            "op": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "subscribeevent",
+                    "unsubscribeevent"
+                  ]
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "subscribeevent",
+                      "unsubscribeevent"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "form_element_root": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/form_element"
+        },
+        {
+          "properties": {
+            "op": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "readallproperties",
+                    "writeallproperties",
+                    "readmultipleproperties",
+                    "writemultipleproperties"
+                  ]
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "readallproperties",
+                      "writeallproperties",
+                      "readmultipleproperties",
+                      "writemultipleproperties"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

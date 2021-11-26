@@ -4,7 +4,6 @@ import (
 	schema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
-	"github.com/tidwall/gjson"
 )
 
 type InteractionAffordance struct {
@@ -20,15 +19,13 @@ type InteractionAffordance struct {
 func NewInteractionAffordanceFromString(description string) *InteractionAffordance {
 	var i = InteractionAffordance{}
 	data := []byte(description)
-	if gjson.Get(description, "uriVariables").Exists() {
-		m := gjson.Get(description, "uriVariables").Map()
-		if len(m) > 0 {
-			i.UriVariables = make(map[string]*schema.DataSchema)
-			for k, v := range m {
-				i.UriVariables[k] = schema.NewDataSchemaFromString(v.String())
-			}
-		}
+
+	var uriVariables map[string]*schema.DataSchema
+	json.Get(data, "uriVariables").ToVal(&uriVariables)
+	if uriVariables != nil {
+		i.UriVariables = uriVariables
 	}
+
 	i.AtType = controls.JSONGetString(data, "@type", "")
 	i.Title = controls.JSONGetString(data, "title", "")
 	i.Titles = controls.JSONGetMap(data, "titles")

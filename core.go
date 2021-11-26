@@ -2,10 +2,10 @@ package gateway
 
 import (
 	"context"
-	"github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/db"
+	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin"
@@ -42,7 +42,7 @@ func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gat
 	g := &Gateway{}
 
 	g.config = config
-	u := &rpc.UsrProfile{
+	u := &messages.PluginRegisterResponseJsonDataUserProfile{
 		BaseDir:    g.config.BaseDir,
 		DataDir:    path.Join(g.config.BaseDir, "data"),
 		AddonsDir:  path.Join(g.config.BaseDir, "addons"),

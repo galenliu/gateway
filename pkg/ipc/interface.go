@@ -1,16 +1,18 @@
 package ipc
 
-import "github.com/galenliu/gateway-grpc"
+import (
+	messages "github.com/galenliu/gateway/pkg/ipc_messages"
+)
 
 type Clint interface {
-	WriteMessage(message *rpc.BaseMessage) error
-	ReadMessage() (*rpc.BaseMessage, error)
+	WriteMessage(message messages.MessageType, data interface{}) error
+	ReadMessage() (messages.MessageType, interface{}, error)
 	SetPluginId(id string)
 	GetPluginId() string
 }
 
 type PluginHandler interface {
-	OnMsg(mt rpc.MessageType, data []byte)
+	OnMsg(mt messages.MessageType, data interface{})
 }
 
 type PluginServer interface {

@@ -2,9 +2,8 @@ package plugin
 
 import (
 	"context"
-	"github.com/galenliu/gateway-grpc"
-	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/ipc"
+	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
 	json "github.com/json-iterator/go"
 	"io"
@@ -45,6 +44,14 @@ func NewPlugin(pluginId string, manager *Manager, s *PluginsServer, log logging.
 	plugin.restart = false
 	plugin.pluginServer = s
 	return
+}
+
+func (plugin *Plugin) getId() string {
+	return plugin.pluginId
+}
+
+func (plugin *Plugin) getName() string {
+	return plugin.pluginId
 }
 
 func (plugin *Plugin) getAdapter(adapterId string) *Adapter {
@@ -89,116 +96,202 @@ func (plugin *Plugin) getApiHandlers() (apiHandlers []*ApiHandler) {
 	return
 }
 
-func (plugin *Plugin) OnMsg(messageType rpc.MessageType, data []byte) {
+func (plugin *Plugin) OnMsg(mt messages.MessageType, data interface{}) {
 
-	switch messageType {
-	case rpc.MessageType_AdapterAddedNotification:
-		var message rpc.AdapterAddedNotificationMessage_Data
-		err := json.Unmarshal(data, &message)
+	d, err := json.Marshal(data)
+	if err != nil {
+		plugin.logger.Errorf("Bad message : %s", err.Error())
+		return
+	}
+
+	switch mt {
+	case messages.MessageType_AdapterAddedNotification:
+		var message messages.AdapterAddedNotificationJsonData
+		err := json.Unmarshal(d, &message)
 		if err != nil {
-			plugin.logger.Errorf("Bad message : MessageType_AdapterAddedNotification")
+			plugin.logger.Errorf("Bad message : %s", err.Error())
 			return
 		}
 		adapter := NewAdapter(plugin, message.AdapterId, message.Name, message.PackageName, plugin.logger)
-		plugin.adapters.Store(adapter.ID, adapter)
+		plugin.adapters.Store(adapter.id, adapter)
 		plugin.addonManager.addAdapter(adapter)
 		return
 
-	case rpc.MessageType_NotifierAddedNotification:
-		return
-
+	case messages.MessageType_NotifierAddedNotification:
+		var message messages.NotifierAddedNotificationJsonData
+		err := json.Unmarshal(d, &message)
+		if err != nil {
+			plugin.logger.Errorf("Bad message : %s", err.Error())
+			return
+		}
 	}
-	adapterId := json.Get(data, "adapterId").ToString()
+
+	adapterId := json.Get(d, "adapterId").ToString()
 	adapter := plugin.getAdapter(adapterId)
 	if adapter == nil {
 		plugin.logger.Errorf("adapter not found")
 		return
 	}
-
 	// adapter handler
-	switch messageType {
-
-	case rpc.MessageType_OutletNotifyResponse:
-		break
-	case rpc.MessageType_AdapterUnloadResponse:
-		break
-
-	case rpc.MessageType_ApiHandlerApiResponse:
-		break
-
-	case rpc.MessageType_ApiHandlerAddedNotification:
-		return
-	case rpc.MessageType_ApiHandlerUnloadResponse:
-		return
-	case rpc.MessageType_PluginUnloadRequest:
-		plugin.pluginServer.unregisterPlugin(plugin.pluginId)
-		return
-	case rpc.MessageType_PluginErrorNotification:
-		return
-	case rpc.MessageType_DeviceAddedNotification:
-		var deviceDescription addon.Device
-		json.Get(data, "device").ToVal(&deviceDescription)
-		if &deviceDescription == nil {
-			plugin.logger.Errorf("deivce added notification bad message")
+	switch mt {
+	case messages.MessageType_OutletNotifyResponse:
+		var message messages.OutletNotifyRequestJsonData
+		err := json.Unmarshal(d, &message)
+		if err != nil {
+			plugin.logger.Errorf("Bad message : %s", err.Error())
 			return
 		}
-		var device = &Device{
-			adapter: adapter,
-			Device:  &deviceDescription,
+		break
+	case messages.MessageType_AdapterUnloadResponse:
+		var message messages.AdapterUnloadRequestJsonData
+		err := json.Unmarshal(d, &message)
+		if err != nil {
+			plugin.logger.Errorf("Bad message : %s", err.Error())
+			return
 		}
-		adapter.handleDeviceAdded(device)
+		break
+
+	case messages.MessageType_ApiHandlerApiResponse:
+		var message messages.ApiHandlerApiRequestJsonData
+		err := json.Unmarshal(d, &message)
+		if err != nil {
+			plugin.logger.Errorf("Bad message : %s", err.Error())
+			return
+		}
+		break
+
+	case messages.MessageType_ApiHandlerAddedNotification:
+		var message messages.ApiHandlerAddedNotificationJsonData
+		err := json.Unmarshal(d, &message)
+		if err != nil {
+			plugin.logger.Errorf("Bad message : %s", err.Error())
+			return
+		}
+		break
+	case messages.MessageType_ApiHandlerUnloadResponse:
+		var message messages.ApiHandlerUnloadResponseJsonData
+		err := json.Unmarshal(d, &message)
+		if err != nil {
+			plugin.logger.Errorf("Bad message : %s", err.Error())
+			return
+		}
+		break
+
+	case messages.MessageType_PluginUnloadRequest:
+		var message messages.PluginUnloadRequestJsonData
+		err := json.Unmarshal(d, &message)
+		if err != nil {
+			plugin.logger.Errorf("Bad message : %s", err.Error())
+			return
+		}
+		plugin.pluginServer.unregisterPlugin(message.PluginId)
+		break
+
+	case messages.MessageType_PluginErrorNotification:
+		var message messages.PluginErrorNotificationJsonData
+		err := json.Unmarshal(d, &message)
+		if err != nil {
+			plugin.logger.Errorf("Bad message : %s", err.Error())
+			return
+		}
+		break
+
+	case messages.MessageType_DeviceAddedNotification:
+		var message messages.DeviceAddedNotificationJsonData
+		err := json.Unmarshal(d, &message)
+		if err != nil {
+			plugin.logger.Errorf("Bad message : %s", err.Error())
+			return
+		}
+		adapter.handleDeviceAdded(newDevice(message.Device))
 		return
-	}
-
-	// services message
-	{
-
 	}
 
 	//device handler
-	device := plugin.pluginServer.manager.getDevice(json.Get(data, "deviceId").ToString())
+	deviceId := json.Get(d, "deviceId").ToString()
+	device := plugin.pluginServer.manager.getDevice(deviceId)
 	if device == nil {
+		plugin.logger.Errorf("device:%s not found", deviceId)
 		return
 	}
-	switch messageType {
-	case rpc.MessageType_DeviceConnectedStateNotification:
-		connected := json.Get(data, "connected").ToBool()
-		device.connectedNotify(connected)
-
-	case rpc.MessageType_DeviceRequestActionResponse:
-		break
-	case rpc.MessageType_DeviceRemoveActionResponse:
-		break
-	case rpc.MessageType_DeviceSetCredentialsResponse:
-		break
-	case rpc.MessageType_DevicePropertyChangedNotification:
-		var property addon.Property
-		json.Get(data, "property").ToVal(&property)
-		if &property == nil {
-			plugin.logger.Errorf("device property changed notification bad message")
+	switch mt {
+	case messages.MessageType_DeviceConnectedStateNotification:
+		var message messages.DeviceConnectedStateNotificationJsonData
+		err := json.Unmarshal(d, &message)
+		if err != nil {
+			plugin.logger.Errorf("Bad message : %s", err.Error())
 			return
 		}
-		device.notifyValueChanged(&property)
+		device.notifyDeviceConnected(message.Connected)
+		break
 
-	case rpc.MessageType_AdapterRemoveDeviceResponse:
+	case messages.MessageType_DeviceRequestActionResponse:
+		var message messages.DeviceRequestActionResponseJsonData
+		err := json.Unmarshal(d, &message)
+		if err != nil {
+			plugin.logger.Errorf("Bad message : %s", err.Error())
+			return
+		}
+		break
+	case messages.MessageType_DeviceRemoveActionResponse:
+		var message messages.DeviceRemoveActionResponseJsonData
+		err := json.Unmarshal(d, &message)
+		if err != nil {
+			plugin.logger.Errorf("Bad message : %s", err.Error())
+			return
+		}
+		break
+	case messages.MessageType_DeviceSetCredentialsResponse:
+		var message messages.DeviceSetCredentialsRequestJsonData
+		err := json.Unmarshal(d, &message)
+		if err != nil {
+			plugin.logger.Errorf("Bad message : %s", err.Error())
+			return
+		}
+		break
+	case messages.MessageType_DevicePropertyChangedNotification:
+		var message messages.DevicePropertyChangedNotificationJsonData
+		err := json.Unmarshal(d, &message)
+		if err != nil {
+			plugin.logger.Errorf("Bad message : %s", err.Error())
+			return
+		}
+		if message.Property.Name == nil || message.Property.Value == nil {
+			plugin.logger.Errorf("Bad message : %s", err.Error())
+			return
+		}
+		var readOnly = false
+		if message.Property.ReadOnly == nil {
+			message.Property.ReadOnly = &readOnly
+		}
+		device.notifyValueChanged(message.Property)
+
+	case messages.MessageType_AdapterRemoveDeviceResponse:
+		var message messages.AdapterRemoveDeviceResponseJsonData
+		err := json.Unmarshal(d, &message)
+		if err != nil {
+			plugin.logger.Errorf("Bad message : %s", err.Error())
+			return
+		}
 		adapter.handleDeviceRemoved(device)
 		return
 	default:
-		plugin.logger.Infof("unkown message : %v", messageType)
+		plugin.logger.Infof("unknown message : %v", mt)
 	}
 	return
 }
 
-func (plugin *Plugin) SendMsg(mt rpc.MessageType, message map[string]interface{}) {
+func (plugin *Plugin) sendMsg(mt messages.MessageType, message map[string]interface{}) {
 	message["pluginId"] = plugin.pluginId
-	data, err := json.Marshal(message)
+	err := plugin.clint.WriteMessage(mt, message)
 	if err != nil {
+		plugin.logger.Infof("plugin %s send err: %s", plugin.pluginId, err.Error())
 		return
 	}
-	err = plugin.clint.WriteMessage(&rpc.BaseMessage{
-		MessageType: mt,
-		Data:        data,
-	})
+}
+
+func (plugin *Plugin) send(mt messages.MessageType, data interface{}) {
+	err := plugin.clint.WriteMessage(mt, data)
 	if err != nil {
 		plugin.logger.Infof("plugin %s send err: %s", plugin.pluginId, err.Error())
 		return
@@ -279,7 +372,7 @@ func (plugin *Plugin) unload() {
 	plugin.logger.Info("unloading plugin %s", plugin.pluginId)
 	plugin.restart = false
 	plugin.unloading = true
-	plugin.SendMsg(rpc.MessageType_PluginUnloadRequest, map[string]interface{}{})
+	plugin.sendMsg(messages.MessageType_PluginUnloadRequest, map[string]interface{}{})
 }
 
 func (plugin *Plugin) unloadComponents() {

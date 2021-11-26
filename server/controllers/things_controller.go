@@ -1,11 +1,9 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/server/models/model"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
 	"github.com/tidwall/gjson"
@@ -21,12 +19,12 @@ type ThingsManager interface {
 }
 
 type thingsController struct {
-	model   model.Container
+	model   *container.ThingsContainer
 	logger  logging.Logger
 	manager ThingsManager
 }
 
-func NewThingsControllerFunc(manager ThingsManager, model container.Container, log logging.Logger) *thingsController {
+func NewThingsControllerFunc(manager ThingsManager, model *container.ThingsContainer, log logging.Logger) *thingsController {
 	tc := &thingsController{}
 	tc.manager = manager
 	tc.model = model
@@ -36,11 +34,10 @@ func NewThingsControllerFunc(manager ThingsManager, model container.Container, l
 
 // POST /things
 func (tc *thingsController) handleCreateThing(c *fiber.Ctx) error {
-
 	tc.logger.Infof("Post /thing,Body: %s", c.Body())
-	des, e := tc.model.CreateThing(c.Body())
-	if e != nil {
-		return c.SendStatus(fiber.StatusBadRequest)
+	des, err := tc.model.CreateThing(c.Body())
+	if err != nil {
+		return err
 	}
 	return c.Status(fiber.StatusOK).JSON(des)
 }
@@ -50,9 +47,9 @@ func (tc *thingsController) handleDeleteThing(c *fiber.Ctx) error {
 	thingId := c.Params("thingId")
 	err := tc.model.RemoveThing(thingId)
 	if err != nil {
-		return fiber.NewError(http.StatusInternalServerError, err.Error())
+		return err
 	}
-	tc.logger.Info(fmt.Sprintf("Successfully deleted %v from database", thingId))
+	tc.logger.Infof("Successfully deleted %v from database", thingId)
 	return c.SendStatus(http.StatusNoContent)
 }
 
@@ -92,22 +89,19 @@ func (tc *thingsController) handlePatchThing(c *fiber.Ctx) error {
 	return nil
 }
 
-//PUT /:thing/properties/:propertyName
+//PUT /:thing/a/:propertyName
 func (tc *thingsController) handleSetProperty(c *fiber.Ctx) error {
-
 	thingId := c.Params("thingId")
 	propName := c.Params("*")
 	if thingId == "" || propName == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid params")
 	}
 	value := c.Body()
-	v, e := tc.manager.SetPropertyValue(thingId, propName, value)
-	if e != nil {
-		tc.logger.Error("Failed set thing(%s) property:(%s) value:(%s),err:(%s)", thingId, propName, value, e.Error())
-		return fiber.NewError(fiber.StatusGatewayTimeout, e.Error())
+	v, err := tc.model.SetThingProperty(thingId, propName, value)
+	if err != nil {
+		return err
 	}
-	data := map[string]interface{}{propName: v}
-	return c.Status(fiber.StatusOK).JSON(data)
+	return c.Status(fiber.StatusOK).JSON(v)
 }
 
 func (tc *thingsController) handleGetPropertyValue(c *fiber.Ctx) error {

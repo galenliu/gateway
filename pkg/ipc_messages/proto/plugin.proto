@@ -1,0 +1,9 @@
+syntax = "proto3";
+import "message.proto";
+option go_package = "../../gateway-ipc_messages;rpc";
+
+service PluginServer {
+  // Sends another greeting
+  rpc PluginHandler (stream BaseMessage) returns (stream BaseMessage) {}
+}
+

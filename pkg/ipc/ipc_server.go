@@ -2,10 +2,9 @@ package ipc
 
 import (
 	"github.com/fasthttp/websocket"
-	"github.com/galenliu/gateway-grpc"
+	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
-	json "github.com/json-iterator/go"
 	"net/http"
 	"sync"
 	"time"
@@ -27,10 +26,10 @@ type IPCServer struct {
 	port         string
 	locker       *sync.Mutex
 	pluginServer PluginServer
-	userProfile  *rpc.UsrProfile
+	userProfile  *messages.PluginRegisterResponseJsonDataUserProfile
 }
 
-func NewIPCServer(pluginServer PluginServer, port string, userProfile *rpc.UsrProfile, log logging.Logger) *IPCServer {
+func NewIPCServer(pluginServer PluginServer, port string, userProfile *messages.PluginRegisterResponseJsonDataUserProfile, log logging.Logger) *IPCServer {
 	ipc := &IPCServer{}
 	ipc.pluginServer = pluginServer
 	ipc.logger = log
@@ -87,12 +86,12 @@ func (s *IPCServer) readLoop(conn *websocket.Conn) {
 		}
 	}()
 	for {
-		message, err := clint.ReadMessage()
+		mt, data, err := clint.ReadMessage()
 		if err != nil {
 			s.logger.Errorf("%s read err : %s", clint.GetPluginId(), err.Error())
 			return
 		}
-		pluginHandler.OnMsg(message.MessageType, message.Data)
+		pluginHandler.OnMsg(mt, data)
 	}
 }
 
@@ -102,43 +101,42 @@ type connection struct {
 	pluginId string
 }
 
-func (c *connection) WriteMessage(message *rpc.BaseMessage) error {
-	baseMessage := BaseMessage{MessageType: int(message.MessageType)}
-	err := json.Unmarshal(message.Data, &baseMessage.Data)
-	if err != nil {
-		return err
+func (c *connection) WriteMessage(mt messages.MessageType, data interface{}) error {
+	message := struct {
+		MessageType messages.MessageType `json:"messageType"`
+		Data        interface{}          `json:"data"`
+	}{
+		MessageType: mt,
+		Data:        data,
 	}
-	err = c.Conn.WriteJSON(baseMessage)
+	err := c.Conn.WriteJSON(message)
 	if err != nil {
 		return err
 	}
 	if c.GetPluginId() == "" {
-		c.logger.Debugf("PluginServer send :%s", util.JsonIndent(baseMessage))
+		c.logger.Debugf("PluginServer send :%s", util.JsonIndent(message))
 	} else {
-		c.logger.Debugf("PluginServer send to &s:%s", c.GetPluginId(), util.JsonIndent(baseMessage))
+		c.logger.Debugf("PluginServer send to %s:%s", c.GetPluginId(), util.JsonIndent(message))
 	}
 	return nil
 }
 
-func (c *connection) ReadMessage() (*rpc.BaseMessage, error) {
+func (c *connection) ReadMessage() (messages.MessageType, interface{}, error) {
 	//var msg rpc.BaseMessage
-	var msg BaseMessage
-	_, data, err := c.Conn.ReadMessage()
-	err = json.Unmarshal(data, &msg)
+	var msg struct {
+		MessageType messages.MessageType `json:"messageType"`
+		Data        interface{}          `json:"data"`
+	}
+	err := c.Conn.ReadJSON(&msg)
 	if err != nil {
-		return nil, err
+		return 0, nil, err
 	}
 	if c.GetPluginId() == "" {
 		c.logger.Debugf("IPC register :%s", util.JsonIndent(msg))
 	} else {
 		c.logger.Debugf("IPC server read %s: %s", c.GetPluginId(), util.JsonIndent(msg))
 	}
-
-	marshal, err := json.Marshal(msg.Data)
-	if err != nil {
-		return nil, err
-	}
-	return &rpc.BaseMessage{MessageType: rpc.MessageType(msg.MessageType), Data: marshal}, nil
+	return msg.MessageType, msg.Data, nil
 }
 
 func (c *connection) SetPluginId(id string) {

@@ -6,6 +6,7 @@ import (
 )
 
 type PropertyAffordance interface {
+	IsReadOnly() bool
 }
 
 func NewPropertyAffordanceFromString(description string) PropertyAffordance {

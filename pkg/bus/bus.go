@@ -28,11 +28,11 @@ func (b *Bus) PublishConnected(thingId string, connected bool) {
 	b.Publish(thingId+"."+constant.Connected, connected)
 }
 
-func (b *Bus) PublishActionStatus(action *addon.Action) {
+func (b *Bus) PublishActionStatus(action interface{}) {
 	b.Publish(constant.ActionStatus, action)
 }
 
-func (b *Bus) PublishPropertyChanged(thingId string, property *addon.Property) {
+func (b *Bus) PublishPropertyChanged(thingId string, property *addon.PropertyDescription) {
 	b.Publish(thingId+"."+constant.PropertyChanged, property)
 }
 
@@ -98,14 +98,14 @@ func (b *Bus) AddModifiedSubscription(thingId string, fn func()) func() {
 	}
 }
 
-func (b *Bus) AddPropertyChangedSubscription(thingId string, fn func(p *addon.Property)) func() {
+func (b *Bus) AddPropertyChangedSubscription(thingId string, fn func(p *addon.PropertyDescription)) func() {
 	b.subscribe(thingId+"."+constant.PropertyChanged, fn)
 	return func() {
 		b.unsubscribe(thingId+"."+constant.PropertyChanged, fn)
 	}
 }
 
-func (b *Bus) AddActionStatusSubscription(f func(action *addon.Action)) func() {
+func (b *Bus) AddActionStatusSubscription(f func(action *addon.ActionDescription)) func() {
 	b.subscribe(constant.ActionStatus, f)
 	return func() {
 		b.unsubscribe(constant.ActionStatus, f)

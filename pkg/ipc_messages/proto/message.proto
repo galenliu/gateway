@@ -1,0 +1,259 @@
+syntax = "proto3";
+import "any.proto";
+import "messageType.proto";
+option go_package = "../../gateway-ipc_messages;rpc";
+
+
+// The request message containing the user's name.
+message BaseMessage {
+  messageType messageType = 1;
+  bytes data = 2;
+}
+
+
+message NotifierAddedNotificationMessage {
+  messageType messageType = 1;
+  Data data = 3;
+  message Data{
+    string pluginId = 2;
+    string  notifierId = 3;
+    string name = 4;
+    string  packageName = 5;
+  }
+}
+
+
+message PluginRegisterRequestMessage {
+  messageType messageType = 1;
+  Data data = 2;
+  message Data{
+    string pluginId = 11;
+  }
+}
+
+message PluginRegisterResponseMessage{
+  messageType messageType = 1;
+  Data data = 2;
+  message Data {
+    string pluginId = 1;
+    string gatewayVersion = 2;
+    UsrProfile userProfile = 3;
+    Preferences preferences = 4;
+  }
+}
+
+message Preferences{
+  string language = 1;
+  Units units = 2;
+  message Units{
+    string temperature = 1;
+  }
+}
+
+message UsrProfile{
+  string addonsDir = 1;
+  string  baseDir = 2 ;
+  string  configDir = 3;
+  string  dataDir = 4 ;
+  string  mediaDir = 5 ;
+  string  logDir = 6 ;
+  string  gatewayDir = 7 ;
+}
+
+message AdapterAddedNotificationMessage{
+  messageType messageType = 1;
+  Data data = 2;
+  message Data{
+    string pluginId = 1;
+    string adapterId = 2;
+    string name = 3;
+    string packageName = 4;
+  }
+}
+
+message DeviceAddedNotificationMessage{
+  messageType messageType = 1;
+  Data data = 2;
+  message Data{
+    string pluginId = 1;
+    string adapterId = 2;
+    Device device = 3;
+  }
+}
+
+message DevicePropertyChangedNotificationMessage{
+  messageType messageType = 1;
+  Data data = 2;
+  message Data{
+    string pluginId = 1;
+    string adapterId = 2;
+    string deviceId = 3;
+    Property property = 4;
+  }
+}
+
+message  DeviceActionStatusNotificationMessage{
+  messageType messageType = 1;
+  Data data = 2;
+  message Data{
+    string pluginId = 3;
+    string adapterId = 4;
+    string  deviceId = 5;
+    ActionDescription  action = 6;
+  }
+}
+
+
+message DeviceConnectedStateNotificationMessage{
+  messageType messageType = 1;
+  Data data = 2;
+  message Data{
+    string pluginId = 11;
+    string adapterId = 21;
+    string deviceId = 22;
+    bool connected = 23;
+  }
+}
+
+// Device
+message Device{
+  string atContext = 1 [json_name = "@context"];
+  string atType = 2 [json_name = "@type"];
+  string id = 3;
+  string title = 4;
+  string description = 5;
+  repeated   link links = 6;
+  string baseHref = 7;
+  DevicePin pin = 8;
+  map<string, Property> properties = 9;
+  map<string, Action> actions = 10;
+  map<string, Event> events = 11;
+  bool  credentialsRequired = 12;
+}
+
+message Property{
+  string name = 1;
+  string atType = 2 [json_name = "@type"];
+  string  title = 3;
+  string  type = 4;
+  string  unit = 5;
+  string  description = 6;
+  float  minimum = 7;
+  float  maximum = 8;
+  repeated bytes  enum = 9;
+  bool readOnly = 10;
+  float multipleOf = 11;
+  repeated  link links = 103;
+  google.protobuf.Any  value = 12;
+}
+
+message Action{
+  string atType = 1 [json_name = "@type"];
+  string title = 2;
+  string description = 3;
+  repeated link links = 4;
+  optional bytes input = 5;
+}
+
+message Event {
+  string atType = 1[json_name = "@type"];
+  string name = 2;
+  string title = 3;
+  string description = 4;
+  repeated   link links = 5;
+  string type = 6;
+  string unit = 7;
+  float minimum = 8;
+  float maximum = 9;
+  float multipleOf = 10;
+  repeated google.protobuf.Any enum = 11;
+}
+
+
+
+message link {
+  string href = 1;
+  string rel = 2;
+  string mediaType = 3;
+}
+
+message DevicePin{
+  bool required = 1;
+  string  pattern = 2;
+}
+
+message ObjectActionInput{
+  string type = 1;
+  map<string, ActionInputProperty> properties = 2;
+}
+
+message ActionInputProperty{
+  string atType = 1[json_name = "@type"];
+  string type = 2;
+  string unit = 3;
+  float minimum = 4;
+  float maximum = 5;
+  float multipleOf = 6;
+  repeated google.protobuf.Any enum = 7;
+}
+
+message ActionDescription{
+  string id = 1;
+  string name = 2;
+  map<string, Action>  input = 3;
+  string status = 4;
+  string timeRequested = 5;
+  string  timeCompleted = 6;
+}
+
+message EventDescription{
+  string name = 1;
+  google.protobuf.Any data = 2;
+  string  timestamp = 3;
+}
+
+
+
+// Things
+message ThingDescription{
+  string id = 1;
+  string title = 2;
+  string atContext = 3 [json_name = "@context"];
+  string atType = 4 [json_name = "@type"];
+  string description = 5;
+  string base = 6;
+  string baseHref = 7;
+  repeated   link links = 8;
+  DevicePin pin = 9;
+  map<string, Property > properties = 10;
+  map<string, Action > actions = 11;
+  map<string, Event > events = 12;
+  bool  credentialsRequired = 13;
+  bool  floorplanVisibility = 14;
+  uint32 floorplanX = 15;
+  uint32 floorplanY = 16;
+  uint32 layoutIndex = 17;
+  string selectedCapability = 18;
+  string   iconHref = 19;
+  IconData iconData = 20;
+  string  security = 21;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ;
+  SecurityDefinition securityDefinitions = 22;
+  string group_id = 23;
+}
+
+message  IconData {
+  string  data = 1;
+  string mime = 2;
+}
+
+message SecurityDefinition{
+  OAuth2  oauth2_sc = 1;
+}
+
+message OAuth2 {
+  string scheme = 1;
+  string flow = 2;
+  string authorization = 3;
+  string  token = 4;
+  repeated string scopes = 5;
+}

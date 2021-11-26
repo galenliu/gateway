@@ -4,9 +4,9 @@ package plugin
 import (
 	"context"
 	"fmt"
-	rpc "github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/ipc"
+	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
 	json "github.com/json-iterator/go"
 	"sync"
@@ -16,7 +16,6 @@ type PluginsServer struct {
 	Plugins   sync.Map
 	manager   *Manager
 	ipc       *ipc.IPCServer
-	rpc       *ipc.RPCServer
 	closeChan chan struct{}
 	ctx       context.Context
 	logger    logging.Logger
@@ -34,29 +33,29 @@ func NewPluginServer(manager *Manager) *PluginsServer {
 }
 
 func (s *PluginsServer) RegisterPlugin(clint ipc.Clint) (ipc.PluginHandler, error) {
-	message, err := clint.ReadMessage()
+	mt, j, err := clint.ReadMessage()
 	if err != nil {
 		return nil, err
 	}
-	if message.MessageType != rpc.MessageType_PluginRegisterRequest {
+	if mt != messages.MessageType_PluginRegisterRequest {
 		return nil, fmt.Errorf("MessageType need PluginRegisterRequest")
 	}
-	var registerMessage rpc.PluginRegisterRequestMessage_Data
-	err = json.Unmarshal(message.Data, &registerMessage)
+	data, _ := json.Marshal(j)
+	var registerMessage messages.PluginRegisterRequestJsonData
+	err = json.Unmarshal(data, &registerMessage)
 	if err != nil {
-		return nil, fmt.Errorf("message failed err: %s", err.Error())
+		return nil, fmt.Errorf("bad data")
 	}
 
-	responseMessage :=
-		&rpc.PluginRegisterResponseMessage_Data{
-			PluginId:       json.Get(message.Data, "pluginId").ToString(),
-			GatewayVersion: constant.Version,
-			UserProfile:    s.manager.config.UserProfile,
-			Preferences:    s.getPreferences(),
-		}
-	data, _ := json.Marshal(responseMessage)
+	responseData := messages.PluginRegisterResponseJsonData{
+		GatewayVersion: constant.Version,
+		PluginId:       registerMessage.PluginId,
+		Preferences:    *s.getPreferences(),
+		UserProfile:    *s.manager.config.UserProfile,
+	}
+
 	clint.SetPluginId(registerMessage.PluginId)
-	err = clint.WriteMessage(&rpc.BaseMessage{MessageType: rpc.MessageType_PluginRegisterResponse, Data: data})
+	err = clint.WriteMessage(messages.MessageType_PluginRegisterResponse, responseData)
 	if err != nil {
 		return nil, err
 	}
@@ -114,8 +113,13 @@ func (s *PluginsServer) getPlugins() (plugins []*Plugin) {
 	return
 }
 
-func (s *PluginsServer) getPreferences() *rpc.Preferences {
-	r := &rpc.Preferences{Language: "en-US", Units: &rpc.Preferences_Units{Temperature: "degree celsius"}}
+func (s *PluginsServer) getPreferences() *messages.PluginRegisterResponseJsonDataPreferences {
+	r := &messages.PluginRegisterResponseJsonDataPreferences{
+		Language: "en-US",
+		Units: messages.PluginRegisterResponseJsonDataPreferencesUnits{
+			Temperature: "degree celsius",
+		},
+	}
 	lang, err := s.manager.storage.GetSetting("localization.language")
 	if err == nil {
 		r.Language = lang

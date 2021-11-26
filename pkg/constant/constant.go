@@ -81,6 +81,8 @@ const (
 	PrefUnitsTempCelsius = "degree celsius"
 	DegreeCelsius        = "degree celsius"    //摄氏度
 	FahrenheitDegree     = "fahrenheit degree" //华氏度
+
+	DeviceRemovalTimeout = 30000
 )
 
 const (

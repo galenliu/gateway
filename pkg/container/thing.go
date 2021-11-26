@@ -32,7 +32,6 @@ func NewThingFromString(id string, description string) (thing *Thing, err error)
 		return nil, fmt.Errorf("id or description err")
 	}
 	data := []byte(description)
-
 	t := Thing{
 		Thing:               wot.NewThingFromString(description),
 		Pin:                 nil,

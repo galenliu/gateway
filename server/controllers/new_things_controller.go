@@ -34,7 +34,6 @@ func NewNewThingsController(log logging.Logger) *NewThingsController {
 
 func (c *NewThingsController) handleNewThingsWebsocket(m deviceManager, t thingContainer, bus controllerBus) func(conn *websocket.Conn) {
 	return func(conn *websocket.Conn) {
-
 		addonDevices := m.GetMapOfDevices()
 		removeFunc := bus.AddDeviceAddedSubscription(func(device *addon.Device) {
 			_ = c.handlerNewDevice(conn, device)

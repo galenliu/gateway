@@ -32,9 +32,9 @@ type controllerBus interface {
 
 	AddModifiedSubscription(thingId string, fn func()) func()
 
-	AddPropertyChangedSubscription(thingId string, fn func(p *addon.Property)) func()
+	AddPropertyChangedSubscription(thingId string, fn func(p *addon.PropertyDescription)) func()
 
-	AddActionStatusSubscription(func(action *addon.Action)) func()
+	AddActionStatusSubscription(func(action *addon.ActionDescription)) func()
 
 	AddThingEventSubscription(func(event *addon.Event)) func()
 }
@@ -86,14 +86,14 @@ func NewRouter(ctx context.Context, config Config, manager Manager, store Storag
 
 	//models init
 	settingModel := models.NewSettingsModel(config.AddonUrls, store, log)
-	containerModel := container.NewThingsContainerModel(store, bus, log)
+	containerModel := container.NewThingsContainerModel(manager, store, bus, log)
 	jwtMiddleware := middleware.NewJWTMiddleware(store, log)
 	auth := jwtMiddleware.Auth
 	usersModel := models.NewUsersModel(store, log)
 	addonModel := models.NewAddonsModel(store, log)
 	jsonwebtokenModel := models.NewJsonwebtokenModel(settingModel, store, log)
 
-	actionsModel := models.NewActionsModel(manager, bus, log)
+	actionsModel := models.NewActionsModel(manager, containerModel, log)
 	//serviceModel := models.NewServicesModel(deviceManager)
 	//newThingsModel := models.NewNewThingsModel(deviceManager, log)
 
@@ -169,7 +169,15 @@ func NewRouter(ctx context.Context, config Config, manager Manager, store Storag
 		usersGroup.Post("/", usersController.createUser)
 	}
 
-	actionsController := NewActionsController(actionsModel, log)
+	actionsController := NewActionsController(actionsModel, containerModel, manager, bus, log)
+	//actions Controller
+	{
+		actionsGroup := app.Group(constant.ActionsPath)
+		actionsGroup.Post("/", actionsController.handleCreateAction)
+		actionsGroup.Get("/", actionsController.handleGetActions)
+		actionsGroup.Delete("/:actionName/:actionId", actionsController.handleDeleteAction)
+	}
+
 	//Things Controller
 	{
 		thingsController := NewThingsControllerFunc(manager, containerModel, log)
@@ -198,12 +206,6 @@ func NewRouter(ctx context.Context, config Config, manager Manager, store Storag
 
 		thingsGroup.Get("/:thingId"+constant.ActionsPath, actionsController.handleGetActions)
 		thingsGroup.Post("/:thingId"+constant.ActionsPath, actionsController.handleCreateAction)
-
-		//actions Controller
-		actionsGroup := app.Group(constant.ActionsPath)
-		actionsGroup.Post("/", actionsController.handleCreateAction)
-		actionsGroup.Get("/", actionsController.handleGetActions)
-		actionsGroup.Delete("/:actionName/:actionId", actionsController.handleDeleteAction)
 	}
 
 	//NewThing Controller
@@ -236,9 +238,9 @@ func NewRouter(ctx context.Context, config Config, manager Manager, store Storag
 
 	//Settings Controller
 	{
+		settingsGroup := app.Group(constant.SettingsPath)
 		settingsController := NewSettingController(settingModel, log)
-		debugGroup := app.Group(constant.SettingsPath)
-		debugGroup.Get("/addonsInfo", settingsController.handleGetAddonsInfo)
+		settingsGroup.Get("/addonsInfo", settingsController.handleGetAddonsInfo)
 	}
 
 	//Services Controller

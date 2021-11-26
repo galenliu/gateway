@@ -5,9 +5,10 @@ import (
 	"compress/gzip"
 	"context"
 	"fmt"
-	rpc "github.com/galenliu/gateway-grpc"
 	"github.com/galenliu/gateway/pkg/addon"
+	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/container"
+	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
@@ -20,11 +21,6 @@ import (
 	"time"
 )
 
-const (
-	ActionPair   = "pair"
-	ActionUnpair = "unpair"
-)
-
 type managerStore interface {
 	AddonsStore
 	GetSetting(key string) (string, error)
@@ -35,7 +31,7 @@ type Config struct {
 	AttachAddonsDir string
 	IPCPort         string
 	RPCPort         string
-	UserProfile     *rpc.UsrProfile
+	UserProfile     *messages.PluginRegisterResponseJsonDataUserProfile
 }
 
 type Manager struct {
@@ -47,8 +43,8 @@ type Manager struct {
 	services      sync.Map
 	installAddons sync.Map
 	extensions    sync.Map
-	container     container.Container
-	bus           addonBus
+	container     *container.ThingsContainer
+	bus           managerBus
 	addonsLoaded  bool
 	isPairing     bool
 	running       bool
@@ -58,19 +54,22 @@ type Manager struct {
 	actions       map[string]*wot.ActionAffordance
 	storage       managerStore
 	ctx           context.Context
+
+	deferredRemove sync.Map
 }
 
-type addonBus interface {
+type managerBus interface {
 	PublishDeviceAdded(device *addon.Device)
 	PublishDeviceRemoved(deviceId string)
 	PublishPairingTimeout()
-	PublishActionStatus(action *addon.Action)
+	PublishActionStatus(action interface{})
 	PublishConnected(thingId string, connected bool)
 	PublishEvent(event *addon.Event)
-	PublishPropertyChanged(thingId string, property *addon.Property)
+	PublishPropertyChanged(thingId string, property *addon.PropertyDescription)
+	AddPropertyChangedSubscription(thingId string, fn func(p *addon.PropertyDescription)) func()
 }
 
-func NewAddonsManager(ctx context.Context, conf Config, s managerStore, bus addonBus, log logging.Logger) *Manager {
+func NewAddonsManager(ctx context.Context, conf Config, s managerStore, bus managerBus, log logging.Logger) *Manager {
 	am := &Manager{}
 	am.config = conf
 	am.ctx = ctx
@@ -85,34 +84,69 @@ func NewAddonsManager(ctx context.Context, conf Config, s managerStore, bus addo
 	return am
 }
 
-func (m *Manager) GetPropertiesValue(thingId string) (map[string]interface{}, error) {
-	panic("implement me")
+func (m *Manager) RequestAction(deviceId, actionName string, input map[string]interface{}) error {
+	device := m.getDevice(deviceId)
+	if device == nil {
+		return fmt.Errorf("device %s not found", deviceId)
+	}
+	return nil
 }
 
 func (m *Manager) AddNewThings(timeout int) error {
 	if m.pairTask != nil {
 		return fmt.Errorf("add new things already in progress")
 	}
-	m.logger.Info("pairing.....")
 	m.pairTask = make(chan struct{})
 	timeoutChan := time.After(time.Duration(timeout) * time.Millisecond)
 	var handlePairingTimeout = func() {
 		for _, adapter := range m.getAdapters() {
-			adapter.pairing(timeout)
+			adapter.startPairing(timeout)
 		}
 		for {
 			select {
 			case <-timeoutChan:
-				m.logger.Info("pairing timeout")
+				m.logger.Info("startPairing timeout")
 				m.bus.PublishPairingTimeout()
 				m.CancelAddNewThing()
 			case <-m.pairTask:
-				m.logger.Info("pairing cancel")
+				m.logger.Info("startPairing cancel")
 				return
 			}
 		}
 	}
 	go handlePairingTimeout()
+	return nil
+}
+
+func (m *Manager) RemoveThing(deviceId string) error {
+
+	task, ok := m.deferredRemove.LoadOrStore(deviceId, make(chan struct{}))
+	if ok {
+		return fmt.Errorf("remove already progress")
+	}
+	device := m.getDevice(deviceId)
+	if device == nil {
+		m.logger.Infof("thing %s removed", deviceId)
+		return nil
+	}
+	adapter := device.getAdapter()
+	if adapter == nil {
+		return fmt.Errorf("adapter not found")
+	}
+	m.deferredRemove.Store(deviceId, make(chan struct{}))
+	removeTask, _ := task.(chan struct{})
+	timeout := time.After(constant.DeviceRemovalTimeout * time.Millisecond)
+	go func() {
+		select {
+		case <-timeout:
+			m.cancelRemoveThing(deviceId)
+		case <-removeTask:
+			m.deferredRemove.Delete(deviceId)
+			m.logger.Infof("thing %s removed", deviceId)
+			return
+		}
+	}()
+	adapter.removeThing(device)
 	return nil
 }
 
@@ -131,6 +165,25 @@ func (m *Manager) CancelAddNewThing() {
 	return
 }
 
+func (m *Manager) cancelRemoveThing(deviceId string) {
+	task, _ := m.deferredRemove.Load(deviceId)
+	removeTask, ok := task.(chan struct{})
+	if ok {
+		select {
+		case removeTask <- struct{}{}:
+		}
+	}
+	device := m.getDevice(deviceId)
+	if device == nil {
+		return
+	}
+	adapter := device.getAdapter()
+	if adapter == nil {
+		return
+	}
+	adapter.cancelRemoveThing(device)
+}
+
 func (m *Manager) actionNotify(action *addon.Action) {
 	m.bus.PublishActionStatus(action)
 }
@@ -140,7 +193,7 @@ func (m *Manager) eventNotify(event *addon.Event) {
 }
 
 func (m *Manager) addAdapter(adapter *Adapter) {
-	m.adapters.Store(adapter.ID, adapter)
+	m.adapters.Store(adapter.id, adapter)
 }
 
 func (m *Manager) handleDeviceAdded(device *Device) {
@@ -151,19 +204,15 @@ func (m *Manager) handleDeviceAdded(device *Device) {
 
 func (m *Manager) handleDeviceRemoved(device *Device) {
 	m.devices.Delete(device.GetId())
+	task, ok := m.deferredRemove.Load(device.GetId())
+	taskChan := task.(chan struct{})
+	if ok {
+		select {
+		case taskChan <- struct{}{}:
+			m.logger.Infof("handle device removed")
+		}
+	}
 	m.bus.PublishDeviceRemoved(device.GetId())
-}
-
-func (m *Manager) handleSetProperty(deviceId, propName string, setValue interface{}) error {
-	device := m.getDevice(deviceId)
-	if device == nil {
-		return fmt.Errorf("addon Id err")
-	}
-	property := device.GetProperty(propName)
-	if property == nil {
-		return fmt.Errorf("property err")
-	}
-	return nil
 }
 
 func (m *Manager) getAdapter(adapterId string) *Adapter {
@@ -213,17 +262,6 @@ func (m *Manager) getDevice(deviceId string) *Device {
 		return nil
 	}
 	return device
-}
-
-func (m *Manager) getDevices() (devices []*Device) {
-	m.devices.Range(func(key, value interface{}) bool {
-		device, ok := value.(*Device)
-		if ok {
-			devices = append(devices, device)
-		}
-		return true
-	})
-	return
 }
 
 func (m *Manager) getInstallAddon(addonId string) *Addon {
@@ -390,7 +428,7 @@ func (m *Manager) loadAddon(packageId string) {
 }
 
 func (m *Manager) removeAdapter(adapter *Adapter) {
-	m.adapters.Delete(adapter.ID)
+	m.adapters.Delete(adapter.id)
 }
 
 func (m *Manager) getAddonPath(packageId string) string {

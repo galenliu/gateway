@@ -3,82 +3,69 @@ package plugin
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon"
+	"time"
 )
 
+const SetPropertyTimeOut = 3000
+
 func (m *Manager) SetPropertyValue(deviceId, propName string, newValue interface{}) (interface{}, error) {
-
-	//addon, ok := m.devices[deviceId]
-	//if !ok {
-	//	return nil, fmt.Errorf("addon not found")
-	//}
-	//prop := addon.GetProperty(propName)
-	//if prop == nil {
-	//	return nil, fmt.Errorf("property not found")
-	//}
-	//
-	//return prop.SetValue(newValue)
-
-	//go func() {
-	//	err := m.handleSetProperty(deviceId, propName, newValue)
-	//	if err != nil {
-	//		m.logger.Error(err.Error())
-	//	}
-	//}()
-	//closeChan := make(chan struct{})
-	//propChan := make(chan interface{})
-	//time.AfterFunc(3*time.Second, func() {
-	//	closeChan <- struct{}{}
-	//})
-	//changed := func(data []byte) {
-	//	Id := json.Get(data, "deviceId").ToString()
-	//	name := json.Get(data, "name").ToString()
-	//	value := json.Get(data, "value").GetInterface()
-	//	if Id == deviceId && name == propName {
-	//		propChan <- value
-	//	}
-	//}
-	//go m.bus.Subscribe(constant.PropertyChanged, changed)
-	//defer m.bus.Unsubscribe(constant.PropertyChanged, changed)
-	//for {
-	//	select {
-	//	case v := <-propChan:
-	//		return v, nil
-	//	case <-closeChan:
-	//		m.logger.Error("set property(name: %s value: %s) timeout", propName, newValue)
-	//		return nil, fmt.Errorf("timeout")
-	//	}
-	//}
-	return nil, nil
+	device := m.getDevice(deviceId)
+	if device == nil {
+		return nil, fmt.Errorf("device:%s not found", deviceId)
+	}
+	_, ok := device.GetProperty(propName)
+	if !ok {
+		return nil, fmt.Errorf("property:%s not found", propName)
+	}
+	device.setPropertyValue(propName, newValue)
+	var valueChan = make(chan interface{})
+	unsubscribeFunc := m.bus.AddPropertyChangedSubscription(deviceId, func(p *addon.PropertyDescription) {
+		if p.Name == propName {
+			valueChan <- p.Value
+		}
+	})
+	defer func() {
+		unsubscribeFunc()
+		close(valueChan)
+	}()
+	timeOut := time.After(SetPropertyTimeOut * time.Millisecond)
+	for {
+		select {
+		case <-timeOut:
+			return nil, fmt.Errorf("time out")
+		case p := <-valueChan:
+			return p, nil
+		}
+	}
 }
 
-func (m *Manager) GetPropertyValue(deviceId, propName string) (interface{}, error) {
-	//addon, ok := m.devices[deviceId]
-	//if !ok {
-	//	return nil, fmt.Errorf("deviceId (%s)invaild", deviceId)
-	//}
-	//prop := addon.GetProperty(propName)
-	//if prop == nil {
-	//	return nil, fmt.Errorf("propName(%s)invaild", propName)
-	//}
-	//return prop.GetValue(), nil
-	return nil, nil
+func (m *Manager) GetPropertyValue(thingId, propName string) (interface{}, error) {
+	device := m.getDevice(thingId)
+	if device == nil {
+		return nil, fmt.Errorf("device:%s not found", thingId)
+	}
+	p, ok := device.GetProperty(propName)
+	if !ok {
+		return nil, fmt.Errorf("property:%s not found", propName)
+	}
+	return p.GetValue(), nil
 }
 
-//func (m *Manager)GetPropertiesValue(deviceId string)(map[string]interface{},error){
-//	addon, ok := m.devices[deviceId]
-//	if !ok {
-//		return nil, fmt.Errorf("deviceId (%s)invaild", deviceId)
-//	}
-//	addon.GetPropertyValue()
-//
-//}
-
-func (m *Manager) GetDevice(deviceId string) *Device {
-	return nil
+func (m *Manager) GetPropertiesValue(deviceId string) (map[string]interface{}, error) {
+	data := make(map[string]interface{})
+	device := m.getDevice(deviceId)
+	if device == nil {
+		return nil, fmt.Errorf("device:%s not found", deviceId)
+	}
+	propMap := device.GetProperties()
+	for n, p := range propMap {
+		data[n] = p.GetValue()
+	}
+	return data, nil
 }
 
 func (m *Manager) GetMapOfDevices() (devices map[string]*addon.Device) {
-	devs := m.getDevices()
+	devs := m.GetDevices()
 	var devicesMap = make(map[string]*addon.Device)
 	if devs != nil {
 		for _, dev := range devs {
@@ -90,35 +77,14 @@ func (m *Manager) GetMapOfDevices() (devices map[string]*addon.Device) {
 }
 
 func (m *Manager) GetDevices() (devices []*Device) {
-	devs := m.getDevices()
-	if devs != nil {
-		for _, dev := range devs {
-			devices = append(devices, dev)
+	m.devices.Range(func(key, value interface{}) bool {
+		device, ok := value.(*Device)
+		if ok {
+			devices = append(devices, device)
 		}
-	}
-	return devices
-}
-
-func (m *Manager) RemoveDevice(deviceId string) error {
-	//
-	//addon := m.getDevice(deviceId)
-	//adapter := m.getAdapter(addon.AdapterId)
-	//if adapter != nil {
-	//	adapter.removeThing(addon)
-	//	return nil
-	//}
-	return fmt.Errorf("can not find thing")
-}
-
-func (m *Manager) CancelRemoveThing(deviceId string) {
-	device := m.getDevice(deviceId)
-	if device == nil {
-		return
-	}
-
-	if device.adapter != nil {
-		device.adapter.cancelRemoveThing(deviceId)
-	}
+		return true
+	})
+	return
 }
 
 func (m *Manager) SetPIN(thingId string, pin interface{}) error {

@@ -3,7 +3,7 @@ package plugin
 //import (
 //	"fmt"
 //	"github.com/galenliu/gateway-addon/properties"
-//	"github.com/galenliu/gateway-grpc"
+//	"github.com/galenliu/gateway-ipc_messages"
 //	"github.com/xiam/to"
 //
 //	"math"

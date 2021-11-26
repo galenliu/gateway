@@ -4,8 +4,16 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/gofiber/fiber/v2"
 	json "github.com/json-iterator/go"
+	"net/http"
 )
+
+type ThingsManager interface {
+	SetPropertyValue(thingId, propertyName string, value interface{}) (interface{}, error)
+	GetPropertyValue(thingId, propertyName string) (interface{}, error)
+	GetPropertiesValue(thingId string) (map[string]interface{}, error)
+}
 
 // ThingsStorage CRUD
 type ThingsStorage interface {
@@ -15,21 +23,12 @@ type ThingsStorage interface {
 	GetThings() map[string][]byte
 }
 
-// Container  Things
-type Container interface {
-	GetThing(id string) *Thing
-	GetThings() []*Thing
-	GetMapOfThings() map[string]*Thing
-	CreateThing(data []byte) (*Thing, error)
-	RemoveThing(id string) error
-	UpdateThing(data []byte) error
-}
-
 type ThingsContainer struct {
-	things map[string]*Thing
-	store  ThingsStorage
-	logger logging.Logger
-	bus    containerBus
+	things  map[string]*Thing
+	manager ThingsManager
+	store   ThingsStorage
+	logger  logging.Logger
+	bus     containerBus
 }
 
 type containerBus interface {
@@ -40,9 +39,10 @@ type containerBus interface {
 	PublishThingRemoved(thingId string)
 }
 
-func NewThingsContainerModel(store ThingsStorage, bus containerBus, log logging.Logger) *ThingsContainer {
+func NewThingsContainerModel(manager ThingsManager, store ThingsStorage, bus containerBus, log logging.Logger) *ThingsContainer {
 	t := &ThingsContainer{}
 	t.store = store
+	t.manager = manager
 	t.logger = log
 	t.things = make(map[string]*Thing)
 	_ = bus.AddDeviceRemovedSubscription(t.handleDeviceRemoved)
@@ -56,6 +56,25 @@ func (c *ThingsContainer) GetThing(id string) *Thing {
 		return nil
 	}
 	return t
+}
+
+func (c *ThingsContainer) SetThingProperty(thingId, propName string, value interface{}) (interface{}, error) {
+	thing := c.GetThing(thingId)
+	if thing == nil {
+		return nil, fiber.NewError(fiber.StatusNotFound, "Thing not found")
+	}
+	prop, ok := thing.Properties[propName]
+	if !ok {
+		return nil, fiber.NewError(fiber.StatusNotFound, "property not found")
+	}
+	if prop.IsReadOnly() {
+		return nil, fiber.NewError(fiber.StatusNotFound, "property read only")
+	}
+	v, err := c.manager.SetPropertyValue(thingId, propName, value)
+	if err != nil {
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "failure")
+	}
+	return v, nil
 }
 
 func (c *ThingsContainer) GetThings() (ts []*Thing) {
@@ -81,7 +100,7 @@ func (c *ThingsContainer) GetMapOfThings() map[string]*Thing {
 func (c *ThingsContainer) CreateThing(data []byte) (*Thing, error) {
 	t, err := c.handleCreateThing(data)
 	if err != nil {
-		return nil, err
+		return nil, fiber.NewError(fiber.StatusBadRequest)
 	}
 	t.container = c
 	c.things[t.GetId()] = t
@@ -91,7 +110,7 @@ func (c *ThingsContainer) CreateThing(data []byte) (*Thing, error) {
 func (c *ThingsContainer) RemoveThing(thingId string) error {
 	t, err := c.handleRemoveThing(thingId)
 	if err != nil {
-		return err
+		return fiber.NewError(http.StatusInternalServerError, err.Error())
 	}
 	t.remove()
 	delete(c.things, thingId)

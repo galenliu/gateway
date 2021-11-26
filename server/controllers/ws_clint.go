@@ -157,11 +157,11 @@ func (c *wsClint) addThing(t *container.Thing) {
 	}
 	removeThingEventStatusFunc := c.bus.AddThingEventSubscription(onEvent)
 
-	onPropertyChanged := func(property *addon.Property) {
+	onPropertyChanged := func(property *addon.PropertyDescription) {
 		err := c.ws.WriteJSON(map[string]interface{}{
 			"id":          t.GetId(),
 			"messageType": constant.Event,
-			"data":        map[string]interface{}{property.GetName(): property.GetValue()},
+			"data":        map[string]interface{}{property.Name: property.Value},
 		})
 		if err != nil {
 		}
@@ -169,7 +169,7 @@ func (c *wsClint) addThing(t *container.Thing) {
 	}
 	removePropertyChangedFunc := c.bus.AddPropertyChangedSubscription(t.GetId(), onPropertyChanged)
 
-	onActionStatus := func(action *addon.Action) {
+	onActionStatus := func(action *addon.ActionDescription) {
 		err := c.ws.WriteJSON(map[string]interface{}{
 			"id":          t.GetId(),
 			"messageType": constant.Event,

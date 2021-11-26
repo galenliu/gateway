@@ -9,7 +9,7 @@ import (
 type IntegerPropertyAffordance struct {
 	*ia.InteractionAffordance
 	*schema.IntegerSchema
-	Observable bool             `json:"observable,omitempty"`
+	Observable bool             `json:"observable,omitempty"` //with default
 	Value      controls.Integer `json:"value,omitempty"`
 }
 

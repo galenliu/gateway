@@ -4,35 +4,28 @@ import (
 	ia "github.com/galenliu/gateway/pkg/wot/definitions/core/interaction_affordance"
 	schema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
-	"github.com/tidwall/gjson"
-
 	json "github.com/json-iterator/go"
 )
 
-type EventAffordance interface {
-}
-
-type eventAffordance struct {
+type EventAffordance struct {
 	*ia.InteractionAffordance
 	Subscription *schema.DataSchema `json:"subscription,omitempty"`
 	Data         *schema.DataSchema `json:"data,omitempty"`
 	Cancellation *schema.DataSchema `json:"cancellation,omitempty"`
 }
 
-func NewEventAffordanceFromString(data string) *eventAffordance {
+func NewEventAffordanceFromString(data string) *EventAffordance {
 	var affordance = ia.NewInteractionAffordanceFromString(data)
 	err := json.Unmarshal([]byte(data), &affordance)
 	if err != nil {
 		return nil
 	}
-	var e = eventAffordance{}
+	var e = EventAffordance{}
 
-	if gjson.Get(data, "subscription").Exists() {
-		s := gjson.Get(data, "subscription").String()
-		d := schema.NewDataSchemaFromString(s)
-		if d != nil {
-			e.Subscription = d
-		}
+	var dataSchema schema.DataSchema
+	json.Get([]byte(data), "subscription").ToVal(&dataSchema)
+	{
+		e.Subscription = &dataSchema
 	}
 
 	s := json.Get([]byte(data), "data").ToString()

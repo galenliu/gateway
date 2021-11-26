@@ -7,25 +7,33 @@ import (
 
 type IntegerSchema struct {
 	*DataSchema
-	Minimum          controls.Integer `json:"minimum,,omitempty"`
-	ExclusiveMinimum controls.Integer `json:"exclusiveMinimum,omitempty"`
-	Maximum          controls.Integer `json:"maximum,omitempty"`
-	ExclusiveMaximum controls.Integer `json:"exclusiveMaximum,omitempty"`
-	MultipleOf       controls.Integer `json:"multipleOf,omitempty"`
+	Minimum          *controls.Integer `json:"minimum,,omitempty"`
+	ExclusiveMinimum *controls.Integer `json:"exclusiveMinimum,omitempty"`
+	Maximum          *controls.Integer `json:"maximum,omitempty"`
+	ExclusiveMaximum *controls.Integer `json:"exclusiveMaximum,omitempty"`
+	MultipleOf       *controls.Integer `json:"multipleOf,omitempty"`
 }
 
 func NewIntegerSchemaFromString(description string) *IntegerSchema {
 	data := []byte(description)
 	var schema = IntegerSchema{}
+	getInteger := func(sep string) *controls.Integer {
+		var ig controls.Integer
+		json.Get(data, sep).ToVal(&ig)
+		if &ig != nil {
+			return &ig
+		}
+		return nil
+	}
 	schema.DataSchema = NewDataSchemaFromString(description)
 	if schema.DataSchema == nil && schema.DataSchema.GetType() != controls.TypeString {
 		return nil
 	}
-	schema.Minimum = controls.Integer(json.Get(data, "minimum").ToInt64())
-	schema.ExclusiveMinimum = controls.Integer(json.Get(data, "exclusiveMinimum").ToInt64())
-	schema.Maximum = controls.Integer(json.Get(data, "maximum").ToInt64())
-	schema.ExclusiveMaximum = controls.Integer(json.Get(data, "exclusiveMaximum").ToInt64())
-	schema.MultipleOf = controls.Integer(json.Get(data, "multipleOf").ToInt64())
+	schema.Minimum = getInteger("minimum")
+	schema.ExclusiveMinimum = getInteger("exclusiveMinimum")
+	schema.Maximum = getInteger("maximum")
+	schema.ExclusiveMaximum = getInteger("exclusiveMaximum")
+	schema.MultipleOf = getInteger("multipleOf")
 	return &schema
 }
 
@@ -34,13 +42,16 @@ func (i *IntegerSchema) Convert(v interface{}) interface{} {
 }
 
 func (i *IntegerSchema) clamp(value controls.Integer) controls.Integer {
-	if i.Maximum != 0 {
-		if value > i.Maximum {
-			return i.Maximum
+	if i.Maximum != nil {
+		if value > *i.Maximum {
+			return *i.Maximum
 		}
 	}
-	if value < i.Minimum {
-		return i.Minimum
+	if i.Minimum != nil {
+		if value < *i.Minimum {
+			return *i.Minimum
+		}
+
 	}
 	return value
 }
