@@ -17,11 +17,11 @@ type ThingActions map[string]ActionAffordance
 type ThingEvents map[string]EventAffordance
 
 type Thing struct {
-	AtContext    controls.URI      `json:"@context,omitempty"` //mandatory
+	Context      controls.URI      `json:"@context,omitempty"` //mandatory
 	Title        string            `json:"title,omitempty"`    //mandatory
 	Titles       map[string]string `json:"titles,omitempty"`
 	Id           controls.URI      `json:"id"`
-	AtType       []string          `json:"@type"`
+	Type         []string          `json:"@type"`
 	Description  string            `json:"description,omitempty"`
 	Descriptions map[string]string `json:"descriptions,omitempty"`
 
@@ -55,7 +55,7 @@ func NewThingFromString(description string) (thing *Thing) {
 	if t.Id == "" {
 		t.Id = controls.URI(t.Title)
 	}
-	t.AtContext = controls.URI(json.Get(data, "@context").ToString())
+	t.Context = controls.URI(json.Get(data, "@context").ToString())
 	t.Security = controls.NewArrayOfString(json.Get(data, "security").ToString())
 	t.Description = controls.JSONGetString(data, "description", "")
 

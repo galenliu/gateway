@@ -38,8 +38,8 @@ func newDevice(msg messages.Device) *Device {
 				Type:        p.Type,
 				Unit:        *p.Unit,
 				Description: *p.Description,
-				Minimum:     *p.Minimum,
-				Maximum:     *p.Maximum,
+				Minimum:     p.Minimum,
+				Maximum:     p.Maximum,
 				Enum: func(elems []messages.PropertyEnumElem) []interface{} {
 					var enums []interface{}
 					for e := range elems {
@@ -48,7 +48,7 @@ func newDevice(msg messages.Device) *Device {
 					return enums
 				}(p.Enum),
 				ReadOnly:   *p.ReadOnly,
-				MultipleOf: *p.MultipleOf,
+				MultipleOf: p.MultipleOf,
 				Links:      nil,
 				Value:      p.Value,
 			}

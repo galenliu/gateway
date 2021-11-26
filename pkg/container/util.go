@@ -16,10 +16,10 @@ import (
 func AsWebOfThing(device *addon.Device) Thing {
 	thing := Thing{
 		Thing: &wot.Thing{
-			AtContext:           controls.URI(device.GetAtContext()),
+			Context:             controls.URI(device.GetAtContext()),
 			Title:               device.GetTitle(),
 			Id:                  controls.URI(device.GetId()),
-			AtType:              device.GetAtType(),
+			Type:                device.GetType(),
 			Description:         device.GetDescription(),
 			Support:             "刘桂林",
 			Base:                "",

@@ -41,21 +41,21 @@ func NewThingFromString(id string, description string) (thing *Thing, err error)
 		GroupId:             "",
 	}
 
-	if len(t.AtType) < 1 || t.Id == "" {
+	if len(t.Type) < 1 || t.Id == "" {
 		return nil, fmt.Errorf("@type or id err")
 	}
 
 	if t.SelectedCapability == "" {
-		t.SelectedCapability = t.AtType[0]
+		t.SelectedCapability = t.Type[0]
 	}
-	if !util.In(t.SelectedCapability, t.AtType) {
+	if !util.In(t.SelectedCapability, t.Type) {
 		return nil, fmt.Errorf("selectedCapability err")
 	}
 	return &t, nil
 }
 
 func (t *Thing) SetSelectedCapability(selectedCapability string) bool {
-	for _, s := range t.AtType {
+	for _, s := range t.Type {
 		if s == selectedCapability {
 			t.SelectedCapability = selectedCapability
 			return true

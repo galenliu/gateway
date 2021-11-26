@@ -1,18 +1,16 @@
 package devices
 
 import (
-	"github.com/galenliu/gateway-addon/actions"
-	"github.com/galenliu/gateway-addon/events"
-	"github.com/galenliu/gateway-addon/properties"
-	json "github.com/json-iterator/go"
+	"github.com/galenliu/gateway/pkg/addon"
+	"github.com/galenliu/gateway/pkg/addon/gateway-addon/properties"
 )
 
 type Device struct {
-	ID          string `json:"id"`
-	AtContext   string `json:"@context"`
-	AtType      string `json:"@type"`
-	Title       string `json:"title"`
-	Description string `json:"description,omitempty"`
+	ID          string   `json:"id"`
+	Context     string   `json:"@context"`
+	Type        []string `json:"@type"`
+	Title       string   `json:"title"`
+	Description string   `json:"description,omitempty"`
 
 	Links               []*Link                         `json:"links,omitempty"`
 	PinRequired         bool                            `json:"pinRequired"`
@@ -20,8 +18,8 @@ type Device struct {
 	BaseHref            string                          `json:"baseHref"`
 	Pin                 *Pin                            `json:"pin,omitempty"`
 	Properties          map[string]*properties.Property `json:"properties,omitempty"`
-	Actions             map[string]*actions.Action      `json:"action,omitempty"`
-	Events              map[string]*events.Event        `json:"events,omitempty"`
+	Actions             map[string]*addon.Action        `json:"action,omitempty"`
+	Events              map[string]*addon.Event         `json:"events,omitempty"`
 }
 
 type Pin struct {
@@ -35,11 +33,11 @@ type Link struct {
 	MediaType string `protobuf:"bytes,3,opt,name=mediaType,proto3" json:"mediaType,omitempty"`
 }
 
-func NewDeviceFormMessage(dev *rpc.Device) *Device {
+func NewDeviceFormMessage(dev *addon.Device) *Device {
 	device := &Device{
 		ID:                  dev.Id,
-		AtContext:           dev.AtContext,
-		AtType:              dev.AtType,
+		Context:             dev.GetAtContext(),
+		Type:                dev.GetType(),
 		Title:               dev.Title,
 		Description:         dev.Description,
 		PinRequired:         dev.Pin.Required,
@@ -64,32 +62,32 @@ func NewDeviceFormMessage(dev *rpc.Device) *Device {
 	}
 	if len(dev.Properties) > 0 {
 		device.Properties = make(map[string]*properties.Property)
-		for name, property := range dev.Properties {
-			device.Properties[name] = properties.NewPropertyFormMessage(property)
-		}
+		//for name, property := range dev.Properties {
+		//	device.Properties[name] = properties.NewPropertyFormMessage(property)
+		//}
 	}
 
 	if len(dev.Events) > 0 {
-		device.Events = make(map[string]*events.Event)
-		for name, event := range dev.Events {
-			device.Events[name] = events.NewEventFormMessage(event)
-		}
+		device.Events = make(map[string]*addon.Event)
+		//for name, event := range dev.Events {
+		//device.Events[name] = events.NewEventFormMessage(event)
+		//}
 	}
 	if len(dev.Actions) > 0 {
-		device.Actions = make(map[string]*actions.Action)
-		for name, action := range dev.Actions {
-			device.Actions[name] = actions.NewActionFormMessage(action)
-		}
+		device.Actions = make(map[string]*addon.Action)
+		//for name, action := range dev.Actions {
+		//	device.Actions[name] = actions.NewActionFormMessage(action)
+		//}
 	}
 	return device
 }
 
 func NewDeviceFormString(des string) *Device {
 	var device Device
-	err := json.UnmarshalFromString(des, &device)
-	if err != nil {
-		return nil
-	}
+	//err := json.UnmarshalFromString(des, &device)
+	//if err != nil {
+	//	return nil
+	//}
 	return &device
 }
 
@@ -98,11 +96,11 @@ func (device *Device) GetID() string {
 }
 
 func (device *Device) GetAtContext() string {
-	return device.AtType
+	return device.Context
 }
 
-func (device *Device) GetAtType() string {
-	return device.AtType
+func (device *Device) GetType() []string {
+	return device.Type
 }
 
 func (device *Device) GetTitle() string {
@@ -120,16 +118,16 @@ func (device *Device) AddProperty(property *properties.Property) {
 	device.Properties[property.Name] = property
 }
 
-func (device *Device) AddAction(action *actions.Action) {
+func (device *Device) AddAction(action *addon.Action) {
 	if device.Actions == nil {
-		device.Actions = make(map[string]*actions.Action)
+		device.Actions = make(map[string]*addon.Action)
 	}
-	device.Actions[action.Name] = action
+	//device.Actions[action.Name] = action
 }
 
-func (device *Device) AddEvent(event *events.Event) {
+func (device *Device) AddEvent(event *addon.Event) {
 	if device.Events == nil {
-		device.Events = make(map[string]*events.Event)
+		device.Events = make(map[string]*addon.Event)
 	}
 	device.Events[event.Name] = event
 }

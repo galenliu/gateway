@@ -25,7 +25,7 @@ func NewEventFromString(data string) *Event {
 			Op:          hypermedia_controls.NewArrayOfString(hypermedia_controls.SubscribeEvent),
 		})
 	}
-	this.EventAffordance = aa
+	this.EventAffordance = *aa
 	return &this
 }
 

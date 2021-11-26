@@ -1,12 +1,6 @@
-[submodule "gateway-addon"]
-	path = gateway-addon
-	url = https://github.com/galenliu/gateway-addon.git
 [submodule "app"]
 	path = app
 	url = https://github.com/galenliu/app.git
-[submodule "gateway-grpc"]
-	path = gateway-grpc
-	url = https://github.com/galenliu/gateway-grpc.git
 [submodule "virtual-things-service"]
 	path = virtual-things-service
 	url = https://github.com/galenliu/virtual-things-service.git

@@ -42,7 +42,7 @@ func (d Device) GetAtContext() string {
 	return d.Context
 }
 
-func (d Device) GetAtType() []string {
+func (d Device) GetType() []string {
 	return d.Type
 }
 
