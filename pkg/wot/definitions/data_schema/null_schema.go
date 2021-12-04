@@ -1,29 +1,35 @@
 package data_schema
 
 import (
+	"fmt"
 	"github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
+	json "github.com/json-iterator/go"
 )
 
 type NullSchema struct {
 	*DataSchema
 }
 
-func NewNullSchemaFromString(description string) *NullSchema {
-	var schema = NullSchema{}
-	schema.DataSchema = NewDataSchemaFromString(description)
-	if schema.DataSchema == nil || schema.DataSchema.GetType() != hypermedia_controls.TypeString {
-		return nil
+func (schema *NullSchema) UnmarshalJSON(data []byte) error {
+	var dataSchema DataSchema
+	err := json.Unmarshal(data, &dataSchema)
+	if err != nil {
+		return err
 	}
-	return &schema
+	schema.DataSchema = &dataSchema
+	if schema.DataSchema == nil || schema.DataSchema.GetType() != hypermedia_controls.TypeNull {
+		return fmt.Errorf("type must null")
+	}
+	return nil
 }
 
-func (n *NullSchema) Convert(v interface{}) interface{} {
+func (schema *NullSchema) Convert(v interface{}) interface{} {
 	return v
 }
 
-func (n *NullSchema) GetDefaultValue() interface{} {
-	if n.Default != nil {
-		return n.Convert(n.Default)
+func (schema *NullSchema) GetDefaultValue() interface{} {
+	if schema.Default != nil {
+		return schema.Convert(schema.Default)
 	}
 	return nil
 }

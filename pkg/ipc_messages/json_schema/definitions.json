@@ -13,12 +13,24 @@
     "any": {
       "title": "Any",
       "oneOf": [
-        {"type": "null"},
-        {"type": "boolean"},
-        {"type": "object"},
-        {"type": "array"},
-        {"type": "number"},
-        {"type": "string"}
+        {
+          "type": "null"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "object"
+        },
+        {
+          "type": "array"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
       ]
     },
     "device": {
@@ -534,9 +546,9 @@
         }
       ]
     },
-    "form_element":{
+    "form_element": {
       "title": "Form",
-      "type":"object",
+      "type": "object",
       "properties": {
         "href": {
           "$ref": "#/definitions/anyUri"
@@ -571,8 +583,10 @@
     },
     "form_element_property": {
       "title": "PropertyForm",
-      "allOf":[
-        { "$ref": "#/definitions/form_element" },
+      "allOf": [
+        {
+          "$ref": "#/definitions/form_element"
+        },
         {
           "properties": {
             "op": {

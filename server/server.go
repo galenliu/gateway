@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/controllers"
 )
 
@@ -23,7 +24,7 @@ type WebServe struct {
 	options Config
 }
 
-func NewServe(ctx context.Context, config Config, addonManager controllers.Manager, store controllers.Storage, bus *bus.Bus, log logging.Logger) *WebServe {
+func NewServe(ctx context.Context, config Config, addonManager *plugin.Manager, store controllers.Storage, bus *bus.Bus, log logging.Logger) *WebServe {
 	sev := &WebServe{}
 	sev.options = config
 	sev.logger = log

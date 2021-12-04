@@ -3,14 +3,14 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/bus"
+	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/middleware"
 	"github.com/galenliu/gateway/server/models"
-	"github.com/galenliu/gateway/server/models/model"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -22,21 +22,8 @@ import (
 )
 
 type controllerBus interface {
-	AddThingAddedSubscription(func(thing *container.Thing)) func()
-	AddRemovedSubscription(thingId string, fn func()) func()
-
-	AddDeviceRemovedSubscription(fn func(deviceId string)) func()
-	AddDeviceAddedSubscription(fn func(device *addon.Device)) func()
-
-	AddConnectedSubscription(thingId string, fn func(b bool)) func()
-
-	AddModifiedSubscription(thingId string, fn func()) func()
-
-	AddPropertyChangedSubscription(thingId string, fn func(p *addon.PropertyDescription)) func()
-
-	AddActionStatusSubscription(func(action *addon.ActionDescription)) func()
-
-	AddThingEventSubscription(func(event *addon.Event)) func()
+	Pub(topic topic.Topic, args ...interface{})
+	Sub(topic topic.Topic, fun interface{}) func()
 }
 
 type Storage interface {
@@ -53,16 +40,20 @@ type Config struct {
 	AddonUrls []string
 }
 
-type Models struct {
-	ThingsModel  *model.Container
-	UsersModel   *models.Users
-	SettingModel *models.Settings
+// Container  Things
+type Container interface {
+	GetThing(id string) *container.Thing
+	GetThings() []*container.Thing
+	GetMapOfThings() map[string]*container.Thing
+	CreateThing(data []byte) (*container.Thing, error)
+	RemoveThing(id string) error
+	UpdateThing(data []byte) error
 }
 
-type Manager interface {
-	AddonManager
-	ThingsManager
-	models.ActionsManager
+type Models struct {
+	ThingsModel  *Container
+	UsersModel   *models.Users
+	SettingModel *models.Settings
 }
 
 type Router struct {
@@ -72,7 +63,7 @@ type Router struct {
 	config Config
 }
 
-func NewRouter(ctx context.Context, config Config, manager Manager, store Storage, bus *bus.Bus, log logging.Logger) *Router {
+func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, store Storage, bus *bus.Bus, log logging.Logger) *Router {
 
 	//router init
 	app := Router{}
@@ -93,7 +84,7 @@ func NewRouter(ctx context.Context, config Config, manager Manager, store Storag
 	addonModel := models.NewAddonsModel(store, log)
 	jsonwebtokenModel := models.NewJsonwebtokenModel(settingModel, store, log)
 
-	actionsModel := models.NewActionsModel(manager, containerModel, log)
+	actionsModel := models.NewActionsModel(manager, containerModel, bus, log)
 	//serviceModel := models.NewServicesModel(deviceManager)
 	//newThingsModel := models.NewNewThingsModel(deviceManager, log)
 
@@ -150,7 +141,7 @@ func NewRouter(ctx context.Context, config Config, manager Manager, store Storag
 		return c.SendStatus(http.StatusNoContent)
 	})
 
-	//root model
+	//root actions
 	app.Use(rootHandler)
 
 	//app.Get("/", controllers.RootHandle())
@@ -176,6 +167,7 @@ func NewRouter(ctx context.Context, config Config, manager Manager, store Storag
 		actionsGroup.Post("/", actionsController.handleCreateAction)
 		actionsGroup.Get("/", actionsController.handleGetActions)
 		actionsGroup.Delete("/:actionName/:actionId", actionsController.handleDeleteAction)
+		actionsGroup.Delete("/:thingId/:actionName/:actionId", actionsController.handleDeleteAction)
 	}
 
 	//Things Controller

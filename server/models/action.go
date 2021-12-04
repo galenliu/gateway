@@ -2,16 +2,14 @@ package models
 
 import (
 	"fmt"
+	"github.com/galenliu/gateway/pkg/bus"
+	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
 	uuid "github.com/satori/go.uuid"
 	"time"
 )
-
-type bus interface {
-	PublishActionStatus(action interface{})
-}
 
 type ActionDescription struct {
 	Input         map[string]interface{} `json:"input,omitempty"`
@@ -24,18 +22,18 @@ type ActionDescription struct {
 type Action struct {
 	Id            string                 `json:"-"`
 	ThingId       string                 `json:"-"`
-	Name          string                 `json:"name"`
+	Name          string                 `json:"name,omitempty"`
 	Input         map[string]interface{} `json:"input,omitempty"`
-	Href          string                 `json:"href"`
+	Href          string                 `json:"href,omitempty"`
 	TimeRequested *time.Time             `json:"timeRequested,omitempty"`
 	TimeCompleted *time.Time             `json:"timeCompleted,omitempty"`
-	Status        string                 `json:"status"`
+	Status        string                 `json:"status,omitempty"`
 	Error         error                  `json:"error,omitempty"`
-	bus           bus
+	bus           *bus.Bus
 	logger        logging.Logger
 }
 
-func NewActionModel(name string, input map[string]interface{}, thing *container.Thing, bus bus, log logging.Logger) *Action {
+func NewActionModel(name string, input map[string]interface{}, bus *bus.Bus, log logging.Logger, things ...*container.Thing) *Action {
 	t := time.Now()
 	a := &Action{
 		logger:        log,
@@ -45,15 +43,48 @@ func NewActionModel(name string, input map[string]interface{}, thing *container.
 		Status:        ActionCreated,
 		TimeRequested: &t,
 		TimeCompleted: nil,
+		ThingId:       "",
 		bus:           bus,
 	}
-	if thing != nil {
+	if things != nil || len(things) > 0 {
+		thing := things[0]
 		a.ThingId = thing.GetId()
 		a.Href = fmt.Sprintf("%s/%s/%s/%s", thing.GetHref(), constant.ActionsPath, name, a.Id)
 	} else {
-		a.Href = fmt.Sprintf("%s/%s/%s", constant.ActionsPath, name, a.Id)
+		a.Href = fmt.Sprintf("%s/%s/%s", constant.ActionsPath, name, a.GetId())
 	}
 	return a
+}
+
+func (action *Action) GetDescription() *ActionDescription {
+	des := &ActionDescription{
+		Input:         action.Input,
+		Href:          action.Href,
+		TimeRequested: action.TimeRequested,
+		TimeCompleted: action.TimeRequested,
+		Error:         action.Error,
+	}
+	return des
+}
+
+func (action *Action) GetId() string {
+	return action.Id
+}
+
+func (action *Action) GetThingId() string {
+	return action.ThingId
+}
+
+func (action *Action) GetName() string {
+	return action.Name
+}
+
+func (action *Action) GetStatus() string {
+	return action.Status
+}
+
+func (action *Action) GetInput() map[string]interface{} {
+	return action.Input
 }
 
 func (action *Action) updateStatus(newStatus string) {
@@ -65,29 +96,7 @@ func (action *Action) updateStatus(newStatus string) {
 		action.TimeCompleted = &t
 	}
 	action.Status = newStatus
-	action.bus.PublishActionStatus(action)
-}
-
-func (action *Action) GetDescription() *ActionDescription {
-	return &ActionDescription{
-		Input:         action.Input,
-		Href:          action.Href,
-		TimeRequested: action.TimeRequested,
-		TimeCompleted: action.TimeRequested,
-		Error:         nil,
-	}
-}
-
-func (action *Action) GetId() string {
-	return action.Id
-}
-
-func (action *Action) GetName() string {
-	return action.Name
-}
-
-func (action *Action) GetInput() map[string]interface{} {
-	return action.Input
+	action.bus.Pub(topic.ThingActionStatus, action)
 }
 
 func (action *Action) SetErr(err error) {

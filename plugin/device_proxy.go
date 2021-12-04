@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"github.com/galenliu/gateway/pkg/addon"
+	"github.com/galenliu/gateway/pkg/bus/topic"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 )
 
@@ -10,21 +11,36 @@ type Device struct {
 	*addon.Device
 }
 
-func newDevice(msg messages.Device) *Device {
-	linksFunc := func(links []messages.Link) (links1 []addon.DeviceLink) {
+func newDevice(adapter *Adapter, msg messages.Device) *Device {
+
+	getString := func(s *string) string {
+		if s == nil {
+			return ""
+		}
+		return *s
+	}
+
+	linksFunc := func(links []messages.Link) (ls []addon.DeviceLink) {
+		if len(links) == 0 {
+			return nil
+		}
 		for _, l := range links {
-			links1 = append(links1, addon.DeviceLink{
+			ls = append(ls, addon.DeviceLink{
 				Href:      l.Href,
-				Rel:       *l.Rel,
-				MediaType: *l.MediaType,
+				Rel:       getString(l.Rel),
+				MediaType: getString(l.MediaType),
 			})
 		}
-		return nil
+		return ls
 	}
-	pinFunc := func(pin *messages.Pin) (pin1 *addon.DevicePin) {
+
+	pinFunc := func(pin *messages.Pin) *addon.DevicePin {
+		if pin == nil {
+			return nil
+		}
 		return &addon.DevicePin{
 			Required: pin.Required,
-			Pattern:  *pin.Pattern,
+			Pattern:  getString(pin.Pattern),
 		}
 	}
 
@@ -32,12 +48,12 @@ func newDevice(msg messages.Device) *Device {
 		properties1 = make(map[string]addon.Property)
 		for n, p := range properties {
 			properties1[n] = addon.Property{
-				Name:        *p.Name,
-				AtType:      *p.AtType,
-				Title:       *p.Title,
+				Name:        getString(p.Name),
+				AtType:      getString(p.AtType),
+				Title:       getString(p.Title),
 				Type:        p.Type,
-				Unit:        *p.Unit,
-				Description: *p.Description,
+				Unit:        getString(p.Unit),
+				Description: getString(p.Description),
 				Minimum:     p.Minimum,
 				Maximum:     p.Maximum,
 				Enum: func(elems []messages.PropertyEnumElem) []interface{} {
@@ -47,7 +63,12 @@ func newDevice(msg messages.Device) *Device {
 					}
 					return enums
 				}(p.Enum),
-				ReadOnly:   *p.ReadOnly,
+				ReadOnly: func() bool {
+					if p.ReadOnly == nil {
+						return false
+					}
+					return *p.ReadOnly
+				}(),
 				MultipleOf: p.MultipleOf,
 				Links:      nil,
 				Value:      p.Value,
@@ -56,13 +77,13 @@ func newDevice(msg messages.Device) *Device {
 		return
 	}
 
-	actionsFunc := func(actions messages.DeviceActions) (actions1 map[string]addon.Action) {
-		actions1 = make(map[string]addon.Action)
+	actionsFunc := func(actions messages.DeviceActions) (oActions map[string]addon.Action) {
+		oActions = make(map[string]addon.Action)
 		for n, a := range actions {
-			actions1[n] = addon.Action{
-				Type:        *a.Type,
-				Title:       *a.Title,
-				Description: *a.Description,
+			oActions[n] = addon.Action{
+				Type:        getString(a.Type),
+				Title:       getString(a.Title),
+				Description: getString(a.Description),
 				Forms: func(s []messages.ActionFormsElem) (forms []addon.ActionFormsElem) {
 					if len(s) == 0 {
 						return nil
@@ -85,12 +106,12 @@ func newDevice(msg messages.Device) *Device {
 		for n, e := range events {
 			events1[n] = addon.Event{
 				AtType:      "",
-				Name:        *e.Name,
-				Title:       *e.Title,
-				Description: *e.Description,
+				Name:        getString(e.Name),
+				Title:       getString(e.Name),
+				Description: getString(e.Description),
 				Links:       nil,
-				Type:        *e.Type,
-				Unit:        "",
+				Type:        getString(e.Type),
+				Unit:        getString(e.Unit),
 				Minimum:     0,
 				Maximum:     0,
 				MultipleOf:  0,
@@ -101,23 +122,39 @@ func newDevice(msg messages.Device) *Device {
 	}
 
 	device := &Device{
-		adapter: nil,
+		adapter: adapter,
 		Device: &addon.Device{
-			Context:             *msg.Context,
-			Type:                msg.Type,
-			Id:                  msg.Id,
-			Title:               *msg.Title,
-			Description:         *msg.Description,
-			Links:               linksFunc(msg.Links),
-			BaseHref:            *msg.BaseHref,
-			Pin:                 pinFunc(msg.Pin),
-			Properties:          propertiesFunc(msg.Properties),
-			Actions:             actionsFunc(msg.Actions),
-			Events:              eventFunc(msg.Events),
-			CredentialsRequired: *msg.CredentialsRequired,
+			Context: getString(msg.Context),
+			Type:    msg.Type,
+			Id:      msg.Id,
+			Title: func() string {
+				t := getString(msg.Title)
+				if t != "" {
+					return t
+				}
+				return msg.Id
+			}(),
+			Description: func() string {
+				d := getString(msg.Description)
+				if d != "" {
+					return d
+				}
+				return *msg.Description
+			}(),
+			Links:      linksFunc(msg.Links),
+			BaseHref:   *msg.BaseHref,
+			Pin:        pinFunc(msg.Pin),
+			Properties: propertiesFunc(msg.Properties),
+			Actions:    actionsFunc(msg.Actions),
+			Events:     eventFunc(msg.Events),
+			CredentialsRequired: func() bool {
+				if msg.CredentialsRequired == nil {
+					return false
+				}
+				return *msg.CredentialsRequired
+			}(),
 		},
 	}
-
 	return device
 }
 
@@ -143,28 +180,30 @@ func (device *Device) notifyValueChanged(property messages.Property) {
 		descriptionChanged = p.SetDescription(*property.Description)
 	}
 	if valueChanged || descriptionChanged || titleChanged {
-		device.adapter.plugin.pluginServer.manager.bus.PublishPropertyChanged(device.GetId(), p.GetDescriptions())
-	}
-}
+		device.adapter.plugin.pluginServer.manager.bus.Pub(topic.DevicePropertyChanged, device.GetId(), p.GetDescriptions())
 
-func (device *Device) requestAction(description addon.ActionDescription) {
-	var message = messages.DeviceRequestActionRequestJsonData{
-		ActionId:   description.Id,
-		ActionName: description.Name,
-		AdapterId:  device.getAdapter().getId(),
-		DeviceId:   device.GetId(),
-		Input:      description.Input,
-		PluginId:   device.getAdapter().getPlugin().pluginId,
 	}
-	device.adapter.send(messages.MessageType_DeviceRequestActionRequest, message)
 }
 
 func (device *Device) notifyDeviceConnected(connected bool) {
-	device.adapter.plugin.pluginServer.manager.bus.PublishConnected(device.GetId(), connected)
+	device.adapter.plugin.pluginServer.manager.bus.Pub(topic.DeviceConnected, device.GetId(), connected)
+
 }
 
 func (device *Device) notifyAction(actionDescription *addon.ActionDescription) {
-	device.adapter.plugin.pluginServer.manager.bus.PublishActionStatus(actionDescription)
+	device.adapter.plugin.pluginServer.manager.bus.Pub(topic.DeviceActionStatus, actionDescription)
+}
+
+func (device *Device) requestAction(id, name string, input map[string]interface{}) {
+	var message = messages.DeviceRequestActionRequestJsonData{
+		ActionId:   id,
+		ActionName: name,
+		AdapterId:  device.getAdapter().getId(),
+		DeviceId:   device.GetId(),
+		Input:      input,
+		PluginId:   device.getAdapter().getPlugin().pluginId,
+	}
+	device.adapter.send(messages.MessageType_DeviceRequestActionRequest, message)
 }
 
 func (device *Device) setPropertyValue(name string, value interface{}) {

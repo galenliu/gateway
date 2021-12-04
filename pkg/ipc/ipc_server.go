@@ -64,7 +64,6 @@ func (s *IPCServer) handle(w http.ResponseWriter, r *http.Request) {
 	s.readLoop(conn)
 }
 
-// g
 func (s *IPCServer) readLoop(conn *websocket.Conn) {
 	conn.SetPongHandler(func(appData string) error {
 		s.logger.Info("ping request: %s", appData)

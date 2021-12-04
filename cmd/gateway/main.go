@@ -19,8 +19,6 @@ func init() {
 	flag.BoolVar(&showVersion, "version", false, "version")
 }
 
-
-
 // TermFunc defines the function which is executed on termination.
 type TermFunc func(sig os.Signal)
 

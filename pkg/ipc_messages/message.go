@@ -82,7 +82,7 @@ package messages
 //	BaseHref            string               `protobuf:"bytes,7,opt,name=baseHref,proto3" json:"baseHref,omitempty"`
 //	Pin                 *DevicePin           `protobuf:"bytes,8,opt,name=pin,proto3" json:"pin,omitempty"`
 //	Properties          map[string]*Property `protobuf:"bytes,9,rep,name=properties,proto3" json:"properties,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-//	Actions             map[string]*Action   `protobuf:"bytes,10,rep,name=actions,proto3" json:"actions,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+//	actions             map[string]*Action   `protobuf:"bytes,10,rep,name=actions,proto3" json:"actions,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 //	Events              map[string]*Event    `protobuf:"bytes,11,rep,name=events,proto3" json:"events,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 //	CredentialsRequired bool                 `protobuf:"varint,12,opt,name=credentialsRequired,proto3" json:"credentialsRequired,omitempty"`
 //}
@@ -182,7 +182,7 @@ package messages
 //	Links               []*Link              `protobuf:"bytes,8,rep,name=links,proto3" json:"links,omitempty"`
 //	Pin                 *DevicePin           `protobuf:"bytes,9,opt,name=pin,proto3" json:"pin,omitempty"`
 //	Properties          map[string]*Property `protobuf:"bytes,10,rep,name=properties,proto3" json:"properties,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-//	Actions             map[string]*Action   `protobuf:"bytes,11,rep,name=actions,proto3" json:"actions,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+//	actions             map[string]*Action   `protobuf:"bytes,11,rep,name=actions,proto3" json:"actions,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 //	Events              map[string]*Event    `protobuf:"bytes,12,rep,name=events,proto3" json:"events,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 //	CredentialsRequired bool                 `protobuf:"varint,13,opt,name=credentialsRequired,proto3" json:"credentialsRequired,omitempty"`
 //	FloorplanVisibility bool                 `protobuf:"varint,14,opt,name=floorplanVisibility,proto3" json:"floorplanVisibility,omitempty"`

@@ -50,7 +50,7 @@ func (s *PluginsServer) RegisterPlugin(clint ipc.Clint) (ipc.PluginHandler, erro
 	responseData := messages.PluginRegisterResponseJsonData{
 		GatewayVersion: constant.Version,
 		PluginId:       registerMessage.PluginId,
-		Preferences:    *s.getPreferences(),
+		Preferences:    *s.manager.GetPreferences(),
 		UserProfile:    *s.manager.config.UserProfile,
 	}
 
@@ -111,24 +111,6 @@ func (s *PluginsServer) getPlugins() (plugins []*Plugin) {
 		return true
 	})
 	return
-}
-
-func (s *PluginsServer) getPreferences() *messages.PluginRegisterResponseJsonDataPreferences {
-	r := &messages.PluginRegisterResponseJsonDataPreferences{
-		Language: "en-US",
-		Units: messages.PluginRegisterResponseJsonDataPreferencesUnits{
-			Temperature: "degree celsius",
-		},
-	}
-	lang, err := s.manager.storage.GetSetting("localization.language")
-	if err == nil {
-		r.Language = lang
-	}
-	temp, err := s.manager.storage.GetSetting("localization.units.temperature")
-	if err == nil {
-		r.Units.Temperature = temp
-	}
-	return r
 }
 
 func (s *PluginsServer) shutdown() {

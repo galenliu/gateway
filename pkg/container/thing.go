@@ -2,16 +2,24 @@ package container
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/addon"
-	"github.com/galenliu/gateway/pkg/util"
+	"github.com/galenliu/gateway/pkg/bus/topic"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	json "github.com/json-iterator/go"
 )
 
+type ThingPin struct {
+	Required bool   `json:"required"`
+	Pattern  string `json:"pattern"`
+}
+
+type eventBus interface {
+	Pub(topic.Topic, ...interface{})
+}
+
 type Thing struct {
 	*wot.Thing
-	Pin                 *addon.DevicePin `json:"pin,omitempty"`
-	CredentialsRequired bool             `json:"credentialsRequired,omitempty"`
+	Pin                 *ThingPin `json:"pin,omitempty"`
+	CredentialsRequired bool      `json:"credentialsRequired,omitempty"`
 
 	//The state  of the thing
 	SelectedCapability string `json:"selectedCapability,omitempty"`
@@ -24,40 +32,45 @@ type Thing struct {
 	GroupId string `json:"groupId,omitempty"`
 
 	container *ThingsContainer
+	bus       eventBus
 }
 
-// NewThingFromString 把传入description组装成一个thing对象
-func NewThingFromString(id string, description string) (thing *Thing, err error) {
-	if id == "" || description == "" {
-		return nil, fmt.Errorf("id or description err")
+func (t *Thing) UnmarshalJSON(data []byte) error {
+	var thing wot.Thing
+	err := json.Unmarshal(data, &thing)
+	if err != nil {
+		return err
 	}
-	data := []byte(description)
-	t := Thing{
-		Thing:               wot.NewThingFromString(description),
-		Pin:                 nil,
-		CredentialsRequired: json.Get(data, "credentialsRequired").ToBool(),
-		SelectedCapability:  json.Get(data, "selectedCapability").ToString(),
-		Connected:           json.Get(data, "connected").ToBool(),
-		GroupId:             "",
-	}
+	t.Thing = &thing
 
-	if len(t.Type) < 1 || t.Id == "" {
-		return nil, fmt.Errorf("@type or id err")
-	}
+	var pin ThingPin
+	json.Get(data, "pin").ToVal(&pin)
+	t.Pin = &pin
 
+	t.CredentialsRequired = json.Get(data, "credentialsRequired").ToBool()
+	t.Connected = json.Get(data, "connected").ToBool()
+	t.GroupId = json.Get(data, "groupId").ToString()
+	t.SelectedCapability = json.Get(data, "selectedCapability").ToString()
 	if t.SelectedCapability == "" {
 		t.SelectedCapability = t.Type[0]
 	}
-	if !util.In(t.SelectedCapability, t.Type) {
-		return nil, fmt.Errorf("selectedCapability err")
+	var b = false
+	for _, s := range t.Type {
+		if s == t.SelectedCapability {
+			b = true
+		}
 	}
-	return &t, nil
+	if !b {
+		return fmt.Errorf("selectedCapability err")
+	}
+	return nil
 }
 
 func (t *Thing) SetSelectedCapability(selectedCapability string) bool {
 	for _, s := range t.Type {
 		if s == selectedCapability {
 			t.SelectedCapability = selectedCapability
+			t.bus.Pub(topic.ThingModify, t.GetId())
 			return true
 		}
 	}
@@ -69,6 +82,7 @@ func (t *Thing) SetTitle(title string) bool {
 		return false
 	}
 	t.Title = title
+	t.bus.Pub(topic.ThingModify, t.GetId())
 	return true
 }
 
@@ -77,9 +91,23 @@ func (t *Thing) setConnected(connected bool) {
 		return
 	}
 	t.Connected = connected
-	t.container.bus.PublishThingConnected(t.GetId(), connected)
+	t.bus.Pub(topic.ThingConnected, t.GetId(), connected)
 }
 
 func (t *Thing) remove() {
-	t.container.bus.PublishThingRemoved(t.GetId())
+	t.bus.Pub(topic.ThingRemoved, t.GetId())
+}
+
+func (t *Thing) added() {
+	t.bus.Pub(topic.ThingAdded, t.GetId())
+}
+
+func (t *Thing) AddAction(name string) bool {
+	_, ok := t.Actions[name]
+	return ok
+}
+
+func (t *Thing) RemoveAction(name string) bool {
+	_, ok := t.Actions[name]
+	return ok
 }

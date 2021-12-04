@@ -12,7 +12,7 @@ import (
 type ActionsController struct {
 	logger         logging.Logger
 	thingContainer *container.ThingsContainer
-	model          *models.ActionsModel
+	actions        *models.ActionsModel
 	manager        models.ActionsManager
 	bus            *bus.Bus
 }
@@ -22,7 +22,7 @@ func NewActionsController(model *models.ActionsModel, thing *container.ThingsCon
 		logger:         log,
 		manager:        manager,
 		thingContainer: thing,
-		model:          model,
+		actions:        model,
 		bus:            bus,
 	}
 }
@@ -32,13 +32,11 @@ func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 	var thingId = c.FormValue("thingId", "")
 	var actionBody map[string]map[string]interface{}
 	err := c.BodyParser(&actionBody)
-
 	if err != nil || len(actionBody) != 1 {
 		err := fmt.Errorf("incorrect number of parameters. body:  %s", c.Body())
 		a.logger.Error(err.Error())
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
-
 	var actionName string
 	var actionParams map[string]interface{}
 	for a, params := range actionBody {
@@ -54,8 +52,8 @@ func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 	if !ok {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
-
 	var thing *container.Thing
+	var actionModel *models.Action
 	if thingId != "" {
 		thing = a.thingContainer.GetThing(thingId)
 		if thing == nil {
@@ -63,19 +61,20 @@ func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 			a.logger.Error(err.Error())
 			return fiber.NewError(fiber.StatusNotFound, err.Error())
 		}
-	}
-	actionModel := models.NewActionModel(actionName, input, thing, a.bus, a.logger)
-	if thing != nil {
+		actionModel = models.NewActionModel(actionName, input, a.bus, a.logger, thing)
 		err := a.manager.RequestAction(thing.GetId(), actionModel.GetName(), input)
 		if err != nil {
-			return fiber.NewError(fiber.StatusNotFound, err.Error())
+			return fiber.NewError(fiber.StatusNotFound, fmt.Sprintf("create action: %s failed. err: %s", actionName, err.Error()))
 		}
 	}
-	err = a.model.Add(actionModel)
-	if err != nil {
-		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	if thing != nil || actionModel == nil {
+		actionModel = models.NewActionModel(actionName, input, a.bus, a.logger)
 	}
-	return c.Status(fiber.StatusCreated).Send(nil)
+	err = a.actions.Add(actionModel)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, fmt.Sprintf("create action: %s failed，err:%s", actionName, err.Error()))
+	}
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"actionName": actionModel.GetDescription()})
 }
 
 func (a *ActionsController) handleGetActions(c *fiber.Ctx) error {
@@ -89,27 +88,26 @@ func (a *ActionsController) handleGetActions(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON("")
 	} else {
 		//actions := a.actions.GetGatewayActions(actionName)
-		return c.Status(fiber.StatusOK).JSON("")
+		return c.SendStatus(fiber.StatusOK)
 	}
 }
 
 func (a *ActionsController) handleDeleteAction(c *fiber.Ctx) error {
-	//
-	//actionId := c.Params("actionId")
-	//actionName := c.Params("actionName")
-	//thingId := c.Params("thingId")
-	//
-	//if thingId != "" {
-	//	err := plugin.RemoveAction(thingId, actionId, actionName)
-	//	if err != nil {
-	//		logging.Error(fmt.Sprintf("Removing acotion actionId: %s faild,err: %v", actionId, err))
-	//		return fiber.NewError(http.StatusBadGateway, err.Error())
-	//
-	//	}
-	//}
-	//err := a.actions.Remove(actionId)
-	//if err != nil {
-	//	return fiber.NewError(fiber.StatusInternalServerError, err.Error())
-	//}
-	return c.SendStatus(fiber.StatusOK)
+
+	actionId := c.Params("actionId")
+	actionName := c.Params("actionName")
+	thingId := c.Params("thingId")
+
+	if thingId != "" {
+		err := a.manager.RemoveAction(thingId, actionId, actionName)
+		if err != nil {
+			a.logger.Error("delete action failed err: %s", actionName)
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+	}
+	err := a.actions.Remove(actionId)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	}
+	return c.SendStatus(fiber.StatusNoContent)
 }

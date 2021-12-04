@@ -3,6 +3,8 @@ package container
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon"
+	bus "github.com/galenliu/gateway/pkg/bus"
+	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/gofiber/fiber/v2"
 	json "github.com/json-iterator/go"
@@ -32,21 +34,22 @@ type ThingsContainer struct {
 }
 
 type containerBus interface {
-	AddDeviceRemovedSubscription(fn func(deviceId string)) func()
-	AddDeviceAddedSubscription(fn func(device *addon.Device)) func()
-
-	PublishThingConnected(thingId string, connected bool)
-	PublishThingRemoved(thingId string)
+	Sub(topic topic.Topic, fn interface{}) func()
+	Pub(topic topic.Topic, args ...interface{})
 }
 
-func NewThingsContainerModel(manager ThingsManager, store ThingsStorage, bus containerBus, log logging.Logger) *ThingsContainer {
+func NewThingsContainerModel(manager ThingsManager, store ThingsStorage, b *bus.Bus, log logging.Logger) *ThingsContainer {
 	t := &ThingsContainer{}
 	t.store = store
 	t.manager = manager
 	t.logger = log
 	t.things = make(map[string]*Thing)
-	_ = bus.AddDeviceRemovedSubscription(t.handleDeviceRemoved)
-	_ = bus.AddDeviceAddedSubscription(t.handleDeviceAdded)
+	_ = b.Sub(topic.DeviceAdded, t.handleDeviceAdded)
+	_ = b.Sub(topic.DeviceRemoved, t.handleDeviceRemoved)
+	_ = b.Sub(topic.DeviceConnected, t.handleDeviceConnected)
+	_ = b.Sub(topic.DevicePropertyChanged, t.handleDevicePropertyChanged)
+	_ = b.Sub(topic.DeviceActionStatus, t.handleDeviceActionStatus)
+	_ = b.Sub(topic.DeviceEvent, t.handleDeviceEvent)
 	return t
 }
 
@@ -108,7 +111,14 @@ func (c *ThingsContainer) CreateThing(data []byte) (*Thing, error) {
 }
 
 func (c *ThingsContainer) RemoveThing(thingId string) error {
-	t, err := c.handleRemoveThing(thingId)
+	err := c.store.RemoveThing(thingId)
+	if err != nil {
+		c.logger.Error("remove thing id: %s from Store err: %s", thingId, err.Error())
+	}
+	t, ok := c.things[thingId]
+	if !ok {
+		return fiber.NewError(http.StatusInternalServerError, fmt.Sprintf("container has not thing id: %s", thingId))
+	}
 	if err != nil {
 		return fiber.NewError(http.StatusInternalServerError, err.Error())
 	}
@@ -147,32 +157,20 @@ func (c *ThingsContainer) handleCreateThing(data []byte) (*Thing, error) {
 	return &thing, nil
 }
 
-func (c *ThingsContainer) handleRemoveThing(thingId string) (*Thing, error) {
-	err := c.store.RemoveThing(thingId)
-	if err != nil {
-		c.logger.Error("remove thing id: %s from Store err: %s", thingId, err.Error())
-	}
-	t, ok := c.things[thingId]
-	if !ok {
-		return nil, fmt.Errorf("container has not thing id: %s", thingId)
-	}
-	return t, nil
-}
-
 func (c *ThingsContainer) handleUpdateThing(data []byte) error {
 	thingId := json.Get(data, "id").ToString()
 	if _, ok := c.things[thingId]; ok {
-		newThing, err := NewThingFromString(thingId, string(data))
+		var newThing Thing
+		err := json.Unmarshal(data, &newThing)
 		if err != nil {
 			return err
 		}
-		if newThing != nil {
-			c.things[newThing.Id.GetId()] = newThing
-			err := c.store.UpdateThing(newThing.GetId(), newThing)
-			if err != nil {
-				return err
-			}
+		c.things[newThing.Id.GetId()] = &newThing
+		err = c.store.UpdateThing(newThing.GetId(), newThing)
+		if err != nil {
+			return err
 		}
+
 	}
 	return nil
 }
@@ -191,16 +189,44 @@ func (c *ThingsContainer) updateThings() {
 	}
 }
 
-func (c *ThingsContainer) handleDeviceRemoved(deviceId string) {
-	t := c.GetThing(deviceId)
+func (c *ThingsContainer) handleDeviceRemoved(thingId string) {
+	t := c.GetThing(thingId)
 	if t != nil {
 		t.setConnected(false)
 	}
 }
 
-func (c *ThingsContainer) handleDeviceAdded(device *addon.Device) {
-	t := c.GetThing(device.GetId())
+func (c *ThingsContainer) handleDeviceAdded(deviceId string, device *addon.Device) {
+	t := c.GetThing(deviceId)
 	if t != nil {
 		t.setConnected(true)
+	}
+}
+
+func (c *ThingsContainer) handleDeviceConnected(deviceId string, connected bool) {
+	t := c.GetThing(deviceId)
+	if t != nil {
+		t.setConnected(connected)
+	}
+}
+
+func (c *ThingsContainer) handleDevicePropertyChanged(deviceId string, property *addon.PropertyDescription) {
+	t := c.GetThing(deviceId)
+	if t != nil {
+		t.bus.Pub(topic.ThingPropertyChanged, t.GetId(), property)
+	}
+}
+
+func (c *ThingsContainer) handleDeviceActionStatus(deviceId string, action *addon.ActionDescription) {
+	t := c.GetThing(deviceId)
+	if t != nil {
+		t.bus.Pub(topic.ThingActionStatus, t.GetId(), action)
+	}
+}
+
+func (c *ThingsContainer) handleDeviceEvent(deviceId string, event *addon.Event) {
+	t := c.GetThing(deviceId)
+	if t != nil {
+		t.bus.Pub(topic.ThingEvent, t.GetId(), event)
 	}
 }

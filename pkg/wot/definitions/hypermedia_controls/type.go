@@ -1,6 +1,7 @@
 package hypermedia_controls
 
 import (
+	"encoding/json"
 	"github.com/xiam/to"
 	"strings"
 )
@@ -11,6 +12,18 @@ type Number float64
 type URI string
 type ArrayOfString string
 type Double float64
+
+func (a ArrayOfString) MarshalJSON() ([]byte, error) {
+	arr := strings.Split(string(a), "")
+	if len(arr) == 1 {
+		return []byte(arr[0]), nil
+	}
+	var s []string
+	for _, a := range arr {
+		s = append(s, a)
+	}
+	return json.Marshal(s)
+}
 
 func NewArrayOfString(args ...string) ArrayOfString {
 	var array = ""

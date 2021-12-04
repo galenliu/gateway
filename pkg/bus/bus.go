@@ -2,9 +2,7 @@ package bus
 
 import (
 	bus "github.com/asaskevich/EventBus"
-	"github.com/galenliu/gateway/pkg/addon"
-	"github.com/galenliu/gateway/pkg/constant"
-	"github.com/galenliu/gateway/pkg/container"
+	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/logging"
 )
 
@@ -18,105 +16,6 @@ func NewBusController(log logging.Logger) *Bus {
 	b.logger = log
 	b.Bus = bus.New()
 	return b
-}
-
-func (b *Bus) PublishPairingTimeout() {
-	b.Publish(constant.PairingTimeout)
-}
-
-func (b *Bus) PublishConnected(thingId string, connected bool) {
-	b.Publish(thingId+"."+constant.Connected, connected)
-}
-
-func (b *Bus) PublishActionStatus(action interface{}) {
-	b.Publish(constant.ActionStatus, action)
-}
-
-func (b *Bus) PublishPropertyChanged(thingId string, property *addon.PropertyDescription) {
-	b.Publish(thingId+"."+constant.PropertyChanged, property)
-}
-
-func (b *Bus) PublishEvent(event *addon.Event) {
-	b.Publish(constant.Event, event)
-}
-
-func (b *Bus) PublishDeviceAdded(device *addon.Device) {
-	b.Publish(constant.DeviceAdded, device)
-}
-
-func (b *Bus) PublishDeviceRemoved(deviceId string) {
-	b.Publish(constant.DeviceRemoved, deviceId)
-}
-
-func (b *Bus) PublishThingConnected(thingId string, connected bool) {
-	b.Publish(thingId+"."+constant.Connected, connected)
-}
-
-func (b *Bus) PublishThingRemoved(thingId string) {
-	b.Publish(thingId + "." + constant.Removed)
-}
-
-func (b *Bus) AddDeviceRemovedSubscription(fn func(deviceId string)) func() {
-	b.subscribe(constant.DeviceRemoved, fn)
-	return func() {
-		b.unsubscribe(constant.DeviceRemoved, fn)
-	}
-}
-
-func (b *Bus) AddDeviceAddedSubscription(fn func(device *addon.Device)) func() {
-	b.subscribe(constant.DeviceAdded, fn)
-	return func() {
-		b.unsubscribe(constant.DeviceAdded, fn)
-	}
-}
-
-func (b *Bus) AddThingAddedSubscription(f func(thing *container.Thing)) func() {
-	b.subscribe(constant.ThingAdded, f)
-	return func() {
-		b.unsubscribe(constant.ThingAdded, f)
-	}
-}
-
-func (b *Bus) AddRemovedSubscription(thingId string, fn func()) func() {
-	b.subscribe(thingId+"."+constant.Removed, fn)
-	return func() {
-		b.unsubscribe(thingId+"."+constant.Removed, fn)
-	}
-}
-
-func (b *Bus) AddConnectedSubscription(thingId string, fn func(b bool)) func() {
-	b.subscribe(thingId+"."+constant.Connected, fn)
-	return func() {
-		b.unsubscribe(thingId+"."+constant.Connected, fn)
-	}
-}
-
-func (b *Bus) AddModifiedSubscription(thingId string, fn func()) func() {
-	b.subscribe(thingId+"."+constant.Modified, fn)
-	return func() {
-		b.unsubscribe(thingId+"."+constant.Modified, fn)
-	}
-}
-
-func (b *Bus) AddPropertyChangedSubscription(thingId string, fn func(p *addon.PropertyDescription)) func() {
-	b.subscribe(thingId+"."+constant.PropertyChanged, fn)
-	return func() {
-		b.unsubscribe(thingId+"."+constant.PropertyChanged, fn)
-	}
-}
-
-func (b *Bus) AddActionStatusSubscription(f func(action *addon.ActionDescription)) func() {
-	b.subscribe(constant.ActionStatus, f)
-	return func() {
-		b.unsubscribe(constant.ActionStatus, f)
-	}
-}
-
-func (b *Bus) AddThingEventSubscription(f func(event *addon.Event)) func() {
-	b.subscribe(constant.Event, f)
-	return func() {
-		b.unsubscribe(constant.Event, f)
-	}
 }
 
 func (b *Bus) subscribe(topic string, fn interface{}) {
@@ -157,6 +56,21 @@ func (b *Bus) subscribeAsync(topic string, fn interface{}) {
 	if err != nil {
 		b.logger.Error("topic: %s subscribe async err: %s", topic, err.Error())
 	}
+}
+
+func (b *Bus) Sub(topic topic.Topic, fn interface{}) func() {
+	b.subscribe(topic.ToString(), fn)
+	return func() {
+		b.unsubscribe(topic.ToString(), fn)
+	}
+}
+
+func (b *Bus) Pub(topic topic.Topic, args ...interface{}) {
+	b.logger.Debugf("publish topic:[%s]", topic)
+	if !b.Bus.HasCallback(topic.ToString()) {
+		return
+	}
+	b.Bus.Publish(topic.ToString(), args...)
 }
 
 func (b *Bus) waitAsync() {

@@ -1,59 +1,67 @@
 package data_schema
 
 import (
+	"fmt"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
 )
 
 type StringSchema struct {
 	*DataSchema
-	MinLength        controls.UnsignedInt `json:"minLength,omitempty"`
-	MaxLength        controls.UnsignedInt `json:"maxLength,omitempty"`
-	Pattern          string               `json:"pattern,omitempty"`
-	ContentEncoding  string               `json:"contentEncoding,omitempty"`
-	ContentMediaType string               `json:"contentMediaType,omitempty"`
+	MinLength        *controls.UnsignedInt `json:"minLength,omitempty"`
+	MaxLength        *controls.UnsignedInt `json:"maxLength,omitempty"`
+	Pattern          string                `json:"pattern,omitempty"`
+	ContentEncoding  string                `json:"contentEncoding,omitempty"`
+	ContentMediaType string                `json:"contentMediaType,omitempty"`
 }
 
-func NewStringSchemaFromString(description string) *StringSchema {
-	data := []byte(description)
-	var schema = StringSchema{}
-	schema.DataSchema = NewDataSchemaFromString(description)
+func (schema *StringSchema) UnmarshalJSON(data []byte) error {
+	var dataSchema DataSchema
+	err := json.Unmarshal(data, &dataSchema)
+	if err != nil {
+		return err
+	}
 	if schema.DataSchema == nil || schema.DataSchema.GetType() != controls.TypeString {
-		return nil
-	}
-	if json.Get(data, "minLength").ValueType() != json.NilValue {
-		schema.MinLength = controls.UnsignedInt(json.Get(data, "minLength").ToInt64())
-	}
-	if json.Get(data, "maxLength").ValueType() != json.NilValue {
-		schema.MinLength = controls.UnsignedInt(json.Get(data, "maxLength").ToInt64())
+		return fmt.Errorf("type must string")
 	}
 
-	if json.Get(data, "contentEncoding").ValueType() != json.StringValue {
-		schema.ContentEncoding = json.Get(data, "maxLength").ToString()
+	if min := json.Get(data, "minLength"); min.ValueType() != json.NilValue {
+		m := controls.UnsignedInt(min.ToInt64())
+		schema.MinLength = &m
 	}
 
-	if json.Get(data, "contentMediaType").ValueType() != json.StringValue {
-		schema.ContentMediaType = json.Get(data, "maxLength").ToString()
+	if max := json.Get(data, "maxLength"); max.ValueType() != json.NilValue {
+		m := controls.UnsignedInt(max.ToInt64())
+		schema.MaxLength = &m
 	}
-	return &schema
+	if v := json.Get(data, "contentEncoding"); v.ValueType() != json.StringValue {
+		schema.ContentEncoding = v.ToString()
+	}
+	if v := json.Get(data, "contentMediaType"); v.ValueType() != json.StringValue {
+		schema.ContentMediaType = v.ToString()
+	}
+	return nil
 }
 
-func (s *StringSchema) Convert(v interface{}) interface{} {
-	return s.clamp(controls.ToString(v))
-}
+//func (schema *StringSchema) Convert(v interface{}) interface{} {
+//	return schema.clamp(controls.ToString(v))
+//}
 
-func (s *StringSchema) GetDefaultValue() interface{} {
-	if s.DataSchema.Default != nil {
-		return s.Convert(s.DataSchema.Default)
+func (schema *StringSchema) GetDefaultValue() interface{} {
+	if schema.DataSchema.Default != nil {
+		return schema.Default
+	}
+	if len(schema.Enum) > 0 {
+		return schema.Enum[0]
 	}
 	return ""
 }
 
-func (s *StringSchema) clamp(value string) string {
-	if s.MaxLength != 0 {
-		if s.MaxLength < controls.ToUnsignedInt(len(value)) {
-			return string([]rune(value)[:s.MaxLength])
-		}
-	}
-	return value
-}
+//func (schema *StringSchema) clamp(value string) string {
+//	if schema.MaxLength != 0 {
+//		if schema.MaxLength < controls.ToUnsignedInt(len(value)) {
+//			return string([]rune(value)[:schema.MaxLength])
+//		}
+//	}
+//	return value
+//}

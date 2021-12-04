@@ -1,27 +1,31 @@
 package data_schema
 
-import controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
+import (
+	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
+	json "github.com/json-iterator/go"
+)
 
 type BooleanSchema struct {
 	*DataSchema
 }
 
-func NewBooleanSchemaFromString(description string) *BooleanSchema {
-	var schema = BooleanSchema{}
-	schema.DataSchema = NewDataSchemaFromString(description)
-	if schema.DataSchema == nil || schema.DataSchema.GetType() != controls.TypeString {
-		return nil
+func (schema *BooleanSchema) UnmarshalJSON(data []byte) error {
+	var dataSchema DataSchema
+	err := json.Unmarshal(data, &dataSchema)
+	if err != nil {
+		return err
 	}
-	return &schema
+	schema.DataSchema = &dataSchema
+	return nil
 }
 
-func (b *BooleanSchema) Convert(v interface{}) interface{} {
+func (schema *BooleanSchema) Convert(v interface{}) interface{} {
 	return controls.ToBool(v)
 }
 
-func (b *BooleanSchema) GetDefaultValue() interface{} {
-	if b.DataSchema.Default != nil {
-		return b.Convert(b.Default)
+func (schema *BooleanSchema) GetDefaultValue() interface{} {
+	if schema.DataSchema.Default != nil {
+		return schema.Convert(schema.Default)
 	}
 	return false
 }

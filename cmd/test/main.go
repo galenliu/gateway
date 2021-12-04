@@ -5,26 +5,19 @@ import (
 	"fmt"
 )
 
-type Message struct {
-	Minimum int    `json:"minimum"`
-	Unit    string `json:"unit"`
+type String = string
+type Array = []string
+
+type ArrayOfString struct {
+	String
+	Array
 }
 
 func main() {
-	var str = `{
-          "minimum": 12,
-          "unit": "milliseconds"
-        }`
-	var i interface{}
-	err := json.Unmarshal([]byte(str), &i)
-	if err != nil {
-		fmt.Println("1111111111" + err.Error())
-	}
-	var m Message
-	data, err := json.Marshal(i)
-	err = json.Unmarshal(data, &m)
+	str := `{"12123","sdf"}`
+	var as ArrayOfString
+	err := json.Unmarshal([]byte(str), &as)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-
 }

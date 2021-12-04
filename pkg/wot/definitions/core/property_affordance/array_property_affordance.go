@@ -3,7 +3,7 @@ package property_affordance
 import (
 	ia "github.com/galenliu/gateway/pkg/wot/definitions/core/interaction_affordance"
 	schema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
-	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
+	json "github.com/json-iterator/go"
 )
 
 type ArrayPropertyAffordance struct {
@@ -12,14 +12,19 @@ type ArrayPropertyAffordance struct {
 	Observable bool `json:"observable,omitempty"`
 }
 
-func NewArrayPropertyAffordanceFormString(description string) *ArrayPropertyAffordance {
-	data := []byte(description)
-	var p = ArrayPropertyAffordance{}
-	p.InteractionAffordance = ia.NewInteractionAffordanceFromString(description)
-	p.ArraySchema = schema.NewArraySchemaFromString(description)
-	if p.ArraySchema == nil {
-		return nil
+func (p *ArrayPropertyAffordance) UnmarshalJSON(data []byte) error {
+	var i ia.InteractionAffordance
+	err := json.Unmarshal(data, &i)
+	if err != nil {
+		return err
 	}
-	p.Observable = controls.JSONGetBool(data, "observable", false)
-	return &p
+	p.InteractionAffordance = &i
+	var s schema.ArraySchema
+	err = json.Unmarshal(data, &s)
+	if err != nil {
+		return err
+	}
+	p.ArraySchema = &s
+	p.Observable = json.Get(data, "observable").ToBool()
+	return nil
 }

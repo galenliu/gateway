@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/galenliu/gateway/pkg/addon"
+	b "github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/gofiber/websocket/v2"
@@ -10,6 +11,7 @@ import (
 
 type deviceManager interface {
 	GetMapOfDevices() map[string]*addon.Device
+	GetLanguage() string
 }
 type thingContainer interface {
 	GetMapOfThings() map[string]*container.Thing
@@ -34,22 +36,24 @@ func NewNewThingsController(log logging.Logger) *NewThingsController {
 
 func (c *NewThingsController) handleNewThingsWebsocket(m deviceManager, t thingContainer, bus controllerBus) func(conn *websocket.Conn) {
 	return func(conn *websocket.Conn) {
+		addThing := func(deviceId string, device *addon.Device) {
+			err := conn.WriteJSON(container.AsWebOfThing(device))
+			if err != nil {
+				return
+			}
+		}
 		addonDevices := m.GetMapOfDevices()
-		removeFunc := bus.AddDeviceAddedSubscription(func(device *addon.Device) {
-			_ = c.handlerNewDevice(conn, device)
-		})
+		unSub := bus.Sub(b.DeviceAdded, addThing)
 		defer func() {
-			removeFunc()
+			//removeFunc()
+			unSub()
 			_ = conn.Close()
 		}()
 		savedThings := t.GetMapOfThings()
 		for id, dev := range addonDevices {
 			_, ok := savedThings[id]
 			if !ok {
-				err := c.handlerNewDevice(conn, dev)
-				if err != nil {
-					return
-				}
+				addThing(dev.GetId(), dev)
 			}
 		}
 		for {
@@ -59,8 +63,4 @@ func (c *NewThingsController) handleNewThingsWebsocket(m deviceManager, t thingC
 			}
 		}
 	}
-}
-
-func (c *NewThingsController) handlerNewDevice(conn *websocket.Conn, device *addon.Device) error {
-	return conn.WriteJSON(container.AsWebOfThing(device))
 }

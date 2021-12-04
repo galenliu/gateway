@@ -3,40 +3,48 @@ package data_schema
 import (
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
-	"math"
 )
 
 type ArraySchema struct {
 	*DataSchema
-	Items    []*DataSchema        `json:"items,omitempty"`
-	MinItems controls.UnsignedInt `json:"minItems,omitempty"`
-	MaxItems controls.UnsignedInt `json:"maxItems,omitempty"`
+	Items    []DataSchema          `json:"items,omitempty"`
+	MinItems *controls.UnsignedInt `json:"minItems,omitempty"`
+	MaxItems *controls.UnsignedInt `json:"maxItems,omitempty"`
 }
 
-func NewArraySchemaFromString(description string) *ArraySchema {
-	data := []byte(description)
-	var schema = ArraySchema{}
-	schema.DataSchema = NewDataSchemaFromString(description)
-	if schema.DataSchema == nil || schema.DataSchema.GetType() != controls.TypeArray {
+func (schema *ArraySchema) UnmarshalJSON(data []byte) error {
+	var dataSchema DataSchema
+	err := json.Unmarshal(data, &dataSchema)
+	if err != nil {
+		return err
+	}
+	schema.DataSchema = &dataSchema
+	if schema.DataSchema.GetType() != controls.TypeArray {
 		return nil
 	}
-	var items []string
+	var items []DataSchema
 	json.Get(data, "items").ToVal(&items)
-	for _, i := range items {
-		schema.Items = append(schema.Items, NewDataSchemaFromString(i))
+	if items != nil || len(items) > 0 {
+		schema.Items = items
 	}
-	schema.MinItems = controls.UnsignedInt(controls.JSONGetUint64(data, "minItems", math.MaxInt))
-	schema.MaxItems = controls.UnsignedInt(controls.JSONGetUint64(data, "maxItems", math.MaxInt))
-	return &schema
+	if minItems := json.Get(data, "minItems"); minItems.ValueType() == json.NumberValue {
+		var min = controls.UnsignedInt(minItems.ToInt64())
+		schema.MinItems = &min
+	}
+	if minItems := json.Get(data, "maxItems"); minItems.ValueType() == json.NumberValue {
+		var max = controls.UnsignedInt(minItems.ToInt64())
+		schema.MaxItems = &max
+	}
+	return nil
 }
 
-func (a *ArraySchema) Convert(v interface{}) interface{} {
+func (schema *ArraySchema) Convert(v interface{}) interface{} {
 	return v
 }
 
-func (a *ArraySchema) GetDefaultValue() interface{} {
-	if a.DataSchema.Default != nil {
-		return a.Convert(a.Default)
+func (schema *ArraySchema) GetDefaultValue() interface{} {
+	if schema.DataSchema.Default != nil {
+		return schema.Convert(schema.Default)
 	}
 	return nil
 }

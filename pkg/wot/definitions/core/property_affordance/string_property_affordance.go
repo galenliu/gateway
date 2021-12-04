@@ -1,26 +1,30 @@
 package property_affordance
 
 import (
-	"github.com/galenliu/gateway/pkg/wot/definitions/core/interaction_affordance"
+	ia "github.com/galenliu/gateway/pkg/wot/definitions/core/interaction_affordance"
 	schema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
-	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
+	json "github.com/json-iterator/go"
 )
 
 type StringPropertyAffordance struct {
-	*interaction_affordance.InteractionAffordance
+	*ia.InteractionAffordance
 	*schema.StringSchema
-	Observable bool   `json:"observable,omitempty"`
-	Value      string `json:"value,omitempty"`
+	Observable bool `json:"observable,omitempty"`
 }
 
-func NewStringPropertyAffordanceFormString(description string) *StringPropertyAffordance {
-	data := []byte(description)
-	var p = StringPropertyAffordance{}
-	p.InteractionAffordance = interaction_affordance.NewInteractionAffordanceFromString(description)
-	p.StringSchema = schema.NewStringSchemaFromString(description)
-	if p.StringSchema == nil {
-		return nil
+func (p *StringPropertyAffordance) UnmarshalJSON(data []byte) error {
+	var i ia.InteractionAffordance
+	err := json.Unmarshal(data, &i)
+	if err != nil {
+		return err
 	}
-	p.Observable = controls.JSONGetBool(data, "observable", false)
-	return &p
+	p.InteractionAffordance = &i
+	var s schema.StringSchema
+	err = json.Unmarshal(data, &s)
+	if err != nil {
+		return err
+	}
+	p.StringSchema = &s
+	p.Observable = json.Get(data, "observable").ToBool()
+	return nil
 }

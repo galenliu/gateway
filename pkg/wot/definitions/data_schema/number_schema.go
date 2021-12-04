@@ -1,6 +1,7 @@
 package data_schema
 
 import (
+	"fmt"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
 	"github.com/xiam/to"
@@ -15,12 +16,14 @@ type NumberSchema struct {
 	MultipleOf       *controls.Double `json:"multipleOf,omitempty"`
 }
 
-func NewNumberSchemaFromString(description string) *NumberSchema {
-	data := []byte(description)
-	var schema = NumberSchema{}
-	schema.DataSchema = NewDataSchemaFromString(description)
+func (schema *NumberSchema) UnmarshalJSON(data []byte) error {
+	var dataSchema DataSchema
+	err := json.Unmarshal(data, &dataSchema)
+	if err != nil {
+		return err
+	}
 	if schema.DataSchema == nil || schema.DataSchema.GetType() != controls.TypeNumber {
-		return nil
+		return fmt.Errorf("type must number")
 	}
 	getDouble := func(sep string) *controls.Double {
 		var d controls.Double
@@ -35,22 +38,35 @@ func NewNumberSchemaFromString(description string) *NumberSchema {
 	schema.ExclusiveMinimum = getDouble("exclusiveMinimum")
 	schema.ExclusiveMaximum = getDouble("exclusiveMaximum")
 	schema.MultipleOf = getDouble("multipleOf")
-	return &schema
+	return nil
 }
 
-func (n *NumberSchema) Convert(v interface{}) interface{} {
-	return n.clamp(controls.Double(to.Float64(v)))
+func (schema *NumberSchema) GetDefaultValue() interface{} {
+	if schema.DataSchema.Default != nil {
+		return schema.Default
+	}
+	if len(schema.Enum) > 0 {
+		return schema.Enum[0]
+	}
+	if schema.Minimum != nil {
+		return *schema.Minimum
+	}
+	return 0
 }
 
-func (n NumberSchema) clamp(value controls.Double) controls.Double {
-	if n.Maximum != nil {
-		if value > *n.Maximum {
-			return *n.Maximum
+func (schema *NumberSchema) Convert(v interface{}) interface{} {
+	return schema.clamp(controls.Double(to.Float64(v)))
+}
+
+func (schema NumberSchema) clamp(value controls.Double) controls.Double {
+	if schema.Maximum != nil {
+		if value > *schema.Maximum {
+			return *schema.Maximum
 		}
 	}
-	if n.Maximum != nil {
-		if value < *n.Minimum {
-			return *n.Minimum
+	if schema.Maximum != nil {
+		if value < *schema.Minimum {
+			return *schema.Minimum
 		}
 	}
 	return value

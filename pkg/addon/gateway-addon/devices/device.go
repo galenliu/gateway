@@ -75,8 +75,8 @@ func NewDeviceFormMessage(dev *addon.Device) *Device {
 	}
 	if len(dev.Actions) > 0 {
 		device.Actions = make(map[string]*addon.Action)
-		//for name, action := range dev.Actions {
-		//	device.Actions[name] = actions.NewActionFormMessage(action)
+		//for name, action := range dev.actions {
+		//	device.actions[name] = actions.NewActionFormMessage(action)
 		//}
 	}
 	return device
@@ -122,7 +122,7 @@ func (device *Device) AddAction(action *addon.Action) {
 	if device.Actions == nil {
 		device.Actions = make(map[string]*addon.Action)
 	}
-	//device.Actions[action.Name] = action
+	//device.actions[action.Name] = action
 }
 
 func (device *Device) AddEvent(event *addon.Event) {

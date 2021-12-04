@@ -1,6 +1,7 @@
 package data_schema
 
 import (
+	"fmt"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
 )
@@ -18,31 +19,32 @@ const (
 )
 
 type DataSchema struct {
-	AtType       string            `json:"@type,omitempty"`
-	Title        string            `json:"title,omitempty"`
-	Titles       map[string]string `json:"titles,omitempty"`
-	Description  string            `json:"description,omitempty"`
-	Descriptions map[string]string `json:"descriptions,omitempty"`
-	Const        interface{}       `json:"const,omitempty"`
-	Default      interface{}       `json:"default,omitempty"`
-	Unit         string            `json:"unit,omitempty"`
-	OneOf        []DataSchema      `json:"oneOf,,omitempty"`
-	Enum         []interface{}     `json:"enum,omitempty"`
-	ReadOnly     bool              `json:"readOnly,omitempty"`
-	WriteOnly    bool              `json:"writeOnly,omitempty"`
-	Format       string            `json:"format,omitempty"`
-	Type         string            `json:"type,,omitempty"`
+	AtType       string            `json:"@type,omitempty" wot:"optional"`
+	Title        string            `json:"title,omitempty" wot:"optional"`
+	Titles       map[string]string `json:"titles,omitempty" wot:"optional"`
+	Description  string            `json:"description,omitempty" wot:"optional"`
+	Descriptions map[string]string `json:"descriptions,omitempty" wot:"optional"`
+	Const        interface{}       `json:"const,omitempty" wot:"optional"`
+	Default      interface{}       `json:"default,omitempty" wot:"optional"`
+	Unit         string            `json:"unit,omitempty" wot:"optional"`
+	OneOf        []DataSchema      `json:"oneOf,,omitempty" wot:"optional"`
+	Enum         []interface{}     `json:"enum,omitempty" wot:"optional"`
+	ReadOnly     bool              `json:"readOnly,omitempty" wot:"withDefault"`
+	WriteOnly    bool              `json:"writeOnly,omitempty" wot:"withDefault"`
+	Format       string            `json:"format,omitempty" wot:"optional"`
+	Type         string            `json:"type,,omitempty" wot:"optional"`
 }
 
-func NewDataSchemaFromString(description string) *DataSchema {
-	data := []byte(description)
-	schema := DataSchema{}
-	schema.AtType = controls.JSONGetString(data, "@type", "")
-	schema.Title = controls.JSONGetString(data, "title", "")
+func (schema *DataSchema) UnmarshalJSON(data []byte) error {
+	schema.AtType = json.Get(data, "@type").ToString()
+	if schema.Type == "" {
+		return nil
+	}
+	schema.Title = json.Get(data, "@title").ToString()
 	schema.Titles = controls.JSONGetMap(data, "titles")
-	schema.Description = controls.JSONGetString(data, "description", "")
+	schema.Description = json.Get(data, "description").ToString()
 	schema.Descriptions = controls.JSONGetMap(data, "descriptions")
-	schema.Unit = controls.JSONGetString(data, "unit", "")
+	schema.Unit = json.Get(data, "unit").ToString()
 	schema.Const = json.Get(data, "const").GetInterface()
 	schema.Default = json.Get(data, "default").GetInterface()
 	var oneOf []DataSchema
@@ -57,53 +59,27 @@ func NewDataSchemaFromString(description string) *DataSchema {
 	}
 	schema.ReadOnly = controls.JSONGetBool(data, "readOnly", false)
 	schema.WriteOnly = controls.JSONGetBool(data, "writeOnly", false)
-	schema.Format = controls.JSONGetString(data, "format", "")
-	schema.Type = controls.JSONGetString(data, "type", "")
+	schema.Format = json.Get(data, "format").ToString()
+	schema.Type = json.Get(data, "type").ToString()
 	if schema.Type == controls.TypeNumber || schema.Type == controls.TypeString || schema.Type == controls.TypeInteger || schema.Type == controls.TypeNull ||
 		schema.Type == controls.TypeObject || schema.Type == controls.TypeArray || schema.Type == controls.TypeBoolean {
-		return &schema
+		return fmt.Errorf("type err")
 	}
 	return nil
 }
 
-//func NewDataSchemaFromString(description string) DataSchema {
-//	data := []byte(description)
-//	typ := controls.JSONGetString(data, "type", "")
-//	if typ == "" {
-//		return nil
-//	}
-//	switch typ {
-//	case controls.TypeNumber:
-//		return NewNumberSchemaFromString(description)
-//	case controls.TypeInteger:
-//		return NewNumberSchemaFromString(description)
-//	case controls.TypeString:
-//		return NewStringSchemaFromString(description)
-//	case controls.TypeArray:
-//		return NewArraySchemaFromString(description)
-//	case controls.TypeBoolean:
-//		return NewBooleanSchemaFromString(description)
-//	case controls.TypeNull:
-//		return NewNullSchemaFromString(description)
-//	case controls.TypeObject:
-//		return NewObjectSchemaFromString(description)
-//	default:
-//		return nil
-//	}
-//}
-
-func (d *DataSchema) GetType() string {
-	return d.Type
+func (schema *DataSchema) GetType() string {
+	return schema.Type
 }
 
-func (d *DataSchema) GetAtType() string {
-	return d.AtType
+func (schema *DataSchema) GetAtType() string {
+	return schema.AtType
 }
 
-func (d *DataSchema) GetDescription() string {
-	return d.Description
+func (schema *DataSchema) GetDescription() string {
+	return schema.Description
 }
 
-func (d *DataSchema) IsReadOnly() bool {
-	return d.ReadOnly
+func (schema *DataSchema) IsReadOnly() bool {
+	return schema.ReadOnly
 }

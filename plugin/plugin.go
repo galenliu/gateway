@@ -203,7 +203,8 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, data interface{}) {
 			plugin.logger.Errorf("Bad message : %s", err.Error())
 			return
 		}
-		adapter.handleDeviceAdded(newDevice(message.Device))
+		device := newDevice(adapter, message.Device)
+		adapter.handleDeviceAdded(device)
 		return
 	}
 

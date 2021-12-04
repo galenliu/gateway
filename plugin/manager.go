@@ -6,6 +6,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon"
+	"github.com/galenliu/gateway/pkg/bus"
+	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/container"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
@@ -44,7 +46,7 @@ type Manager struct {
 	installAddons sync.Map
 	extensions    sync.Map
 	container     *container.ThingsContainer
-	bus           managerBus
+	bus           *bus.Bus
 	addonsLoaded  bool
 	isPairing     bool
 	running       bool
@@ -58,18 +60,20 @@ type Manager struct {
 	deferredRemove sync.Map
 }
 
-type managerBus interface {
-	PublishDeviceAdded(device *addon.Device)
-	PublishDeviceRemoved(deviceId string)
-	PublishPairingTimeout()
-	PublishActionStatus(action interface{})
-	PublishConnected(thingId string, connected bool)
-	PublishEvent(event *addon.Event)
-	PublishPropertyChanged(thingId string, property *addon.PropertyDescription)
-	AddPropertyChangedSubscription(thingId string, fn func(p *addon.PropertyDescription)) func()
-}
+//type managerBus interface {
+//	Pub(topic bus.Topic, args ...interface{})
+//	Sub(topic bus.Topic, fu interface{})
+//	PublishThingAdded(thing *container.Thing)
+//	PublishDeviceRemoved(deviceId string)
+//	PublishPairingTimeout()
+//	PublishActionStatus(action interface{})
+//	PublishConnected(thingId string, connected bool)
+//	PublishEvent(event *addon.Event)
+//	PublishPropertyChanged(thingId string, property *addon.PropertyDescription)
+//	AddPropertyChangedSubscription(thingId string, fn func(p *addon.PropertyDescription)) func()
+//}
 
-func NewAddonsManager(ctx context.Context, conf Config, s managerStore, bus managerBus, log logging.Logger) *Manager {
+func NewAddonsManager(ctx context.Context, conf Config, s managerStore, bus *bus.Bus, log logging.Logger) *Manager {
 	am := &Manager{}
 	am.config = conf
 	am.ctx = ctx
@@ -84,11 +88,16 @@ func NewAddonsManager(ctx context.Context, conf Config, s managerStore, bus mana
 	return am
 }
 
-func (m *Manager) RequestAction(deviceId, actionName string, input map[string]interface{}) error {
-	device := m.getDevice(deviceId)
+func (m *Manager) RequestAction(thingId, actionName string, input map[string]interface{}) error {
+	device := m.getDevice(thingId)
 	if device == nil {
-		return fmt.Errorf("device %s not found", deviceId)
+		return fmt.Errorf("device %s not found", thingId)
 	}
+	device.requestAction(thingId, actionName, input)
+	return nil
+}
+
+func (m *Manager) RemoveAction(deviceId, actionId, actionName string) error {
 	return nil
 }
 
@@ -106,7 +115,7 @@ func (m *Manager) AddNewThings(timeout int) error {
 			select {
 			case <-timeoutChan:
 				m.logger.Info("startPairing timeout")
-				m.bus.PublishPairingTimeout()
+				m.bus.Pub(topic.PairingTimeout)
 				m.CancelAddNewThing()
 			case <-m.pairTask:
 				m.logger.Info("startPairing cancel")
@@ -139,7 +148,7 @@ func (m *Manager) RemoveThing(deviceId string) error {
 	go func() {
 		select {
 		case <-timeout:
-			m.cancelRemoveThing(deviceId)
+			m.CancelRemoveThing(deviceId)
 		case <-removeTask:
 			m.deferredRemove.Delete(deviceId)
 			m.logger.Infof("thing %s removed", deviceId)
@@ -165,7 +174,7 @@ func (m *Manager) CancelAddNewThing() {
 	return
 }
 
-func (m *Manager) cancelRemoveThing(deviceId string) {
+func (m *Manager) CancelRemoveThing(deviceId string) {
 	task, _ := m.deferredRemove.Load(deviceId)
 	removeTask, ok := task.(chan struct{})
 	if ok {
@@ -185,11 +194,11 @@ func (m *Manager) cancelRemoveThing(deviceId string) {
 }
 
 func (m *Manager) actionNotify(action *addon.Action) {
-	m.bus.PublishActionStatus(action)
+	//m.bus.PublishActionStatus(action)
 }
 
 func (m *Manager) eventNotify(event *addon.Event) {
-	m.bus.PublishEvent(event)
+	//m.bus.PublishEvent(event)
 }
 
 func (m *Manager) addAdapter(adapter *Adapter) {
@@ -199,7 +208,7 @@ func (m *Manager) addAdapter(adapter *Adapter) {
 func (m *Manager) handleDeviceAdded(device *Device) {
 	m.devices.Store(device.GetId(), device)
 	m.logger.Infof("Device added: %s", util.JsonIndent(container.AsWebOfThing(device.Device)))
-	go m.bus.PublishDeviceAdded(device.Device)
+	m.bus.Pub(topic.DeviceAdded, device.GetId(), device.Device)
 }
 
 func (m *Manager) handleDeviceRemoved(device *Device) {
@@ -212,7 +221,7 @@ func (m *Manager) handleDeviceRemoved(device *Device) {
 			m.logger.Infof("handle device removed")
 		}
 	}
-	m.bus.PublishDeviceRemoved(device.GetId())
+	m.bus.Pub(topic.DeviceRemoved, device.GetId())
 }
 
 func (m *Manager) getAdapter(adapterId string) *Adapter {
@@ -460,4 +469,26 @@ func (m *Manager) removeApiHandler(id int) {
 // 定时任务，更新Add-on
 func (m *Manager) updateAddons() {
 	m.logger.Infof("time task: addons upgrade %s", time.Now().String())
+}
+
+func (m *Manager) GetPreferences() *messages.PluginRegisterResponseJsonDataPreferences {
+	r := &messages.PluginRegisterResponseJsonDataPreferences{
+		Language: "en-US",
+		Units: messages.PluginRegisterResponseJsonDataPreferencesUnits{
+			Temperature: "degree celsius",
+		},
+	}
+	lang, err := m.storage.GetSetting("localization.language")
+	if err == nil {
+		r.Language = lang
+	}
+	temp, err := m.storage.GetSetting("localization.units.temperature")
+	if err == nil {
+		r.Units.Temperature = temp
+	}
+	return r
+}
+
+func (m *Manager) GetLanguage() string {
+	return m.GetPreferences().Language
 }

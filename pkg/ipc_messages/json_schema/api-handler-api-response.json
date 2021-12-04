@@ -58,16 +58,24 @@
               "title": "Content Type",
               "description": "Content-Type of the response body",
               "oneOf": [
-                {"type": "null"},
-                {"type": "string"}
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string"
+                }
               ]
             },
             "content": {
               "title": "Content",
               "description": "Body content",
               "oneOf": [
-                {"type": "null"},
-                {"type": "string"}
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string"
+                }
               ]
             }
           }

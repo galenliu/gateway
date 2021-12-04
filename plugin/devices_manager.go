@@ -3,6 +3,7 @@ package plugin
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon"
+	"github.com/galenliu/gateway/pkg/bus/topic"
 	"time"
 )
 
@@ -19,9 +20,11 @@ func (m *Manager) SetPropertyValue(deviceId, propName string, newValue interface
 	}
 	device.setPropertyValue(propName, newValue)
 	var valueChan = make(chan interface{})
-	unsubscribeFunc := m.bus.AddPropertyChangedSubscription(deviceId, func(p *addon.PropertyDescription) {
-		if p.Name == propName {
-			valueChan <- p.Value
+	unsubscribeFunc := m.bus.Sub(topic.DevicePropertyChanged, func(deviceId string, p *addon.PropertyDescription) {
+		if deviceId != device.GetId() {
+			if p.Name == propName {
+				valueChan <- p.Value
+			}
 		}
 	})
 	defer func() {

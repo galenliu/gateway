@@ -63,7 +63,7 @@ func (adapter *Adapter) cancelRemoveThing(device *Device) {
 		DeviceId:  device.GetId(),
 		PluginId:  adapter.plugin.getId(),
 	}
-	adapter.logger.Info("adapter: %s id: %s cancelRemoveThing:", adapter.getName(), adapter.getId(), device.GetId())
+	adapter.logger.Info("adapter: %s id: %s CancelRemoveThing:", adapter.getName(), adapter.getId(), device.GetId())
 	adapter.send(messages.MessageType_AdapterCancelRemoveDeviceCommand, data)
 }
 
