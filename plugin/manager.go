@@ -88,13 +88,12 @@ func NewAddonsManager(ctx context.Context, conf Config, s managerStore, bus *bus
 	return am
 }
 
-func (m *Manager) RequestAction(thingId, actionName string, input map[string]interface{}) error {
+func (m *Manager) RequestAction(ctx context.Context, thingId, actionName string, input map[string]interface{}) error {
 	device := m.getDevice(thingId)
 	if device == nil {
 		return fmt.Errorf("device %s not found", thingId)
 	}
-	device.requestAction(thingId, actionName, input)
-	return nil
+	return device.requestAction(ctx, thingId, actionName, input)
 }
 
 func (m *Manager) RemoveAction(deviceId, actionId, actionName string) error {

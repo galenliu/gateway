@@ -52,7 +52,7 @@ type DeviceActionStatusNotificationJsonDataAction struct {
 	TimeRequested string `json:"timeRequested" yaml:"timeRequested"`
 }
 
-type DeviceActionStatusNotificationJsonDataActionInput interface{}
+type DeviceActionStatusNotificationJsonDataActionInput map[string]interface{}
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceActionStatusNotificationJsonDataAction) UnmarshalJSON(b []byte) error {

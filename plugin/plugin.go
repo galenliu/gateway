@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"context"
+	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/ipc"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
@@ -226,12 +227,41 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, data interface{}) {
 		device.notifyDeviceConnected(message.Connected)
 		break
 
+	case messages.MessageType_DeviceActionStatusNotification:
+		var message messages.DeviceActionStatusNotificationJsonData
+		err := json.Unmarshal(d, &message)
+		if err != nil {
+			plugin.logger.Errorf("Bad message : %s", err.Error())
+			return
+		}
+		device.notifyAction(&addon.ActionDescription{
+			Id:            message.Action.Id,
+			Name:          message.Action.Name,
+			Input:         message.Action.Input,
+			Status:        message.Action.Status,
+			TimeRequested: message.Action.TimeRequested,
+			TimeCompleted: func() string {
+				if message.Action.TimeCompleted == nil {
+					return ""
+				}
+				return *message.Action.TimeCompleted
+			}(),
+		})
+		break
+
 	case messages.MessageType_DeviceRequestActionResponse:
 		var message messages.DeviceRequestActionResponseJsonData
 		err := json.Unmarshal(d, &message)
 		if err != nil {
 			plugin.logger.Errorf("Bad message : %s", err.Error())
 			return
+		}
+		task, ok := device.requestActionTask[message.ActionId]
+		if !ok {
+			return
+		}
+		select {
+		case task <- message.Success:
 		}
 		break
 	case messages.MessageType_DeviceRemoveActionResponse:

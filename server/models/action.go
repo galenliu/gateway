@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
@@ -102,4 +103,14 @@ func (action *Action) updateStatus(newStatus string) {
 func (action *Action) SetErr(err error) {
 	action.Error = err
 	action.updateStatus(ActionError)
+}
+
+func (action *Action) update(ad *addon.ActionDescription) {
+	t, _ := time.Parse("2006-1-2 15:04:05", ad.TimeRequested)
+	action.TimeRequested = &t
+	if ad.TimeCompleted != "" {
+		t, _ := time.Parse("2006-1-2 15:04:05", ad.TimeCompleted)
+		action.TimeCompleted = &t
+	}
+	action.updateStatus(ad.Status)
 }

@@ -1,12 +1,14 @@
 package controllers
 
 import (
+	"context"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/server/models"
 	"github.com/gofiber/fiber/v2"
+	"time"
 )
 
 type ActionsController struct {
@@ -43,7 +45,6 @@ func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 		actionName = a
 		actionParams = params
 	}
-
 	i, ok := actionParams["input"]
 	if actionName == "" || actionParams == nil || !ok {
 		return c.SendStatus(fiber.StatusBadRequest)
@@ -62,7 +63,9 @@ func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 			return fiber.NewError(fiber.StatusNotFound, err.Error())
 		}
 		actionModel = models.NewActionModel(actionName, input, a.bus, a.logger, thing)
-		err := a.manager.RequestAction(thing.GetId(), actionModel.GetName(), input)
+		ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*1)
+		err := a.manager.RequestAction(ctx, thing.GetId(), actionModel.GetName(), input)
+		cancelFunc()
 		if err != nil {
 			return fiber.NewError(fiber.StatusNotFound, fmt.Sprintf("create action: %s failed. err: %s", actionName, err.Error()))
 		}

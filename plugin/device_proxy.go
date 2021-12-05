@@ -1,6 +1,8 @@
 package plugin
 
 import (
+	"context"
+	"fmt"
 	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
@@ -9,6 +11,7 @@ import (
 type Device struct {
 	adapter *Adapter
 	*addon.Device
+	requestActionTask map[string]chan bool
 }
 
 func newDevice(adapter *Adapter, msg messages.Device) *Device {
@@ -155,6 +158,7 @@ func newDevice(adapter *Adapter, msg messages.Device) *Device {
 			}(),
 		},
 	}
+	device.requestActionTask = make(map[string]chan bool)
 	return device
 }
 
@@ -194,7 +198,11 @@ func (device *Device) notifyAction(actionDescription *addon.ActionDescription) {
 	device.adapter.plugin.pluginServer.manager.bus.Pub(topic.DeviceActionStatus, actionDescription)
 }
 
-func (device *Device) requestAction(id, name string, input map[string]interface{}) {
+func (device *Device) requestAction(ctx context.Context, id, name string, input map[string]interface{}) error {
+	_, ok := device.requestActionTask[id]
+	if ok {
+		return fmt.Errorf("action id: %v already exists", id)
+	}
 	var message = messages.DeviceRequestActionRequestJsonData{
 		ActionId:   id,
 		ActionName: name,
@@ -204,6 +212,22 @@ func (device *Device) requestAction(id, name string, input map[string]interface{
 		PluginId:   device.getAdapter().getPlugin().pluginId,
 	}
 	device.adapter.send(messages.MessageType_DeviceRequestActionRequest, message)
+	device.requestActionTask[id] = make(chan bool)
+	task := device.requestActionTask[id]
+	defer func() {
+		delete(device.requestActionTask, id)
+	}()
+	for {
+		select {
+		case <-ctx.Done():
+			return fmt.Errorf("timeout")
+		case b := <-task:
+			if b {
+				return nil
+			}
+			return fmt.Errorf("action task failed")
+		}
+	}
 }
 
 func (device *Device) setPropertyValue(name string, value interface{}) {

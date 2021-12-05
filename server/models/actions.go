@@ -1,7 +1,9 @@
 package models
 
 import (
+	"context"
 	"fmt"
+	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/container"
@@ -24,7 +26,7 @@ const (
 type ActionsManager interface {
 	AddNewThings(timeOut int) error
 	CancelAddNewThing()
-	RequestAction(thingId, actionName string, input map[string]interface{}) error
+	RequestAction(ctx context.Context, thingId, actionName string, input map[string]interface{}) error
 	RemoveThing(id string) error
 	RemoveAction(thingId string, actionId string, actionName string) error
 	CancelRemoveThing(id string)
@@ -48,10 +50,8 @@ func NewActionsModel(m ActionsManager, container *container.ThingsContainer, bus
 }
 
 func (m *ActionsModel) Add(a *Action) error {
-
 	m.actions.Store(a.GetId(), a)
 	m.onActionStatus(a)
-
 	if a.GetThingId() != "" {
 		thing := m.container.GetThing(a.GetThingId())
 		success := thing.AddAction(a.GetName())
@@ -61,7 +61,6 @@ func (m *ActionsModel) Add(a *Action) error {
 		}
 	}
 	a.updateStatus(ActionPending)
-
 	switch a.GetName() {
 	case ActionPair:
 		timeout := to.Int(a.Input["timeout"])
@@ -106,6 +105,15 @@ func (m *ActionsModel) Add(a *Action) error {
 
 func (m *ActionsModel) onActionStatus(a *Action) {
 	m.bus.Pub(topic.ThingActionStatus, a)
+}
+
+func (m *ActionsModel) updateStatus(ad *addon.ActionDescription) {
+	a, ok := m.actions.Load(ad.Id)
+	if !ok {
+		return
+	}
+	action, ok := a.(*Action)
+	action.update(ad)
 }
 
 func (m *ActionsModel) Remove(id string) error {
