@@ -4,11 +4,10 @@ import (
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 )
 
-type Clint interface {
+type Connection interface {
 	WriteMessage(message messages.MessageType, data interface{}) error
 	ReadMessage() (messages.MessageType, interface{}, error)
-	SetPluginId(id string)
-	GetPluginId() string
+	Register(pluginId string)
 }
 
 type PluginHandler interface {
@@ -16,5 +15,5 @@ type PluginHandler interface {
 }
 
 type PluginServer interface {
-	RegisterPlugin(clint Clint) (PluginHandler, error)
+	RegisterPlugin(clint Connection) (PluginHandler, error)
 }

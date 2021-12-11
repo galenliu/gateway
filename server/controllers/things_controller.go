@@ -1,21 +1,26 @@
 package controllers
 
 import (
+	"context"
 	"github.com/galenliu/gateway/pkg/addon"
-	"github.com/galenliu/gateway/pkg/container"
+	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/server/models/container"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
 	json "github.com/json-iterator/go"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type ThingsManager interface {
-	SetPropertyValue(thingId, propertyName string, value interface{}) (interface{}, error)
+	SetPropertyValue(ctx context.Context, thingId, propertyName string, value interface{}) (interface{}, error)
 	GetPropertyValue(thingId, propertyName string) (interface{}, error)
 	GetPropertiesValue(thingId string) (map[string]interface{}, error)
 	GetMapOfDevices() map[string]*addon.Device
+	SetPIN(ctx context.Context, thingId string, pin string) (*messages.Device, error)
+	SetCredentials(ctx context.Context, thingId, username, password string) (*messages.Device, error)
 }
 
 type thingsController struct {
@@ -32,22 +37,25 @@ func NewThingsControllerFunc(manager ThingsManager, model *container.ThingsConta
 	return tc
 }
 
-// POST /things
+// POST /things  create a new thing
 func (tc *thingsController) handleCreateThing(c *fiber.Ctx) error {
-	tc.logger.Infof("Post /thing,Body: %s", c.Body())
-	des, err := tc.model.CreateThing(c.Body())
+	tc.logger.Infof("Post /thing:\t\n %s", c.Body())
+	thing, err := tc.model.CreateThing(c.Body())
 	if err != nil {
-		return err
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
-	return c.Status(fiber.StatusOK).JSON(des)
+	return c.Status(fiber.StatusOK).JSON(*thing)
 }
 
 // DELETE /things/:thingId
 func (tc *thingsController) handleDeleteThing(c *fiber.Ctx) error {
 	thingId := c.Params("thingId")
+	if thingId == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "thing id must be provided")
+	}
 	err := tc.model.RemoveThing(thingId)
 	if err != nil {
-		return err
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 	tc.logger.Infof("Successfully deleted %v from database", thingId)
 	return c.SendStatus(http.StatusNoContent)
@@ -96,7 +104,11 @@ func (tc *thingsController) handleSetProperty(c *fiber.Ctx) error {
 	if thingId == "" || propName == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid params")
 	}
-	value := c.Body()
+	var value interface{}
+	err := json.Unmarshal(c.Body(), &value)
+	if err != nil {
+		return err
+	}
 	v, err := tc.model.SetThingProperty(thingId, propName, value)
 	if err != nil {
 		return err
@@ -139,4 +151,31 @@ func (tc *thingsController) handleSetThing(c *fiber.Ctx) error {
 		thing.SetSelectedCapability(selectedCapability)
 	}
 	return c.Status(fiber.StatusOK).SendString("")
+}
+
+// Patch thing
+func (tc *thingsController) handleUpdateThing(c *fiber.Ctx) error {
+
+	ctx, cancelFunc := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancelFunc()
+	thingId := c.Params("thingId")
+	username := json.Get(c.Body(), "username").ToString()
+	password := json.Get(c.Body(), "password").ToString()
+	pin := json.Get(c.Body(), "pin").ToString()
+
+	if thingId != "" && pin != "" {
+		device, err := tc.manager.SetPIN(ctx, thingId, pin)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+		return c.JSON(device)
+	}
+	if thingId != "" && username != "" && password != "" {
+		device, err := tc.manager.SetCredentials(ctx, thingId, username, password)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+		return c.JSON(device)
+	}
+	return fiber.NewError(fiber.StatusBadRequest)
 }

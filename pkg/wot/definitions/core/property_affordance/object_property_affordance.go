@@ -28,3 +28,17 @@ func (p *ObjectPropertyAffordance) UnmarshalJSON(data []byte) error {
 	p.Observable = json.Get(data, "observable").ToBool()
 	return nil
 }
+
+func (p *ObjectPropertyAffordance) MarshalJSON() ([]byte, error) {
+	type property struct {
+		*ia.InteractionAffordance
+		*schema.ObjectSchema
+		Observable bool `json:"observable,omitempty"`
+	}
+	prop := property{
+		InteractionAffordance: p.InteractionAffordance,
+		ObjectSchema:          p.ObjectSchema,
+		Observable:            p.Observable,
+	}
+	return json.Marshal(prop)
+}

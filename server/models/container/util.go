@@ -3,6 +3,7 @@ package container
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon"
+	"github.com/galenliu/gateway/pkg/constant"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	ia "github.com/galenliu/gateway/pkg/wot/definitions/core/interaction_affordance"
 	pa "github.com/galenliu/gateway/pkg/wot/definitions/core/property_affordance"
@@ -21,7 +22,7 @@ func AsWebOfThing(device *addon.Device) Thing {
 			Type:         device.GetType(),
 			Description:  device.GetDescription(),
 			Descriptions: map[string]string{},
-			Support:      "liuguilin",
+			Support:      constant.Support,
 			Base:         "",
 			Version: &wot.VersionInfo{
 				Instance: "1.1",
@@ -95,7 +96,7 @@ func mapOfWotProperties(deviceId string, props addon.DeviceProperties) (mapOfPro
 
 		switch p.Type {
 		case controls.TypeInteger:
-			wp = pa.IntegerPropertyAffordance{
+			wp = &pa.IntegerPropertyAffordance{
 				InteractionAffordance: i,
 				IntegerSchema: &schema.IntegerSchema{
 					DataSchema: dataSchema,
@@ -129,7 +130,7 @@ func mapOfWotProperties(deviceId string, props addon.DeviceProperties) (mapOfPro
 				Observable: false,
 			}
 		case controls.TypeNumber:
-			wp = pa.NumberPropertyAffordance{
+			wp = &pa.NumberPropertyAffordance{
 				InteractionAffordance: i,
 				NumberSchema: &schema.NumberSchema{
 					DataSchema: dataSchema,
@@ -157,13 +158,13 @@ func mapOfWotProperties(deviceId string, props addon.DeviceProperties) (mapOfPro
 				Observable: false,
 			}
 		case controls.TypeBoolean:
-			wp = pa.BooleanPropertyAffordance{
+			wp = &pa.BooleanPropertyAffordance{
 				InteractionAffordance: i,
 				BooleanSchema:         &schema.BooleanSchema{DataSchema: dataSchema},
 				Observable:            false,
 			}
 		case controls.TypeString:
-			wp = pa.StringPropertyAffordance{
+			wp = &pa.StringPropertyAffordance{
 				InteractionAffordance: i,
 				StringSchema: &schema.StringSchema{
 					DataSchema: dataSchema,
@@ -256,7 +257,7 @@ func mapOfWotEvent(deviceId string, events addon.DeviceEvents) (es wot.ThingEven
 						Response:            nil,
 						AdditionalResponses: nil,
 						Subprotocol:         "",
-						Op:                  controls.NewArrayOfString(controls.Op_subscribeEvent),
+						Op:                  controls.Op_subscribeEvent,
 					},
 				},
 				UriVariables: nil,

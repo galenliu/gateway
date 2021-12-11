@@ -6,8 +6,8 @@ import (
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
-	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/server/models/container"
 	uuid "github.com/satori/go.uuid"
 	"time"
 )
@@ -41,13 +41,13 @@ func NewActionModel(name string, input map[string]interface{}, bus *bus.Bus, log
 		Input:         input,
 		Id:            uuid.NewV4().String(),
 		Name:          name,
-		Status:        ActionCreated,
 		TimeRequested: &t,
 		TimeCompleted: nil,
 		ThingId:       "",
 		bus:           bus,
 	}
-	if things != nil || len(things) > 0 {
+	a.updateStatus(ActionCreated)
+	if things != nil && len(things) > 0 {
 		thing := things[0]
 		a.ThingId = thing.GetId()
 		a.Href = fmt.Sprintf("%s/%s/%s/%s", thing.GetHref(), constant.ActionsPath, name, a.Id)
@@ -97,6 +97,7 @@ func (action *Action) updateStatus(newStatus string) {
 		action.TimeCompleted = &t
 	}
 	action.Status = newStatus
+	action.logger.Infof("action.updateStatus: %s", newStatus)
 	action.bus.Pub(topic.ThingActionStatus, action)
 }
 

@@ -4,12 +4,12 @@ type Form struct {
 	Href                URI                          `json:"href" wot:"mandatory"`
 	ContentType         string                       `json:"contentType,omitempty" wot:"withDefault"`
 	ContentCoding       string                       `json:"contentCoding,omitempty" wot:"optional"`
-	Security            ArrayOfString                `json:"security,omitempty" wot:"optional"`
-	Scopes              ArrayOfString                `json:"scopes,omitempty" wot:"optional"`
+	Security            ArrayOrString                `json:"security,omitempty" wot:"optional"`
+	Scopes              ArrayOrString                `json:"scopes,omitempty" wot:"optional"`
 	Response            *ExpectedResponse            `json:"response,omitempty" wot:"optional"`
 	AdditionalResponses []AdditionalExpectedResponse `json:"additionalResponses,omitempty" wot:"optional"`
 	Subprotocol         string                       `json:"subprotocol,omitempty" wot:"optional"`
-	Op                  ArrayOfString                `json:"op,omitempty" wot:"withDefault"`
+	Op                  ArrayOrString                `json:"op,omitempty" wot:"withDefault"`
 }
 
 /*

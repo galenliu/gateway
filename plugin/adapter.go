@@ -1,20 +1,24 @@
 package plugin
 
 import (
+	"context"
+	"fmt"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
 	"sync"
 )
 
 type Adapter struct {
-	id          string
-	name        string
-	looker      *sync.Mutex
-	isPairing   bool
-	devices     sync.Map
-	packageName string
-	logger      logging.Logger
-	plugin      *Plugin
+	id                 string
+	name               string
+	isPairing          bool
+	packageName        string
+	logger             logging.Logger
+	plugin             *Plugin
+	devices            sync.Map
+	setCredentialsTask sync.Map
+	setPinTask         sync.Map
+	nextId             int
 }
 
 func NewAdapter(plugin *Plugin, adapterId, name, packageName string, log logging.Logger) *Adapter {
@@ -24,8 +28,57 @@ func NewAdapter(plugin *Plugin, adapterId, name, packageName string, log logging
 	adapter.id = adapterId
 	adapter.name = name
 	adapter.packageName = packageName
-	adapter.looker = new(sync.Mutex)
+	adapter.nextId = 0
 	return adapter
+}
+
+func (adapter *Adapter) setDeviceCredentials(ctx context.Context, thingId, username, password string) (*messages.Device, error) {
+	messageId := adapter.generatedId()
+	t, ok := adapter.setCredentialsTask.LoadOrStore(messageId, make(chan *messages.Device))
+	defer adapter.setCredentialsTask.Delete(messageId)
+	adapter.send(messages.MessageType_DeviceSetCredentialsRequest,
+		messages.DeviceSetCredentialsRequestJsonData{
+			AdapterId: adapter.getId(),
+			DeviceId:  thingId,
+			MessageId: messageId,
+			Password:  password,
+			PluginId:  adapter.plugin.getId(),
+			Username:  username,
+		})
+	task, ok := t.(chan *messages.Device)
+	if ok {
+		select {
+		case <-ctx.Done():
+			return nil, fmt.Errorf("timeout for setDeviceCredentials")
+		case d := <-task:
+			return d, nil
+		}
+	}
+	return nil, fmt.Errorf("failed to set device credentials")
+}
+
+func (adapter *Adapter) setDevicePin(ctx context.Context, deviceId, pin string) (*messages.Device, error) {
+	messageId := adapter.generatedId()
+	t, ok := adapter.setPinTask.LoadOrStore(messageId, make(chan *messages.Device))
+	defer adapter.setPinTask.Delete(messageId)
+	adapter.send(messages.MessageType_DeviceSetPinRequest,
+		messages.DeviceSetPinRequestJsonData{
+			AdapterId: adapter.getId(),
+			DeviceId:  deviceId,
+			MessageId: 0,
+			Pin:       pin,
+			PluginId:  adapter.getPlugin().getId(),
+		})
+	task, ok := t.(chan *messages.Device)
+	if ok {
+		select {
+		case <-ctx.Done():
+			return nil, fmt.Errorf("timeout for setting device pin")
+		case d := <-task:
+			return d, nil
+		}
+	}
+	return nil, fmt.Errorf("failed set device pin")
 }
 
 func (adapter *Adapter) startPairing(timeout int) {
@@ -67,23 +120,18 @@ func (adapter *Adapter) cancelRemoveThing(device *Device) {
 	adapter.send(messages.MessageType_AdapterCancelRemoveDeviceCommand, data)
 }
 
-func (adapter *Adapter) sendMsg(messageType messages.MessageType, data map[string]interface{}) {
-	data["adapterId"] = adapter.id
-	adapter.plugin.sendMsg(messageType, data)
-}
-
 func (adapter *Adapter) send(messageType messages.MessageType, data interface{}) {
 	adapter.plugin.send(messageType, data)
 }
 
 func (adapter *Adapter) handleDeviceRemoved(d *Device) {
 	adapter.devices.Delete(d.GetId())
-	adapter.plugin.pluginServer.manager.handleDeviceRemoved(d)
+	adapter.plugin.manager.handleDeviceRemoved(d)
 }
 
 func (adapter *Adapter) handleDeviceAdded(device *Device) {
 	adapter.devices.Store(device.GetId(), device)
-	adapter.plugin.pluginServer.manager.handleDeviceAdded(device)
+	adapter.plugin.manager.handleDeviceAdded(device)
 }
 
 func (adapter *Adapter) getDevice(deviceId string) *Device {
@@ -119,5 +167,12 @@ func (adapter *Adapter) getPlugin() *Plugin {
 }
 
 func (adapter *Adapter) unload() {
+	for _, device := range adapter.getDevices() {
+		adapter.handleDeviceRemoved(device)
+	}
+}
 
+func (adapter *Adapter) generatedId() int {
+	adapter.nextId = adapter.nextId + 1
+	return adapter.nextId
 }

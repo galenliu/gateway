@@ -29,7 +29,7 @@ func (j *PluginRegisterRequestJsonData) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// Register a plugin with the gateway
+// register a plugin with the gateway
 type PluginRegisterRequestJson struct {
 	// Message-specific data
 	Data PluginRegisterRequestJsonData `json:"data" yaml:"data"`

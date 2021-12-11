@@ -1,15 +1,13 @@
 package plugin
 
 import (
+	"context"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon"
-	"github.com/galenliu/gateway/pkg/bus/topic"
-	"time"
+	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 )
 
-const SetPropertyTimeOut = 3000
-
-func (m *Manager) SetPropertyValue(deviceId, propName string, newValue interface{}) (interface{}, error) {
+func (m *Manager) SetPropertyValue(ctx context.Context, deviceId, propName string, newValue interface{}) (interface{}, error) {
 	device := m.getDevice(deviceId)
 	if device == nil {
 		return nil, fmt.Errorf("device:%s not found", deviceId)
@@ -18,28 +16,7 @@ func (m *Manager) SetPropertyValue(deviceId, propName string, newValue interface
 	if !ok {
 		return nil, fmt.Errorf("property:%s not found", propName)
 	}
-	device.setPropertyValue(propName, newValue)
-	var valueChan = make(chan interface{})
-	unsubscribeFunc := m.bus.Sub(topic.DevicePropertyChanged, func(deviceId string, p *addon.PropertyDescription) {
-		if deviceId != device.GetId() {
-			if p.Name == propName {
-				valueChan <- p.Value
-			}
-		}
-	})
-	defer func() {
-		unsubscribeFunc()
-		close(valueChan)
-	}()
-	timeOut := time.After(SetPropertyTimeOut * time.Millisecond)
-	for {
-		select {
-		case <-timeOut:
-			return nil, fmt.Errorf("time out")
-		case p := <-valueChan:
-			return p, nil
-		}
-	}
+	return device.setPropertyValue(ctx, propName, newValue)
 }
 
 func (m *Manager) GetPropertyValue(thingId, propName string) (interface{}, error) {
@@ -90,14 +67,18 @@ func (m *Manager) GetDevices() (devices []*Device) {
 	return
 }
 
-func (m *Manager) SetPIN(thingId string, pin interface{}) error {
+func (m *Manager) SetPIN(ctx context.Context, thingId string, pin string) (*messages.Device, error) {
 	device := m.getDevice(thingId)
 	if device == nil {
-		return fmt.Errorf("con not finid addon:" + thingId)
+		return nil, fmt.Errorf("con not finid addon:" + thingId)
 	}
-	//err := addon.SetPin(pin)
-	//if err != nil {
-	//	return err
-	//}
-	return nil
+	return device.getAdapter().setDevicePin(ctx, thingId, pin)
+}
+
+func (m *Manager) SetCredentials(ctx context.Context, thingId, username, password string) (*messages.Device, error) {
+	device := m.getDevice(thingId)
+	if device == nil {
+		return nil, fmt.Errorf("con not finid addon:" + thingId)
+	}
+	return device.getAdapter().setDeviceCredentials(ctx, thingId, username, password)
 }

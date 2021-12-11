@@ -3,8 +3,8 @@ package controllers
 import (
 	"github.com/galenliu/gateway/pkg/addon"
 	b "github.com/galenliu/gateway/pkg/bus/topic"
-	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
+	container2 "github.com/galenliu/gateway/server/models/container"
 	"github.com/gofiber/websocket/v2"
 	"sync"
 )
@@ -14,7 +14,7 @@ type deviceManager interface {
 	GetLanguage() string
 }
 type thingContainer interface {
-	GetMapOfThings() map[string]*container.Thing
+	GetMapOfThings() map[string]*container2.Thing
 }
 
 type NewThingsController struct {
@@ -37,7 +37,7 @@ func NewNewThingsController(log logging.Logger) *NewThingsController {
 func (c *NewThingsController) handleNewThingsWebsocket(m deviceManager, t thingContainer, bus controllerBus) func(conn *websocket.Conn) {
 	return func(conn *websocket.Conn) {
 		addThing := func(deviceId string, device *addon.Device) {
-			err := conn.WriteJSON(container.AsWebOfThing(device))
+			err := conn.WriteJSON(container2.AsWebOfThing(device))
 			if err != nil {
 				return
 			}

@@ -3,11 +3,9 @@ package models
 import (
 	"context"
 	"fmt"
-	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/bus"
-	"github.com/galenliu/gateway/pkg/bus/topic"
-	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/server/models/container"
 	"github.com/xiam/to"
 	"sync"
 )
@@ -18,9 +16,8 @@ const (
 	ActionCreated   = "created"
 	ActionError     = "error"
 	ActionDeleted   = "deleted"
-
-	ActionPair   = "pair"
-	ActionUnpair = "unpair"
+	ActionPair      = "pair"
+	ActionUnpair    = "unpair"
 )
 
 type ActionsManager interface {
@@ -51,12 +48,12 @@ func NewActionsModel(m ActionsManager, container *container.ThingsContainer, bus
 
 func (m *ActionsModel) Add(a *Action) error {
 	m.actions.Store(a.GetId(), a)
-	m.onActionStatus(a)
+	defer m.actions.Delete(a.GetId())
+
 	if a.GetThingId() != "" {
 		thing := m.container.GetThing(a.GetThingId())
 		success := thing.AddAction(a.GetName())
 		if !success {
-			m.actions.Delete(a.GetId())
 			return fmt.Errorf("invalid thing action name: %s", a.GetName())
 		}
 	}
@@ -97,23 +94,9 @@ func (m *ActionsModel) Add(a *Action) error {
 			return err
 		}
 	default:
-		m.actions.Delete(a.GetId())
 		return fmt.Errorf("invalid action name: %s", a.GetName())
 	}
 	return nil
-}
-
-func (m *ActionsModel) onActionStatus(a *Action) {
-	m.bus.Pub(topic.ThingActionStatus, a)
-}
-
-func (m *ActionsModel) updateStatus(ad *addon.ActionDescription) {
-	a, ok := m.actions.Load(ad.Id)
-	if !ok {
-		return
-	}
-	action, ok := a.(*Action)
-	action.update(ad)
 }
 
 func (m *ActionsModel) Remove(id string) error {

@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"github.com/galenliu/gateway/server/models/container"
 	json "github.com/json-iterator/go"
 )
 
@@ -30,11 +31,16 @@ func (s *Storage) CreateThing(id string, thing interface{}) error {
 	return nil
 }
 
-func (s *Storage) GetThings() (things map[string][]byte) {
-	if things == nil {
-		things = make(map[string][]byte)
-	}
+func (s *Storage) GetThings() map[string]*container.Thing {
+
+	things := make(map[string]*container.Thing)
 	rows, err := s.db.Query("SELECT id, description FROM things")
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+			fmt.Printf(err.Error())
+		}
+	}(rows)
 	if err != nil {
 		return nil
 	}
@@ -42,10 +48,15 @@ func (s *Storage) GetThings() (things map[string][]byte) {
 		var id string
 		var description string
 		err = rows.Scan(&id, &description)
-		if err == nil {
+		if err != nil {
 			continue
 		}
-		things[id] = []byte(description)
+		var thing container.Thing
+		err := json.Unmarshal([]byte(description), &thing)
+		if err != nil {
+			continue
+		}
+		things[id] = &thing
 	}
 	return things
 }

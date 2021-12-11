@@ -1,0 +1,97 @@
+PUT http://localhost:9090/things/0x0000000010e2fa00/properties/on
+Content-Type: application/x-www-form-urlencoded
+
+false
+
+
+###
+
+
+<> 2021-12-11T002411.201.json
+
+###GET Things
+GET http://localhost:9090/things
+Accept: application/json
+
+<> 2021-12-11T003054.200.json
+
+
+###create thing
+POST http://localhost:9090/things
+Content-Type: application/json
+
+{
+  "@context": "https://webthings.io/schemas",
+  "title": "0x0000000010e2fa00",
+  "id": "0x0000000010e2fa00",
+  "@type": [
+    "Light"
+  ],
+  "support": "liuguilin361@gmai.com",
+  "version": {
+    "instance": "1.1",
+    "model": ""
+  },
+  "created": "2021-12-05T20:17:38.617089+08:00",
+  "modified": "2021-12-05T20:17:38.61709+08:00",
+  "properties": {
+    "hue": {
+      "@type": "ColorProperty",
+      "title": "Hue",
+      "forms": [
+        {
+          "href": "/things/0x0000000010e2fa00/properties/hue"
+        }
+      ],
+      "type": "string"
+    },
+    "level": {
+      "@type": "BrightnessProperty",
+      "title": "Brightness",
+      "forms": [
+        {
+          "href": "/things/0x0000000010e2fa00/properties/level"
+        }
+      ],
+      "unit": "percent",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "on": {
+      "@type": "OnOffProperty",
+      "title": "On/Off",
+      "forms": [
+        {
+          "href": "/things/0x0000000010e2fa00/properties/on"
+        }
+      ],
+      "type": "boolean"
+    }
+  },
+  "pin": {
+    "required": false,
+    "pattern": ""
+  }
+}
+
+<> 2021-12-11T003053.400.txt
+
+### Get addonsInfo
+GET http://localhost:9090/settings/addonsInfo
+Accept: application/json
+
+0x0000000010e2fa00
+
+<> 2021-12-11T003053.200.json
+
+###GET Things
+GET http://localhost:9090/things
+Accept: application/json
+
+
+<> 2021-12-11T003029.200.json
+
+
+
+

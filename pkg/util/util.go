@@ -3,18 +3,14 @@ package util
 import (
 	"bytes"
 	"crypto/sha256"
-	"encoding/binary"
-	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/logging"
 	"io"
 	"io/ioutil"
-	"math"
 	"os"
 	"os/exec"
 	"runtime"
-	"sort"
 	"strings"
 )
 
@@ -116,34 +112,10 @@ func GetNodeVersion() (version string) {
 	return strings.TrimPrefix(strings.TrimSuffix(v[0]+v[1], "."), "v")
 }
 
-func ByteToFloat64(bytes []byte) float64 {
-	bits := binary.LittleEndian.Uint64(bytes)
-	return math.Float64frombits(bits)
-}
-
-func GetBytes(key interface{}) []byte {
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
-	err := enc.Encode(key)
-	if err != nil {
-		return nil
-	}
-	return buf.Bytes()
-}
-
 func JsonIndent(in interface{}) string {
 	d, err := json.MarshalIndent(&in, "", "  ")
 	if err != nil {
 		return ""
 	}
 	return string(d)
-}
-
-func In(target string, strArray []string) bool {
-	sort.Strings(strArray)
-	index := sort.SearchStrings(strArray, target)
-	if index < len(strArray) && strArray[index] == target {
-		return true
-	}
-	return false
 }

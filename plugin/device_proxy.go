@@ -6,12 +6,17 @@ import (
 	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
+	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/xiam/to"
+	"sync"
 )
 
 type Device struct {
 	adapter *Adapter
 	*addon.Device
-	requestActionTask map[string]chan bool
+	logger               logging.Logger
+	requestActionTask    sync.Map
+	setPropertyValueTask sync.Map
 }
 
 func newDevice(adapter *Adapter, msg messages.Device) *Device {
@@ -104,7 +109,7 @@ func newDevice(adapter *Adapter, msg messages.Device) *Device {
 		return
 	}
 
-	eventFunc := func(events messages.DeviceEvents) (events1 map[string]addon.Event) {
+	eventsFunc := func(events messages.DeviceEvents) (events1 map[string]addon.Event) {
 		events1 = make(map[string]addon.Event)
 		for n, e := range events {
 			events1[n] = addon.Event{
@@ -149,7 +154,7 @@ func newDevice(adapter *Adapter, msg messages.Device) *Device {
 			Pin:        pinFunc(msg.Pin),
 			Properties: propertiesFunc(msg.Properties),
 			Actions:    actionsFunc(msg.Actions),
-			Events:     eventFunc(msg.Events),
+			Events:     eventsFunc(msg.Events),
 			CredentialsRequired: func() bool {
 				if msg.CredentialsRequired == nil {
 					return false
@@ -158,15 +163,18 @@ func newDevice(adapter *Adapter, msg messages.Device) *Device {
 			}(),
 		},
 	}
-	device.requestActionTask = make(map[string]chan bool)
+	device.logger = adapter.logger
 	return device
 }
 
-func (device *Device) getAdapter() *Adapter {
-	return device.adapter
-}
-
 func (device *Device) notifyValueChanged(property messages.Property) {
+	t, ok := device.setPropertyValueTask.Load(*property.Name)
+	if ok {
+		task := t.(chan interface{})
+		select {
+		case task <- property.Value:
+		}
+	}
 	p, ok := device.GetProperty(*property.Name)
 	if !ok {
 		return
@@ -184,43 +192,40 @@ func (device *Device) notifyValueChanged(property messages.Property) {
 		descriptionChanged = p.SetDescription(*property.Description)
 	}
 	if valueChanged || descriptionChanged || titleChanged {
-		device.adapter.plugin.pluginServer.manager.bus.Pub(topic.DevicePropertyChanged, device.GetId(), p.GetDescriptions())
-
+		device.adapter.plugin.manager.bus.Pub(topic.DevicePropertyChanged, device.GetId(), p.GetDescriptions())
 	}
 }
 
 func (device *Device) notifyDeviceConnected(connected bool) {
-	device.adapter.plugin.pluginServer.manager.bus.Pub(topic.DeviceConnected, device.GetId(), connected)
-
+	device.adapter.plugin.manager.bus.Pub(topic.DeviceConnected, device.GetId(), connected)
 }
 
 func (device *Device) notifyAction(actionDescription *addon.ActionDescription) {
-	device.adapter.plugin.pluginServer.manager.bus.Pub(topic.DeviceActionStatus, actionDescription)
+	device.adapter.plugin.manager.bus.Pub(topic.DeviceActionStatus, device.GetId(), actionDescription)
 }
 
 func (device *Device) requestAction(ctx context.Context, id, name string, input map[string]interface{}) error {
-	_, ok := device.requestActionTask[id]
-	if ok {
-		return fmt.Errorf("action id: %v already exists", id)
+
+	t, ok := device.requestActionTask.LoadOrStore(id, make(chan bool))
+	if !ok {
+		var message = messages.DeviceRequestActionRequestJsonData{
+			ActionId:   id,
+			ActionName: name,
+			AdapterId:  device.getAdapter().getId(),
+			DeviceId:   device.GetId(),
+			Input:      input,
+			PluginId:   device.getAdapter().getPlugin().pluginId,
+		}
+		device.adapter.send(messages.MessageType_DeviceRequestActionRequest, message)
 	}
-	var message = messages.DeviceRequestActionRequestJsonData{
-		ActionId:   id,
-		ActionName: name,
-		AdapterId:  device.getAdapter().getId(),
-		DeviceId:   device.GetId(),
-		Input:      input,
-		PluginId:   device.getAdapter().getPlugin().pluginId,
-	}
-	device.adapter.send(messages.MessageType_DeviceRequestActionRequest, message)
-	device.requestActionTask[id] = make(chan bool)
-	task := device.requestActionTask[id]
+	task := t.(chan bool)
 	defer func() {
-		delete(device.requestActionTask, id)
+		device.requestActionTask.Delete(id)
 	}()
 	for {
 		select {
 		case <-ctx.Done():
-			return fmt.Errorf("timeout")
+			return fmt.Errorf("requestActionTask timeout")
 		case b := <-task:
 			if b {
 				return nil
@@ -230,13 +235,53 @@ func (device *Device) requestAction(ctx context.Context, id, name string, input 
 	}
 }
 
-func (device *Device) setPropertyValue(name string, value interface{}) {
-	data := messages.DeviceSetPropertyCommandJsonData{
-		AdapterId:     device.getAdapter().getId(),
-		DeviceId:      device.GetId(),
-		PluginId:      device.getAdapter().getPlugin().getId(),
-		PropertyName:  name,
-		PropertyValue: value,
+func (device *Device) setPropertyValue(ctx context.Context, name string, value interface{}) (interface{}, error) {
+
+	p, _ := device.GetProperty(name)
+	if p.Type == TypeBoolean {
+		value = to.Bool(value)
 	}
-	device.getAdapter().send(messages.MessageType_DeviceSetPropertyCommand, data)
+	if p.Type == TypeNumber {
+		value = to.Float64(value)
+	}
+	if p.Type == TypeInteger {
+		value = to.Int64(value)
+	}
+	if p.Type == TypeString {
+		value = to.String(value)
+	}
+
+	t, ok := device.setPropertyValueTask.LoadOrStore(name, make(chan interface{}))
+	task := t.(chan interface{})
+
+	defer func() {
+		device.setPropertyValueTask.Delete(name)
+	}()
+
+	defer func() {
+		device.setPropertyValueTask.Delete(name)
+	}()
+	if !ok {
+		data := messages.DeviceSetPropertyCommandJsonData{
+			AdapterId:     device.getAdapter().getId(),
+			DeviceId:      device.GetId(),
+			PluginId:      device.getAdapter().getPlugin().getId(),
+			PropertyName:  name,
+			PropertyValue: value,
+		}
+		device.getAdapter().send(messages.MessageType_DeviceSetPropertyCommand, data)
+	}
+
+	for {
+		select {
+		case <-ctx.Done():
+			return nil, fmt.Errorf("timeout for setPropertyValue")
+		case v := <-task:
+			return v, nil
+		}
+	}
+}
+
+func (device *Device) getAdapter() *Adapter {
+	return device.adapter
 }

@@ -2,6 +2,8 @@ package constant
 
 // events
 const (
+	Support = "liuguilin361@gmai.com"
+
 	UnloadPluginKillDelay = 3000
 	GatewayStop           = "gatewayStop"
 

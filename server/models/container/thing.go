@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
+	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
 )
 
@@ -23,7 +24,7 @@ type Thing struct {
 
 	//The state  of the thing
 	SelectedCapability string `json:"selectedCapability,omitempty"`
-	Connected          bool   `json:"connected,,omitempty"`
+	Connected          bool   `json:"-"`
 
 	//FloorplanVisibility bool `json:"floorplanVisibility"`
 	//FloorplanX          uint `json:"floorplanX"`
@@ -44,11 +45,15 @@ func (t *Thing) UnmarshalJSON(data []byte) error {
 	t.Thing = &thing
 
 	var pin ThingPin
-	json.Get(data, "pin").ToVal(&pin)
-	t.Pin = &pin
+	if p := json.Get(data, "pin"); p.LastError() == nil {
+		p.ToVal(&pin)
+		if &pin != nil {
+			t.Pin = &pin
+		}
+	}
 
-	t.CredentialsRequired = json.Get(data, "credentialsRequired").ToBool()
-	t.Connected = json.Get(data, "connected").ToBool()
+	t.CredentialsRequired = controls.JSONGetBool(data, "credentialsRequired", false)
+	t.Connected = controls.JSONGetBool(data, "connected", false)
 	t.GroupId = json.Get(data, "groupId").ToString()
 	t.SelectedCapability = json.Get(data, "selectedCapability").ToString()
 	if t.SelectedCapability == "" {

@@ -106,7 +106,7 @@ func (m *Manager) UnloadAddon(packageId string) {
 	}
 	plugin.unloadComponents()
 	time.AfterFunc(time.Duration(constant.UnloadPluginKillDelay)*time.Millisecond, func() {
-		plugin.kill()
+		plugin.shutdown()
 		_, _ = m.extensions.LoadAndDelete(packageId)
 	})
 }

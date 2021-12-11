@@ -17,14 +17,6 @@ type IntegerSchema struct {
 
 func (schema *IntegerSchema) UnmarshalJSON(data []byte) error {
 
-	getInteger := func(sep string) *controls.Integer {
-		var ig controls.Integer
-		json.Get(data, sep).ToVal(&ig)
-		if &ig != nil {
-			return &ig
-		}
-		return nil
-	}
 	var dataSchema DataSchema
 	err := json.Unmarshal(data, &dataSchema)
 	if err != nil {
@@ -35,11 +27,11 @@ func (schema *IntegerSchema) UnmarshalJSON(data []byte) error {
 	if schema.DataSchema == nil && schema.DataSchema.GetType() != controls.TypeInteger {
 		return fmt.Errorf("type must integer")
 	}
-	schema.Minimum = getInteger("minimum")
-	schema.ExclusiveMinimum = getInteger("exclusiveMinimum")
-	schema.Maximum = getInteger("maximum")
-	schema.ExclusiveMaximum = getInteger("exclusiveMaximum")
-	schema.MultipleOf = getInteger("multipleOf")
+	schema.Minimum = controls.JSONGetInteger(data, "minimum")
+	schema.ExclusiveMinimum = controls.JSONGetInteger(data, "exclusiveMinimum")
+	schema.Maximum = controls.JSONGetInteger(data, "maximum")
+	schema.ExclusiveMaximum = controls.JSONGetInteger(data, "exclusiveMaximum")
+	schema.MultipleOf = controls.JSONGetInteger(data, "multipleOf")
 	return nil
 }
 

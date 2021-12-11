@@ -12,33 +12,30 @@ type InteractionAffordance struct {
 	Titles       map[string]string            `json:"titles,omitempty,optional"`
 	Description  string                       `json:"description,omitempty,optional"`
 	Descriptions map[string]string            `json:"descriptions,omitempty,optional"`
-	Forms        []controls.Form              `json:"forms,omitempty,mandatory"`
+	Forms        []controls.Form              `json:"forms,omitempty,mandatory" wot:"optional"`
 	UriVariables map[string]schema.DataSchema `json:"uriVariables,omitempty"`
 }
 
 func (i *InteractionAffordance) UnmarshalJSON(data []byte) error {
 	var uriVariables map[string]schema.DataSchema
-	json.Get(data, "uriVariables").ToVal(&uriVariables)
-	if uriVariables != nil {
-		i.UriVariables = uriVariables
+	if uriVar := json.Get(data, "uriVariables"); uriVar.LastError() == nil {
+		uriVar.ToVal(&uriVariables)
+		if &uriVar != nil && len(uriVariables) > 0 {
+			i.UriVariables = uriVariables
+		}
 	}
 	i.Type = json.Get(data, "@type").ToString()
-	i.Title = json.Get(data, "@title").ToString()
+	i.Title = json.Get(data, "title").ToString()
 	i.Titles = controls.JSONGetMap(data, "titles")
-	i.Description = json.Get(data, "@description").ToString()
+	i.Description = json.Get(data, "description").ToString()
 	i.Descriptions = controls.JSONGetMap(data, "descriptions")
 
 	var forms []controls.Form
-	json.Get(data, "forms").ToVal(&forms)
-	if len(forms) > 0 {
-		i.Forms = forms
-	} else {
-		return nil
-	}
-	var uris map[string]schema.DataSchema
-	json.Get(data, "uriVariables").ToVal(&uris)
-	if len(uris) > 0 {
-		i.UriVariables = uris
+	if f := json.Get(data, "forms"); f.LastError() == nil {
+		f.ToVal(&forms)
+		if &f != nil && len(forms) > 0 {
+			i.Forms = forms
+		}
 	}
 	return nil
 }

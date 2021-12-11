@@ -31,21 +31,32 @@ func JSONGetUint64(data []byte, field string, def uint64) uint64 {
 }
 
 func JSONGetMap(data []byte, field string) map[string]string {
-	var v map[string]string
-	json.Get(data, field).ToVal(&v)
-	if len(v) == 0 {
-		return nil
+	var m map[string]string
+	if result := json.Get(data, field); result.LastError() == nil {
+		result.ToVal(&m)
+		if m != nil && len(m) > 0 {
+			return m
+		}
 	}
-	return v
+	return nil
+}
+
+func JSONGetInteger(data []byte, sep string) *Integer {
+	if v := json.Get(data, sep); v.LastError() == nil {
+		i := Integer(v.ToInt64())
+		return &i
+	}
+	return nil
 }
 
 func JSONGetArray(data []byte, field string) []string {
-	if result := json.Get(data, field); result.ValueType() == json.ArrayValue {
-		return result.Keys()
-	}
-
-	if result := json.Get(data, field); result.ValueType() == json.StringValue {
-		return []string{result.ToString()}
+	var arr []string
+	if result := json.Get(data, field); result.LastError() == nil {
+		result.ToVal(&arr)
+		if &arr != nil && len(arr) > 0 {
+			return arr
+		}
+		return nil
 	}
 	return nil
 }

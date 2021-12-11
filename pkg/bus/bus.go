@@ -34,14 +34,6 @@ func (b *Bus) unsubscribe(topic string, fn interface{}) {
 	}
 }
 
-func (b *Bus) publish(topic string, args ...interface{}) {
-	b.logger.Debugf("publish topic:[%s]", topic)
-	if !b.Bus.HasCallback(topic) {
-		return
-	}
-	b.Bus.Publish(topic, args...)
-}
-
 func (b *Bus) subscribeOnce(topic string, fn interface{}) {
 	b.logger.Debugf("subscribeOnce topic:[%s]", topic)
 	err := b.Bus.SubscribeOnce(topic, fn)
@@ -59,18 +51,15 @@ func (b *Bus) subscribeAsync(topic string, fn interface{}) {
 }
 
 func (b *Bus) Sub(topic topic.Topic, fn interface{}) func() {
-	b.subscribe(topic.ToString(), fn)
+	go b.subscribe(topic.ToString(), fn)
 	return func() {
 		b.unsubscribe(topic.ToString(), fn)
 	}
 }
 
 func (b *Bus) Pub(topic topic.Topic, args ...interface{}) {
-	b.logger.Debugf("publish topic:[%s]", topic)
-	if !b.Bus.HasCallback(topic.ToString()) {
-		return
-	}
-	b.Bus.Publish(topic.ToString(), args...)
+	b.logger.Debugf("publish topic:[%s] Args:%#v", topic, args)
+	go b.Bus.Publish(topic.ToString(), args...)
 }
 
 func (b *Bus) waitAsync() {

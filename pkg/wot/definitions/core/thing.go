@@ -1,6 +1,8 @@
 package core
 
 import (
+	"fmt"
+	wot_properties "github.com/galenliu/gateway/pkg/wot/definitions/core/property_affordance"
 	dataSchema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	securityScheme "github.com/galenliu/gateway/pkg/wot/definitions/security_scheme"
@@ -39,7 +41,7 @@ type Thing struct {
 	Links []controls.Link `json:"links,omitempty"`
 	Forms []controls.Form `json:"forms,omitempty"`
 
-	Security            controls.ArrayOfString   `json:"security,omitempty" wot:"mandatory"`
+	Security            controls.ArrayOrString   `json:"security,omitempty" wot:"mandatory"`
 	SecurityDefinitions ThingSecurityDefinitions `json:"securityDefinitions,omitempty" wot:"mandatory"`
 
 	Profile           []controls.URI         `json:"profile,omitempty" wot:"optional"`
@@ -47,6 +49,7 @@ type Thing struct {
 }
 
 func (t *Thing) UnmarshalJSON(data []byte) error {
+
 	t.Id = controls.URI(json.Get(data, "id").ToString())
 	t.Title = json.Get(data, "title").ToString()
 	if t.Title == "" {
@@ -56,50 +59,152 @@ func (t *Thing) UnmarshalJSON(data []byte) error {
 		t.Id = controls.URI(t.Title)
 	}
 	t.Context = controls.URI(json.Get(data, "@context").ToString())
-	t.Security = controls.NewArrayOfString(json.Get(data, "security").ToString())
+	t.Security = controls.ArrayOrString(json.Get(data, "security").ToString())
 	t.Description = json.Get(data, "description").ToString()
+	t.Support = controls.URI(json.Get(data, "support").ToString())
+
+	var typ []string
+	if tp := json.Get(data, "@type"); tp.LastError() == nil {
+		tp.ToVal(&typ)
+		if tp != nil {
+			t.Type = typ
+		}
+	} else {
+		return fmt.Errorf("type nil")
+	}
 
 	var m map[string]securityScheme.SecurityScheme
-	json.Get(data, "securityDefinitions").ToVal(&m)
-	if m != nil {
-		t.SecurityDefinitions = m
+	if s := json.Get(data, "securityDefinitions"); s.LastError() == nil {
+		s.ToVal(&m)
+		if m != nil {
+			t.SecurityDefinitions = m
+		}
 	}
 
 	var props ThingProperties
-	json.Get(data, "properties").ToVal(&props)
-	t.Properties = props
+	if properties := json.Get(data, "properties"); properties.LastError() == nil {
+		props = make(ThingProperties)
+		for _, name := range properties.Keys() {
+			prop := properties.Get(name)
+			typ := properties.Get(name, "type").ToString()
+			if prop.LastError() != nil || typ == "" {
+				continue
+			}
+			switch typ {
+			case controls.TypeString:
+				var p wot_properties.StringPropertyAffordance
+				prop.ToVal(&p)
+				if &p != nil {
+					props[name] = &p
+				}
+			case controls.TypeBoolean:
+				var p wot_properties.BooleanPropertyAffordance
+				prop.ToVal(&p)
+				if &p != nil {
+					props[name] = &p
+				}
+			case controls.TypeInteger:
+				var p wot_properties.IntegerPropertyAffordance
+				prop.ToVal(&p)
+				if &p != nil {
+					props[name] = &p
+				}
+			case controls.TypeNumber:
+				var p wot_properties.NumberPropertyAffordance
+				prop.ToVal(&p)
+				if &p != nil {
+					props[name] = &p
+				}
+			case controls.TypeObject:
+				var p wot_properties.ObjectPropertyAffordance
+				prop.ToVal(&p)
+				if &p != nil {
+					props[name] = &p
+				}
+			case controls.TypeArray:
+				var p wot_properties.ArrayPropertyAffordance
+				prop.ToVal(&p)
+				if &p != nil {
+					props[name] = &p
+				}
+			case controls.TypeNull:
+				var p wot_properties.NullPropertyAffordance
+				prop.ToVal(&p)
+				if &p != nil {
+					props[name] = &p
+				}
+			default:
+				continue
+			}
+		}
+		if props != nil && len(props) > 0 {
+			t.Properties = props
+		}
+	}
 
 	var actions ThingActions
-	json.Get(data, "actions").ToVal(&actions)
-	t.Actions = actions
+	if a := json.Get(data, "actions"); a.LastError() == nil {
+		a.ToVal(&actions)
+		if actions != nil {
+			t.Actions = actions
+		}
+	}
 
 	var events ThingEvents
-	json.Get(data, "events").ToVal(&events)
-	t.Events = events
+	if e := json.Get(data, "events"); e.LastError() == nil {
+		e.ToVal(&events)
+		if e != nil {
+			t.Events = events
+		}
+	}
 
 	var links []controls.Link
-	json.Get(data, "links").ToVal(&links)
-	t.Links = links
+	if l := json.Get(data, "links"); l.LastError() == nil {
+		l.ToVal(&links)
+		if l != nil {
+			t.Links = links
+		}
+	}
 
 	var forms []controls.Form
-	json.Get(data, "forms").ToVal(&forms)
-	t.Forms = forms
+	if cf := json.Get(data, "forms"); cf.LastError() == nil {
+		cf.ToVal(&forms)
+		if forms != nil {
+			t.Forms = forms
+		}
+	}
 
-	var security controls.ArrayOfString
-	json.Get(data, "security").ToVal(&security)
-	t.Security = security
+	var security controls.ArrayOrString
+	if ca := json.Get(data, "security"); ca.LastError() == nil {
+		ca.ToVal(&security)
+		if security != "" {
+			t.Security = security
+		}
+	}
 
 	var securityDefinitions ThingSecurityDefinitions
-	json.Get(data, "securityDefinitions").ToVal(&securityDefinitions)
-	t.SecurityDefinitions = securityDefinitions
+	if s := json.Get(data, "securityDefinitions"); s.LastError() == nil {
+		s.ToVal(&securityDefinitions)
+		if securityDefinitions != nil {
+			t.SecurityDefinitions = securityDefinitions
+		}
+	}
 
 	var profile []controls.URI
-	json.Get(data, "profile").ToVal(&profile)
-	t.Profile = profile
+	if pf := json.Get(data, "profile"); pf.LastError() == nil {
+		pf.ToVal(&profile)
+		if profile != nil {
+			t.Profile = profile
+		}
+	}
 
 	var schemaDefinitions ThingSchemaDefinitions
-	json.Get(data, "schemaDefinitions").ToVal(&schemaDefinitions)
-	t.SchemaDefinitions = schemaDefinitions
+	if tsd := json.Get(data, "schemaDefinitions"); tsd.LastError() == nil {
+		tsd.ToVal(&schemaDefinitions)
+		if securityDefinitions != nil {
+			t.SchemaDefinitions = schemaDefinitions
+		}
+	}
 
 	return nil
 }

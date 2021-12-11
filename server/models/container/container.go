@@ -1,6 +1,7 @@
 package container
 
 import (
+	"context"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon"
 	bus "github.com/galenliu/gateway/pkg/bus"
@@ -9,10 +10,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 	json "github.com/json-iterator/go"
 	"net/http"
+	"time"
 )
 
 type ThingsManager interface {
-	SetPropertyValue(thingId, propertyName string, value interface{}) (interface{}, error)
+	SetPropertyValue(ctx context.Context, thingId, propertyName string, value interface{}) (interface{}, error)
 	GetPropertyValue(thingId, propertyName string) (interface{}, error)
 	GetPropertiesValue(thingId string) (map[string]interface{}, error)
 }
@@ -22,7 +24,7 @@ type ThingsStorage interface {
 	RemoveThing(id string) error
 	CreateThing(id string, thing interface{}) error
 	UpdateThing(id string, thing interface{}) error
-	GetThings() map[string][]byte
+	GetThings() map[string]*Thing
 }
 
 type ThingsContainer struct {
@@ -43,7 +45,9 @@ func NewThingsContainerModel(manager ThingsManager, store ThingsStorage, b *bus.
 	t.store = store
 	t.manager = manager
 	t.logger = log
-	t.things = make(map[string]*Thing)
+	t.bus = b
+	t.things = make(map[string]*Thing, 20)
+	t.updateThings()
 	_ = b.Sub(topic.DeviceAdded, t.handleDeviceAdded)
 	_ = b.Sub(topic.DeviceRemoved, t.handleDeviceRemoved)
 	_ = b.Sub(topic.DeviceConnected, t.handleDeviceConnected)
@@ -73,9 +77,13 @@ func (c *ThingsContainer) SetThingProperty(thingId, propName string, value inter
 	if prop.IsReadOnly() {
 		return nil, fiber.NewError(fiber.StatusNotFound, "property read only")
 	}
-	v, err := c.manager.SetPropertyValue(thingId, propName, value)
+	ctx, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)
+	defer func() {
+		cancelFunc()
+	}()
+	v, err := c.manager.SetPropertyValue(ctx, thingId, propName, value)
 	if err != nil {
-		return nil, fiber.NewError(fiber.StatusInternalServerError, "failure")
+		return nil, fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 	return v, nil
 }
@@ -101,13 +109,27 @@ func (c *ThingsContainer) GetMapOfThings() map[string]*Thing {
 }
 
 func (c *ThingsContainer) CreateThing(data []byte) (*Thing, error) {
-	t, err := c.handleCreateThing(data)
-	if err != nil {
-		return nil, fiber.NewError(fiber.StatusBadRequest)
+
+	thingId := json.Get(data, "id").ToString()
+	var thing Thing
+	err := json.Unmarshal(data, &thing)
+	if err != nil || thingId == "" {
+		return nil, err
 	}
-	t.container = c
-	c.things[t.GetId()] = t
-	return t, nil
+	t := c.GetThing(thingId)
+	if t != nil {
+		return nil, fmt.Errorf("thing: %s is exited", t.GetId())
+	}
+	thing.container = c
+	thing.bus = c.bus
+	err = c.store.CreateThing(thingId, thing)
+	if err != nil {
+		return nil, err
+	}
+	id := thing.GetId()
+	th := &thing
+	c.things[id] = th
+	return th, nil
 }
 
 func (c *ThingsContainer) RemoveThing(thingId string) error {
@@ -116,11 +138,8 @@ func (c *ThingsContainer) RemoveThing(thingId string) error {
 		c.logger.Error("remove thing id: %s from Store err: %s", thingId, err.Error())
 	}
 	t, ok := c.things[thingId]
-	if !ok {
+	if !ok || t == nil {
 		return fiber.NewError(http.StatusInternalServerError, fmt.Sprintf("container has not thing id: %s", thingId))
-	}
-	if err != nil {
-		return fiber.NewError(http.StatusInternalServerError, err.Error())
 	}
 	t.remove()
 	delete(c.things, thingId)
@@ -137,24 +156,6 @@ func (c *ThingsContainer) UpdateThing(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (c *ThingsContainer) handleCreateThing(data []byte) (*Thing, error) {
-	thingId := json.Get(data, "id").ToString()
-	var thing Thing
-	err := json.Unmarshal(data, &thing)
-	if err != nil || thingId == "" {
-		return nil, err
-	}
-	t := c.GetThing(thingId)
-	if t != nil {
-		return nil, fmt.Errorf("thing id: %s is exited", t.GetId())
-	}
-	err = c.store.CreateThing(thingId, thing)
-	if err != nil {
-		return nil, err
-	}
-	return &thing, nil
 }
 
 func (c *ThingsContainer) handleUpdateThing(data []byte) error {
@@ -177,14 +178,10 @@ func (c *ThingsContainer) handleUpdateThing(data []byte) error {
 
 func (c *ThingsContainer) updateThings() {
 	if len(c.things) < 1 {
-		for id, bytes := range c.store.GetThings() {
-			var thing Thing
-			err := json.Unmarshal(bytes, &thing)
-			if err != nil {
-				continue
-			}
+		for id, thing := range c.store.GetThings() {
 			thing.container = c
-			c.things[id] = &thing
+			thing.bus = c.bus
+			c.things[id] = thing
 		}
 	}
 }
@@ -196,7 +193,7 @@ func (c *ThingsContainer) handleDeviceRemoved(thingId string) {
 	}
 }
 
-func (c *ThingsContainer) handleDeviceAdded(deviceId string, device *addon.Device) {
+func (c *ThingsContainer) handleDeviceAdded(deviceId string, _ *addon.Device) {
 	t := c.GetThing(deviceId)
 	if t != nil {
 		t.setConnected(true)

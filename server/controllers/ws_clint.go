@@ -4,8 +4,8 @@ import (
 	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
-	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
+	container2 "github.com/galenliu/gateway/server/models/container"
 	"github.com/gofiber/websocket/v2"
 )
 
@@ -36,7 +36,7 @@ func (c *wsClint) handle() {
 	if c.thingId == "" {
 		things := c.container.GetThings()
 		unsubscribe = c.bus.Sub(topic.DeviceAdded, func(deviceId string, device *addon.Device) {
-			thing := container.AsWebOfThing(device)
+			thing := container2.AsWebOfThing(device)
 			c.addThing(&thing)
 		})
 		for _, t := range things {
@@ -91,7 +91,7 @@ func (c *wsClint) close() {
 	}
 }
 
-func (c *wsClint) addThing(t *container.Thing) {
+func (c *wsClint) addThing(t *container2.Thing) {
 
 	onConnected := func(deviceId string, connected bool) {
 		if deviceId != t.GetId() {

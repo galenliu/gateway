@@ -4,10 +4,9 @@ go 1.17
 
 require (
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
-	github.com/gofiber/fiber/v2 v2.22.0
-	github.com/gofiber/websocket/v2 v2.0.13
+	github.com/gofiber/fiber/v2 v2.23.0
+	github.com/gofiber/websocket/v2 v2.0.14
 	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/gorilla/websocket v1.4.2
 	github.com/json-iterator/go v1.1.12
 	github.com/kardianos/service v1.2.0
 	github.com/mattn/go-sqlite3 v1.14.9
@@ -21,14 +20,14 @@ require (
 	github.com/xiam/to v0.0.0-20200126224905-d60d31e03561
 	golang.org/x/crypto v0.0.0-20211117183948-ae814b36b871
 	golang.org/x/sys v0.0.0-20211124211545-fe61309f8881
-	gopkg.in/yaml.v2 v2.4.0
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )
 
 require (
 	github.com/andybalholm/brotli v1.0.2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
-	github.com/fasthttp/websocket v1.4.3-rc.9 // indirect
+	github.com/fasthttp/websocket v1.4.3-rc.10 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
@@ -55,4 +54,5 @@ require (
 	golang.org/x/text v0.3.6 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/ini.v1 v1.63.2 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/bus"
-	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/server/models"
+	"github.com/galenliu/gateway/server/models/container"
 	"github.com/gofiber/fiber/v2"
 	"time"
 )
@@ -63,14 +63,14 @@ func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 			return fiber.NewError(fiber.StatusNotFound, err.Error())
 		}
 		actionModel = models.NewActionModel(actionName, input, a.bus, a.logger, thing)
-		ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*1)
+		ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*3)
 		err := a.manager.RequestAction(ctx, thing.GetId(), actionModel.GetName(), input)
 		cancelFunc()
 		if err != nil {
 			return fiber.NewError(fiber.StatusNotFound, fmt.Sprintf("create action: %s failed. err: %s", actionName, err.Error()))
 		}
 	}
-	if thing != nil || actionModel == nil {
+	if thing == nil && actionModel == nil {
 		actionModel = models.NewActionModel(actionName, input, a.bus, a.logger)
 	}
 	err = a.actions.Add(actionModel)

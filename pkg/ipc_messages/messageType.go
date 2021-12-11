@@ -54,14 +54,7 @@ const (
 	MessageType_OutletNotifyRequest                MessageType = 16386
 	MessageType_OutletNotifyResponse               MessageType = 16387
 	MessageType_OutletRemovedNotification          MessageType = 16385
-	MessageType_ServiceAddedNotification           MessageType = 81000
-	MessageType_ServiceSetPropertyValueRequest     MessageType = 81100
-	MessageType_ServicePropertyChangedNotification MessageType = 81101
-	MessageType_ServiceActionsStatusNotification   MessageType = 81109
-	MessageType_ServiceGetThingsRequest            MessageType = 81001
-	MessageType_ServiceGetThingsResponse           MessageType = 81002
-	MessageType_ServiceGetThingRequest             MessageType = 81003
-	MessageType_ServiceGetThingResponse            MessageType = 81004
+	MessageType_MashalERROR                        MessageType = 81000
 )
 
 // Enum value maps for MessageType.

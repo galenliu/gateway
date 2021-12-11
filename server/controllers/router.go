@@ -6,11 +6,11 @@ import (
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
-	"github.com/galenliu/gateway/pkg/container"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/middleware"
 	"github.com/galenliu/gateway/server/models"
+	container2 "github.com/galenliu/gateway/server/models/container"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -28,7 +28,7 @@ type controllerBus interface {
 
 type Storage interface {
 	models.UsersStore
-	container.ThingsStorage
+	container2.ThingsStorage
 	models.SettingsStore
 	models.JsonwebtokenStore
 	models.AddonStore
@@ -42,10 +42,10 @@ type Config struct {
 
 // Container  Things
 type Container interface {
-	GetThing(id string) *container.Thing
-	GetThings() []*container.Thing
-	GetMapOfThings() map[string]*container.Thing
-	CreateThing(data []byte) (*container.Thing, error)
+	GetThing(id string) *container2.Thing
+	GetThings() []*container2.Thing
+	GetMapOfThings() map[string]*container2.Thing
+	CreateThing(data []byte) (*container2.Thing, error)
 	RemoveThing(id string) error
 	UpdateThing(data []byte) error
 }
@@ -77,7 +77,7 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 
 	//models init
 	settingModel := models.NewSettingsModel(config.AddonUrls, store, log)
-	containerModel := container.NewThingsContainerModel(manager, store, bus, log)
+	containerModel := container2.NewThingsContainerModel(manager, store, bus, log)
 	jwtMiddleware := middleware.NewJWTMiddleware(store, log)
 	auth := jwtMiddleware.Auth
 	usersModel := models.NewUsersModel(store, log)
@@ -182,6 +182,7 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		thingsGroup.Post("/", thingsController.handleCreateThing)
 
 		thingsGroup.Get("/:thingId", thingsController.handleGetThing)
+		thingsGroup.Patch("/:thingId", thingsController.handleUpdateThing)
 		thingsGroup.Get("/", thingsController.handleGetThings)
 
 		thingsGroup.Get("/:thingId", websocket.New(handleWebsocket(containerModel, bus, log)))

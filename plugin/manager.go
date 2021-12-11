@@ -5,15 +5,13 @@ import (
 	"compress/gzip"
 	"context"
 	"fmt"
-	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
-	"github.com/galenliu/gateway/pkg/container"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
-	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
+	container2 "github.com/galenliu/gateway/server/models/container"
 	"github.com/robfig/cron"
 	"io"
 	"os"
@@ -37,41 +35,26 @@ type Config struct {
 }
 
 type Manager struct {
-	config        Config
-	configPath    string
-	pluginServer  *PluginsServer
-	devices       sync.Map
-	adapters      sync.Map
-	services      sync.Map
-	installAddons sync.Map
-	extensions    sync.Map
-	container     *container.ThingsContainer
-	bus           *bus.Bus
-	addonsLoaded  bool
-	isPairing     bool
-	running       bool
-	pairTask      chan struct{}
-	locker        *sync.Mutex
-	logger        logging.Logger
-	actions       map[string]*wot.ActionAffordance
-	storage       managerStore
-	ctx           context.Context
-
+	config         Config
+	configPath     string
+	pluginServer   *PluginsServer
+	devices        sync.Map
+	adapters       sync.Map
+	outlets        sync.Map
+	installAddons  sync.Map
+	extensions     sync.Map
+	container      *container2.ThingsContainer
+	bus            *bus.Bus
+	addonsLoaded   bool
+	isPairing      bool
+	running        bool
+	pairTask       chan bool
+	locker         *sync.Mutex
+	logger         logging.Logger
+	storage        managerStore
+	ctx            context.Context
 	deferredRemove sync.Map
 }
-
-//type managerBus interface {
-//	Pub(topic bus.Topic, args ...interface{})
-//	Sub(topic bus.Topic, fu interface{})
-//	PublishThingAdded(thing *container.Thing)
-//	PublishDeviceRemoved(deviceId string)
-//	PublishPairingTimeout()
-//	PublishActionStatus(action interface{})
-//	PublishConnected(thingId string, connected bool)
-//	PublishEvent(event *addon.Event)
-//	PublishPropertyChanged(thingId string, property *addon.PropertyDescription)
-//	AddPropertyChangedSubscription(thingId string, fn func(p *addon.PropertyDescription)) func()
-//}
 
 func NewAddonsManager(ctx context.Context, conf Config, s managerStore, bus *bus.Bus, log logging.Logger) *Manager {
 	am := &Manager{}
@@ -104,26 +87,42 @@ func (m *Manager) AddNewThings(timeout int) error {
 	if m.pairTask != nil {
 		return fmt.Errorf("add new things already in progress")
 	}
-	m.pairTask = make(chan struct{})
+	m.pairTask = make(chan bool)
 	timeoutChan := time.After(time.Duration(timeout) * time.Millisecond)
 	var handlePairingTimeout = func() {
 		for _, adapter := range m.getAdapters() {
+			m.logger.Infof("%s to call startPairing on", adapter.name)
 			adapter.startPairing(timeout)
 		}
 		for {
 			select {
 			case <-timeoutChan:
-				m.logger.Info("startPairing timeout")
+				m.pairTask = nil
+				m.logger.Info("pairing timeout")
 				m.bus.Pub(topic.PairingTimeout)
 				m.CancelAddNewThing()
+				return
 			case <-m.pairTask:
-				m.logger.Info("startPairing cancel")
+				m.logger.Info("pairing cancel")
+				m.pairTask = nil
 				return
 			}
 		}
 	}
 	go handlePairingTimeout()
 	return nil
+}
+
+func (m *Manager) CancelAddNewThing() {
+	if m.pairTask != nil {
+		select {
+		case m.pairTask <- true:
+		}
+	}
+	for _, adapter := range m.getAdapters() {
+		adapter.cancelPairing()
+	}
+	return
 }
 
 func (m *Manager) RemoveThing(deviceId string) error {
@@ -158,21 +157,6 @@ func (m *Manager) RemoveThing(deviceId string) error {
 	return nil
 }
 
-func (m *Manager) CancelAddNewThing() {
-	if m.pairTask != nil {
-		select {
-		case m.pairTask <- struct{}{}:
-		default:
-			break
-		}
-	}
-	for _, adapter := range m.getAdapters() {
-		adapter.cancelPairing()
-	}
-	m.pairTask = nil
-	return
-}
-
 func (m *Manager) CancelRemoveThing(deviceId string) {
 	task, _ := m.deferredRemove.Load(deviceId)
 	removeTask, ok := task.(chan struct{})
@@ -192,21 +176,17 @@ func (m *Manager) CancelRemoveThing(deviceId string) {
 	adapter.cancelRemoveThing(device)
 }
 
-func (m *Manager) actionNotify(action *addon.Action) {
-	//m.bus.PublishActionStatus(action)
+func (m *Manager) handleAdapterAdded(adapter *Adapter) {
+	m.adapters.Store(adapter.getId(), adapter)
 }
 
-func (m *Manager) eventNotify(event *addon.Event) {
-	//m.bus.PublishEvent(event)
-}
-
-func (m *Manager) addAdapter(adapter *Adapter) {
-	m.adapters.Store(adapter.id, adapter)
+func (m *Manager) handleAdapterUnload(adapterId string) {
+	m.adapters.Delete(adapterId)
 }
 
 func (m *Manager) handleDeviceAdded(device *Device) {
 	m.devices.Store(device.GetId(), device)
-	m.logger.Infof("Device added: %s", util.JsonIndent(container.AsWebOfThing(device.Device)))
+	m.logger.Infof("Device added: %s", util.JsonIndent(container2.AsWebOfThing(device.Device)))
 	m.bus.Pub(topic.DeviceAdded, device.GetId(), device.Device)
 }
 
@@ -265,6 +245,9 @@ func (m *Manager) getExtensions() (adapters []*Extension) {
 
 func (m *Manager) getDevice(deviceId string) *Device {
 	d, ok := m.devices.Load(deviceId)
+	if !ok {
+		return nil
+	}
 	device, ok := d.(*Device)
 	if !ok {
 		return nil
@@ -304,7 +287,7 @@ func (m *Manager) installAddon(packageId, packagePath string) error {
 	if !m.addonsLoaded {
 		return fmt.Errorf("cannot install add-on before other add-ons have been loaded")
 	}
-	m.logger.Infof("run install %s", packageId)
+	m.logger.Infof("start install %s", packageId)
 	f, err := os.Open(packagePath)
 	if err != nil {
 		return err
@@ -365,7 +348,6 @@ func (m *Manager) loadAddons() {
 		for _, fi := range fs {
 			if fi.IsDir() {
 				m.loadAddon(fi.Name())
-
 			}
 		}
 	}
@@ -436,7 +418,7 @@ func (m *Manager) loadAddon(packageId string) {
 }
 
 func (m *Manager) removeAdapter(adapter *Adapter) {
-	m.adapters.Delete(adapter.id)
+	m.adapters.Delete(adapter.getId())
 }
 
 func (m *Manager) getAddonPath(packageId string) string {
@@ -458,7 +440,7 @@ func (m *Manager) removeNotifier(notifierId string) {
 }
 
 func (m *Manager) handleOutletRemoved(outlet *Outlet) {
-
+	m.outlets.Delete(outlet.getId())
 }
 
 func (m *Manager) removeApiHandler(id int) {
