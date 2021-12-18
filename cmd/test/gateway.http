@@ -1,0 +1,25 @@
+### Pair
+POST http://localhost:9090/actions
+Content-Type: application/json
+
+{
+  "pair":{
+    "input":{
+      "timeout": 3000
+    }
+  }
+}
+
+###GET Things
+GET http://localhost:9090/things
+Accept: application/json
+
+### Get addonsInfo
+GET http://localhost:9090/settings/addonsInfo
+Accept: application/json
+
+
+
+
+
+

@@ -39,7 +39,13 @@ func (schema *IntegerSchema) GetDefaultValue() interface{} {
 	if schema.DataSchema.Default != nil {
 		return schema.Convert(schema.Default)
 	}
-	return nil
+	if len(schema.Enum) > 0 {
+		return schema.Convert(schema.Enum[0])
+	}
+	if schema.Minimum != nil {
+		return schema.Convert(*schema.Minimum)
+	}
+	return controls.DefaultInteger
 }
 
 func (schema *IntegerSchema) Convert(v interface{}) interface{} {
@@ -56,7 +62,14 @@ func (schema *IntegerSchema) clamp(value controls.Integer) controls.Integer {
 		if value < *schema.Minimum {
 			return *schema.Minimum
 		}
-
 	}
 	return value
+}
+
+func (schema *IntegerSchema) verify(value interface{}) bool {
+	switch value.(type) {
+	case controls.Integer:
+		return true
+	}
+	return false
 }

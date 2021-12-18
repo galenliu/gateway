@@ -51,7 +51,7 @@ func (schema *NumberSchema) GetDefaultValue() interface{} {
 	if schema.Minimum != nil {
 		return *schema.Minimum
 	}
-	return 0
+	return controls.DefaultNumber
 }
 
 func (schema *NumberSchema) Convert(v interface{}) interface{} {
@@ -70,4 +70,12 @@ func (schema NumberSchema) clamp(value controls.Double) controls.Double {
 		}
 	}
 	return value
+}
+
+func (schema *NumberSchema) verify(value interface{}) bool {
+	switch value.(type) {
+	case controls.Number:
+		return true
+	}
+	return false
 }

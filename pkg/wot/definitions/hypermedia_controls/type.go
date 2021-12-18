@@ -12,6 +12,10 @@ type URI string
 type ArrayOrString string
 type Double float64
 
+const DefaultInteger Integer = 0
+const DefaultNumber Number = 0
+const DefaultDouble Double = 0
+
 const (
 	TypeNumber  = "number"
 	TypeString  = "string"

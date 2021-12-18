@@ -47,10 +47,6 @@ func (schema *StringSchema) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-//func (schema *StringSchema) Convert(v interface{}) interface{} {
-//	return schema.clamp(controls.ToString(v))
-//}
-
 func (schema *StringSchema) GetDefaultValue() interface{} {
 	if schema.DataSchema.Default != nil {
 		return schema.Default
@@ -61,11 +57,17 @@ func (schema *StringSchema) GetDefaultValue() interface{} {
 	return ""
 }
 
-//func (schema *StringSchema) clamp(value string) string {
-//	if schema.MaxLength != 0 {
-//		if schema.MaxLength < controls.ToUnsignedInt(len(value)) {
-//			return string([]rune(value)[:schema.MaxLength])
-//		}
-//	}
-//	return value
-//}
+func (schema *StringSchema) verifyType(value interface{}) bool {
+	switch value.(type) {
+	case string:
+		return true
+	}
+	return false
+}
+
+func (schema *StringSchema) clamp(value string) string {
+	if schema.MaxLength != nil {
+		value = value[0:*schema.MaxLength]
+	}
+	return value
+}

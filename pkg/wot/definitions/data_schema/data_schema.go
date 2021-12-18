@@ -12,10 +12,9 @@ const (
 	SenmlJSON       = "application/senml+json"
 	CBOR            = "application/cbor"
 	SenmlCbor       = "application/senml+cbor"
-
-	XML      = "application/xml"
-	SenmlXML = "application/senml+xml"
-	EXI      = "application/exi"
+	XML             = "application/xml"
+	SenmlXML        = "application/senml+xml"
+	EXI             = "application/exi"
 )
 
 type DataSchema struct {
@@ -28,7 +27,7 @@ type DataSchema struct {
 	Default      interface{}       `json:"default,omitempty" wot:"optional"`
 	Unit         string            `json:"unit,omitempty" wot:"optional"`
 	OneOf        []DataSchema      `json:"oneOf,,omitempty" wot:"optional"`
-	Enum         []interface{}     `json:"enum,omitempty" wot:"optional"`
+	Enum         []any             `json:"enum,omitempty" wot:"optional"`
 	ReadOnly     bool              `json:"readOnly,omitempty" wot:"withDefault"`
 	WriteOnly    bool              `json:"writeOnly,omitempty" wot:"withDefault"`
 	Format       string            `json:"format,omitempty" wot:"optional"`
@@ -57,7 +56,7 @@ func (schema *DataSchema) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	var enum []interface{}
+	var enum []any
 	if e := json.Get(data, "enum"); e.LastError() == nil {
 		e.ToVal(&oneOf)
 		if len(enum) > 0 {

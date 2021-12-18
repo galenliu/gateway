@@ -1,20 +1,31 @@
+### trune on
+PUT http://localhost:9090/things/0x0000000010e2fa00/properties/on
+Content-Type: application/x-www-form-urlencoded
+
+true
+
+### trune level
+PUT http://localhost:9090/things/0x0000000010e2fa00/properties/level
+Content-Type: application/x-www-form-urlencoded
+
+100
+
+### set hue
+PUT http://localhost:9090/things/0x0000000010e2fa00/properties/hue
+Content-Type: application/x-www-form-urlencoded
+
+"#111111"
+
+
+### trune off
 PUT http://localhost:9090/things/0x0000000010e2fa00/properties/on
 Content-Type: application/x-www-form-urlencoded
 
 false
 
-
-###
-
-
-<> 2021-12-11T002411.201.json
-
 ###GET Things
 GET http://localhost:9090/things
 Accept: application/json
-
-<> 2021-12-11T003054.200.json
-
 
 ###create thing
 POST http://localhost:9090/things
@@ -81,16 +92,12 @@ Content-Type: application/json
 GET http://localhost:9090/settings/addonsInfo
 Accept: application/json
 
-0x0000000010e2fa00
-
-<> 2021-12-11T003053.200.json
-
 ###GET Things
 GET http://localhost:9090/things
 Accept: application/json
 
 
-<> 2021-12-11T003029.200.json
+
 
 
 

@@ -30,9 +30,9 @@ type Thing struct {
 	Support controls.URI `json:"support,omitempty" wot:"optional"`
 	Base    controls.URI `json:"base,omitempty" wot:"optional"`
 
-	Version  *VersionInfo       `json:"version,omitempty" wot:"optional"`
-	Created  *controls.DataTime `json:"created,omitempty" wot:"optional"`
-	Modified *controls.DataTime `json:"modified,omitempty" wot:"optional"`
+	Version  *VersionInfo      `json:"version,omitempty" wot:"optional"`
+	Created  controls.DataTime `json:"created,omitempty" wot:"optional"`
+	Modified controls.DataTime `json:"modified,omitempty" wot:"optional"`
 
 	Properties ThingProperties `json:"properties,omitempty" wot:"optional"`
 	Actions    ThingActions    `json:"actions,omitempty" wot:"optional"`
