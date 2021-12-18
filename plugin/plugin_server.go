@@ -14,7 +14,7 @@ import (
 type PluginsServer struct {
 	Plugins   sync.Map
 	manager   *Manager
-	ipc       *ipc.IPCServer
+	ipc       *ipc.WebSocketServer
 	closeChan chan struct{}
 	logger    logging.Logger
 }
@@ -89,7 +89,7 @@ func (s *PluginsServer) getPlugin(id string) *Plugin {
 }
 
 func (s *PluginsServer) getPlugins() (plugins []*Plugin) {
-	s.Plugins.Range(func(key, value interface{}) bool {
+	s.Plugins.Range(func(key, value any) bool {
 		p, ok := value.(*Plugin)
 		if ok {
 			plugins = append(plugins, p)

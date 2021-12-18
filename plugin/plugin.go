@@ -72,7 +72,7 @@ func (plugin *Plugin) getAdapter(adapterId string) *Adapter {
 }
 
 func (plugin *Plugin) getAdapters() (adapters []*Adapter) {
-	plugin.adapters.Range(func(key, value interface{}) bool {
+	plugin.adapters.Range(func(key, value any) bool {
 		adapter, ok := value.(*Adapter)
 		if ok {
 			adapters = append(adapters, adapter)
@@ -83,7 +83,7 @@ func (plugin *Plugin) getAdapters() (adapters []*Adapter) {
 }
 
 func (plugin *Plugin) getNotifiers() (notifiers []*Notifier) {
-	plugin.notifiers.Range(func(key, value interface{}) bool {
+	plugin.notifiers.Range(func(key, value any) bool {
 		notifier, ok := value.(*Notifier)
 		if ok {
 			notifiers = append(notifiers, notifier)
@@ -94,7 +94,7 @@ func (plugin *Plugin) getNotifiers() (notifiers []*Notifier) {
 }
 
 func (plugin *Plugin) getApiHandlers() (apiHandlers []*ApiHandler) {
-	plugin.apiHandlers.Range(func(key, value interface{}) bool {
+	plugin.apiHandlers.Range(func(key, value any) bool {
 		apiHandler, ok := value.(*ApiHandler)
 		if ok {
 			apiHandlers = append(apiHandlers, apiHandler)

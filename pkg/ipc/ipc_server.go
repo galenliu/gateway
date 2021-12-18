@@ -6,19 +6,15 @@ import (
 	"github.com/galenliu/gateway/pkg/logging"
 	"net/http"
 	"sync"
-	"time"
 )
 
 var upgrade = websocket.Upgrader{
-	ReadBufferSize:   1024,
-	WriteBufferSize:  1024,
-	HandshakeTimeout: 1 * time.Second,
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
 }
 
-type IPCServer struct {
+type WebSocketServer struct {
 	logger       logging.Logger
 	path         string
 	port         string
@@ -27,8 +23,8 @@ type IPCServer struct {
 	userProfile  *messages.PluginRegisterResponseJsonDataUserProfile
 }
 
-func NewIPCServer(pluginServer PluginServer, port string, userProfile *messages.PluginRegisterResponseJsonDataUserProfile, log logging.Logger) *IPCServer {
-	ipc := &IPCServer{}
+func NewIPCServer(pluginServer PluginServer, port string, userProfile *messages.PluginRegisterResponseJsonDataUserProfile, log logging.Logger) *WebSocketServer {
+	ipc := &WebSocketServer{}
 	ipc.pluginServer = pluginServer
 	ipc.logger = log
 	ipc.port = port
@@ -37,12 +33,12 @@ func NewIPCServer(pluginServer PluginServer, port string, userProfile *messages.
 	return ipc
 }
 
-func (s *IPCServer) Run() {
+func (s *WebSocketServer) Run() {
 
 	http.HandleFunc("/", s.handle)
 	http.HandleFunc("/ws", s.handle)
 	s.logger.Infof("ipc listen addr: %s", s.port)
-	err := http.ListenAndServe("127.0.0.1"+s.port, nil)
+	err := http.ListenAndServe("localhost"+s.port, nil)
 	if err != nil {
 		s.logger.Errorf("ipcServer Listen err : %s", err.Error())
 	}
@@ -52,7 +48,7 @@ func (s *IPCServer) Run() {
 }
 
 //处理IPC客户端请求
-func (s *IPCServer) handle(w http.ResponseWriter, r *http.Request) {
+func (s *WebSocketServer) handle(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrade.Upgrade(w, r, nil)
 	if err != nil {
 		s.logger.Errorf("upgrade websocket failed err: %s", err.Error())
@@ -62,7 +58,7 @@ func (s *IPCServer) handle(w http.ResponseWriter, r *http.Request) {
 	go s.readLoop(conn)
 }
 
-func (s *IPCServer) readLoop(conn *websocket.Conn) {
+func (s *WebSocketServer) readLoop(conn *websocket.Conn) {
 	//conn.SetPongHandler(func(appData string) error {
 	//	s.logger.Info("ping request: %s", appData)
 	//	return conn.WriteMessage(websocket.PongMessage, nil)

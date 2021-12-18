@@ -9,7 +9,7 @@ type Property struct {
 	Description string             `json:"description,omitempty"`
 	Minimum     *float64           `json:"minimum,omitempty"`
 	Maximum     *float64           `json:"maximum,omitempty"`
-	Enum        []interface{}      `json:"enum,omitempty"`
+	Enum        []any              `json:"enum,omitempty"`
 	ReadOnly    bool               `json:"readOnly,omitempty"`
 	MultipleOf  *float64           `json:"multipleOf,omitempty"`
 	Links       []PropertyLinkElem `json:"links,omitempty"`
@@ -25,7 +25,7 @@ type PropertyDescription struct {
 	Description string             `json:"description,omitempty"`
 	Minimum     *float64           `json:"minimum,omitempty"`
 	Maximum     *float64           `json:"maximum,omitempty"`
-	Enum        []interface{}      `json:"enum,omitempty"`
+	Enum        []any              `json:"enum,omitempty"`
 	ReadOnly    bool               `json:"readOnly,omitempty"`
 	MultipleOf  *float64           `json:"multipleOf,omitempty"`
 	Links       []PropertyLinkElem `json:"links,omitempty"`
@@ -71,7 +71,7 @@ func (p Property) GetMaximum() *float64 {
 	return p.Maximum
 }
 
-func (p Property) GetEnum() []interface{} {
+func (p Property) GetEnum() []any {
 	return p.Enum
 }
 
