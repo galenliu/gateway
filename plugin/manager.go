@@ -71,7 +71,7 @@ func NewAddonsManager(ctx context.Context, conf Config, s managerStore, bus *bus
 	return am
 }
 
-func (m *Manager) RequestAction(ctx context.Context, thingId, actionName string, input map[string]interface{}) error {
+func (m *Manager) RequestAction(ctx context.Context, thingId, actionName string, input map[string]any) error {
 	device := m.getDevice(thingId)
 	if device == nil {
 		return fmt.Errorf("device %s not found", thingId)
@@ -213,7 +213,7 @@ func (m *Manager) getAdapter(adapterId string) *Adapter {
 }
 
 func (m *Manager) getAdapters() (adapters []*Adapter) {
-	m.adapters.Range(func(key, value interface{}) bool {
+	m.adapters.Range(func(key, value any) bool {
 		adapter, ok := value.(*Adapter)
 		if ok {
 			adapters = append(adapters, adapter)
@@ -233,7 +233,7 @@ func (m *Manager) getExtension(id string) *Extension {
 }
 
 func (m *Manager) getExtensions() (adapters []*Extension) {
-	m.extensions.Range(func(key, value interface{}) bool {
+	m.extensions.Range(func(key, value any) bool {
 		ext, ok := value.(*Extension)
 		if ok {
 			adapters = append(adapters, ext)
@@ -272,7 +272,7 @@ func (m *Manager) getPlugin(packetId string) *Plugin {
 }
 
 func (m *Manager) getInstallAddons() (addons []*Addon) {
-	m.installAddons.Range(func(key, value interface{}) bool {
+	m.installAddons.Range(func(key, value any) bool {
 		ad, ok := value.(*Addon)
 		if ok {
 			addons = append(addons, ad)

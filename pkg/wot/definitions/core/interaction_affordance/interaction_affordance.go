@@ -6,7 +6,7 @@ import (
 )
 
 type InteractionAffordance struct {
-	Type         string                       `json:"@type,omitempty,optional"`
+	AtType       string                       `json:"@type,omitempty,optional"`
 	Title        string                       `json:"title,omitempty,optional"`
 	Titles       map[string]string            `json:"titles,omitempty,optional"`
 	Description  string                       `json:"description,omitempty,optional"`

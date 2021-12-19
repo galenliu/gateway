@@ -49,7 +49,7 @@ func (p *IntegerPropertyAffordance) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	p.InteractionAffordance = &ia.InteractionAffordance{
-		Type:         prop.Type,
+		AtType:       prop.AtType,
 		Title:        prop.Title,
 		Titles:       prop.Titles,
 		Description:  prop.Description,

@@ -2,9 +2,9 @@ package db
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"github.com/galenliu/gateway/server/models/container"
-	json "github.com/json-iterator/go"
 )
 
 func (s *Storage) CreateThing(id string, thing interface{}) error {

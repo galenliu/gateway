@@ -14,7 +14,7 @@ Content-Type: application/x-www-form-urlencoded
 PUT http://localhost:9090/things/0x0000000010e2fa00/properties/hue
 Content-Type: application/x-www-form-urlencoded
 
-"#111111"
+"#FF0000"
 
 
 ### trune off
@@ -26,6 +26,10 @@ false
 ###GET Things
 GET http://localhost:9090/things
 Accept: application/json
+
+
+### Delete thing
+DELETE http://localhost:9090/things/0x0000000010e2fa00
 
 ###create thing
 POST http://localhost:9090/things
@@ -43,8 +47,8 @@ Content-Type: application/json
     "instance": "1.1",
     "model": ""
   },
-  "created": "2021-12-05T20:17:38.617089+08:00",
-  "modified": "2021-12-05T20:17:38.61709+08:00",
+  "created": "2021-12-20T00:57:40.5020687+08:00",
+  "modified": "2021-12-20T00:57:40.5020687+08:00",
   "properties": {
     "hue": {
       "@type": "ColorProperty",
@@ -80,11 +84,32 @@ Content-Type: application/json
       "type": "boolean"
     }
   },
+  "actions": {
+    "effect": {
+      "forms": [
+        {
+          "href": "things/0x0000000010e2fa00/actions/effect",
+          "op": "observeallproperties"
+        }
+      ]
+    }
+  },
   "pin": {
     "required": false,
     "pattern": ""
   }
 }
+
+
+
+###create thing action
+POST http://localhost:9090/things/0x0000000010e2fa00/actions
+Content-Type: application/json
+
+{
+  "effect": {"input": {"type": "smooth","duration": 100}}
+}
+
 
 <> 2021-12-11T003053.400.txt
 

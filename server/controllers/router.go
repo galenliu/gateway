@@ -174,6 +174,7 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 	{
 		thingsController := NewThingsControllerFunc(manager, containerModel, log)
 		thingsGroup := app.Group(constant.ThingsPath)
+
 		//set a properties of a thing.
 		thingsGroup.Put("/:thingId/properties/*", thingsController.handleSetProperty)
 		thingsGroup.Get("/:thingId/properties/*", thingsController.handleGetPropertyValue)
@@ -197,8 +198,8 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		thingsGroup.Patch("/:thingId", thingsController.handlePatchThing)
 		thingsGroup.Delete("/:thingId", thingsController.handleDeleteThing)
 
-		thingsGroup.Get("/:thingId"+constant.ActionsPath, actionsController.handleGetActions)
-		thingsGroup.Post("/:thingId"+constant.ActionsPath, actionsController.handleCreateAction)
+		thingsGroup.Get("/:thingId"+"/"+constant.ActionsPath, actionsController.handleGetActions)
+		thingsGroup.Post("/:thingId"+"/"+constant.ActionsPath, actionsController.handleCreateAction)
 	}
 
 	//NewThing Controller

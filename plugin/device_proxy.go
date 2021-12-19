@@ -64,8 +64,8 @@ func newDevice(adapter *Adapter, msg messages.Device) *Device {
 				Description: getString(p.Description),
 				Minimum:     p.Minimum,
 				Maximum:     p.Maximum,
-				Enum: func(elems []messages.PropertyEnumElem) []interface{} {
-					var enums []interface{}
+				Enum: func(elems []messages.PropertyEnumElem) []any {
+					var enums []any
 					for e := range elems {
 						enums = append(enums, e)
 					}
@@ -204,7 +204,7 @@ func (device *Device) notifyAction(actionDescription *addon.ActionDescription) {
 	device.adapter.plugin.manager.bus.Pub(topic.DeviceActionStatus, device.GetId(), actionDescription)
 }
 
-func (device *Device) requestAction(ctx context.Context, id, name string, input map[string]interface{}) error {
+func (device *Device) requestAction(ctx context.Context, id, name string, input map[string]any) error {
 
 	t, ok := device.requestActionTask.LoadOrStore(id, make(chan bool))
 	if !ok {

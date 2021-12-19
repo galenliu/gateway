@@ -59,7 +59,7 @@ func mapOfWotProperties(deviceId string, props addon.DeviceProperties) (mapOfPro
 	asWotProperty := func(deviceId string, p addon.Property) wot.PropertyAffordance {
 		var wp wot.PropertyAffordance
 		var i = &ia.InteractionAffordance{
-			Type:         p.AtType,
+			AtType:       p.AtType,
 			Title:        p.Title,
 			Titles:       map[string]string{},
 			Description:  p.Description,
@@ -206,7 +206,7 @@ func mapOfWotActions(deviceId string, actions addon.DeviceActions) (mapOfPropert
 	asWotAction := func(deviceId, actionName string, a addon.Action) wot.ActionAffordance {
 		var aa = wot.ActionAffordance{}
 		var i = &ia.InteractionAffordance{
-			Type:         a.AtType,
+			AtType:       a.AtType,
 			Title:        a.Title,
 			Titles:       map[string]string{},
 			Description:  a.Description,
@@ -242,7 +242,7 @@ func mapOfWotEvent(deviceId string, events addon.DeviceEvents) (es wot.ThingEven
 	asWotEvent := func(deviceId string, a addon.Event) wot.EventAffordance {
 		ea := wot.EventAffordance{
 			InteractionAffordance: ia.InteractionAffordance{
-				Type:         a.Type,
+				AtType:       a.Type,
 				Title:        a.Title,
 				Titles:       map[string]string{},
 				Description:  a.Description,

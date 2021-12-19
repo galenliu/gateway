@@ -13,28 +13,28 @@ import (
 )
 
 type ActionDescription struct {
-	Input         map[string]interface{} `json:"input,omitempty"`
-	Href          string                 `json:"href,omitempty"`
-	TimeRequested *time.Time             `json:"timeRequested,omitempty"`
-	TimeCompleted *time.Time             `json:"timeCompleted,omitempty"`
-	Error         error                  `json:"error,omitempty"`
+	Input         map[string]any `json:"input,omitempty"`
+	Href          string         `json:"href,omitempty"`
+	TimeRequested *time.Time     `json:"timeRequested,omitempty"`
+	TimeCompleted *time.Time     `json:"timeCompleted,omitempty"`
+	Error         error          `json:"error,omitempty"`
 }
 
 type Action struct {
-	Id            string                 `json:"-"`
-	ThingId       string                 `json:"-"`
-	Name          string                 `json:"name,omitempty"`
-	Input         map[string]interface{} `json:"input,omitempty"`
-	Href          string                 `json:"href,omitempty"`
-	TimeRequested *time.Time             `json:"timeRequested,omitempty"`
-	TimeCompleted *time.Time             `json:"timeCompleted,omitempty"`
-	Status        string                 `json:"status,omitempty"`
-	Error         error                  `json:"error,omitempty"`
+	Id            string         `json:"-"`
+	ThingId       string         `json:"-"`
+	Name          string         `json:"name,omitempty"`
+	Input         map[string]any `json:"input,omitempty"`
+	Href          string         `json:"href,omitempty"`
+	TimeRequested *time.Time     `json:"timeRequested,omitempty"`
+	TimeCompleted *time.Time     `json:"timeCompleted,omitempty"`
+	Status        string         `json:"status,omitempty"`
+	Error         error          `json:"error,omitempty"`
 	bus           *bus.Bus
 	logger        logging.Logger
 }
 
-func NewActionModel(name string, input map[string]interface{}, bus *bus.Bus, log logging.Logger, things ...*container.Thing) *Action {
+func NewActionModel(name string, input map[string]any, bus *bus.Bus, log logging.Logger, things ...*container.Thing) *Action {
 	t := time.Now()
 	a := &Action{
 		logger:        log,
@@ -84,7 +84,7 @@ func (action *Action) GetStatus() string {
 	return action.Status
 }
 
-func (action *Action) GetInput() map[string]interface{} {
+func (action *Action) GetInput() map[string]any {
 	return action.Input
 }
 

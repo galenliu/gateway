@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="gateway" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="gateway" />
+    <working_directory value="$PROJECT_DIR$" />
+    <parameters value="start --data-dir C:\Users\galen\Desktop\web-things\gateway\configs" />
+    <kind value="FILE" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/cmd/gateway/main.go" />
+    <method v="2" />
+  </configuration>
+</component>

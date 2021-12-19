@@ -5,6 +5,7 @@ import (
 	"github.com/galenliu/gateway/pkg/addon"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/server/models/container"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
@@ -44,7 +45,7 @@ func (tc *thingsController) handleCreateThing(c *fiber.Ctx) error {
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
-	return c.Status(fiber.StatusOK).JSON(*thing)
+	return c.Status(fiber.StatusOK).SendString(util.JsonIndent(thing))
 }
 
 // DELETE /things/:thingId

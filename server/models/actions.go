@@ -23,7 +23,7 @@ const (
 type ActionsManager interface {
 	AddNewThings(timeOut int) error
 	CancelAddNewThing()
-	RequestAction(ctx context.Context, thingId, actionName string, input map[string]interface{}) error
+	RequestAction(ctx context.Context, thingId, actionName string, input map[string]any) error
 	RemoveThing(id string) error
 	RemoveAction(thingId string, actionId string, actionName string) error
 	CancelRemoveThing(id string)
@@ -51,11 +51,13 @@ func (m *ActionsModel) Add(a *Action) error {
 	defer m.actions.Delete(a.GetId())
 
 	if a.GetThingId() != "" {
+		a.updateStatus(ActionPending)
 		thing := m.container.GetThing(a.GetThingId())
 		success := thing.AddAction(a.GetName())
 		if !success {
 			return fmt.Errorf("invalid thing action name: %s", a.GetName())
 		}
+		return nil
 	}
 	a.updateStatus(ActionPending)
 	switch a.GetName() {

@@ -31,8 +31,11 @@ func NewActionsController(model *models.ActionsModel, thing *container.ThingsCon
 
 func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 
-	var thingId = c.FormValue("thingId", "")
-	var actionBody map[string]map[string]interface{}
+	type action struct {
+		Input map[string]any `json:"input,omitempty"`
+	}
+	thingId := c.Params("thingId")
+	var actionBody map[string]action
 	err := c.BodyParser(&actionBody)
 	if err != nil || len(actionBody) != 1 {
 		err := fmt.Errorf("incorrect number of parameters. body:  %s", c.Body())
@@ -40,19 +43,16 @@ func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 	var actionName string
-	var actionParams map[string]interface{}
+	var actionParams action
 	for a, params := range actionBody {
 		actionName = a
 		actionParams = params
 	}
-	i, ok := actionParams["input"]
-	if actionName == "" || actionParams == nil || !ok {
+
+	if actionName == "" {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
-	input, ok := i.(map[string]interface{})
-	if !ok {
-		return c.SendStatus(fiber.StatusBadRequest)
-	}
+
 	var thing *container.Thing
 	var actionModel *models.Action
 	if thingId != "" {
@@ -62,16 +62,16 @@ func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 			a.logger.Error(err.Error())
 			return fiber.NewError(fiber.StatusNotFound, err.Error())
 		}
-		actionModel = models.NewActionModel(actionName, input, a.bus, a.logger, thing)
+		actionModel = models.NewActionModel(actionName, actionParams.Input, a.bus, a.logger, thing)
 		ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*3)
-		err := a.manager.RequestAction(ctx, thing.GetId(), actionModel.GetName(), input)
+		err := a.manager.RequestAction(ctx, thing.GetId(), actionModel.GetName(), actionParams.Input)
 		cancelFunc()
 		if err != nil {
 			return fiber.NewError(fiber.StatusNotFound, fmt.Sprintf("create action: %s failed. err: %s", actionName, err.Error()))
 		}
 	}
 	if thing == nil && actionModel == nil {
-		actionModel = models.NewActionModel(actionName, input, a.bus, a.logger)
+		actionModel = models.NewActionModel(actionName, actionParams.Input, a.bus, a.logger)
 	}
 	err = a.actions.Add(actionModel)
 	if err != nil {

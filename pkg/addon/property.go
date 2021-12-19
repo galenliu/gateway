@@ -18,7 +18,7 @@ type Property struct {
 
 type PropertyDescription struct {
 	Name        string             `json:"name,omitempty"`
-	AtType      string             `json:"atType,omitempty"`
+	AtType      string             `json:"@type,omitempty"`
 	Title       string             `json:"title,omitempty"`
 	Type        string             `json:"type,omitempty"`
 	Unit        string             `json:"unit,omitempty"`
