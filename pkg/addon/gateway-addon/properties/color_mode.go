@@ -12,6 +12,6 @@ func NewColorModeProperty() *ColorModeProperty {
 	p.AtType = TypeColorModeProperty
 	p.Name = ColorModel
 	p.SetValue("color")
-	p.Enum = []interface{}{"color", "temperature"}
+	p.Enum = []any{"color", "temperature"}
 	return p
 }

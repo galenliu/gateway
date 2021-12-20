@@ -7,7 +7,7 @@ import (
 	"github.com/galenliu/gateway/server/models/container"
 )
 
-func (s *Storage) CreateThing(id string, thing interface{}) error {
+func (s *Storage) CreateThing(id string, thing any) error {
 	bytes, _ := json.MarshalIndent(thing, "", "  ")
 	stmt, err := s.db.Prepare("INSERT INTO things(id, description) values(?,?)")
 	if err != nil {
@@ -79,7 +79,7 @@ func (s *Storage) RemoveThing(id string) error {
 	return nil
 }
 
-func (s *Storage) UpdateThing(id string, thing interface{}) (err error) {
+func (s *Storage) UpdateThing(id string, thing any) (err error) {
 	bytes, _ := json.Marshal(thing)
 	_, err = s.db.Exec(`update things set id=@id where description=@description`, sql.Named("id", id), sql.Named("description", bytes))
 	return

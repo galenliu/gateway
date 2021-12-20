@@ -30,11 +30,11 @@ type ApiHandlerApiRequestJsonDataRequest struct {
 }
 
 // Query parameters from URL
-type ApiHandlerApiRequestJsonDataRequestQuery map[string]interface{}
+type ApiHandlerApiRequestJsonDataRequestQuery map[string]any
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *ApiHandlerApiRequestJsonDataRequest) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -76,7 +76,7 @@ type ApiHandlerApiRequestJsonData struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *ApiHandlerApiRequestJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -102,11 +102,11 @@ func (j *ApiHandlerApiRequestJsonData) UnmarshalJSON(b []byte) error {
 }
 
 // Parsed parameters from the body
-type ApiHandlerApiRequestJsonDataRequestBody map[string]interface{}
+type ApiHandlerApiRequestJsonDataRequestBody map[string]any
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *ApiHandlerApiRequestJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

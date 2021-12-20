@@ -18,7 +18,7 @@ func NewBusController(log logging.Logger) *Bus {
 	return b
 }
 
-func (b *Bus) subscribe(topic string, fn interface{}) {
+func (b *Bus) subscribe(topic string, fn any) {
 	b.logger.Debugf("subscribe topic:[%s]", topic)
 	err := b.Bus.Subscribe(topic, fn)
 	if err != nil {
@@ -26,7 +26,7 @@ func (b *Bus) subscribe(topic string, fn interface{}) {
 	}
 }
 
-func (b *Bus) unsubscribe(topic string, fn interface{}) {
+func (b *Bus) unsubscribe(topic string, fn any) {
 	b.logger.Debugf("unsubscribe topic:[%s]", topic)
 	err := b.Bus.Unsubscribe(topic, fn)
 	if err != nil {
@@ -34,7 +34,7 @@ func (b *Bus) unsubscribe(topic string, fn interface{}) {
 	}
 }
 
-func (b *Bus) subscribeOnce(topic string, fn interface{}) {
+func (b *Bus) subscribeOnce(topic string, fn any) {
 	b.logger.Debugf("subscribeOnce topic:[%s]", topic)
 	err := b.Bus.SubscribeOnce(topic, fn)
 	if err != nil {
@@ -42,7 +42,7 @@ func (b *Bus) subscribeOnce(topic string, fn interface{}) {
 	}
 }
 
-func (b *Bus) subscribeAsync(topic string, fn interface{}) {
+func (b *Bus) subscribeAsync(topic string, fn any) {
 	b.logger.Debugf("subscribeAsync topic:[%s]", topic)
 	err := b.Bus.SubscribeAsync(topic, fn, false)
 	if err != nil {
@@ -50,14 +50,14 @@ func (b *Bus) subscribeAsync(topic string, fn interface{}) {
 	}
 }
 
-func (b *Bus) Sub(topic topic.Topic, fn interface{}) func() {
+func (b *Bus) Sub(topic topic.Topic, fn any) func() {
 	go b.subscribe(topic.ToString(), fn)
 	return func() {
 		b.unsubscribe(topic.ToString(), fn)
 	}
 }
 
-func (b *Bus) Pub(topic topic.Topic, args ...interface{}) {
+func (b *Bus) Pub(topic topic.Topic, args ...any) {
 	b.logger.Debugf("publish topic:[%s] Args:%#v", topic, args)
 	go b.Bus.Publish(topic.ToString(), args...)
 }

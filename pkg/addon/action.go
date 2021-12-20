@@ -2,7 +2,7 @@ package addon
 
 import json "github.com/json-iterator/go"
 
-type ActionInput map[string]interface{}
+type ActionInput map[string]any
 
 type Action struct {
 	Type        string            `json:"type,omitempty"`
@@ -34,30 +34,30 @@ func (a Action) GetDescription() string {
 	return a.Description
 }
 
-func (a Action) GetInput() map[string]interface{} {
+func (a Action) GetInput() map[string]any {
 	return a.Input
 }
 
 type ActionDescription struct {
-	Id            string                 `json:"id,omitempty"`
-	Name          string                 `json:"name,omitempty"`
-	Input         map[string]interface{} `json:"input,omitempty"`
-	Status        string                 `json:"status,omitempty"`
-	TimeRequested string                 `json:"timeRequested,omitempty"`
-	TimeCompleted string                 `json:"timeCompleted,omitempty"`
+	Id            string         `json:"id,omitempty"`
+	Name          string         `json:"name,omitempty"`
+	Input         map[string]any `json:"input,omitempty"`
+	Status        string         `json:"status,omitempty"`
+	TimeRequested string         `json:"timeRequested,omitempty"`
+	TimeCompleted string         `json:"timeCompleted,omitempty"`
 }
 
 type ActionLinksElem struct {
 }
 
 type ActionFormsElem struct {
-	Op interface{} `json:"op"`
+	Op any `json:"op"`
 }
 
 func (a ActionDescription) GetName() string {
 	return a.Name
 }
 
-func (a ActionDescription) GetDescription() interface{} {
+func (a ActionDescription) GetDescription() any {
 	return nil
 }

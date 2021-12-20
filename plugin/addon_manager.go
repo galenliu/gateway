@@ -12,7 +12,7 @@ import (
 )
 
 // GetInstallAddons  获取已安装的add-on
-func (m *Manager) GetInstallAddons() interface{} {
+func (m *Manager) GetInstallAddons() any {
 	return m.getInstallAddons()
 }
 

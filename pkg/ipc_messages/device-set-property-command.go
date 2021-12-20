@@ -16,7 +16,7 @@ type DeviceSetPropertyCommandJson struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceSetPropertyCommandJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -63,11 +63,11 @@ type DeviceSetPropertyCommandJsonData struct {
 }
 
 // New value of the property
-type DeviceSetPropertyCommandJsonDataPropertyValue interface{}
+type DeviceSetPropertyCommandJsonDataPropertyValue any
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceSetPropertyCommandJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

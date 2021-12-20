@@ -16,7 +16,7 @@ type MockAdapterClearStateRequestJsonData struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *MockAdapterClearStateRequestJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ type MockAdapterClearStateRequestJson struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *MockAdapterClearStateRequestJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

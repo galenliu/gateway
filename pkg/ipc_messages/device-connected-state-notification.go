@@ -22,7 +22,7 @@ type DeviceConnectedStateNotificationJsonData struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceConnectedStateNotificationJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ type DeviceConnectedStateNotificationJson struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceConnectedStateNotificationJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

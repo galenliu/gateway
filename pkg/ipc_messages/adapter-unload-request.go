@@ -16,7 +16,7 @@ type AdapterUnloadRequestJsonData struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *AdapterUnloadRequestJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ type AdapterUnloadRequestJson struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *AdapterUnloadRequestJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

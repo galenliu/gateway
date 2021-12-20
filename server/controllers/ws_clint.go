@@ -70,10 +70,10 @@ func (c *wsClint) handleMessage(data []byte) {
 	c.logger.Infof("websocket read message: %s", data)
 }
 
-func (c *wsClint) sendMessage(messageType string, data map[string]interface{}) {
+func (c *wsClint) sendMessage(messageType string, data map[string]any) {
 	err := c.ws.WriteJSON(struct {
-		MessageType string                 `json:"messageType"`
-		Data        map[string]interface{} `json:"data"`
+		MessageType string         `json:"messageType"`
+		Data        map[string]any `json:"data"`
 	}{
 		MessageType: messageType,
 		Data:        data,
@@ -97,7 +97,7 @@ func (c *wsClint) addThing(t *container2.Thing) {
 		if deviceId != t.GetId() {
 			return
 		}
-		err := c.ws.WriteJSON(map[string]interface{}{
+		err := c.ws.WriteJSON(map[string]any{
 			"id":          t.GetId(),
 			"messageType": constant.Connected,
 			"data":        connected,
@@ -116,7 +116,7 @@ func (c *wsClint) addThing(t *container2.Thing) {
 		if ok {
 			f()
 		}
-		err := c.ws.WriteJSON(map[string]interface{}{
+		err := c.ws.WriteJSON(map[string]any{
 			"id":          t.GetId(),
 			"messageType": constant.ThingRemoved,
 			"data":        struct{}{},
@@ -131,7 +131,7 @@ func (c *wsClint) addThing(t *container2.Thing) {
 		if thingId != t.GetId() {
 			return
 		}
-		err := c.ws.WriteJSON(map[string]interface{}{
+		err := c.ws.WriteJSON(map[string]any{
 			"id":          t.GetId(),
 			"messageType": constant.ThingModified,
 			"data":        struct{}{},
@@ -143,7 +143,7 @@ func (c *wsClint) addThing(t *container2.Thing) {
 	removeModifiedFunc := c.bus.Sub(topic.ThingModify, onThingModified)
 
 	onEvent := func(event *addon.Event) {
-		err := c.ws.WriteJSON(map[string]interface{}{
+		err := c.ws.WriteJSON(map[string]any{
 			"id":          t.GetId(),
 			"messageType": constant.Event,
 			"data": struct {
@@ -161,10 +161,10 @@ func (c *wsClint) addThing(t *container2.Thing) {
 		if thingId != t.GetId() {
 			return
 		}
-		err := c.ws.WriteJSON(map[string]interface{}{
+		err := c.ws.WriteJSON(map[string]any{
 			"id":          t.GetId(),
 			"messageType": constant.PropertyChanged,
-			"data":        map[string]interface{}{property.Name: property.Value},
+			"data":        map[string]any{property.Name: property.Value},
 		})
 		if err != nil {
 		}
@@ -176,10 +176,10 @@ func (c *wsClint) addThing(t *container2.Thing) {
 		if t.GetId() != thingId {
 			return
 		}
-		err := c.ws.WriteJSON(map[string]interface{}{
+		err := c.ws.WriteJSON(map[string]any{
 			"id":          t.GetId(),
 			"messageType": constant.ActionStatus,
-			"data":        map[string]interface{}{action.GetName(): action.GetDescription()},
+			"data":        map[string]any{action.GetName(): action.GetDescription()},
 		})
 		if err != nil {
 		}

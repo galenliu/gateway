@@ -7,7 +7,7 @@ import (
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 )
 
-func (m *Manager) SetPropertyValue(ctx context.Context, deviceId, propName string, newValue interface{}) (interface{}, error) {
+func (m *Manager) SetPropertyValue(ctx context.Context, deviceId, propName string, newValue any) (any, error) {
 	device := m.getDevice(deviceId)
 	if device == nil {
 		return nil, fmt.Errorf("device:%s not found", deviceId)
@@ -19,7 +19,7 @@ func (m *Manager) SetPropertyValue(ctx context.Context, deviceId, propName strin
 	return device.setPropertyValue(ctx, propName, newValue)
 }
 
-func (m *Manager) GetPropertyValue(thingId, propName string) (interface{}, error) {
+func (m *Manager) GetPropertyValue(thingId, propName string) (any, error) {
 	device := m.getDevice(thingId)
 	if device == nil {
 		return nil, fmt.Errorf("device:%s not found", thingId)
@@ -31,8 +31,8 @@ func (m *Manager) GetPropertyValue(thingId, propName string) (interface{}, error
 	return p.GetValue(), nil
 }
 
-func (m *Manager) GetPropertiesValue(deviceId string) (map[string]interface{}, error) {
-	data := make(map[string]interface{})
+func (m *Manager) GetPropertiesValue(deviceId string) (map[string]any, error) {
+	data := make(map[string]any)
 	device := m.getDevice(deviceId)
 	if device == nil {
 		return nil, fmt.Errorf("device:%s not found", deviceId)
@@ -57,7 +57,7 @@ func (m *Manager) GetMapOfDevices() (devices map[string]*addon.Device) {
 }
 
 func (m *Manager) GetDevices() (devices []*Device) {
-	m.devices.Range(func(key, value interface{}) bool {
+	m.devices.Range(func(key, value any) bool {
 		device, ok := value.(*Device)
 		if ok {
 			devices = append(devices, device)

@@ -112,7 +112,7 @@ func GetNodeVersion() (version string) {
 	return strings.TrimPrefix(strings.TrimSuffix(v[0]+v[1], "."), "v")
 }
 
-func JsonIndent(in interface{}) string {
+func JsonIndent(in any) string {
 	d, err := json.MarshalIndent(&in, "", "  ")
 	if err != nil {
 		return ""

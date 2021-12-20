@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/server/models"
 	"github.com/galenliu/gateway/server/models/container"
 	"github.com/gofiber/fiber/v2"
@@ -77,7 +78,7 @@ func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotFound, fmt.Sprintf("create action: %s failed，err:%s", actionName, err.Error()))
 	}
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"actionName": actionModel.GetDescription()})
+	return c.Status(fiber.StatusCreated).SendString(util.JsonIndent(map[string]any{"actionName": actionModel.GetDescription()}))
 }
 
 func (a *ActionsController) handleGetActions(c *fiber.Ctx) error {

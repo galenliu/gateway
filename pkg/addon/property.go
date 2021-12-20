@@ -13,7 +13,7 @@ type Property struct {
 	ReadOnly    bool               `json:"readOnly,omitempty"`
 	MultipleOf  *float64           `json:"multipleOf,omitempty"`
 	Links       []PropertyLinkElem `json:"links,omitempty"`
-	Value       interface{}        `json:"value,omitempty"`
+	Value       any                `json:"value,omitempty"`
 }
 
 type PropertyDescription struct {
@@ -29,7 +29,7 @@ type PropertyDescription struct {
 	ReadOnly    bool               `json:"readOnly,omitempty"`
 	MultipleOf  *float64           `json:"multipleOf,omitempty"`
 	Links       []PropertyLinkElem `json:"links,omitempty"`
-	Value       interface{}        `json:"value,omitempty"`
+	Value       any                `json:"value,omitempty"`
 }
 
 type PropertyLinkElem struct {
@@ -75,7 +75,7 @@ func (p Property) GetEnum() []any {
 	return p.Enum
 }
 
-func (p Property) GetValue() interface{} {
+func (p Property) GetValue() any {
 	return p.Value
 }
 
@@ -98,7 +98,7 @@ func (p Property) SetTitle(s string) bool {
 	return true
 }
 
-func (p Property) SetValue(value interface{}) bool {
+func (p Property) SetValue(value any) bool {
 	if p.Value == value {
 		return false
 	}

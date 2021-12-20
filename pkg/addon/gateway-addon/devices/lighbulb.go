@@ -75,7 +75,7 @@ func (light *LightBulb) SetBrightness(brightness int) {
 	//light.Bright.SetValue(brightness)
 }
 
-func (light *LightBulb) propertyValueUpdate(propName string, newValue interface{}) {
+func (light *LightBulb) propertyValueUpdate(propName string, newValue any) {
 
 }
 

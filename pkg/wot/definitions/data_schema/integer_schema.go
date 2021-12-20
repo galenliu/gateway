@@ -35,7 +35,7 @@ func (schema *IntegerSchema) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (schema *IntegerSchema) GetDefaultValue() interface{} {
+func (schema *IntegerSchema) GetDefaultValue() any {
 	if schema.DataSchema.Default != nil {
 		return schema.Convert(schema.Default)
 	}
@@ -48,7 +48,7 @@ func (schema *IntegerSchema) GetDefaultValue() interface{} {
 	return controls.DefaultInteger
 }
 
-func (schema *IntegerSchema) Convert(v interface{}) interface{} {
+func (schema *IntegerSchema) Convert(v any) any {
 	return schema.clamp(controls.ToInteger(v))
 }
 
@@ -66,7 +66,7 @@ func (schema *IntegerSchema) clamp(value controls.Integer) controls.Integer {
 	return value
 }
 
-func (schema *IntegerSchema) verify(value interface{}) bool {
+func (schema *IntegerSchema) verify(value any) bool {
 	switch value.(type) {
 	case controls.Integer:
 		return true

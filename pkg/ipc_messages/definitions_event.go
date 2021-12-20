@@ -5,7 +5,7 @@ import json "github.com/json-iterator/go"
 type DeviceEvents map[string]Event
 
 // EventEnumElem The possible values of the property
-type EventEnumElem interface{}
+type EventEnumElem any
 
 // Event Description of the event
 type Event struct {
@@ -40,7 +40,7 @@ type Event struct {
 	Unit *string `json:"unit,omitempty" yaml:"unit,omitempty"`
 }
 
-type DeviceWithoutIdEvents map[string]interface{}
+type DeviceWithoutIdEvents map[string]any
 
 type EventFormsElem struct {
 	FormElement

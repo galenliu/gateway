@@ -8,7 +8,7 @@ type AddonStore interface {
 	LoadAddonSetting(id string) (value string, err error)
 	StoreAddonSetting(id, value string) error
 	LoadAddonConfig(id string) (value string, err error)
-	StoreAddonsConfig(id string, value interface{}) error
+	StoreAddonsConfig(id string, value any) error
 }
 
 type AddonsModel struct {

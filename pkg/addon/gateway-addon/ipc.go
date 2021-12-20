@@ -47,8 +47,8 @@ type IpcClient struct {
 
 	writeCh   chan []byte
 	readCh    chan []byte
-	closeChan chan interface{}
-	reConnect chan interface{}
+	closeChan chan any
+	reConnect chan any
 
 	gatewayVersion string
 
@@ -70,8 +70,8 @@ func NewClient(PluginId string, handler OnMessage) *IpcClient {
 	client.status = Disconnect
 	client.mu = new(sync.Mutex)
 
-	client.closeChan = make(chan interface{})
-	client.reConnect = make(chan interface{})
+	client.closeChan = make(chan any)
+	client.reConnect = make(chan any)
 
 	client.readCh = make(chan []byte)
 	client.writeCh = make(chan []byte)
@@ -155,8 +155,8 @@ func (client *IpcClient) Register() {
 
 	if client.status == Connected {
 		message := struct {
-			MessageType int         `json:"messageType"`
-			Data        interface{} `json:"data"`
+			MessageType int `json:"messageType"`
+			Data        any `json:"data"`
 		}{
 			MessageType: PluginRegisterRequest,
 			Data: struct {

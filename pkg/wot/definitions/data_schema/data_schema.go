@@ -23,8 +23,8 @@ type DataSchema struct {
 	Titles       map[string]string `json:"titles,omitempty" wot:"optional"`
 	Description  string            `json:"description,omitempty" wot:"optional"`
 	Descriptions map[string]string `json:"descriptions,omitempty" wot:"optional"`
-	Const        interface{}       `json:"const,omitempty" wot:"optional"`
-	Default      interface{}       `json:"default,omitempty" wot:"optional"`
+	Const        any               `json:"const,omitempty" wot:"optional"`
+	Default      any               `json:"default,omitempty" wot:"optional"`
 	Unit         string            `json:"unit,omitempty" wot:"optional"`
 	OneOf        []DataSchema      `json:"oneOf,,omitempty" wot:"optional"`
 	Enum         []any             `json:"enum,omitempty" wot:"optional"`

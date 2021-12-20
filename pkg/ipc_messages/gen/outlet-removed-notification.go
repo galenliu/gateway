@@ -19,7 +19,7 @@ type OutletRemovedNotificationJsonData struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *OutletRemovedNotificationJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ type OutletRemovedNotificationJson struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *OutletRemovedNotificationJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

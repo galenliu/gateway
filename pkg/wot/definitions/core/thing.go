@@ -9,8 +9,7 @@ import (
 	json "github.com/json-iterator/go"
 )
 
-type ThingInterface interface {
-}
+type ThingInterface any
 
 type ThingProperties map[string]PropertyAffordance
 type ThingActions map[string]ActionAffordance

@@ -16,7 +16,7 @@ type DeviceRequestActionRequestJson struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceRequestActionRequestJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -69,11 +69,11 @@ type DeviceRequestActionRequestJsonData struct {
 }
 
 // Input to the action
-type DeviceRequestActionRequestJsonDataInput interface{}
+type DeviceRequestActionRequestJsonDataInput any
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceRequestActionRequestJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

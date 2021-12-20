@@ -14,16 +14,16 @@ import (
 )
 
 type ThingsManager interface {
-	SetPropertyValue(ctx context.Context, thingId, propertyName string, value interface{}) (interface{}, error)
-	GetPropertyValue(thingId, propertyName string) (interface{}, error)
-	GetPropertiesValue(thingId string) (map[string]interface{}, error)
+	SetPropertyValue(ctx context.Context, thingId, propertyName string, value any) (any, error)
+	GetPropertyValue(thingId, propertyName string) (any, error)
+	GetPropertiesValue(thingId string) (map[string]any, error)
 }
 
 // ThingsStorage CRUD
 type ThingsStorage interface {
 	RemoveThing(id string) error
-	CreateThing(id string, thing interface{}) error
-	UpdateThing(id string, thing interface{}) error
+	CreateThing(id string, thing any) error
+	UpdateThing(id string, thing any) error
 	GetThings() map[string]*Thing
 }
 
@@ -36,8 +36,8 @@ type ThingsContainer struct {
 }
 
 type containerBus interface {
-	Sub(topic topic.Topic, fn interface{}) func()
-	Pub(topic topic.Topic, args ...interface{})
+	Sub(topic topic.Topic, fn any) func()
+	Pub(topic topic.Topic, args ...any)
 }
 
 func NewThingsContainerModel(manager ThingsManager, store ThingsStorage, b *bus.Bus, log logging.Logger) *ThingsContainer {
@@ -65,7 +65,7 @@ func (c *ThingsContainer) GetThing(id string) *Thing {
 	return t
 }
 
-func (c *ThingsContainer) SetThingProperty(thingId, propName string, value interface{}) (interface{}, error) {
+func (c *ThingsContainer) SetThingProperty(thingId, propName string, value any) (any, error) {
 	thing := c.GetThing(thingId)
 	if thing == nil {
 		return nil, fiber.NewError(fiber.StatusNotFound, "Thing not found")

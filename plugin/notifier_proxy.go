@@ -23,7 +23,7 @@ func (m *Notifier) getOutlet(outletId string) *Outlet {
 }
 
 func (m *Notifier) getOutlets() (outlets []*Outlet) {
-	m.outlets.Range(func(key, value interface{}) bool {
+	m.outlets.Range(func(key, value any) bool {
 		outlet, ok := value.(*Outlet)
 		if ok {
 			outlets = append(outlets, outlet)

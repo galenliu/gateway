@@ -8,13 +8,13 @@ true
 PUT http://localhost:9090/things/0x0000000010e2fa00/properties/level
 Content-Type: application/x-www-form-urlencoded
 
-100
+20
 
 ### set hue
 PUT http://localhost:9090/things/0x0000000010e2fa00/properties/hue
 Content-Type: application/x-www-form-urlencoded
 
-"#FF0000"
+"#0000FF"
 
 
 ### trune off

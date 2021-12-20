@@ -22,7 +22,7 @@ type PluginRegisterResponseJsonData struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *PluginRegisterResponseJsonDataPreferencesUnits) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -49,7 +49,7 @@ type PluginRegisterResponseJson struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *PluginRegisterResponseJsonDataPreferences) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -94,7 +94,7 @@ type PluginRegisterResponseJsonDataUserProfile struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *PluginRegisterResponseJsonDataUserProfile) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -136,7 +136,7 @@ type PluginRegisterResponseJsonDataPreferencesUnits struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *PluginRegisterResponseJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -172,7 +172,7 @@ type PluginRegisterResponseJsonDataPreferences struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *PluginRegisterResponseJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

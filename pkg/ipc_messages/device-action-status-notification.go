@@ -52,11 +52,11 @@ type DeviceActionStatusNotificationJsonDataAction struct {
 	TimeRequested string `json:"timeRequested" yaml:"timeRequested"`
 }
 
-type DeviceActionStatusNotificationJsonDataActionInput map[string]interface{}
+type DeviceActionStatusNotificationJsonDataActionInput map[string]any
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceActionStatusNotificationJsonDataAction) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -83,7 +83,7 @@ func (j *DeviceActionStatusNotificationJsonDataAction) UnmarshalJSON(b []byte) e
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceActionStatusNotificationJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -110,7 +110,7 @@ func (j *DeviceActionStatusNotificationJsonData) UnmarshalJSON(b []byte) error {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceActionStatusNotificationJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

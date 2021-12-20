@@ -19,11 +19,11 @@ func (schema *BooleanSchema) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (schema *BooleanSchema) Convert(v interface{}) interface{} {
+func (schema *BooleanSchema) Convert(v any) any {
 	return controls.ToBool(v)
 }
 
-func (schema *BooleanSchema) GetDefaultValue() interface{} {
+func (schema *BooleanSchema) GetDefaultValue() any {
 	if schema.DataSchema.Default != nil {
 		return schema.Convert(schema.Default)
 	}

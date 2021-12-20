@@ -44,7 +44,7 @@ func (a *Adapter) HandleDeviceAdded(device IDevice) {
 }
 
 func (a *Adapter) SendError(message string) {
-	data := make(map[string]interface{})
+	data := make(map[string]any)
 	data[Aid] = a.GetID()
 	data["message"] = message
 	a.manager.send(PluginErrorNotification, data)
@@ -56,7 +56,7 @@ func (a *Adapter) SendError(message string) {
 
 //向前端UI发送提示
 func (a *Adapter) SendPairingPrompt(prompt, url string, did string) {
-	data := make(map[string]interface{})
+	data := make(map[string]any)
 	data[Aid] = a.GetID()
 	data["prompt"] = prompt
 	data[Did] = did
@@ -67,7 +67,7 @@ func (a *Adapter) SendPairingPrompt(prompt, url string, did string) {
 }
 
 func (a *Adapter) SendUnpairingPrompt(prompt, url string, did string) {
-	data := make(map[string]interface{})
+	data := make(map[string]any)
 	data[Aid] = a.GetID()
 	data["prompt"] = prompt
 	if did != "" {
@@ -79,7 +79,7 @@ func (a *Adapter) SendUnpairingPrompt(prompt, url string, did string) {
 	a.manager.send(AdapterUnpairingPromptNotification, data)
 }
 
-func (a *Adapter) Send(mt int, data map[string]interface{}) {
+func (a *Adapter) Send(mt int, data map[string]any) {
 	a.manager.send(mt, data)
 }
 
@@ -139,7 +139,7 @@ func (a *Adapter) setManager(m *AddonManager) {
 	a.manager = m
 }
 
-func (a *Adapter) SetPin(deviceId string, pin interface{}) {
+func (a *Adapter) SetPin(deviceId string, pin any) {
 
 }
 

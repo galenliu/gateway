@@ -10,11 +10,11 @@ type SchemaJson struct {
 }
 
 // The top-level message which encapsulates all message types
-type SchemaJsonMessage map[string]interface{}
+type SchemaJsonMessage map[string]any
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *SchemaJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

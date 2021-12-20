@@ -120,7 +120,7 @@ func (adapter *Adapter) cancelRemoveThing(device *Device) {
 	adapter.send(messages.MessageType_AdapterCancelRemoveDeviceCommand, data)
 }
 
-func (adapter *Adapter) send(messageType messages.MessageType, data interface{}) {
+func (adapter *Adapter) send(messageType messages.MessageType, data any) {
 	adapter.plugin.send(messageType, data)
 }
 
@@ -144,7 +144,7 @@ func (adapter *Adapter) getDevice(deviceId string) *Device {
 }
 
 func (adapter *Adapter) getDevices() (devices []*Device) {
-	adapter.devices.Range(func(key, value interface{}) bool {
+	adapter.devices.Range(func(key, value any) bool {
 		device, ok := value.(*Device)
 		if ok {
 			devices = append(devices, device)

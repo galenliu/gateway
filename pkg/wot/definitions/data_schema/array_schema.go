@@ -38,11 +38,11 @@ func (schema *ArraySchema) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (schema *ArraySchema) Convert(v interface{}) interface{} {
+func (schema *ArraySchema) Convert(v any) any {
 	return v
 }
 
-func (schema *ArraySchema) GetDefaultValue() interface{} {
+func (schema *ArraySchema) GetDefaultValue() any {
 	if schema.DataSchema.Default != nil {
 		return schema.Convert(schema.Default)
 	}

@@ -28,7 +28,7 @@ func NewJWTMiddleware(storage models.JsonwebtokenStore, logger logging.Logger) *
 func (m JWTMiddleware) Auth(c *fiber.Ctx) error {
 	token, err := extractJWTHeader(c)
 	var claimsMap models.Claims
-	withClaims, err := jwt.ParseWithClaims(token, &claimsMap, func(t *jwt.Token) (interface{}, error) {
+	withClaims, err := jwt.ParseWithClaims(token, &claimsMap, func(t *jwt.Token) (any, error) {
 		clm, ok := t.Claims.(*models.Claims)
 		if !ok {
 			return nil, errors.New("token invalid")

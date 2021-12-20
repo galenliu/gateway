@@ -9,7 +9,7 @@ import (
 )
 
 type AddonManager interface {
-	GetInstallAddons() interface{}
+	GetInstallAddons() any
 	EnableAddon(addonId string) error
 	DisableAddon(addonId string) error
 	InstallAddonFromUrl(id, url, checksum string) error

@@ -15,7 +15,7 @@ type AddonsStore interface {
 	LoadAddonSetting(key string) (string, error)
 	StoreAddonSetting(key, value string) error
 	LoadAddonConfig(key string) (string, error)
-	StoreAddonsConfig(key string, value interface{}) error
+	StoreAddonsConfig(key string, value any) error
 }
 
 type Addon struct {
@@ -95,7 +95,7 @@ func (a *Addon) save() error {
 //  @return *Addon
 //  @return interface{}:addon default config
 //  @return error
-func LoadManifest(destPath, packetId string, store AddonsStore) (*Addon, interface{}, error) {
+func LoadManifest(destPath, packetId string, store AddonsStore) (*Addon, any, error) {
 
 	//load manifest.json
 	manifest, err := readManifest(path.Join(destPath, manifestFileName))

@@ -23,11 +23,11 @@ func (schema *NullSchema) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (schema *NullSchema) Convert(v interface{}) interface{} {
+func (schema *NullSchema) Convert(v any) any {
 	return v
 }
 
-func (schema *NullSchema) GetDefaultValue() interface{} {
+func (schema *NullSchema) GetDefaultValue() any {
 	if schema.Default != nil {
 		return schema.Convert(schema.Default)
 	}

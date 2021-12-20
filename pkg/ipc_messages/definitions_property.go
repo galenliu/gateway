@@ -16,10 +16,10 @@ const (
 type DeviceProperties map[string]Property
 
 // PropertyEnumElem The possible values of the property
-type PropertyEnumElem interface{}
+type PropertyEnumElem any
 
 // PropertyValue The value of the property
-type PropertyValue interface{}
+type PropertyValue any
 
 // Property Description of the Property
 type Property struct {
@@ -65,7 +65,7 @@ type Property struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *Property) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -81,6 +81,6 @@ func (j *Property) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type DeviceWithoutIdProperties map[string]interface{}
+type DeviceWithoutIdProperties map[string]any
 
-type FormElementProperty interface{}
+type FormElementProperty any

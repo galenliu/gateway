@@ -25,7 +25,7 @@ type DeviceSetPinRequestJsonData struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceSetPinRequestJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -64,7 +64,7 @@ type DeviceSetPinRequestJson struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceSetPinRequestJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

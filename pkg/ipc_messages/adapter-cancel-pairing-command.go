@@ -16,7 +16,7 @@ type AdapterCancelPairingCommandJsonData struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *AdapterCancelPairingCommandJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ type AdapterCancelPairingCommandJson struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *AdapterCancelPairingCommandJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

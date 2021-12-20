@@ -22,8 +22,8 @@ import (
 )
 
 type controllerBus interface {
-	Pub(topic topic.Topic, args ...interface{})
-	Sub(topic topic.Topic, fun interface{}) func()
+	Pub(topic topic.Topic, args ...any)
+	Sub(topic topic.Topic, fun any) func()
 }
 
 type Storage interface {

@@ -7,7 +7,7 @@ import "encoding/json"
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *OutletNotifyRequestJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -76,7 +76,7 @@ type OutletNotifyRequestJsonData struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *OutletNotifyRequestJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

@@ -170,7 +170,7 @@ func newDevice(adapter *Adapter, msg messages.Device) *Device {
 func (device *Device) notifyValueChanged(property messages.Property) {
 	t, ok := device.setPropertyValueTask.Load(*property.Name)
 	if ok {
-		task := t.(chan interface{})
+		task := t.(chan any)
 		select {
 		case task <- property.Value:
 		}
@@ -235,7 +235,7 @@ func (device *Device) requestAction(ctx context.Context, id, name string, input 
 	}
 }
 
-func (device *Device) setPropertyValue(ctx context.Context, name string, value interface{}) (interface{}, error) {
+func (device *Device) setPropertyValue(ctx context.Context, name string, value any) (any, error) {
 
 	p, _ := device.GetProperty(name)
 	if p.Type == TypeBoolean {
@@ -251,8 +251,8 @@ func (device *Device) setPropertyValue(ctx context.Context, name string, value i
 		value = to.String(value)
 	}
 
-	t, ok := device.setPropertyValueTask.LoadOrStore(name, make(chan interface{}))
-	task := t.(chan interface{})
+	t, ok := device.setPropertyValueTask.LoadOrStore(name, make(chan any))
+	task := t.(chan any)
 
 	defer func() {
 		device.setPropertyValueTask.Delete(name)

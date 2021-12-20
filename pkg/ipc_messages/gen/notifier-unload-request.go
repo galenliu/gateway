@@ -16,7 +16,7 @@ type NotifierUnloadRequestJsonData struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *NotifierUnloadRequestJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ type NotifierUnloadRequestJson struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *NotifierUnloadRequestJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

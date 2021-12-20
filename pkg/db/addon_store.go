@@ -14,7 +14,7 @@ func (s *Storage) LoadAddonConfig(key string) (value string, err error) {
 	return s.GetSetting("addons.config." + key)
 }
 
-func (s *Storage) StoreAddonsConfig(key string, v interface{}) error {
+func (s *Storage) StoreAddonsConfig(key string, v any) error {
 	value, err := json.MarshalToString(v)
 	if err != nil {
 		return err

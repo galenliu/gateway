@@ -8,7 +8,7 @@ import "encoding/json"
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *Device_1) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func (j *Device_1) UnmarshalJSON(b []byte) error {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *Property) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -62,9 +62,9 @@ func (j *NotificationLevel) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type ActionFormsElem interface{}
+type ActionFormsElem any
 
-type ActionInput interface{}
+type ActionInput any
 
 // Description of the Action
 type Action struct {
@@ -84,16 +84,16 @@ type Action struct {
 	Title *string `json:"title,omitempty" yaml:"title,omitempty"`
 }
 
-type ActionInput_1 interface{}
+type ActionInput_1 any
 
 // The possible values of the input property
-type ActionInputPropertyEnumElem interface{}
+type ActionInputPropertyEnumElem any
 
 type ActionInputPropertyType_2 string
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *Property_1) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -161,13 +161,13 @@ type ActionInputProperty struct {
 	Unit *string `json:"unit,omitempty" yaml:"unit,omitempty"`
 }
 
-type Any interface{}
+type Any any
 
 type AnyUri string
 
-type DeviceActions map[string]interface{}
+type DeviceActions map[string]any
 
-type DeviceEvents map[string]interface{}
+type DeviceEvents map[string]any
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *PropertyType_2_1) UnmarshalJSON(b []byte) error {
@@ -191,7 +191,7 @@ func (j *PropertyType_2_1) UnmarshalJSON(b []byte) error {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *Link) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -211,7 +211,7 @@ const EventType_2_1_Object EventType_2_1 = "object"
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *Pin) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -227,7 +227,7 @@ func (j *Pin) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type DeviceProperties map[string]interface{}
+type DeviceProperties map[string]any
 
 // Description of the device
 type Device struct {
@@ -270,7 +270,7 @@ type Device struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *Device) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -286,11 +286,11 @@ func (j *Device) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type DeviceWithoutIdActions map[string]interface{}
+type DeviceWithoutIdActions map[string]any
 
-type DeviceWithoutIdEvents map[string]interface{}
+type DeviceWithoutIdEvents map[string]any
 
-type DeviceWithoutIdProperties map[string]interface{}
+type DeviceWithoutIdProperties map[string]any
 
 // Description of the device
 type DeviceWithoutId struct {
@@ -329,13 +329,13 @@ type DeviceWithoutId struct {
 }
 
 // The possible values of the property
-type EventEnumElem interface{}
+type EventEnumElem any
 
-type EventFormsElem interface{}
+type EventFormsElem any
 
-type FormElementAction_1 interface{}
+type FormElementAction_1 any
 
-type FormElementEvent_1 interface{}
+type FormElementEvent_1 any
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *EventType_2) UnmarshalJSON(b []byte) error {
@@ -406,11 +406,11 @@ type FormElementResponse struct {
 	ContentType *string `json:"contentType,omitempty" yaml:"contentType,omitempty"`
 }
 
-type FormElementProperty_1 interface{}
+type FormElementProperty_1 any
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *FormElement_1) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -451,7 +451,7 @@ type FormElement struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *FormElement) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -467,11 +467,11 @@ func (j *FormElement) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type FormElementAction interface{}
+type FormElementAction any
 
-type FormElementEvent interface{}
+type FormElementEvent any
 
-type FormElementProperty interface{}
+type FormElementProperty any
 
 // Description of the Action
 type Action_1 struct {
@@ -582,10 +582,10 @@ func (j *EventType_2_1) UnmarshalJSON(b []byte) error {
 
 type EventType_2_1 string
 
-type EventFormsElem_1 interface{}
+type EventFormsElem_1 any
 
 // The possible values of the property
-type EventEnumElem_1 interface{}
+type EventEnumElem_1 any
 
 // Description of the device
 type DeviceWithoutId_1 struct {
@@ -643,7 +643,7 @@ func (j *NotificationLevel_1) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type ActionFormsElem_1 interface{}
+type ActionFormsElem_1 any
 
 // Description of the device
 type Device_1 struct {
@@ -686,14 +686,14 @@ type Device_1 struct {
 
 type EventType_2 string
 
-type ActionInput_3 interface{}
+type ActionInput_3 any
 
 // The possible values of the input property
-type ActionInputPropertyEnumElem_1 interface{}
+type ActionInputPropertyEnumElem_1 any
 
 type ActionInputPropertyType_2_1 string
 
-type DeviceWithoutIdProperties_1 map[string]interface{}
+type DeviceWithoutIdProperties_1 map[string]any
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *ActionInputPropertyType_2_1) UnmarshalJSON(b []byte) error {
@@ -747,19 +747,19 @@ type ActionInputProperty_1 struct {
 	Unit *string `json:"unit,omitempty" yaml:"unit,omitempty"`
 }
 
-type Any_1 interface{}
+type Any_1 any
 
 type AnyUri_1 string
 
-type DeviceActions_1 map[string]interface{}
+type DeviceActions_1 map[string]any
 
-type DeviceEvents_1 map[string]interface{}
+type DeviceEvents_1 map[string]any
 
-type DeviceWithoutIdEvents_1 map[string]interface{}
+type DeviceWithoutIdEvents_1 map[string]any
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *Link_1) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -775,11 +775,11 @@ func (j *Link_1) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type DeviceWithoutIdActions_1 map[string]interface{}
+type DeviceWithoutIdActions_1 map[string]any
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *Pin_1) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -795,21 +795,21 @@ func (j *Pin_1) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type DeviceProperties_1 map[string]interface{}
+type DeviceProperties_1 map[string]any
 
-type ActionInput_2 interface{}
+type ActionInput_2 any
 
-type FormElementRoot interface{}
+type FormElementRoot any
 
-type FormElementRoot_1 interface{}
+type FormElementRoot_1 any
 
-type FormElementScopes interface{}
+type FormElementScopes any
 
-type FormElementScopes_1 interface{}
+type FormElementScopes_1 any
 
-type FormElementSecurity interface{}
+type FormElementSecurity any
 
-type FormElementSecurity_1 interface{}
+type FormElementSecurity_1 any
 
 type FormElement_1 struct {
 	// ContentCoding corresponds to the JSON schema field "contentCoding".
@@ -923,14 +923,14 @@ type Property struct {
 }
 
 // The possible values of the property
-type PropertyEnumElem interface{}
+type PropertyEnumElem any
 
 // The possible values of the property
-type PropertyEnumElem_1 interface{}
+type PropertyEnumElem_1 any
 
-type PropertyFormsElem interface{}
+type PropertyFormsElem any
 
-type PropertyFormsElem_1 interface{}
+type PropertyFormsElem_1 any
 
 type PropertyType_2 string
 
@@ -952,10 +952,10 @@ const PropertyType_2_Object PropertyType_2 = "object"
 const PropertyType_2_String PropertyType_2 = "string"
 
 // The value of the property
-type PropertyValue interface{}
+type PropertyValue any
 
 // The value of the property
-type PropertyValue_1 interface{}
+type PropertyValue_1 any
 
 // Description of the Property
 type Property_1 struct {
@@ -999,15 +999,15 @@ type Property_1 struct {
 	Value PropertyValue_1 `json:"value,omitempty" yaml:"value,omitempty"`
 }
 
-type Scopes interface{}
+type Scopes any
 
-type Scopes_1 interface{}
+type Scopes_1 any
 
-type Security interface{}
+type Security any
 
-type Security_1 interface{}
+type Security_1 any
 
-var enumValues_ActionInputPropertyType_2 = []interface{}{
+var enumValues_ActionInputPropertyType_2 = []any{
 	"null",
 	"boolean",
 	"object",
@@ -1016,7 +1016,7 @@ var enumValues_ActionInputPropertyType_2 = []interface{}{
 	"integer",
 	"string",
 }
-var enumValues_ActionInputPropertyType_2_1 = []interface{}{
+var enumValues_ActionInputPropertyType_2_1 = []any{
 	"null",
 	"boolean",
 	"object",
@@ -1025,7 +1025,7 @@ var enumValues_ActionInputPropertyType_2_1 = []interface{}{
 	"integer",
 	"string",
 }
-var enumValues_EventType_2 = []interface{}{
+var enumValues_EventType_2 = []any{
 	"null",
 	"boolean",
 	"object",
@@ -1034,7 +1034,7 @@ var enumValues_EventType_2 = []interface{}{
 	"integer",
 	"string",
 }
-var enumValues_EventType_2_1 = []interface{}{
+var enumValues_EventType_2_1 = []any{
 	"null",
 	"boolean",
 	"object",
@@ -1043,17 +1043,17 @@ var enumValues_EventType_2_1 = []interface{}{
 	"integer",
 	"string",
 }
-var enumValues_NotificationLevel = []interface{}{
+var enumValues_NotificationLevel = []any{
 	0,
 	1,
 	2,
 }
-var enumValues_NotificationLevel_1 = []interface{}{
+var enumValues_NotificationLevel_1 = []any{
 	0,
 	1,
 	2,
 }
-var enumValues_PropertyType_2 = []interface{}{
+var enumValues_PropertyType_2 = []any{
 	"null",
 	"boolean",
 	"object",
@@ -1062,7 +1062,7 @@ var enumValues_PropertyType_2 = []interface{}{
 	"integer",
 	"string",
 }
-var enumValues_PropertyType_2_1 = []interface{}{
+var enumValues_PropertyType_2_1 = []any{
 	"null",
 	"boolean",
 	"object",

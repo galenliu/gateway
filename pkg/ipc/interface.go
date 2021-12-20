@@ -5,13 +5,13 @@ import (
 )
 
 type Connection interface {
-	WriteMessage(message messages.MessageType, data interface{}) error
-	ReadMessage() (messages.MessageType, interface{}, error)
+	WriteMessage(message messages.MessageType, data any) error
+	ReadMessage() (messages.MessageType, any, error)
 	Register(pluginId string)
 }
 
 type PluginHandler interface {
-	OnMsg(mt messages.MessageType, data interface{})
+	OnMsg(mt messages.MessageType, data any)
 }
 
 type PluginServer interface {

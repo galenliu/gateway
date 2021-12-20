@@ -16,14 +16,14 @@ const (
 )
 
 type IProperty interface {
-	SetValue(interface{})
-	GetValue() interface{}
+	SetValue(any)
+	GetValue() any
 	GetName() string
 	SetName(string)
 	GetAtType() string
 	GetType() string
 	AsDict() []byte
-	ToValue(interface{}) interface{}
+	ToValue(any) any
 
 	DoPropertyChanged(string)
 	UpdateProperty(string)
@@ -40,10 +40,10 @@ type IEvent interface {
 }
 
 type IDevice interface {
-	Send(int, map[string]interface{})
+	Send(int, map[string]any)
 	GetProperty(name string) IProperty
 	SetCredentials(username string, password string) error
-	SetPin(pin interface{}) error
+	SetPin(pin any) error
 	GetDescription() string
 	ToJson() string
 	GetID() string
@@ -61,7 +61,7 @@ type IAdapter interface {
 	HandleDeviceSaved(device IDevice)
 	HandleDeviceRemoved(device IDevice)
 
-	Send(mt int, data map[string]interface{})
+	Send(mt int, data map[string]any)
 
 	getDevice(deviceId string) IDevice
 	setManager(manager *AddonManager)
@@ -98,7 +98,7 @@ func (m *AddonManager) AddAdapters(adapters ...IAdapter) {
 		m.adapters[adapter.GetID()] = adapter
 		adapter.GetID()
 		adapter.setManager(m)
-		data := make(map[string]interface{})
+		data := make(map[string]any)
 		data[Aid] = adapter.GetID()
 		data["name"] = adapter.GetName
 		data["packageName"] = m.packageName
@@ -110,7 +110,7 @@ func (m *AddonManager) handleDeviceAdded(device IDevice) {
 	if m.verbose {
 		log.Printf("addonManager: handle_device_added: %s", device.GetID())
 	}
-	data := make(map[string]interface{})
+	data := make(map[string]any)
 	data[Aid] = device.GetID()
 	description, err := json.Marshal(device)
 	if err != nil {
@@ -124,7 +124,7 @@ func (m *AddonManager) handleDeviceRemoved(device IDevice) {
 	if m.verbose {
 		log.Printf("addon manager handle devices added, deviceId:%v\n", device.GetID())
 	}
-	data := make(map[string]interface{})
+	data := make(map[string]any)
 	data[Aid] = device.GetAdapterId()
 	data[Did] = device.GetID()
 
@@ -146,7 +146,7 @@ func (m *AddonManager) onMessage(data []byte) {
 	switch messageType {
 	//卸载plugin
 	case PluginUnloadRequest:
-		data := make(map[string]interface{})
+		data := make(map[string]any)
 		m.send(PluginUnloadResponse, data)
 		m.running = false
 		var closeFun = func() {
@@ -179,7 +179,7 @@ func (m *AddonManager) onMessage(data []byte) {
 	case AdapterUnloadRequest:
 		go adapter.Unload()
 		unloadFunc := func(proxy *AddonManager, adapter IAdapter) {
-			data := make(map[string]interface{})
+			data := make(map[string]any)
 			data[Aid] = adapter.GetID()
 			proxy.send(AdapterUnloadResponse, data)
 		}
@@ -218,7 +218,7 @@ func (m *AddonManager) onMessage(data []byte) {
 			log.Printf("can not found propertyName(%s)", propName)
 			return
 		}
-		propChanged := func(newValue interface{}) error {
+		propChanged := func(newValue any) error {
 			prop.SetValue(newValue)
 			return nil
 		}
@@ -227,7 +227,7 @@ func (m *AddonManager) onMessage(data []byte) {
 			log.Printf(e.Error())
 			return
 		}
-		data := make(map[string]interface{})
+		data := make(map[string]any)
 		data[Aid] = adapterId
 		data[Did] = device.GetID()
 		data["property"] = prop.AsDict()
@@ -267,7 +267,7 @@ func (m *AddonManager) onMessage(data []byte) {
 
 		handleFunc := func() {
 			err := device.SetCredentials(username, password)
-			data := make(map[string]interface{})
+			data := make(map[string]any)
 			data[Aid] = adapterId
 			data[Did] = deviceId
 			data["messageId"] = messageId
@@ -287,7 +287,7 @@ func (m *AddonManager) onMessage(data []byte) {
 }
 
 func (m *AddonManager) sendConnectedStateNotification(device *devices.Device, connected bool) {
-	data := make(map[string]interface{})
+	data := make(map[string]any)
 	data[Aid] = ""
 	data[Did] = device.ID
 	data["connected"] = connected
@@ -298,11 +298,11 @@ func (m *AddonManager) run() {
 	m.ipcClient.Register()
 }
 
-func (m *AddonManager) send(messageType int, data map[string]interface{}) {
+func (m *AddonManager) send(messageType int, data map[string]any) {
 	data[Pid] = m.packageName
 	var message = struct {
-		MessageType int         `json:"messageType"`
-		Data        interface{} `json:"data"`
+		MessageType int `json:"messageType"`
+		Data        any `json:"data"`
 	}{MessageType: messageType, Data: data}
 	d, er := json.MarshalIndent(message, "", " ")
 	if er != nil {

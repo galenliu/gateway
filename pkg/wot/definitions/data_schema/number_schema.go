@@ -41,7 +41,7 @@ func (schema *NumberSchema) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (schema *NumberSchema) GetDefaultValue() interface{} {
+func (schema *NumberSchema) GetDefaultValue() any {
 	if schema.DataSchema.Default != nil {
 		return schema.Default
 	}
@@ -54,7 +54,7 @@ func (schema *NumberSchema) GetDefaultValue() interface{} {
 	return controls.DefaultNumber
 }
 
-func (schema *NumberSchema) Convert(v interface{}) interface{} {
+func (schema *NumberSchema) Convert(v any) any {
 	return schema.clamp(controls.Double(to.Float64(v)))
 }
 
@@ -72,7 +72,7 @@ func (schema NumberSchema) clamp(value controls.Double) controls.Double {
 	return value
 }
 
-func (schema *NumberSchema) verify(value interface{}) bool {
+func (schema *NumberSchema) verify(value any) bool {
 	switch value.(type) {
 	case controls.Number:
 		return true

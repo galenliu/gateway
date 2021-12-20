@@ -13,7 +13,7 @@ type PluginUnloadResponseJsonData struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *PluginUnloadResponseJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -40,7 +40,7 @@ type PluginUnloadResponseJson struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *PluginUnloadResponseJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

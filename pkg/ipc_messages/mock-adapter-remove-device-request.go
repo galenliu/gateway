@@ -19,7 +19,7 @@ type MockAdapterRemoveDeviceRequestJsonData struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *MockAdapterRemoveDeviceRequestJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ type MockAdapterRemoveDeviceRequestJson struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *MockAdapterRemoveDeviceRequestJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

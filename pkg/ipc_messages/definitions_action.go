@@ -47,10 +47,10 @@ func (a *ActionFormsElemOp) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type ActionInput interface{}
+type ActionInput any
 
 // ActionInputPropertyEnumElem The possible values of the input property
-type ActionInputPropertyEnumElem interface{}
+type ActionInputPropertyEnumElem any
 
 // ActionInputProperty An action input property
 type ActionInputProperty struct {
@@ -73,4 +73,4 @@ type ActionInputProperty struct {
 	Unit *string `json:"unit,omitempty" yaml:"unit,omitempty"`
 }
 
-type DeviceWithoutIdActions map[string]interface{}
+type DeviceWithoutIdActions map[string]any

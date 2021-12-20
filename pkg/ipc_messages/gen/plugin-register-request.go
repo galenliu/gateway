@@ -13,7 +13,7 @@ type PluginRegisterRequestJsonData struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *PluginRegisterRequestJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -40,7 +40,7 @@ type PluginRegisterRequestJson struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *PluginRegisterRequestJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

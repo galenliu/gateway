@@ -31,7 +31,7 @@ type DeviceRemoveActionResponseJsonData struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceRemoveActionResponseJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -76,7 +76,7 @@ type DeviceRemoveActionResponseJson struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceRemoveActionResponseJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

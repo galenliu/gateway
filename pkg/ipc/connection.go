@@ -25,7 +25,7 @@ func newConnection(conn *websocket.Conn, log logging.Logger) *connection {
 	}
 }
 
-func (c *connection) WriteMessage(mt messages.MessageType, data interface{}) error {
+func (c *connection) WriteMessage(mt messages.MessageType, data any) error {
 	message := BaseMessage{
 		MessageType: mt,
 		Data:        data,
@@ -42,7 +42,7 @@ func (c *connection) WriteMessage(mt messages.MessageType, data interface{}) err
 	return nil
 }
 
-func (c *connection) ReadMessage() (messages.MessageType, interface{}, error) {
+func (c *connection) ReadMessage() (messages.MessageType, any, error) {
 	_, data, err := c.Conn.ReadMessage()
 	if err != nil {
 		return 0, nil, fmt.Errorf("read message error: %v", err.Error())
@@ -73,5 +73,5 @@ func (c *connection) Register(pluginId string) {
 
 type BaseMessage struct {
 	MessageType messages.MessageType `json:"messageType"`
-	Data        interface{}          `json:"data"`
+	Data        any                  `json:"data"`
 }

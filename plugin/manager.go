@@ -368,7 +368,7 @@ func (m *Manager) loadAddons() {
 func (m *Manager) loadAddon(packageId string) {
 	m.logger.Infof("starting loading addon %s.", packageId)
 	var addonInfo *Addon
-	var obj interface{}
+	var obj any
 	var err error
 	packageDir := m.getAddonPath(packageId)
 	addonInfo, obj, err = LoadManifest(packageDir, packageId, m.storage)

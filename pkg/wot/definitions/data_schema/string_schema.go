@@ -47,7 +47,7 @@ func (schema *StringSchema) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (schema *StringSchema) GetDefaultValue() interface{} {
+func (schema *StringSchema) GetDefaultValue() any {
 	if schema.DataSchema.Default != nil {
 		return schema.Default
 	}
@@ -57,7 +57,7 @@ func (schema *StringSchema) GetDefaultValue() interface{} {
 	return ""
 }
 
-func (schema *StringSchema) verifyType(value interface{}) bool {
+func (schema *StringSchema) verifyType(value any) bool {
 	switch value.(type) {
 	case string:
 		return true

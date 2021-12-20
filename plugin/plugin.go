@@ -104,7 +104,7 @@ func (plugin *Plugin) getApiHandlers() (apiHandlers []*ApiHandler) {
 	return
 }
 
-func (plugin *Plugin) OnMsg(mt messages.MessageType, dt interface{}) {
+func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 
 	data, err := json.Marshal(dt)
 	if err != nil {
@@ -343,7 +343,7 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt interface{}) {
 	}
 }
 
-func (plugin *Plugin) send(mt messages.MessageType, data interface{}) {
+func (plugin *Plugin) send(mt messages.MessageType, data any) {
 	err := plugin.connection.WriteMessage(mt, data)
 	if err != nil {
 		plugin.logger.Infof("plugin %s send err: %s", plugin.pluginId, err.Error())

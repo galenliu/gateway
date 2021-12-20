@@ -19,7 +19,7 @@ type AdapterStartPairingCommandJsonData struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *AdapterStartPairingCommandJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ type AdapterStartPairingCommandJson struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *AdapterStartPairingCommandJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

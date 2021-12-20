@@ -16,7 +16,7 @@ type DeviceSetCredentialsResponseJson struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceSetCredentialsResponseJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -64,7 +64,7 @@ type DeviceSetCredentialsResponseJsonData struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceSetCredentialsResponseJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

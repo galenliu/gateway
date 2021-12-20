@@ -6,9 +6,9 @@ import (
 )
 
 type Schema struct {
-	Type       string      `json:"type,omitempty"`
-	Required   []string    `json:"required,omitempty"`
-	Properties interface{} `json:"properties,omitempty"`
+	Type       string   `json:"type,omitempty"`
+	Required   []string `json:"required,omitempty"`
+	Properties any      `json:"properties,omitempty"`
 }
 
 type ManifestJson struct {
@@ -24,8 +24,8 @@ type ManifestJson struct {
 	ContentScripts          string `json:"content_Scripts"`
 	WSebAccessibleResources string `json:"web_accessible_resources"`
 	Options                 struct {
-		Default interface{} `json:"default"`
-		Schema  Schema      `json:"schema"`
+		Default any    `json:"default"`
+		Schema  Schema `json:"schema"`
 	}
 	GatewaySpecificSettings struct {
 		WebThings struct {

@@ -44,7 +44,7 @@ type Device struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *Device) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -74,7 +74,7 @@ type Link struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *Link) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -101,7 +101,7 @@ type Pin struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *Pin) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -117,7 +117,7 @@ func (j *Pin) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type Any interface{}
+type Any any
 
 type AnyUri string
 
@@ -187,7 +187,7 @@ type FormElement struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *FormElement) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -205,9 +205,9 @@ func (j *FormElement) UnmarshalJSON(b []byte) error {
 
 type NotificationLevel int
 
-type Scopes interface{}
+type Scopes any
 
-var enumValues_NotificationLevel = []interface{}{
+var enumValues_NotificationLevel = []any{
 	0,
 	1,
 	2,

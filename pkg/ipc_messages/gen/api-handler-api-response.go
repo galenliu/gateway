@@ -8,10 +8,10 @@ import "encoding/json"
 // Outgoing response
 type ApiHandlerApiResponseJsonDataResponse struct {
 	// Body content
-	Content interface{} `json:"content,omitempty" yaml:"content,omitempty"`
+	Content any `json:"content,omitempty" yaml:"content,omitempty"`
 
 	// Content-Type of the response body
-	ContentType interface{} `json:"contentType,omitempty" yaml:"contentType,omitempty"`
+	ContentType any `json:"contentType,omitempty" yaml:"contentType,omitempty"`
 
 	// HTTP status code
 	Status int `json:"status" yaml:"status"`
@@ -19,7 +19,7 @@ type ApiHandlerApiResponseJsonDataResponse struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *ApiHandlerApiResponseJsonDataResponse) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ type ApiHandlerApiResponseJsonData struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *ApiHandlerApiResponseJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -88,7 +88,7 @@ type ApiHandlerApiResponseJson struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *ApiHandlerApiResponseJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

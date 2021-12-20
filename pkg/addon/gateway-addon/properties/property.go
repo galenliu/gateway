@@ -5,19 +5,19 @@ import (
 )
 
 type Property struct {
-	Name        string        `json:"name"`
-	Title       string        `json:"title,omitempty"`
-	Type        string        `json:"type"`
-	AtType      string        `json:"@type,omitempty"`
-	Unit        string        `json:"unit,omitempty"`
-	Description string        `json:"description,omitempty"`
-	Minimum     interface{}   `json:"minimum,omitempty"`
-	Maximum     interface{}   `json:"maximum,omitempty"`
-	Enum        []interface{} `json:"enum,omitempty"`
-	ReadOnly    bool          `json:"readOnly"`
-	MultipleOf  interface{}   `json:"multipleOf,omitempty"`
+	Name        string `json:"name"`
+	Title       string `json:"title,omitempty"`
+	Type        string `json:"type"`
+	AtType      string `json:"@type,omitempty"`
+	Unit        string `json:"unit,omitempty"`
+	Description string `json:"description,omitempty"`
+	Minimum     any    `json:"minimum,omitempty"`
+	Maximum     any    `json:"maximum,omitempty"`
+	Enum        []any  `json:"enum,omitempty"`
+	ReadOnly    bool   `json:"readOnly"`
+	MultipleOf  any    `json:"multipleOf,omitempty"`
 	//Links       []*rpc.Link   `json:"links"`
-	Value interface{} `json:"value"`
+	Value any `json:"value"`
 }
 
 func NewPropertyFormMessage(p *messages.Property) *Property {
@@ -89,10 +89,10 @@ func (p *Property) GetDescription() string {
 	return p.Description
 }
 
-func (p *Property) GetMinimum() interface{} {
+func (p *Property) GetMinimum() any {
 	return p.Minimum
 }
-func (p *Property) GetMaximum() interface{} {
+func (p *Property) GetMaximum() any {
 	return p.Maximum
 }
 
@@ -100,7 +100,7 @@ func (p *Property) IsReadOnly() bool {
 	return p.ReadOnly
 }
 
-func (p *Property) GetMultipleOf() interface{} {
+func (p *Property) GetMultipleOf() any {
 	return p.MultipleOf
 }
 
@@ -108,6 +108,6 @@ func (p *Property) GetMultipleOf() interface{} {
 //	return p.Links
 //}
 
-func (p *Property) GetValue() interface{} {
+func (p *Property) GetValue() any {
 	return p.Value
 }

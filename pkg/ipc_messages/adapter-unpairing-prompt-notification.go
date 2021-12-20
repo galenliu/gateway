@@ -25,7 +25,7 @@ type AdapterUnpairingPromptNotificationJsonData struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *AdapterUnpairingPromptNotificationJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ type AdapterUnpairingPromptNotificationJson struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *AdapterUnpairingPromptNotificationJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

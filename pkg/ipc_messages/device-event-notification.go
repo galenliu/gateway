@@ -41,11 +41,11 @@ type DeviceEventNotificationJsonDataEvent struct {
 	Timestamp string `json:"timestamp" yaml:"timestamp"`
 }
 
-type DeviceEventNotificationJsonDataEventData interface{}
+type DeviceEventNotificationJsonDataEventData any
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceEventNotificationJsonDataEvent) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -66,7 +66,7 @@ func (j *DeviceEventNotificationJsonDataEvent) UnmarshalJSON(b []byte) error {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceEventNotificationJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -93,7 +93,7 @@ func (j *DeviceEventNotificationJsonData) UnmarshalJSON(b []byte) error {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceEventNotificationJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

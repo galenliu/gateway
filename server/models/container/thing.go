@@ -14,7 +14,7 @@ type ThingPin struct {
 }
 
 type eventBus interface {
-	Pub(topic.Topic, ...interface{})
+	Pub(topic.Topic, ...any)
 }
 
 type Thing struct {

@@ -36,10 +36,10 @@ func (schema *ObjectSchema) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (schema *ObjectSchema) Convert(v interface{}) interface{} {
+func (schema *ObjectSchema) Convert(v any) any {
 	return v
 }
 
-func (schema *ObjectSchema) GetDefaultValue() interface{} {
+func (schema *ObjectSchema) GetDefaultValue() any {
 	return schema.Default
 }

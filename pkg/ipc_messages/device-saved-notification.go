@@ -16,7 +16,7 @@ type DeviceSavedNotificationJson struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceSavedNotificationJsonData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ type DeviceSavedNotificationJsonData struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *DeviceSavedNotificationJson) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

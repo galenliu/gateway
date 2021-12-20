@@ -57,8 +57,8 @@ func NewActionModel(name string, input map[string]any, bus *bus.Bus, log logging
 	return a
 }
 
-func (action *Action) GetDescription() *ActionDescription {
-	des := &ActionDescription{
+func (action *Action) GetDescription() ActionDescription {
+	des := ActionDescription{
 		Input:         action.Input,
 		Href:          action.Href,
 		TimeRequested: action.TimeRequested,

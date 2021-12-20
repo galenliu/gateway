@@ -16,9 +16,9 @@ import (
 )
 
 type ThingsManager interface {
-	SetPropertyValue(ctx context.Context, thingId, propertyName string, value interface{}) (interface{}, error)
-	GetPropertyValue(thingId, propertyName string) (interface{}, error)
-	GetPropertiesValue(thingId string) (map[string]interface{}, error)
+	SetPropertyValue(ctx context.Context, thingId, propertyName string, value any) (any, error)
+	GetPropertyValue(thingId, propertyName string) (any, error)
+	GetPropertiesValue(thingId string) (map[string]any, error)
 	GetMapOfDevices() map[string]*addon.Device
 	SetPIN(ctx context.Context, thingId string, pin string) (*messages.Device, error)
 	SetCredentials(ctx context.Context, thingId, username, password string) (*messages.Device, error)
@@ -105,7 +105,7 @@ func (tc *thingsController) handleSetProperty(c *fiber.Ctx) error {
 	if thingId == "" || propName == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid params")
 	}
-	var value interface{}
+	var value any
 	err := json.Unmarshal(c.Body(), &value)
 	if err != nil {
 		return err
@@ -124,7 +124,7 @@ func (tc *thingsController) handleGetPropertyValue(c *fiber.Ctx) error {
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
-	return c.Status(fiber.StatusOK).JSON(map[string]interface{}{propName: v})
+	return c.Status(fiber.StatusOK).JSON(map[string]any{propName: v})
 }
 
 func (tc *thingsController) handleGetProperties(c *fiber.Ctx) error {
