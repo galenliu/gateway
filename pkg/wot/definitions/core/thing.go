@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"github.com/galenliu/gateway/pkg/util"
 	wot_properties "github.com/galenliu/gateway/pkg/wot/definitions/core/property_affordance"
 	dataSchema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
@@ -54,9 +55,7 @@ func (t *Thing) UnmarshalJSON(data []byte) error {
 	if t.Title == "" {
 		return nil
 	}
-	if t.Id == "" {
-		t.Id = controls.URI(t.Title)
-	}
+	t.Id = util.IfThen[controls.URI](t.Id == "", controls.URI(t.Title), t.Id)
 	t.Context = controls.URI(json.Get(data, "@context").ToString())
 	t.Security = controls.ArrayOrString(json.Get(data, "security").ToString())
 	t.Description = json.Get(data, "description").ToString()

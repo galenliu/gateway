@@ -283,12 +283,12 @@ func (m *Manager) getInstallAddons() (addons []*Addon) {
 }
 
 //tar package to addon from the temp dir,
-func (m *Manager) installAddon(packageId, packagePath string) error {
+func (m *Manager) installAddon(packageId, packageDir string) error {
 	if !m.addonsLoaded {
 		return fmt.Errorf("cannot install add-on before other add-ons have been loaded")
 	}
 	m.logger.Infof("start install %s", packageId)
-	f, err := os.Open(packagePath)
+	f, err := os.Open(packageDir)
 	if err != nil {
 		return err
 	}

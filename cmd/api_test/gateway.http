@@ -5,7 +5,7 @@ Content-Type: application/json
 {
   "pair":{
     "input":{
-      "timeout": 3000
+      "timeout": 10000
     }
   }
 }

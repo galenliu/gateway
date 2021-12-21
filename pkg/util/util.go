@@ -119,3 +119,15 @@ func JsonIndent(in any) string {
 	}
 	return string(d)
 }
+
+func IfThen[T any](b bool, trueValue, falseValue T) T {
+	if b {
+		return trueValue
+	} else {
+		return falseValue
+	}
+}
+
+func Get[T any]() {
+
+}

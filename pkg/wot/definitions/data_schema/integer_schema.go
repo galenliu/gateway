@@ -1,9 +1,7 @@
 package data_schema
 
 import (
-	"fmt"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
-	json "github.com/json-iterator/go"
 )
 
 type IntegerSchema struct {
@@ -13,26 +11,6 @@ type IntegerSchema struct {
 	Maximum          *controls.Integer `json:"maximum,omitempty"`
 	ExclusiveMaximum *controls.Integer `json:"exclusiveMaximum,omitempty"`
 	MultipleOf       *controls.Integer `json:"multipleOf,omitempty"`
-}
-
-func (schema *IntegerSchema) UnmarshalJSON(data []byte) error {
-
-	var dataSchema DataSchema
-	err := json.Unmarshal(data, &dataSchema)
-	if err != nil {
-		return err
-	}
-	schema.DataSchema = &dataSchema
-
-	if schema.DataSchema == nil && schema.DataSchema.GetType() != controls.TypeInteger {
-		return fmt.Errorf("type must integer")
-	}
-	schema.Minimum = controls.JSONGetInteger(data, "minimum")
-	schema.ExclusiveMinimum = controls.JSONGetInteger(data, "exclusiveMinimum")
-	schema.Maximum = controls.JSONGetInteger(data, "maximum")
-	schema.ExclusiveMaximum = controls.JSONGetInteger(data, "exclusiveMaximum")
-	schema.MultipleOf = controls.JSONGetInteger(data, "multipleOf")
-	return nil
 }
 
 func (schema *IntegerSchema) GetDefaultValue() any {
