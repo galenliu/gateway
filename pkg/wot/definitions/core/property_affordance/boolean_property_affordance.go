@@ -71,6 +71,7 @@ func (p *BooleanPropertyAffordance) UnmarshalJSON(data []byte) error {
 }
 
 func (p *BooleanPropertyAffordance) MarshalJSON() ([]byte, error) {
+
 	prop := BooleanPropertyDescription{
 		AtType:       p.AtType,
 		Title:        p.Title,

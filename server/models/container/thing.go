@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
-	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
 )
 
@@ -52,15 +51,16 @@ func (t *Thing) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	t.CredentialsRequired = controls.JSONGetBool(data, "credentialsRequired", false)
-	t.Connected = controls.JSONGetBool(data, "connected", false)
+	t.CredentialsRequired = json.Get(data, "credentialsRequired").ToBool()
+	t.Connected = json.Get(data, "connected").ToBool()
 	t.GroupId = json.Get(data, "groupId").ToString()
 	t.SelectedCapability = json.Get(data, "selectedCapability").ToString()
 	if t.SelectedCapability == "" {
-		t.SelectedCapability = t.Type[0]
+		t.SelectedCapability = t.AtType[0]
 	}
 	var b = false
-	for _, s := range t.Type {
+
+	for _, s := range t.AtType {
 		if s == t.SelectedCapability {
 			b = true
 		}
@@ -72,7 +72,7 @@ func (t *Thing) UnmarshalJSON(data []byte) error {
 }
 
 func (t *Thing) SetSelectedCapability(selectedCapability string) bool {
-	for _, s := range t.Type {
+	for _, s := range t.AtType {
 		if s == selectedCapability {
 			t.SelectedCapability = selectedCapability
 			t.bus.Pub(topic.ThingModify, t.GetId())

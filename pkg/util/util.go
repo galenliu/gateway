@@ -3,9 +3,9 @@ package util
 import (
 	"bytes"
 	"crypto/sha256"
-	"encoding/json"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/logging"
+	json "github.com/json-iterator/go"
 	"io"
 	"io/ioutil"
 	"os"
@@ -113,7 +113,7 @@ func GetNodeVersion() (version string) {
 }
 
 func JsonIndent(in any) string {
-	d, err := json.MarshalIndent(&in, "", "  ")
+	d, err := json.MarshalIndent(in, "", "  ")
 	if err != nil {
 		return ""
 	}
@@ -128,6 +128,13 @@ func IfThen[T any](b bool, trueValue, falseValue T) T {
 	}
 }
 
-func Get[T any]() {
-
+func JsonGet[T any](data []byte, field string) T {
+	var t T
+	if v := json.Get(data, field); v.LastError() == nil {
+		v.ToVal(&t)
+		if &t != nil {
+			return t
+		}
+	}
+	return t
 }

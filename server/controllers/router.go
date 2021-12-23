@@ -10,7 +10,7 @@ import (
 	"github.com/galenliu/gateway/plugin"
 	"github.com/galenliu/gateway/server/middleware"
 	"github.com/galenliu/gateway/server/models"
-	container2 "github.com/galenliu/gateway/server/models/container"
+	things "github.com/galenliu/gateway/server/models/container"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -28,7 +28,7 @@ type controllerBus interface {
 
 type Storage interface {
 	models.UsersStore
-	container2.ThingsStorage
+	things.ThingsStorage
 	models.SettingsStore
 	models.JsonwebtokenStore
 	models.AddonStore
@@ -42,11 +42,11 @@ type Config struct {
 
 // Container  Things
 type Container interface {
-	GetThing(id string) *container2.Thing
-	GetThings() []*container2.Thing
-	GetMapOfThings() map[string]*container2.Thing
-	CreateThing(data []byte) (*container2.Thing, error)
-	RemoveThing(id string) error
+	GetThing(id string) *things.Thing
+	GetThings() []*things.Thing
+	GetMapOfThings() map[string]*things.Thing
+	CreateThing(data []byte) (*things.Thing, error)
+	RemoveThing(id string) (bool, error)
 	UpdateThing(data []byte) error
 }
 
@@ -77,7 +77,7 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 
 	//models init
 	settingModel := models.NewSettingsModel(config.AddonUrls, store, log)
-	containerModel := container2.NewThingsContainerModel(manager, store, bus, log)
+	containerModel := things.NewThingsContainerModel(manager, store, bus, log)
 	jwtMiddleware := middleware.NewJWTMiddleware(store, log)
 	auth := jwtMiddleware.Auth
 	usersModel := models.NewUsersModel(store, log)

@@ -7,9 +7,9 @@ import (
 	bus "github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/logging"
+	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	"github.com/gofiber/fiber/v2"
 	json "github.com/json-iterator/go"
-	"net/http"
 	"time"
 )
 
@@ -22,9 +22,9 @@ type ThingsManager interface {
 // ThingsStorage CRUD
 type ThingsStorage interface {
 	RemoveThing(id string) error
-	CreateThing(id string, thing any) error
+	CreateThing(id string, thing Thing) error
 	UpdateThing(id string, thing any) error
-	GetThings() map[string]*Thing
+	GetThings() map[string]Thing
 }
 
 type ThingsContainer struct {
@@ -110,19 +110,16 @@ func (c *ThingsContainer) GetMapOfThings() map[string]*Thing {
 
 func (c *ThingsContainer) CreateThing(data []byte) (*Thing, error) {
 
-	thingId := json.Get(data, "id").ToString()
 	var thing Thing
 	err := json.Unmarshal(data, &thing)
-	if err != nil || thingId == "" {
+	if err != nil {
 		return nil, err
-	}
-	t := c.GetThing(thingId)
-	if t != nil {
-		return nil, fmt.Errorf("thing: %s is exited", t.GetId())
 	}
 	thing.container = c
 	thing.bus = c.bus
-	err = c.store.CreateThing(thingId, thing)
+	thing.Created = &controls.DataTime{Time: time.Now()}
+	thing.Modified = &controls.DataTime{Time: time.Now()}
+	err = c.store.CreateThing(thing.GetId(), thing)
 	if err != nil {
 		return nil, err
 	}
@@ -132,18 +129,15 @@ func (c *ThingsContainer) CreateThing(data []byte) (*Thing, error) {
 	return th, nil
 }
 
-func (c *ThingsContainer) RemoveThing(thingId string) error {
-	err := c.store.RemoveThing(thingId)
-	if err != nil {
-		c.logger.Error("remove thing id: %s from Store err: %s", thingId, err.Error())
-	}
+func (c *ThingsContainer) RemoveThing(thingId string) (ok bool, err error) {
+	err = c.store.RemoveThing(thingId)
 	t, ok := c.things[thingId]
 	if !ok || t == nil {
-		return fiber.NewError(http.StatusInternalServerError, fmt.Sprintf("container has not thing id: %s", thingId))
+		return
 	}
 	t.remove()
 	delete(c.things, thingId)
-	return nil
+	return
 }
 
 func (c *ThingsContainer) UpdateThing(data []byte) error {
@@ -181,7 +175,7 @@ func (c *ThingsContainer) updateThings() {
 		for id, thing := range c.store.GetThings() {
 			thing.container = c
 			thing.bus = c.bus
-			c.things[id] = thing
+			c.things[id] = &thing
 		}
 	}
 }

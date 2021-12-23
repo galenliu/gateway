@@ -1,5 +1,9 @@
 package data_schema
 
+import (
+	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
+)
+
 const (
 	ApplicationJson = "application/json"
 	LdJSON          = "application/ld+json"
@@ -12,20 +16,20 @@ const (
 )
 
 type DataSchema struct {
-	AtType       string            `json:"@type,omitempty" wot:"optional"`
-	Title        string            `json:"title,omitempty" wot:"optional"`
-	Titles       map[string]string `json:"titles,omitempty" wot:"optional"`
-	Description  string            `json:"description,omitempty" wot:"optional"`
-	Descriptions map[string]string `json:"descriptions,omitempty" wot:"optional"`
-	Const        any               `json:"const,omitempty" wot:"optional"`
-	Default      any               `json:"default,omitempty" wot:"optional"`
-	Unit         string            `json:"unit,omitempty" wot:"optional"`
-	OneOf        []DataSchema      `json:"oneOf,,omitempty" wot:"optional"`
-	Enum         []any             `json:"enum,omitempty" wot:"optional"`
-	ReadOnly     bool              `json:"readOnly,omitempty" wot:"withDefault"`
-	WriteOnly    bool              `json:"writeOnly,omitempty" wot:"withDefault"`
-	Format       string            `json:"format,omitempty" wot:"optional"`
-	Type         string            `json:"type,,omitempty" wot:"optional"`
+	AtType       string                 `json:"@type,omitempty" wot:"optional"`
+	Title        string                 `json:"title,omitempty" wot:"optional"`
+	Titles       controls.MultiLanguage `json:"titles,omitempty" wot:"optional"`
+	Description  string                 `json:"description,omitempty" wot:"optional"`
+	Descriptions controls.MultiLanguage `json:"descriptions,omitempty" wot:"optional"`
+	Const        any                    `json:"const,omitempty" wot:"optional"`
+	Default      any                    `json:"default,omitempty" wot:"optional"`
+	Unit         string                 `json:"unit,omitempty" wot:"optional"`
+	OneOf        []DataSchema           `json:"oneOf,,omitempty" wot:"optional"`
+	Enum         []any                  `json:"enum,omitempty" wot:"optional"`
+	ReadOnly     bool                   `json:"readOnly,omitempty" wot:"withDefault"`
+	WriteOnly    bool                   `json:"writeOnly,omitempty" wot:"withDefault"`
+	Format       string                 `json:"format,omitempty" wot:"optional"`
+	Type         string                 `json:"type,,omitempty" wot:"optional"`
 }
 
 func (schema *DataSchema) GetType() string {

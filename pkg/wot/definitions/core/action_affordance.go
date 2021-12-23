@@ -11,8 +11,8 @@ type ActionAffordance struct {
 	*ia.InteractionAffordance
 	Input      *data_schema.DataSchema `json:"input,omitempty"`
 	Output     *data_schema.DataSchema `json:"output,omitempty"`
-	Safe       bool                    `json:"safe,omitempty"`       //with default
-	Idempotent bool                    `json:"idempotent,omitempty"` //with default
+	Safe       bool                    `json:"safe,omitempty" wot:"withDefault"`
+	Idempotent bool                    `json:"idempotent,omitempty" wot:"withDefault"`
 }
 
 type ActionDescription struct {
@@ -26,8 +26,8 @@ type ActionDescription struct {
 
 	Input      *data_schema.DataSchema `json:"input,omitempty"`
 	Output     *data_schema.DataSchema `json:"output,omitempty"`
-	Safe       bool                    `json:"safe,omitempty"`       //with default
-	Idempotent bool                    `json:"idempotent,omitempty"` //with default
+	Safe       bool                    `json:"safe,omitempty" wot:"withDefault"`
+	Idempotent bool                    `json:"idempotent,omitempty" wot:"withDefault"`
 }
 
 func (a *ActionAffordance) MarshalJSON() ([]byte, error) {
@@ -39,20 +39,10 @@ func (a *ActionAffordance) MarshalJSON() ([]byte, error) {
 		Descriptions: a.Descriptions,
 		Forms:        a.Forms,
 		UriVariables: a.UriVariables,
-		Input: func() *data_schema.DataSchema {
-			if a.Input == nil {
-				return nil
-			}
-			return a.Input
-		}(),
-		Output: func() *data_schema.DataSchema {
-			if a.Output == nil {
-				return nil
-			}
-			return a.Output
-		}(),
-		Safe:       a.Safe,
-		Idempotent: a.Idempotent,
+		Input:        a.Input,
+		Output:       a.Output,
+		Safe:         a.Safe,
+		Idempotent:   a.Idempotent,
 	}
 	return json.Marshal(action)
 }

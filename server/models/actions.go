@@ -88,7 +88,7 @@ func (m *ActionsModel) Add(a *Action) error {
 			m.logger.Error(err)
 			return err
 		}
-		err = m.container.RemoveThing(thingId)
+		_, err = m.container.RemoveThing(thingId)
 		if err != nil {
 			err := fmt.Errorf("unpair of thing: %s failed", thingId)
 			a.SetErr(err)

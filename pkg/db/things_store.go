@@ -7,8 +7,11 @@ import (
 	"github.com/galenliu/gateway/server/models/container"
 )
 
-func (s *Storage) CreateThing(id string, thing any) error {
-	bytes, _ := json.MarshalIndent(thing, "", "  ")
+func (s *Storage) CreateThing(id string, thing container.Thing) error {
+	bytes, err := json.Marshal(thing)
+	if err != nil {
+		return err
+	}
 	stmt, err := s.db.Prepare("INSERT INTO things(id, description) values(?,?)")
 	if err != nil {
 		return err
@@ -31,9 +34,9 @@ func (s *Storage) CreateThing(id string, thing any) error {
 	return nil
 }
 
-func (s *Storage) GetThings() map[string]*container.Thing {
+func (s *Storage) GetThings() map[string]container.Thing {
 
-	things := make(map[string]*container.Thing)
+	things := make(map[string]container.Thing)
 	rows, err := s.db.Query("SELECT id, description FROM things")
 	defer func(rows *sql.Rows) {
 		err := rows.Close()
@@ -56,7 +59,7 @@ func (s *Storage) GetThings() map[string]*container.Thing {
 		if err != nil {
 			continue
 		}
-		things[id] = &thing
+		things[id] = thing
 	}
 	return things
 }

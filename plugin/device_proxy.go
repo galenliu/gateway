@@ -133,7 +133,7 @@ func newDevice(adapter *Adapter, msg messages.Device) *Device {
 		adapter: adapter,
 		Device: &addon.Device{
 			Context: getString(msg.Context),
-			Type:    msg.Type,
+			AtType:  msg.Type,
 			Id:      msg.Id,
 			Title: func() string {
 				t := getString(msg.Title)

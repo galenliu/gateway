@@ -9,7 +9,7 @@ type UnsignedInt uint
 type Integer uint
 type Number float64
 type URI string
-type ArrayOrString string
+type ArrayOrString []string
 type Double float64
 
 const DefaultInteger Integer = 0

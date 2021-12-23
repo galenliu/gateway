@@ -54,12 +54,14 @@ func (tc *thingsController) handleDeleteThing(c *fiber.Ctx) error {
 	if thingId == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "thing id must be provided")
 	}
-	err := tc.model.RemoveThing(thingId)
+	ok, err := tc.model.RemoveThing(thingId)
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		tc.logger.Error(err.Error())
 	}
-	tc.logger.Infof("Successfully deleted %v from database", thingId)
-	return c.SendStatus(http.StatusNoContent)
+	if ok {
+		return c.SendStatus(http.StatusNoContent)
+	}
+	return fiber.NewError(fiber.StatusBadRequest, err.Error())
 }
 
 //GET /things/:thingId
@@ -83,7 +85,7 @@ func (tc *thingsController) handleGetThings(c *fiber.Ctx) error {
 		return c.Next()
 	}
 	ts := tc.model.GetThings()
-	return c.Status(fiber.StatusOK).JSON(ts)
+	return c.Status(fiber.StatusOK).SendString(util.JsonIndent(ts))
 }
 
 //patch things

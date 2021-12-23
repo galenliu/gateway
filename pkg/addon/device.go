@@ -6,7 +6,7 @@ type DeviceEvents map[string]Event
 
 type Device struct {
 	Context             string           `json:"@context,omitempty"`
-	Type                []string         `json:"@type,omitempty"`
+	AtType              []string         `json:"@type,omitempty"`
 	Id                  string           `json:"id,omitempty"`
 	Title               string           `json:"title,omitempty"`
 	Description         string           `json:"description,omitempty"`
@@ -42,8 +42,8 @@ func (d Device) GetAtContext() string {
 	return d.Context
 }
 
-func (d Device) GetType() []string {
-	return d.Type
+func (d Device) GetAtType() []string {
+	return d.AtType
 }
 
 func (d Device) GetTitle() string {

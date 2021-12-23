@@ -8,13 +8,13 @@ true
 PUT http://localhost:9090/things/0x0000000010e2fa00/properties/level
 Content-Type: application/x-www-form-urlencoded
 
-20
+50
 
 ### set hue
 PUT http://localhost:9090/things/0x0000000010e2fa00/properties/hue
 Content-Type: application/x-www-form-urlencoded
 
-"#00FFFF"
+"#FFFFFF"
 
 
 ### trune off
@@ -37,68 +37,28 @@ Content-Type: application/json
 
 {
   "@context": "https://webthings.io/schemas",
-  "title": "0x0000000010e2fa00",
-  "id": "0x0000000010e2fa00",
   "@type": [
     "Light"
   ],
-  "support": "liuguilin361@gmai.com",
+  "support": "liuguilin361@gmail.com",
   "version": {
     "instance": "1.1",
     "model": ""
   },
-  "created": "2021-12-20T00:57:40.5020687+08:00",
-  "modified": "2021-12-20T00:57:40.5020687+08:00",
   "properties": {
-    "hue": {
-      "@type": "ColorProperty",
-      "title": "Hue",
-      "forms": [
-        {
-          "href": "/things/0x0000000010e2fa00/properties/hue"
-        }
-      ],
-      "type": "string"
-    },
-    "level": {
-      "@type": "BrightnessProperty",
-      "title": "Brightness",
-      "forms": [
-        {
-          "href": "/things/0x0000000010e2fa00/properties/level"
-        }
-      ],
-      "unit": "percent",
-      "type": "integer",
-      "minimum": 0,
-      "maximum": 100
-    },
-    "on": {
-      "@type": "OnOffProperty",
-      "title": "On/Off",
-      "forms": [
-        {
-          "href": "/things/0x0000000010e2fa00/properties/on"
-        }
-      ],
-      "type": "boolean"
-    }
+    "on": {"@type":"OnOffProperty","title":"On/Off","forms":[{"href":"/things/0x0000000010e2fa00/properties/on"}],"type":"boolean"},
+    "level": {"@type":"BrightnessProperty","title":"Brightness","forms":[{"href":"/things/0x0000000010e2fa00/properties/level"}],"unit":"percent","type":"integer","minimum":0,"maximum":100},
+    "hue": {"@type":"ColorProperty","title":"Hue","forms":[{"href":"/things/0x0000000010e2fa00/properties/hue"}],"type":"string"}
   },
   "actions": {
-    "effect": {
-      "forms": [
-        {
-          "href": "things/0x0000000010e2fa00/actions/effect",
-          "op": "observeallproperties"
-        }
-      ]
-    }
+    "effect": {"forms":[{"href":"things/0x0000000010e2fa00/actions/effect","op":["observeallproperties"]}]}
   },
   "pin": {
     "required": false,
     "pattern": ""
   }
 }
+
 
 
 
