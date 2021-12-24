@@ -79,6 +79,9 @@ func (tc *thingsController) handleGetThings(c *fiber.Ctx) error {
 		return c.Next()
 	}
 	ts := tc.model.GetThings()
+	if len(ts) == 0 {
+		return c.Status(fiber.StatusOK).JSON([]string{})
+	}
 	return c.Status(fiber.StatusOK).SendString(util.JsonIndent(ts))
 }
 
