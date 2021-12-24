@@ -11,7 +11,6 @@ import (
 
 type deviceManager interface {
 	GetMapOfDevices() map[string]*addon.Device
-	GetLanguage() string
 }
 type thingContainer interface {
 	GetMapOfThings() map[string]*container2.Thing

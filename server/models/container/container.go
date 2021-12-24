@@ -129,10 +129,14 @@ func (c *ThingsContainer) CreateThing(data []byte) (*Thing, error) {
 	return th, nil
 }
 
-func (c *ThingsContainer) RemoveThing(thingId string) (ok bool, err error) {
-	err = c.store.RemoveThing(thingId)
-	t, ok := c.things[thingId]
-	if !ok || t == nil {
+func (c *ThingsContainer) RemoveThing(thingId string) {
+	err := c.store.RemoveThing(thingId)
+	if err != nil {
+		c.logger.Errorf("delete thing from db err:", err.Error())
+	}
+	t, _ := c.things[thingId]
+	if t == nil {
+		c.logger.Errorf("thing with id %s not found", thingId)
 		return
 	}
 	t.remove()

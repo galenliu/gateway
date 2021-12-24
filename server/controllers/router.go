@@ -46,7 +46,7 @@ type Container interface {
 	GetThings() []*things.Thing
 	GetMapOfThings() map[string]*things.Thing
 	CreateThing(data []byte) (*things.Thing, error)
-	RemoveThing(id string) (bool, error)
+	RemoveThing(id string)
 	UpdateThing(data []byte) error
 }
 

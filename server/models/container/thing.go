@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
+	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
 )
 
@@ -40,6 +41,15 @@ func (t *Thing) UnmarshalJSON(data []byte) error {
 	err := json.Unmarshal(data, &thing)
 	if err != nil {
 		return err
+	}
+	if thing.Title == "" {
+		return fmt.Errorf("thing title cannot be empty")
+	}
+	if thing.AtContext == "" {
+		return fmt.Errorf("thing @context cannot be empty")
+	}
+	if thing.Id == "" {
+		thing.Id = controls.URI(thing.Title)
 	}
 	t.Thing = &thing
 

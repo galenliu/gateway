@@ -54,14 +54,8 @@ func (tc *thingsController) handleDeleteThing(c *fiber.Ctx) error {
 	if thingId == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "thing id must be provided")
 	}
-	ok, err := tc.model.RemoveThing(thingId)
-	if err != nil {
-		tc.logger.Error(err.Error())
-	}
-	if ok {
-		return c.SendStatus(http.StatusNoContent)
-	}
-	return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	tc.model.RemoveThing(thingId)
+	return c.SendStatus(http.StatusNoContent)
 }
 
 //GET /things/:thingId
