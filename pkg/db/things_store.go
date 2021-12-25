@@ -82,8 +82,11 @@ func (s *Storage) RemoveThing(id string) error {
 	return nil
 }
 
-func (s *Storage) UpdateThing(id string, thing any) (err error) {
-	bytes, _ := json.Marshal(thing)
+func (s *Storage) UpdateThing(id string, thing container.Thing) (err error) {
+	bytes, err := json.Marshal(thing)
+	if err != nil {
+		return fmt.Errorf("thing marshal error: %s", err.Error())
+	}
 	_, err = s.db.Exec(`update things set id=@id where description=@description`, sql.Named("id", id), sql.Named("description", bytes))
 	return
 }

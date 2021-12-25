@@ -23,7 +23,7 @@ type ThingsManager interface {
 type ThingsStorage interface {
 	RemoveThing(id string) error
 	CreateThing(id string, thing Thing) error
-	UpdateThing(id string, thing any) error
+	UpdateThing(id string, thing Thing) error
 	GetThings() map[string]Thing
 }
 

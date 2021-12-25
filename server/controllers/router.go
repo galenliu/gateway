@@ -237,15 +237,6 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		settingsGroup.Get("/addonsInfo", settingsController.handleGetAddonsInfo)
 	}
 
-	//Services Controller
-	//{
-	//	servicesController := NewServicesController(serviceModel, serviceManager, containerModel)
-	//	sGroup := app.Group(constant.ServicesPath)
-	//	sGroup.Get("/", servicesController.handleGetServices)
-	//	sGroup.Get("/:serviceId/config", servicesController.handleGetServiceConfig)
-	//	sGroup.Put("/:serviceId", servicesController.handleSetService)
-	//	sGroup.Put("/:serviceId/config", servicesController.handleSetServiceConfig)
-	//}
 	app.Start()
 	return &app
 }
