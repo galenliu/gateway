@@ -18,7 +18,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/websocket/v2"
 	"net/http"
-	"time"
 )
 
 type controllerBus interface {
@@ -258,7 +257,6 @@ func (app *Router) Start() {
 		}
 		cancelFunc()
 	}()
-	time.Sleep(1 * time.Millisecond)
 
 	go func() {
 		c, cancelFunc := context.WithCancel(app.ctx)

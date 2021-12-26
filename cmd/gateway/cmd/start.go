@@ -80,6 +80,7 @@ func (c *command) initStartCmd() (err error) {
 					sig := <-interruptChannel
 					logger.Debugf("received signal: %v", sig)
 					err := gw.Stop()
+					cancelFunc()
 					if err != nil {
 						fmt.Printf(err.Error())
 					}
@@ -89,6 +90,7 @@ func (c *command) initStartCmd() (err error) {
 					// Shutdown
 					go func() {
 						err := gw.Stop()
+						cancelFunc()
 						if err != nil {
 							fmt.Printf(err.Error())
 						}
