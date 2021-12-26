@@ -35,12 +35,13 @@ type Gateway struct {
 	bus          *bus.Bus
 	addonManager *plugin.Manager
 	sever        *server.WebServe
+	logger       logging.Logger
 }
 
 func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gateway, error) {
 
 	g := &Gateway{}
-
+	g.logger = logger
 	g.config = config
 	u := &messages.PluginRegisterResponseJsonDataUserProfile{
 		BaseDir:    g.config.BaseDir,
@@ -97,7 +98,8 @@ func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gat
 }
 
 func (g *Gateway) Stop() error {
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	g.logger.Info("shutting down, wait 5 second ...")
 	defer cancel()
 	err := g.Shutdown(ctx)
 	if err != nil {

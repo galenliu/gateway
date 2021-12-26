@@ -12,7 +12,6 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
-	"time"
 )
 
 const (
@@ -80,31 +79,21 @@ func (c *command) initStartCmd() (err error) {
 					// Block main goroutine until it is interrupted
 					sig := <-interruptChannel
 					logger.Debugf("received signal: %v", sig)
-					logger.Info("shutting down")
+					err := gw.Stop()
+					if err != nil {
+						fmt.Printf(err.Error())
+					}
 					return
 				},
 				stop: func() {
 					// Shutdown
-
 					go func() {
-
-						ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
-						defer cancel()
-						if err := gw.Shutdown(ctx); err != nil {
-							logger.Errorf("shutdown: %v", err)
+						err := gw.Stop()
+						if err != nil {
+							fmt.Printf(err.Error())
 						}
 					}()
 
-					// If shutdown function is blocking too long,
-					// allow process termination by receiving another signal.
-					select {
-					case sig := <-interruptChannel:
-						cancelFunc()
-						logger.Debugf("received signal: %v", sig)
-						return
-					case <-ctx.Done():
-						cancelFunc()
-					}
 				},
 			}
 
