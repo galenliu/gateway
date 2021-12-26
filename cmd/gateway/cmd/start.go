@@ -65,7 +65,6 @@ func (c *command) initStartCmd() (err error) {
 				HomeKitEnable:    c.config.GetBool(optionHomeKitEnable),
 			}, logger)
 			if err != nil {
-				cancelFunc()
 				return err
 			}
 
