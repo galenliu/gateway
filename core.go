@@ -58,7 +58,6 @@ func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gat
 	util.EnsureDir(logger, u.BaseDir, u.DataDir, u.ConfigDir, u.AddonsDir, u.ConfigDir, u.MediaDir, u.LogDir)
 
 	// 数据初始化
-
 	storage, err := db.NewStorage(u.ConfigDir, logger, db.Config{
 		Reset: config.RemoveBeforeOpen,
 	})
@@ -93,7 +92,7 @@ func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gat
 		LogDir:      path.Join(g.config.BaseDir, "log"),
 	}, g.addonManager, storage, newBus, logger)
 	g.bus = newBus
-	logger.Infof("gateway web server running.")
+	logger.Infof("web server running.")
 	return g, nil
 }
 

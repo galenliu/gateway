@@ -11,7 +11,7 @@ import (
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
-	container2 "github.com/galenliu/gateway/server/models/container"
+	things "github.com/galenliu/gateway/server/models/container"
 	"github.com/robfig/cron"
 	"io"
 	"os"
@@ -24,6 +24,7 @@ import (
 type managerStore interface {
 	AddonsStore
 	GetSetting(key string) (string, error)
+	SetSetting(key, value string) error
 }
 
 type Config struct {
@@ -38,12 +39,13 @@ type Manager struct {
 	config         Config
 	configPath     string
 	pluginServer   *PluginsServer
+	preferences    messages.PluginRegisterResponseJsonDataPreferences
 	devices        sync.Map
 	adapters       sync.Map
 	outlets        sync.Map
 	installAddons  sync.Map
 	extensions     sync.Map
-	container      *container2.ThingsContainer
+	container      *things.ThingsContainer
 	bus            *bus.Bus
 	addonsLoaded   bool
 	isPairing      bool
@@ -67,6 +69,7 @@ func NewAddonsManager(ctx context.Context, conf Config, s managerStore, bus *bus
 	am.bus = bus
 	am.storage = s
 	am.locker = new(sync.Mutex)
+	am.UpdatePreferences()
 	am.loadAddons()
 	return am
 }
@@ -186,7 +189,7 @@ func (m *Manager) handleAdapterUnload(adapterId string) {
 
 func (m *Manager) handleDeviceAdded(device *Device) {
 	m.devices.Store(device.GetId(), device)
-	m.logger.Infof("Device added: %s", util.JsonIndent(container2.AsWebOfThing(device.Device)))
+	m.logger.Infof("Device added: %s", util.JsonIndent(things.AsWebOfThing(device.Device)))
 	m.bus.Pub(topic.DeviceAdded, device.GetId(), device.Device)
 }
 
@@ -453,7 +456,11 @@ func (m *Manager) updateAddons() {
 }
 
 func (m *Manager) GetPreferences() *messages.PluginRegisterResponseJsonDataPreferences {
-	r := &messages.PluginRegisterResponseJsonDataPreferences{
+	return &m.preferences
+}
+
+func (m *Manager) UpdatePreferences() {
+	r := messages.PluginRegisterResponseJsonDataPreferences{
 		Language: "en-US",
 		Units: messages.PluginRegisterResponseJsonDataPreferencesUnits{
 			Temperature: "degree celsius",
@@ -462,12 +469,16 @@ func (m *Manager) GetPreferences() *messages.PluginRegisterResponseJsonDataPrefe
 	lang, err := m.storage.GetSetting("localization.language")
 	if err == nil {
 		r.Language = lang
+	} else {
+		_ = m.storage.SetSetting("localization.language", r.Language)
 	}
 	temp, err := m.storage.GetSetting("localization.units.temperature")
 	if err == nil {
 		r.Units.Temperature = temp
+	} else {
+		_ = m.storage.SetSetting("localization.units.temperature", r.Units.Temperature)
 	}
-	return r
+	m.preferences = r
 }
 
 func (m *Manager) GetLanguage() string {
