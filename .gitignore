@@ -1,10 +1,5 @@
-/app/node_modules/
 .vscode
-.idea/workspace.xml
 .vscode/
-/server/static/*.html
-/server/static/*.js
-!/server/static/*.go
 ##git submodule updata --init --recursive
 /configs/addons
 /configs/config
