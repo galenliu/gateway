@@ -1,10 +1,20 @@
 package properties
 
 type StringProperty struct {
-	*Property
+	*property
 }
 
-func NewStringProperty(typ string) *StringProperty {
+func NewStringProperty(description PropertyDescription) *StringProperty {
+	p := &StringProperty{}
+	p.property = NewProperty(description)
+	if p.property == nil {
+		return nil
+	}
+	p.Type = TypeBoolean
+	return p
+}
+
+func newStringProperty() *StringProperty {
 	p := &StringProperty{}
 	p.Type = TypeString
 	return p
@@ -17,7 +27,7 @@ func (prop *StringProperty) SetValue(value string) {
 
 // GetValue returns the value as bool
 func (prop *StringProperty) GetValue() string {
-	return prop.Property.GetValue().(string)
+	return prop.property.GetValue().(string)
 }
 
 // OnValueRemoteGet calls fn when the value was read by a client.

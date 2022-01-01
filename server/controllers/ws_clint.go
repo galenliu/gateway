@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/galenliu/gateway/pkg/addon"
+	"github.com/galenliu/gateway/pkg/addon/gateway-addon/properties"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
@@ -157,14 +158,14 @@ func (c *wsClint) addThing(t *container2.Thing) {
 	}
 	removeThingEventStatusFunc := c.bus.Sub(topic.ThingEvent, onEvent)
 
-	onPropertyChanged := func(thingId string, property *addon.PropertyDescription) {
+	onPropertyChanged := func(thingId string, property *properties.PropertyDescription) {
 		if thingId != t.GetId() {
 			return
 		}
 		err := c.ws.WriteJSON(map[string]any{
 			"id":          t.GetId(),
 			"messageType": constant.PropertyChanged,
-			"data":        map[string]any{property.Name: property.Value},
+			"data":        map[string]any{*property.Name: property.Value},
 		})
 		if err != nil {
 		}

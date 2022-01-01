@@ -7,7 +7,7 @@ type ColorProperty struct {
 }
 
 func NewColorProperty() *ColorProperty {
-	p := NewStringProperty(TypeColorProperty)
+	p := &StringProperty{}
 	p.Type = TypeString
 	p.Name = ColorModel
 	p.SetValue("#121212")

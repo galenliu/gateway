@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon"
+	"github.com/galenliu/gateway/pkg/addon/gateway-addon/properties"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/util"
 	"github.com/xiam/to"
 	"sync"
 )
@@ -52,37 +54,42 @@ func newDevice(adapter *Adapter, msg messages.Device) *Device {
 		}
 	}
 
-	propertiesFunc := func(properties messages.DeviceProperties) (properties1 map[string]addon.Property) {
-		properties1 = make(map[string]addon.Property)
-		for n, p := range properties {
-			properties1[n] = addon.Property{
-				Name:        getString(p.Name),
-				AtType:      getString(p.AtType),
-				Title:       getString(p.Title),
-				Type:        p.Type,
-				Unit:        getString(p.Unit),
-				Description: getString(p.Description),
-				Minimum:     p.Minimum,
-				Maximum:     p.Maximum,
-				Enum: func(elems []messages.PropertyEnumElem) []any {
-					var enums []any
-					for e := range elems {
-						enums = append(enums, e)
-					}
-					return enums
-				}(p.Enum),
-				ReadOnly: func() bool {
-					if p.ReadOnly == nil {
-						return false
-					}
-					return *p.ReadOnly
-				}(),
-				MultipleOf: p.MultipleOf,
-				Links:      nil,
-				Value:      p.Value,
+	getPropertDescription := func(p messages.Property) properties.PropertyDescription {
+		return properties.PropertyDescription{
+			Name:        p.Name,
+			AtType:      p.AtType,
+			Title:       p.Title,
+			Type:        p.Type,
+			Unit:        p.Unit,
+			Description: p.Description,
+			Minimum:     p.Minimum,
+			Maximum:     p.Maximum,
+			Enum: func(elem []messages.PropertyEnumElem) (em []any) {
+				if len(elem) == 0 {
+					return nil
+				}
+				for e := range elem {
+					em = append(em, e)
+				}
+				return
+			}(p.Enum),
+			ReadOnly:   p.ReadOnly,
+			MultipleOf: nil,
+			Links:      nil,
+			Value:      nil,
+		}
+	}
+
+	propertiesFunc := func(deviceProperties messages.DeviceProperties) map[string]properties.Property {
+		props := make(map[string]properties.Property)
+		for n, p := range deviceProperties {
+			prop := properties.NewProperty(getPropertDescription(p))
+			if prop != nil {
+				props[n] = prop
+
 			}
 		}
-		return
+		return props
 	}
 
 	actionsFunc := func(actions messages.DeviceActions) (oActions map[string]addon.Action) {
@@ -179,7 +186,7 @@ func (device *Device) notifyValueChanged(property messages.Property) {
 	if !ok {
 		return
 	}
-	if p.ReadOnly {
+	if p.IsReadOnly() {
 		return
 	}
 	valueChanged := p.SetValue(property.Value)
@@ -192,7 +199,7 @@ func (device *Device) notifyValueChanged(property messages.Property) {
 		descriptionChanged = p.SetDescription(*property.Description)
 	}
 	if valueChanged || descriptionChanged || titleChanged {
-		device.adapter.plugin.manager.bus.Pub(topic.DevicePropertyChanged, device.GetId(), p.GetDescriptions())
+		device.adapter.plugin.manager.bus.Pub(topic.DevicePropertyChanged, device.GetId(), util.JsonIndent(p))
 	}
 }
 
@@ -238,16 +245,16 @@ func (device *Device) requestAction(ctx context.Context, id, name string, input 
 func (device *Device) setPropertyValue(ctx context.Context, name string, value any) (any, error) {
 
 	p, _ := device.GetProperty(name)
-	if p.Type == TypeBoolean {
+	if p.GetType() == TypeBoolean {
 		value = to.Bool(value)
 	}
-	if p.Type == TypeNumber {
+	if p.GetType() == TypeNumber {
 		value = to.Float64(value)
 	}
-	if p.Type == TypeInteger {
+	if p.GetType() == TypeInteger {
 		value = to.Int64(value)
 	}
-	if p.Type == TypeString {
+	if p.GetType() == TypeString {
 		value = to.String(value)
 	}
 

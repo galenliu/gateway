@@ -9,8 +9,8 @@ import (
 
 type onPairingFunc func(timeout float64)
 type OnCancelPairingFunc func()
-type OnDeviceSavedFunc func(deivceId string, device *devices.Device)
-type OnSetCredentialsFunc func(deivceId, username, password string)
+type OnDeviceSavedFunc func(deviceId string, device *devices.Device)
+type OnSetCredentialsFunc func(deviceId, username, password string)
 
 //type OnSetPinFunc func(deivceId string, devices.P) error
 

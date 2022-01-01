@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon"
+	"github.com/galenliu/gateway/pkg/addon/gateway-addon/properties"
 	bus "github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/logging"
@@ -205,7 +206,7 @@ func (c *ThingsContainer) handleDeviceConnected(deviceId string, connected bool)
 	}
 }
 
-func (c *ThingsContainer) handleDevicePropertyChanged(deviceId string, property *addon.PropertyDescription) {
+func (c *ThingsContainer) handleDevicePropertyChanged(deviceId string, property *properties.PropertyDescription) {
 	t := c.GetThing(deviceId)
 	if t != nil {
 		t.bus.Pub(topic.ThingPropertyChanged, t.GetId(), property)

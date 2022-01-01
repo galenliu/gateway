@@ -1,12 +1,13 @@
 package properties
 
 type IntegerProperty struct {
-	*Property
+	*property
 }
 
-func NewIntegerProperty(typ string) *IntegerProperty {
-
-	return &IntegerProperty{}
+func NewIntegerProperty() *IntegerProperty {
+	return &IntegerProperty{&property{
+		Type: TypeInteger,
+	}}
 }
 
 // SetValue sets a value
@@ -16,7 +17,7 @@ func (prop *IntegerProperty) SetCachedValueAndNotify(value int) {
 
 // GetValue returns the value as bool
 func (prop *IntegerProperty) GetValue() int {
-	return prop.Property.GetValue().(int)
+	return prop.property.GetValue().(int)
 }
 
 // OnValueRemoteGet calls fn when the value was read by a client.

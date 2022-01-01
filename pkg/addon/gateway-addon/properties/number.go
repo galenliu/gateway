@@ -1,10 +1,10 @@
 package properties
 
 type NumberProperty struct {
-	*Property
+	*property
 }
 
-func NewNumberProperty(typ string) *NumberProperty {
+func NewNumberProperty() *NumberProperty {
 	p := &NumberProperty{}
 	p.Type = TypeNumber
 	return p
@@ -17,7 +17,7 @@ func (prop *NumberProperty) SetValue(value float64) {
 
 // GetValue returns the value as bool
 func (prop *NumberProperty) GetValue() float64 {
-	return prop.Property.GetValue().(float64)
+	return prop.property.GetValue().(float64)
 }
 
 // OnValueRemoteGet calls fn when the value was read by a client.

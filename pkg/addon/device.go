@@ -1,6 +1,8 @@
 package addon
 
-type DeviceProperties map[string]Property
+import "github.com/galenliu/gateway/pkg/addon/gateway-addon/properties"
+
+type DeviceProperties map[string]properties.Property
 type DeviceActions map[string]Action
 type DeviceEvents map[string]Event
 
@@ -62,11 +64,11 @@ func (d Device) GetBaseHref() string {
 	return d.BaseHref
 }
 
-func (d Device) GetProperties() map[string]Property {
+func (d Device) GetProperties() map[string]properties.Property {
 	return d.Properties
 }
 
-func (d Device) GetProperty(id string) (p Property, ok bool) {
+func (d Device) GetProperty(id string) (p properties.Property, ok bool) {
 	p, ok = d.Properties[id]
 	return
 }

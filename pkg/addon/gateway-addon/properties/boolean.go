@@ -1,23 +1,26 @@
 package properties
 
 type BooleanProperty struct {
-	*Property
+	*property
 }
 
-func NewBooleanProperty(typ string) *BooleanProperty {
+func NewBooleanProperty(description PropertyDescription) *BooleanProperty {
 	p := &BooleanProperty{}
-	p.Type = typ
+	p.property = NewProperty(description)
+	if p.property == nil {
+		return nil
+	}
 	p.Type = TypeBoolean
 	return p
 }
 
-// SetValue sets a value
+// SetBooleanValue SetValue sets a value
 func (prop *BooleanProperty) SetBooleanValue(value bool) {
 }
 
 // GetValue returns the value as bool
 func (prop *BooleanProperty) GetValue() bool {
-	return prop.Property.GetValue().(bool)
+	return prop.property.GetValue().(bool)
 }
 
 // OnValueRemoteGet calls fn when the value was read by a client.

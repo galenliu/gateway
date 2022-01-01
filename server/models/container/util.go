@@ -3,6 +3,7 @@ package container
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon"
+	"github.com/galenliu/gateway/pkg/addon/gateway-addon/properties"
 	"github.com/galenliu/gateway/pkg/constant"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	ia "github.com/galenliu/gateway/pkg/wot/definitions/core/interaction_affordance"
@@ -54,16 +55,16 @@ func AsWebOfThing(device *addon.Device) Thing {
 }
 
 func mapOfWotProperties(deviceId string, props addon.DeviceProperties) (mapOfProperty map[string]wot.PropertyAffordance) {
-	asWotProperty := func(deviceId string, p addon.Property) wot.PropertyAffordance {
+	asWotProperty := func(deviceId string, p properties.Property) wot.PropertyAffordance {
 		var wp wot.PropertyAffordance
 		var i = &ia.InteractionAffordance{
-			AtType:       p.AtType,
-			Title:        p.Title,
+			AtType:       p.GetAtType(),
+			Title:        p.GetTitle(),
 			Titles:       map[string]string{},
-			Description:  p.Description,
+			Description:  p.GetDescription(),
 			Descriptions: map[string]string{},
 			Forms: []controls.Form{{
-				Href:                controls.URI(fmt.Sprintf("/things/%s/properties/%s", deviceId, p.Name)),
+				Href:                controls.URI(fmt.Sprintf("/things/%s/properties/%s", deviceId, p.GetName())),
 				ContentType:         "",
 				ContentCoding:       "",
 				Security:            nil,
@@ -76,23 +77,23 @@ func mapOfWotProperties(deviceId string, props addon.DeviceProperties) (mapOfPro
 			UriVariables: nil,
 		}
 		var dataSchema = &schema.DataSchema{
-			AtType:       p.AtType,
-			Title:        p.Title,
+			AtType:       p.GetAtType(),
+			Title:        p.GetTitle(),
 			Titles:       nil,
-			Description:  p.Description,
+			Description:  p.GetDescription(),
 			Descriptions: nil,
 			Const:        nil,
 			Default:      nil,
-			Unit:         p.Unit,
+			Unit:         p.GetUnit(),
 			OneOf:        nil,
 			Enum:         p.GetEnum(),
-			ReadOnly:     p.GetReadOnly(),
+			ReadOnly:     p.IsReadOnly(),
 			WriteOnly:    false,
 			Format:       "",
-			Type:         p.Type,
+			Type:         p.GetType(),
 		}
 
-		switch p.Type {
+		switch p.GetType() {
 		case controls.TypeInteger:
 			wp = &pa.IntegerPropertyAffordance{
 				InteractionAffordance: i,
@@ -101,7 +102,7 @@ func mapOfWotProperties(deviceId string, props addon.DeviceProperties) (mapOfPro
 					Minimum: func() *controls.Integer {
 						var min controls.Integer
 						if m := p.GetMinimum(); m != nil {
-							min = controls.Integer(*m)
+							min = controls.ToInteger(m)
 							return &min
 						}
 						return nil
@@ -110,7 +111,7 @@ func mapOfWotProperties(deviceId string, props addon.DeviceProperties) (mapOfPro
 					Maximum: func() *controls.Integer {
 						var max controls.Integer
 						if m := p.GetMaximum(); m != nil {
-							max = controls.Integer(*m)
+							max = controls.ToInteger(m)
 							return &max
 						}
 						return nil
@@ -119,7 +120,7 @@ func mapOfWotProperties(deviceId string, props addon.DeviceProperties) (mapOfPro
 					MultipleOf: func() *controls.Integer {
 						var mo controls.Integer
 						if m := p.GetMultipleOf(); m != nil {
-							mo = controls.Integer(*m)
+							mo = controls.ToInteger(m)
 							return &mo
 						}
 						return nil
@@ -134,21 +135,24 @@ func mapOfWotProperties(deviceId string, props addon.DeviceProperties) (mapOfPro
 					DataSchema: dataSchema,
 					Minimum: func() *controls.Double {
 						if m := p.GetMinimum(); m != nil {
-							return (*controls.Double)(m)
+							d := controls.ToDouble(m)
+							return &d
 						}
 						return nil
 					}(),
 					ExclusiveMinimum: nil,
 					Maximum: func() *controls.Double {
 						if m := p.GetMaximum(); m != nil {
-							return (*controls.Double)(m)
+							d := controls.ToDouble(m)
+							return &d
 						}
 						return nil
 					}(),
 					ExclusiveMaximum: nil,
 					MultipleOf: func() *controls.Double {
 						if m := p.GetMultipleOf(); m != nil {
-							return (*controls.Double)(m)
+							d := controls.ToDouble(m)
+							return &d
 						}
 						return nil
 					}(),
@@ -167,10 +171,10 @@ func mapOfWotProperties(deviceId string, props addon.DeviceProperties) (mapOfPro
 				StringSchema: &schema.StringSchema{
 					DataSchema: dataSchema,
 					MinLength: func() *controls.UnsignedInt {
-						if p.Minimum == nil {
+						if p.GetMinimum() == nil {
 							return nil
 						}
-						var min = controls.UnsignedInt(*p.Minimum)
+						var min = controls.ToUnsignedInt(p.GetMinimum())
 						return &min
 					}(),
 					MaxLength: func() *controls.UnsignedInt {

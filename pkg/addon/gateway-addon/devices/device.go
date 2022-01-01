@@ -8,7 +8,7 @@ import (
 type Device struct {
 	ID          string   `json:"id"`
 	Context     string   `json:"@context"`
-	Type        []string `json:"@type"`
+	AtType      []string `json:"@type"`
 	Title       string   `json:"title"`
 	Description string   `json:"description,omitempty"`
 
@@ -37,7 +37,7 @@ func NewDeviceFormMessage(dev *addon.Device) *Device {
 	device := &Device{
 		ID:                  dev.Id,
 		Context:             dev.GetAtContext(),
-		Type:                dev.GetType(),
+		AtType:              dev.GetAtType(),
 		Title:               dev.Title,
 		Description:         dev.Description,
 		PinRequired:         dev.Pin.Required,
@@ -97,10 +97,6 @@ func (device *Device) GetID() string {
 
 func (device *Device) GetAtContext() string {
 	return device.Context
-}
-
-func (device *Device) GetType() []string {
-	return device.Type
 }
 
 func (device *Device) GetTitle() string {

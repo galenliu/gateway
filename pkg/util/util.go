@@ -85,7 +85,7 @@ func GetArch() string {
 }
 
 func GetPythonVersion() (version []string) {
-	cmd := exec.Command("python3", "--version")
+	cmd := exec.Command("python", "--version")
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	err := cmd.Run()
