@@ -18,6 +18,7 @@ type Property interface {
 	SetValue(any2 any) bool
 	SetTitle(string2 string) bool
 	SetDescription(description string) bool
+	ToDescription() PropertyDescription
 }
 
 type PropertyDescription struct {
@@ -35,6 +36,7 @@ type PropertyDescription struct {
 	Links       []PropertyLinkElem `json:"links,omitempty"`
 	Value       any                `json:"value,omitempty"`
 }
+
 type PropertyLinkElem struct {
 }
 
@@ -188,4 +190,40 @@ func (p *property) SetValue(value any) bool {
 	}
 	p.Value = value
 	return true
+}
+
+func (p *property) ToDescription() PropertyDescription {
+	get := func(s string) *string {
+		if s == "" {
+			return nil
+		}
+		return &s
+	}
+	getFloat := func(s any) *float64 {
+		if s == nil {
+			return nil
+		}
+		switch s.(type) {
+		case float64:
+			return s.(*float64)
+		}
+		return nil
+	}
+	return PropertyDescription{
+		Name:        get(p.Name),
+		AtType:      get(p.AtType),
+		Title:       get(p.Title),
+		Type:        p.Type,
+		Unit:        get(p.Unit),
+		Description: get(p.Description),
+		Minimum:     getFloat(p.Minimum),
+		Maximum:     getFloat(p.Maximum),
+		Enum:        p.Enum,
+		ReadOnly: func(b bool) *bool {
+			return &b
+		}(p.IsReadOnly()),
+		MultipleOf: p.MultipleOf,
+		Links:      nil,
+		Value:      p.Value,
+	}
 }

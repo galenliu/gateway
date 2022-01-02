@@ -206,7 +206,7 @@ func (c *ThingsContainer) handleDeviceConnected(deviceId string, connected bool)
 	}
 }
 
-func (c *ThingsContainer) handleDevicePropertyChanged(deviceId string, property *properties.PropertyDescription) {
+func (c *ThingsContainer) handleDevicePropertyChanged(deviceId string, property properties.PropertyDescription) {
 	t := c.GetThing(deviceId)
 	if t != nil {
 		t.bus.Pub(topic.ThingPropertyChanged, t.GetId(), property)

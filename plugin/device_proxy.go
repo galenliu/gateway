@@ -8,7 +8,6 @@ import (
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/util"
 	"github.com/xiam/to"
 	"sync"
 )
@@ -199,7 +198,7 @@ func (device *Device) notifyValueChanged(property messages.Property) {
 		descriptionChanged = p.SetDescription(*property.Description)
 	}
 	if valueChanged || descriptionChanged || titleChanged {
-		device.adapter.plugin.manager.bus.Pub(topic.DevicePropertyChanged, device.GetId(), util.JsonIndent(p))
+		device.adapter.plugin.manager.bus.Pub(topic.DevicePropertyChanged, device.GetId(), p.ToDescription())
 	}
 }
 
