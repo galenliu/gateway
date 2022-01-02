@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/galenliu/gateway/pkg/addon"
-	"github.com/galenliu/gateway/pkg/addon/gateway-addon/properties"
+	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"

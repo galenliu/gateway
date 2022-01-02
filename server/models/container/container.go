@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon"
-	"github.com/galenliu/gateway/pkg/addon/gateway-addon/properties"
+	"github.com/galenliu/gateway/pkg/addon/properties"
 	bus "github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/logging"

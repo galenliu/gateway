@@ -1,6 +1,8 @@
 package addon
 
-import "github.com/galenliu/gateway/pkg/addon/gateway-addon/properties"
+import (
+	"github.com/galenliu/gateway/pkg/addon/properties"
+)
 
 type DeviceProperties map[string]properties.Property
 type DeviceActions map[string]Action

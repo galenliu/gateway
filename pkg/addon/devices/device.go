@@ -2,7 +2,7 @@ package devices
 
 import (
 	"github.com/galenliu/gateway/pkg/addon"
-	"github.com/galenliu/gateway/pkg/addon/gateway-addon/properties"
+	"github.com/galenliu/gateway/pkg/addon/properties"
 )
 
 type Device struct {
@@ -12,14 +12,14 @@ type Device struct {
 	Title       string   `json:"title"`
 	Description string   `json:"description,omitempty"`
 
-	Links               []*Link                         `json:"links,omitempty"`
-	PinRequired         bool                            `json:"pinRequired"`
-	CredentialsRequired bool                            `json:"credentialsRequired"`
-	BaseHref            string                          `json:"baseHref"`
-	Pin                 *Pin                            `json:"pin,omitempty"`
-	Properties          map[string]*properties.Property `json:"properties,omitempty"`
-	Actions             map[string]*addon.Action        `json:"action,omitempty"`
-	Events              map[string]*addon.Event         `json:"events,omitempty"`
+	Links               []*Link                        `json:"links,omitempty"`
+	PinRequired         bool                           `json:"pinRequired"`
+	CredentialsRequired bool                           `json:"credentialsRequired"`
+	BaseHref            string                         `json:"baseHref"`
+	Pin                 *Pin                           `json:"pin,omitempty"`
+	Properties          map[string]properties.Property `json:"properties,omitempty"`
+	Actions             map[string]*addon.Action       `json:"action,omitempty"`
+	Events              map[string]*addon.Event        `json:"events,omitempty"`
 }
 
 type Pin struct {
@@ -61,7 +61,7 @@ func NewDeviceFormMessage(dev *addon.Device) *Device {
 		}
 	}
 	if len(dev.Properties) > 0 {
-		device.Properties = make(map[string]*properties.Property)
+		device.Properties = make(map[string]properties.Property)
 		//for name, property := range dev.Properties {
 		//	device.Properties[name] = properties.NewPropertyFormMessage(property)
 		//}
@@ -107,11 +107,11 @@ func (device *Device) GetDescription() string {
 	return device.Description
 }
 
-func (device *Device) AddProperty(property *properties.Property) {
+func (device *Device) AddProperty(property properties.Property) {
 	if device.Properties == nil {
-		device.Properties = make(map[string]*properties.Property)
+		device.Properties = make(map[string]properties.Property)
 	}
-	device.Properties[property.Name] = property
+	device.Properties[property.GetName()] = property
 }
 
 func (device *Device) AddAction(action *addon.Action) {

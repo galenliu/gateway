@@ -2,7 +2,7 @@ package addon
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/addon/gateway-addon/devices"
+	"github.com/galenliu/gateway/pkg/addon/devices"
 	"log"
 	"sync"
 )
