@@ -21,6 +21,9 @@ type Property interface {
 	ToDescription() PropertyDescription
 }
 
+type Device interface {
+}
+
 type PropertyDescription struct {
 	Name        *string            `json:"name,omitempty"`
 	AtType      *string            `json:"@type,omitempty"`
@@ -41,6 +44,7 @@ type PropertyLinkElem struct {
 }
 
 type property struct {
+	device      Device
 	Name        string   `json:"name"`
 	Title       string   `json:"title,omitempty"`
 	Type        string   `json:"type"`
@@ -56,7 +60,7 @@ type property struct {
 	Value any `json:"value"`
 }
 
-func NewProperty(description PropertyDescription) *property {
+func NewProperty(device Device, description PropertyDescription) *property {
 	getString := func(s *string) string {
 		if s != nil {
 			return *s

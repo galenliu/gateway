@@ -53,7 +53,7 @@ func newDevice(adapter *Adapter, msg messages.Device) *Device {
 		}
 	}
 
-	getPropertDescription := func(p messages.Property) properties.PropertyDescription {
+	getPropertyDescription := func(p messages.Property) properties.PropertyDescription {
 		return properties.PropertyDescription{
 			Name:        p.Name,
 			AtType:      p.AtType,
@@ -77,18 +77,6 @@ func newDevice(adapter *Adapter, msg messages.Device) *Device {
 			Links:      nil,
 			Value:      nil,
 		}
-	}
-
-	propertiesFunc := func(deviceProperties messages.DeviceProperties) map[string]properties.Property {
-		props := make(map[string]properties.Property)
-		for n, p := range deviceProperties {
-			prop := properties.NewProperty(getPropertDescription(p))
-			if prop != nil {
-				props[n] = prop
-
-			}
-		}
-		return props
 	}
 
 	actionsFunc := func(actions messages.DeviceActions) (oActions map[string]addon.Action) {
@@ -155,12 +143,11 @@ func newDevice(adapter *Adapter, msg messages.Device) *Device {
 				}
 				return *msg.Description
 			}(),
-			Links:      linksFunc(msg.Links),
-			BaseHref:   *msg.BaseHref,
-			Pin:        pinFunc(msg.Pin),
-			Properties: propertiesFunc(msg.Properties),
-			Actions:    actionsFunc(msg.Actions),
-			Events:     eventsFunc(msg.Events),
+			Links:    linksFunc(msg.Links),
+			BaseHref: *msg.BaseHref,
+			Pin:      pinFunc(msg.Pin),
+			Actions:  actionsFunc(msg.Actions),
+			Events:   eventsFunc(msg.Events),
 			CredentialsRequired: func() bool {
 				if msg.CredentialsRequired == nil {
 					return false
@@ -169,6 +156,11 @@ func newDevice(adapter *Adapter, msg messages.Device) *Device {
 			}(),
 		},
 	}
+	for n, p := range msg.Properties {
+		prop := properties.NewProperty(device, getPropertyDescription(p))
+		device.AddProperty(n, prop)
+	}
+
 	device.logger = adapter.logger
 	return device
 }

@@ -38,6 +38,10 @@ type DevicePin struct {
 	Pattern  string `json:"pattern,omitempty"`
 }
 
+func (d Device) AddProperty(n string, p properties.Property) {
+	d.Properties[n] = p
+}
+
 func (d Device) GetId() string {
 	return d.Id
 }
