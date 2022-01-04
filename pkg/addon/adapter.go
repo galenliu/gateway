@@ -27,9 +27,10 @@ type Adapter struct {
 	pluginId    string
 }
 
-func NewAdapter(adapterId, name string) *Adapter {
+func NewAdapter(manager *Manager, adapterId, name string) *Adapter {
 
 	adapter := &Adapter{}
+	adapter.manager = manager
 	adapter.Id = adapterId
 	adapter.name = name
 	adapter.locker = new(sync.Mutex)
@@ -45,10 +46,10 @@ func (a *Adapter) HandleDeviceAdded(device DeviceProxy) {
 }
 
 func (a *Adapter) SendError(message string) {
-	data := make(map[string]any)
-	data["adapterId"] = a.GetId()
-	data["message"] = message
-	a.manager.send(PluginErrorNotification, data)
+	a.manager.send(messages.MessageType_PluginErrorNotification, messages.PluginErrorNotificationJsonData{
+		Message:  message,
+		PluginId: a.manager.packageName,
+	})
 }
 
 //func (a *Adapter) ConnectedNotify(device *DeviceProxy, connected bool) {
@@ -57,27 +58,36 @@ func (a *Adapter) SendError(message string) {
 
 // SendPairingPrompt 向前端UI发送提示
 func (a *Adapter) SendPairingPrompt(prompt, url string, did string) {
-	data := make(map[string]any)
-	data["adapterId"] = a.GetId()
-	data["prompt"] = prompt
-	data["deviceId"] = did
+
+	var u *string
 	if url != "" {
-		data["url"] = url
+		u = &url
+	} else {
+		u = nil
 	}
-	a.manager.send(AdapterPairingPromptNotification, data)
+	a.manager.send(messages.MessageType_AdapterPairingPromptNotification, messages.AdapterPairingPromptNotificationJsonData{
+		AdapterId: a.GetId(),
+		DeviceId:  &did,
+		PluginId:  a.packageName,
+		Prompt:    prompt,
+		Url:       u,
+	})
 }
 
 func (a *Adapter) SendUnpairingPrompt(prompt, url string, did string) {
-	data := make(map[string]any)
-	data["adapterId"] = a.GetId()
-	data["prompt"] = prompt
-	if did != "" {
-		data["deviceId"] = did
-	}
+	var u *string
 	if url != "" {
-		data["url"] = url
+		u = &url
+	} else {
+		u = nil
 	}
-	a.manager.send(AdapterUnpairingPromptNotification, data)
+	a.manager.send(messages.MessageType_AdapterUnpairingPromptNotification, messages.AdapterUnpairingPromptNotificationJsonData{
+		AdapterId: a.GetId(),
+		DeviceId:  &did,
+		PluginId:  a.packageName,
+		Prompt:    prompt,
+		Url:       u,
+	})
 }
 
 func (a *Adapter) Send(mt messages.MessageType, data map[string]any) {

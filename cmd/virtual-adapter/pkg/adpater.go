@@ -9,9 +9,9 @@ type VirtualAdapter struct {
 	*addon.Adapter
 }
 
-func NewVirtualAdapter(adapterId, name string) *VirtualAdapter {
+func NewVirtualAdapter(manager *addon.Manager, adapterId, name string) *VirtualAdapter {
 	v := &VirtualAdapter{
-		addon.NewAdapter(adapterId, name),
+		addon.NewAdapter(manager, adapterId, name),
 	}
 	return v
 }

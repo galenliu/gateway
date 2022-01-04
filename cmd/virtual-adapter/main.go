@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/galenliu/gateway/cmd/virtual-adapter/pkg"
 	"github.com/galenliu/gateway/pkg/addon"
 	"os"
@@ -10,8 +11,12 @@ import (
 )
 
 func main() {
-	manager := addon.NewAddonManager("virtual-adapter-golang")
-	adapter := pkg.NewVirtualAdapter("virtual-adapter", "virtual-adapter")
+	manager, err := addon.NewAddonManager("virtual-adapter-golang")
+	if err != nil {
+		fmt.Printf("addon manager error: %s", err.Error())
+		return
+	}
+	adapter := pkg.NewVirtualAdapter(manager, "virtual-adapter", "virtual-adapter")
 	manager.AddAdapters(adapter)
 
 	interruptChannel := make(chan os.Signal, 1)

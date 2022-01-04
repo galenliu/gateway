@@ -2,7 +2,6 @@ package addon
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/addon/devices"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	json "github.com/json-iterator/go"
 	"log"
@@ -27,36 +26,45 @@ type Manager struct {
 	packageName string
 	verbose     bool
 	running     bool
+	registered  bool
+	userProfile messages.PluginRegisterResponseJsonDataUserProfile
+	preferences messages.PluginRegisterResponseJsonDataPreferences
 }
 
 var once sync.Once
 var instance *Manager
 
-func NewAddonManager(packageName string) *Manager {
+func NewAddonManager(packageName string) (*Manager, error) {
 	once.Do(
 		func() {
 			instance = &Manager{}
 			instance.packageName = packageName
-			instance.running = true
 			instance.verbose = true
+			instance.registered = false
 			instance.ipcClient = NewClient(packageName, instance)
+			if instance.ipcClient != nil {
+				instance.running = true
+			}
+			instance.register()
 		},
 	)
-	return instance
+	if instance.ipcClient == nil {
+		return nil, fmt.Errorf("ipc client not available")
+	}
+	instance.running = true
+	return instance, nil
 }
 
 func (m *Manager) AddAdapters(adapters ...AdapterProxy) {
-	if m.running {
-		m.run()
-	}
+
 	for _, adapter := range adapters {
 		m.adapters.Store(adapter.GetId(), adapter)
-		adapter.GetId()
-		data := make(map[string]any)
-		data["adapterId"] = adapter.GetId()
-		data["name"] = adapter.GetName
-		data["packageName"] = m.packageName
-		m.send(AdapterAddedNotification, data)
+		m.send(messages.MessageType_AdapterAddedNotification, messages.AdapterAddedNotificationJsonData{
+			AdapterId:   adapter.GetId(),
+			Name:        adapter.GetName(),
+			PackageName: m.packageName,
+			PluginId:    m.packageName,
+		})
 	}
 }
 
@@ -64,25 +72,22 @@ func (m *Manager) handleDeviceAdded(device DeviceProxy) {
 	if m.verbose {
 		log.Printf("addonManager: handle_device_added: %s", device.GetId())
 	}
-	data := make(map[string]any)
-	data["adapterId"] = device.GetId()
-	description, err := json.Marshal(device)
-	if err != nil {
-		return
-	}
-	data["device"] = description
-	m.send(DeviceAddedNotification, data)
+	m.send(messages.MessageType_DeviceAddedNotification, messages.DeviceAddedNotificationJsonData{
+		AdapterId: device.GetAdapter().GetId(),
+		Device:    messages.Device{},
+		PluginId:  m.packageName,
+	})
 }
 
 func (m *Manager) handleDeviceRemoved(device DeviceProxy) {
 	if m.verbose {
 		log.Printf("addon manager handle devices added, deviceId:%v\n", device.GetId())
 	}
-	data := make(map[string]any)
-	data["adapterId"] = device.GetAdapter()
-	data["deviceId"] = device.GetId()
-
-	m.send(AdapterRemoveDeviceResponse, data)
+	m.send(messages.MessageType_AdapterRemoveDeviceResponse, messages.AdapterRemoveDeviceResponseJsonData{
+		AdapterId: device.GetAdapter().GetId(),
+		DeviceId:  device.GetId(),
+		PluginId:  m.packageName,
+	})
 }
 
 func (m *Manager) getAdapter(adapterId string) AdapterProxy {
@@ -95,13 +100,28 @@ func (m *Manager) getAdapter(adapterId string) AdapterProxy {
 
 func (m *Manager) onMessage(data []byte) {
 
-	var messageType = json.Get(data, "messageType").ToInt()
+	var messageType = messages.MessageType(json.Get(data, "messageType").ToInt())
+	var dataAny = json.Get(data, "data")
 
 	switch messageType {
-	//卸载plugin
-	case PluginUnloadRequest:
-		data := make(map[string]any)
-		m.send(PluginUnloadResponse, data)
+	case messages.MessageType_PluginRegisterResponse:
+		var msg messages.PluginRegisterResponseJsonData
+		dataAny.ToVal(&msg)
+		if &m != nil {
+			m.registered = true
+			m.preferences = msg.Preferences
+			m.userProfile = msg.UserProfile
+		}
+		return
+	}
+	if !m.registered {
+		fmt.Printf("addon manager not registered")
+		return
+	}
+	switch messageType {
+
+	case messages.MessageType_PluginUnloadRequest:
+		m.send(messages.MessageType_PluginUnloadResponse, messages.PluginUnloadResponseJsonData{PluginId: m.packageName})
 		m.running = false
 		var closeFun = func() {
 			time.AfterFunc(500*time.Millisecond, func() { m.close() })
@@ -119,23 +139,26 @@ func (m *Manager) onMessage(data []byte) {
 
 	switch messageType {
 	//adapter pairing command
-	case AdapterStartPairingCommand:
+	case messages.MessageType_AdapterStartPairingCommand:
 		timeout := json.Get(data, "data", "timeout").ToFloat64()
 		go adapter.StartPairing(time.Duration(timeout) * time.Millisecond)
 		return
 
-	case AdapterCancelPairingCommand:
+	case messages.MessageType_AdapterCancelPairingCommand:
 		go adapter.CancelPairing()
 		return
 
 		//adapter unload request
 
-	case AdapterUnloadRequest:
+	case messages.MessageType_AdapterUnloadRequest:
 		go adapter.Unload()
 		unloadFunc := func(proxy *Manager, adapter AdapterProxy) {
 			data := make(map[string]any)
 			data["adapterId"] = adapter.GetId()
-			proxy.send(AdapterUnloadResponse, data)
+			proxy.send(messages.MessageType_AdapterUnloadResponse, messages.AdapterUnloadResponseJsonData{
+				AdapterId: adapter.GetId(),
+				PluginId:  m.packageName,
+			})
 		}
 		go unloadFunc(m, adapter)
 		m.adapters.Delete(adapter.GetId())
@@ -148,23 +171,23 @@ func (m *Manager) onMessage(data []byte) {
 	}
 
 	switch messageType {
-	case AdapterCancelRemoveDeviceCommand:
+	case messages.MessageType_AdapterCancelRemoveDeviceCommand:
 		adapter := m.getAdapter(adapterId)
 		log.Printf(adapter.GetId())
 
-	case DeviceSavedNotification:
+	case messages.MessageType_DeviceSavedNotification:
 
 		go adapter.HandleDeviceSaved(device)
 		return
 
 		//adapter remove devices request
 
-	case AdapterRemoveDeviceRequest:
+	case messages.MessageType_AdapterRemoveDeviceRequest:
 		adapter.HandleDeviceRemoved(device)
 
 		//devices set properties command
 
-	case DeviceSetPropertyCommand:
+	case messages.MessageType_DeviceSetPropertyCommand:
 		propName := json.Get(data, "data", "propertyName").ToString()
 		newValue := json.Get(data, "data", "propertyValue").GetInterface()
 		prop := device.GetProperty(propName)
@@ -181,13 +204,28 @@ func (m *Manager) onMessage(data []byte) {
 			log.Printf(e.Error())
 			return
 		}
-		data := make(map[string]any)
-		data["adapterId"] = adapterId
-		data["deviceId"] = device.GetId()
-		//data["property"] = prop.AsDict()
-		m.send(DevicePropertyChangedNotification, data)
+		p := prop.ToDescription()
+		m.send(messages.MessageType_DevicePropertyChangedNotification, messages.DevicePropertyChangedNotificationJsonData{
+			AdapterId: adapter.GetId(),
+			DeviceId:  device.GetId(),
+			PluginId:  m.packageName,
+			Property: messages.Property{
+				Type:        p.Type,
+				AtType:      p.AtType,
+				Description: p.Description,
+				Enum:        p.Enum,
+				Maximum:     p.Maximum,
+				Minimum:     p.Minimum,
+				MultipleOf:  p.MultipleOf,
+				Name:        p.Name,
+				ReadOnly:    p.ReadOnly,
+				Title:       p.Title,
+				Unit:        p.Unit,
+				Value:       p.Value,
+			},
+		})
 
-	case DeviceSetPinRequest:
+	case messages.MessageType_DeviceSetPinRequest:
 		//var pin PIN
 		//pin.Pattern = json.Get(data, "data", "pin", "pattern").GetInterface()
 		//pin.Required = json.Get(data, "data", "pin", "required").ToBool()
@@ -214,25 +252,44 @@ func (m *Manager) onMessage(data []byte) {
 		//}
 		//go handleFunc()
 
-	case DeviceSetCredentialsRequest:
+	case messages.MessageType_DeviceSetCredentialsRequest:
 		messageId := json.Get(data, "data", "messageId").ToInt()
 		username := json.Get(data, "data", "username").ToString()
 		password := json.Get(data, "data", "password").ToString()
 
 		handleFunc := func() {
 			err := device.SetCredentials(username, password)
-			data := make(map[string]any)
-			data["adapterId"] = adapterId
-			data["deviceId"] = deviceId
-			data["messageId"] = messageId
 			if err != nil {
-				data["success"] = true
-				m.send(DeviceSetCredentialsResponse, data)
+				m.send(messages.MessageType_DeviceSetCredentialsResponse, messages.DeviceSetCredentialsResponseJsonData{
+					AdapterId: adapter.GetId(),
+					Device:    nil,
+					DeviceId: func(s string) *string {
+						if s == "" {
+							return nil
+						}
+						return &s
+					}(device.GetId()),
+					MessageId: messageId,
+					PluginId:  m.packageName,
+					Success:   true,
+				})
 				fmt.Printf(err.Error())
 				return
 			}
-			data["success"] = false
-			m.send(DeviceSetCredentialsResponse, data)
+
+			m.send(messages.MessageType_DeviceSetCredentialsResponse, messages.DeviceSetCredentialsResponseJsonData{
+				AdapterId: adapter.GetId(),
+				Device:    nil,
+				DeviceId: func(s string) *string {
+					if s == "" {
+						return nil
+					}
+					return &s
+				}(device.GetId()),
+				MessageId: messageId,
+				PluginId:  m.packageName,
+				Success:   false,
+			})
 			return
 		}
 		go handleFunc()
@@ -240,16 +297,13 @@ func (m *Manager) onMessage(data []byte) {
 	}
 }
 
-func (m *Manager) sendConnectedStateNotification(device *devices.Device, connected bool) {
-	data := make(map[string]any)
-	data["adapterId"] = ""
-	data["deviceId"] = device.GetId()
-	data["connected"] = connected
-	m.send(DeviceConnectedStateNotification, data)
-}
-
-func (m *Manager) run() {
-	m.ipcClient.Register()
+func (m *Manager) sendConnectedStateNotification(device DeviceProxy, connected bool) {
+	m.send(messages.MessageType_DeviceConnectedStateNotification, messages.DeviceConnectedStateNotificationJsonData{
+		AdapterId: device.GetAdapter().GetId(),
+		Connected: connected,
+		DeviceId:  device.GetId(),
+		PluginId:  m.packageName,
+	})
 }
 
 func (m *Manager) send(messageType messages.MessageType, data any) {
@@ -257,16 +311,15 @@ func (m *Manager) send(messageType messages.MessageType, data any) {
 		MessageType messages.MessageType `json:"messageType"`
 		Data        any                  `json:"data"`
 	}{MessageType: messageType, Data: data}
-	d, er := json.MarshalIndent(message, "", " ")
-	if er != nil {
-		log.Fatal(er)
-		return
-	}
-	m.ipcClient.sendMessage(d)
+	m.ipcClient.send(message)
 }
 
 func (m *Manager) register() {
-	m.ipcClient.sendMessage()
+	if !m.running {
+		fmt.Printf("addon manager not running")
+		return
+	}
+	m.send(messages.MessageType_PluginRegisterRequest, messages.PluginRegisterRequestJsonData{PluginId: m.packageName})
 }
 
 func (m *Manager) close() {

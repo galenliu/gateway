@@ -68,9 +68,9 @@ func newDevice(adapter *Adapter, msg messages.Device) *Device {
 			Maximum:     p.Maximum,
 			Enum:        p.Enum,
 			ReadOnly:    p.ReadOnly,
-			MultipleOf:  nil,
+			MultipleOf:  p.MultipleOf,
 			Links:       nil,
-			Value:       nil,
+			Value:       p.Value,
 		}
 	}
 
@@ -153,6 +153,9 @@ func newDevice(adapter *Adapter, msg messages.Device) *Device {
 	}
 	for n, p := range msg.Properties {
 		prop := properties.NewProperty(device, getPropertyDescription(p))
+		if prop == nil {
+			continue
+		}
 		device.AddProperty(n, prop)
 	}
 
