@@ -1,12 +1,14 @@
 package controllers
 
 import (
-	"github.com/galenliu/gateway/pkg/addon"
+	things "github.com/galenliu/gateway/api/models/container"
+	"github.com/galenliu/gateway/pkg/addon/actions"
+	"github.com/galenliu/gateway/pkg/addon/devices"
+	"github.com/galenliu/gateway/pkg/addon/events"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
-	container2 "github.com/galenliu/gateway/server/models/container"
 	"github.com/gofiber/websocket/v2"
 )
 
@@ -35,12 +37,12 @@ func NewWsClint(ws *websocket.Conn, bus controllerBus, thingId string, container
 func (c *wsClint) handle() {
 	var unsubscribe func()
 	if c.thingId == "" {
-		things := c.container.GetThings()
-		unsubscribe = c.bus.Sub(topic.DeviceAdded, func(deviceId string, device *addon.Device) {
-			thing := container2.AsWebOfThing(device)
+		ts := c.container.GetThings()
+		unsubscribe = c.bus.Sub(topic.DeviceAdded, func(deviceId string, device *devices.Device) {
+			thing := things.AsWebOfThing(device)
 			c.addThing(&thing)
 		})
-		for _, t := range things {
+		for _, t := range ts {
 			c.addThing(t)
 		}
 	} else {
@@ -92,7 +94,7 @@ func (c *wsClint) close() {
 	}
 }
 
-func (c *wsClint) addThing(t *container2.Thing) {
+func (c *wsClint) addThing(t *things.Thing) {
 
 	onConnected := func(deviceId string, connected bool) {
 		if deviceId != t.GetId() {
@@ -143,14 +145,14 @@ func (c *wsClint) addThing(t *container2.Thing) {
 	}
 	removeModifiedFunc := c.bus.Sub(topic.ThingModify, onThingModified)
 
-	onEvent := func(event *addon.Event) {
+	onEvent := func(e *events.Event) {
 		err := c.ws.WriteJSON(map[string]any{
 			"id":          t.GetId(),
 			"messageType": constant.Event,
 			"data": struct {
-				Name  string       `json:"name"`
-				Event *addon.Event `json:"event"`
-			}{Name: event.GetName(), Event: event},
+				Name  string        `json:"name"`
+				Event *events.Event `json:"events"`
+			}{Name: e.GetName(), Event: e},
 		})
 		if err != nil {
 		}
@@ -173,7 +175,7 @@ func (c *wsClint) addThing(t *container2.Thing) {
 	}
 	removePropertyChangedFunc := c.bus.Sub(topic.ThingPropertyChanged, onPropertyChanged)
 
-	onActionStatus := func(thingId string, action *addon.ActionDescription) {
+	onActionStatus := func(thingId string, action *actions.ActionDescription) {
 		if t.GetId() != thingId {
 			return
 		}

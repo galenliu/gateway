@@ -3,11 +3,11 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"github.com/galenliu/gateway/api/models"
+	"github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
-	"github.com/galenliu/gateway/server/models"
-	"github.com/galenliu/gateway/server/models/container"
 	"github.com/gofiber/fiber/v2"
 	"time"
 )
@@ -68,7 +68,7 @@ func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 		err := a.manager.RequestAction(ctx, thing.GetId(), actionModel.GetName(), actionParams.Input)
 		cancelFunc()
 		if err != nil {
-			return fiber.NewError(fiber.StatusNotFound, fmt.Sprintf("create action: %s failed. err: %s", actionName, err.Error()))
+			return fiber.NewError(fiber.StatusNotFound, fmt.Sprintf("create actions: %s failed. err: %s", actionName, err.Error()))
 		}
 	}
 	if thing == nil && actionModel == nil {
@@ -76,7 +76,7 @@ func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 	}
 	err = a.actions.Add(actionModel)
 	if err != nil {
-		return fiber.NewError(fiber.StatusNotFound, fmt.Sprintf("create action: %s failed，err:%s", actionName, err.Error()))
+		return fiber.NewError(fiber.StatusNotFound, fmt.Sprintf("create actions: %s failed，err:%s", actionName, err.Error()))
 	}
 	return c.Status(fiber.StatusCreated).SendString(util.JsonIndent(map[string]any{"actionName": actionModel.GetDescription()}))
 }
@@ -105,7 +105,7 @@ func (a *ActionsController) handleDeleteAction(c *fiber.Ctx) error {
 	if thingId != "" {
 		err := a.manager.RemoveAction(thingId, actionId, actionName)
 		if err != nil {
-			a.logger.Error("delete action failed err: %s", actionName)
+			a.logger.Error("delete actions failed err: %s", actionName)
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
 	}

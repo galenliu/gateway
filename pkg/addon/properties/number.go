@@ -1,7 +1,7 @@
 package properties
 
 type NumberProperty struct {
-	*property
+	*Property
 }
 
 func NewNumberProperty() *NumberProperty {
@@ -17,7 +17,7 @@ func (prop *NumberProperty) SetValue(value float64) {
 
 // GetValue returns the value as bool
 func (prop *NumberProperty) GetValue() float64 {
-	return prop.property.GetValue().(float64)
+	return prop.Property.GetValue().(float64)
 }
 
 // OnValueRemoteGet calls fn when the value was read by a client.
@@ -29,7 +29,7 @@ func (prop *NumberProperty) OnValueRemoteGet(fn func() float64) {
 
 // OnValueRemoteUpdate calls fn when the value was updated by a client.
 func (prop *NumberProperty) OnValueRemoteUpdate(fn func(float64)) {
-	//prop.OnValueUpdate(func(property *addon.Property, newValue, oldValue interface{}) {
+	//prop.OnValueUpdate(func(Property *addon.PropertyProxy, newValue, oldValue interface{}) {
 	//	fn(newValue.(float64))
 	//})
 }

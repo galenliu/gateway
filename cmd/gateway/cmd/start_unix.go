@@ -1,9 +1,5 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
-//go:build !windows
-// +build !windows
+//go:build linux
+// +build linux
 
 package cmd
 
@@ -17,5 +13,5 @@ func isWindowsService() (bool, error) {
 }
 
 func createWindowsEventLogger(svcName string, logger logging.Logger) (logging.Logger, error) {
-	return nil, errors.New("cannot create Windows event logger")
+	return nil, errors.New("cannot create Windows events logger")
 }

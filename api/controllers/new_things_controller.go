@@ -1,19 +1,19 @@
 package controllers
 
 import (
-	"github.com/galenliu/gateway/pkg/addon"
+	things "github.com/galenliu/gateway/api/models/container"
+	"github.com/galenliu/gateway/pkg/addon/devices"
 	b "github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/logging"
-	container2 "github.com/galenliu/gateway/server/models/container"
 	"github.com/gofiber/websocket/v2"
 	"sync"
 )
 
 type deviceManager interface {
-	GetMapOfDevices() map[string]*addon.Device
+	GetMapOfDevices() map[string]*devices.Device
 }
 type thingContainer interface {
-	GetMapOfThings() map[string]*container2.Thing
+	GetMapOfThings() map[string]*things.Thing
 }
 
 type NewThingsController struct {
@@ -35,8 +35,8 @@ func NewNewThingsController(log logging.Logger) *NewThingsController {
 
 func (c *NewThingsController) handleNewThingsWebsocket(m deviceManager, t thingContainer, bus controllerBus) func(conn *websocket.Conn) {
 	return func(conn *websocket.Conn) {
-		addThing := func(deviceId string, device *addon.Device) {
-			err := conn.WriteJSON(container2.AsWebOfThing(device))
+		addThing := func(deviceId string, device *devices.Device) {
+			err := conn.WriteJSON(things.AsWebOfThing(device))
 			if err != nil {
 				return
 			}

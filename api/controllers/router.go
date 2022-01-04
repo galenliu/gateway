@@ -3,14 +3,14 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"github.com/galenliu/gateway/api/middleware"
+	"github.com/galenliu/gateway/api/models"
+	things "github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/plugin"
-	"github.com/galenliu/gateway/server/middleware"
-	"github.com/galenliu/gateway/server/models"
-	things "github.com/galenliu/gateway/server/models/container"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -250,7 +250,7 @@ func (app *Router) Start() {
 		default:
 			err := app.Listen(app.config.HttpAddr)
 			if err != nil {
-				app.logger.Errorf("http server err:%s", err.Error())
+				app.logger.Errorf("http api err:%s", err.Error())
 				cancelFunc()
 				return
 			}
@@ -267,7 +267,7 @@ func (app *Router) Start() {
 		default:
 			err := app.Listen(app.config.HttpsAddr)
 			if err != nil {
-				app.logger.Errorf("https server err:%s", err.Error())
+				app.logger.Errorf("https api err:%s", err.Error())
 				cancelFunc()
 				return
 			}

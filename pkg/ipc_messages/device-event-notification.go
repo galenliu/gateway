@@ -5,12 +5,12 @@ package messages
 import "fmt"
 import "encoding/json"
 
-// Notification that an event has occurred on a device
+// Notification that an events has occurred on a device
 type DeviceEventNotificationJson struct {
 	// Message-specific data
 	Data DeviceEventNotificationJsonData `json:"data" yaml:"data"`
 
-	// The message type, used by the IPC client and server to differentiate messages
+	// The message type, used by the IPC client and api to differentiate messages
 	MessageType int `json:"messageType" yaml:"messageType"`
 }
 
@@ -22,22 +22,22 @@ type DeviceEventNotificationJsonData struct {
 	// ID of the device
 	DeviceId string `json:"deviceId" yaml:"deviceId"`
 
-	// Description of the event
-	Event DeviceEventNotificationJsonDataEvent `json:"event" yaml:"event"`
+	// Description of the events
+	Event DeviceEventNotificationJsonDataEvent `json:"events" yaml:"events"`
 
 	// ID of the plugin
 	PluginId string `json:"pluginId" yaml:"pluginId"`
 }
 
-// Description of the event
+// Description of the events
 type DeviceEventNotificationJsonDataEvent struct {
 	// Data corresponds to the JSON schema field "data".
 	Data DeviceEventNotificationJsonDataEventData `json:"data,omitempty" yaml:"data,omitempty"`
 
-	// Name of the event
+	// Name of the events
 	Name string `json:"name" yaml:"name"`
 
-	// Timestamp of the event
+	// Timestamp of the events
 	Timestamp string `json:"timestamp" yaml:"timestamp"`
 }
 
@@ -76,8 +76,8 @@ func (j *DeviceEventNotificationJsonData) UnmarshalJSON(b []byte) error {
 	if v, ok := raw["deviceId"]; !ok || v == nil {
 		return fmt.Errorf("field deviceId in DeviceEventNotificationJsonData: required")
 	}
-	if v, ok := raw["event"]; !ok || v == nil {
-		return fmt.Errorf("field event in DeviceEventNotificationJsonData: required")
+	if v, ok := raw["events"]; !ok || v == nil {
+		return fmt.Errorf("field events in DeviceEventNotificationJsonData: required")
 	}
 	if v, ok := raw["pluginId"]; !ok || v == nil {
 		return fmt.Errorf("field pluginId in DeviceEventNotificationJsonData: required")

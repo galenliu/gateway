@@ -7,12 +7,12 @@ type DeviceEvents map[string]Event
 // EventEnumElem The possible values of the property
 type EventEnumElem any
 
-// Event Description of the event
+// Event Description of the events
 type Event struct {
-	// The type of the event
+	// The type of the events
 	Type *string `json:"@type,omitempty" yaml:"@type,omitempty"`
 
-	// Description of the event
+	// Description of the events
 	Description *string `json:"description,omitempty" yaml:"description,omitempty"`
 
 	// Enum corresponds to the JSON schema field "enum".
@@ -21,22 +21,22 @@ type Event struct {
 	// Forms corresponds to the JSON schema field "forms".
 	Forms []EventFormsElem `json:"forms,omitempty" yaml:"forms,omitempty"`
 
-	// The maximum value of the event
+	// The maximum value of the events
 	Maximum *float64 `json:"maximum,omitempty" yaml:"maximum,omitempty"`
 
-	// The minimum value of the event
+	// The minimum value of the events
 	Minimum *float64 `json:"minimum,omitempty" yaml:"minimum,omitempty"`
 
 	// The precision of the value
 	MultipleOf *float64 `json:"multipleOf,omitempty" yaml:"multipleOf,omitempty"`
 
-	// The name of the event
+	// The name of the events
 	Name *string `json:"name,omitempty" yaml:"name,omitempty"`
 
-	// The title of the event
+	// The title of the events
 	Title *string `json:"title,omitempty" yaml:"title,omitempty"`
 
-	// The unit of the event
+	// The unit of the events
 	Unit *string `json:"unit,omitempty" yaml:"unit,omitempty"`
 }
 

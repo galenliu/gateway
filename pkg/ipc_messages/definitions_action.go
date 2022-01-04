@@ -6,7 +6,7 @@ type DeviceActions map[string]Action
 
 // Action Description of the Action
 type Action struct {
-	// The type of the action
+	// The type of the actions
 	Type *string `json:"@type,omitempty" yaml:"@type,omitempty"`
 
 	// Description of the Action
@@ -52,7 +52,7 @@ type ActionInput any
 // ActionInputPropertyEnumElem The possible values of the input property
 type ActionInputPropertyEnumElem any
 
-// ActionInputProperty An action input property
+// ActionInputProperty An actions input property
 type ActionInputProperty struct {
 	// The type of the input property
 	Type *string `json:"@type,omitempty" yaml:"@type,omitempty"`

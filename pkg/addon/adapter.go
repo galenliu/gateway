@@ -3,20 +3,20 @@ package addon
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon/devices"
+	"github.com/galenliu/gateway/pkg/addon/properties"
+	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"log"
 	"sync"
 )
 
-type onPairingFunc func(timeout float64)
-type OnCancelPairingFunc func()
 type OnDeviceSavedFunc func(deviceId string, device *devices.Device)
 type OnSetCredentialsFunc func(deviceId, username, password string)
 
 //type OnSetPinFunc func(deivceId string, devices.P) error
 
 type Adapter struct {
-	Devices     map[string]IDevice
-	manager     *AddonManager
+	Devices     map[string]DeviceProxy
+	manager     *Manager
 	locker      *sync.Mutex
 	cancelChan  chan struct{}
 	Id          string
@@ -24,42 +24,43 @@ type Adapter struct {
 	packageName string
 	IsPairing   bool
 	verbose     bool
+	pluginId    string
 }
 
-func NewAdapter(adapterId, adapterName string) *Adapter {
+func NewAdapter(adapterId, name string) *Adapter {
 
 	adapter := &Adapter{}
 	adapter.Id = adapterId
-	adapter.name = adapterName
+	adapter.name = name
 	adapter.locker = new(sync.Mutex)
-	adapter.Devices = make(map[string]IDevice)
+	adapter.Devices = make(map[string]DeviceProxy)
 	adapter.cancelChan = make(chan struct{})
 	adapter.verbose = true
 	return adapter
 }
 
-func (a *Adapter) HandleDeviceAdded(device IDevice) {
-	a.Devices[device.GetID()] = device
+func (a *Adapter) HandleDeviceAdded(device DeviceProxy) {
+	a.Devices[device.GetId()] = device
 	a.manager.handleDeviceAdded(device)
 }
 
 func (a *Adapter) SendError(message string) {
 	data := make(map[string]any)
-	data[Aid] = a.GetID()
+	data["adapterId"] = a.GetId()
 	data["message"] = message
 	a.manager.send(PluginErrorNotification, data)
 }
 
-//func (a *Adapter) ConnectedNotify(device *Device, connected bool) {
+//func (a *Adapter) ConnectedNotify(device *DeviceProxy, connected bool) {
 //	a.manager.sendConnectedStateNotification(device, connected)
 //}
 
-//向前端UI发送提示
+// SendPairingPrompt 向前端UI发送提示
 func (a *Adapter) SendPairingPrompt(prompt, url string, did string) {
 	data := make(map[string]any)
-	data[Aid] = a.GetID()
+	data["adapterId"] = a.GetId()
 	data["prompt"] = prompt
-	data[Did] = did
+	data["deviceId"] = did
 	if url != "" {
 		data["url"] = url
 	}
@@ -68,10 +69,10 @@ func (a *Adapter) SendPairingPrompt(prompt, url string, did string) {
 
 func (a *Adapter) SendUnpairingPrompt(prompt, url string, did string) {
 	data := make(map[string]any)
-	data[Aid] = a.GetID()
+	data["adapterId"] = a.GetId()
 	data["prompt"] = prompt
 	if did != "" {
-		data[Did] = did
+		data["deviceId"] = did
 	}
 	if url != "" {
 		data["url"] = url
@@ -79,23 +80,17 @@ func (a *Adapter) SendUnpairingPrompt(prompt, url string, did string) {
 	a.manager.send(AdapterUnpairingPromptNotification, data)
 }
 
-func (a *Adapter) Send(mt int, data map[string]any) {
+func (a *Adapter) Send(mt messages.MessageType, data map[string]any) {
 	a.manager.send(mt, data)
-}
-
-func (a *Adapter) StartPairing(timeout float64) {
-	if a.verbose {
-		log.Printf("adapter:(%s)- StartPairing() not implemented", a.GetID())
-	}
 }
 
 func (a *Adapter) CancelPairing() {
 	if a.verbose {
-		log.Printf("adapter:(%s)- CancelPairing() not implemented", a.GetID())
+		log.Printf("adapter:(%s)- CancelPairing() not implemented", a.GetId())
 	}
 }
 
-func (a *Adapter) GetID() string {
+func (a *Adapter) GetId() string {
 	return a.Id
 }
 
@@ -106,23 +101,31 @@ func (a *Adapter) GetName() string {
 	return a.name
 }
 
+func (a *Adapter) GetDevice(id string) DeviceProxy {
+	device, ok := a.Devices[id]
+	if !ok {
+		return nil
+	}
+	return device
+}
+
 func (a *Adapter) Unload() {
 	if a.verbose {
-		log.Printf("adapter:(%s)- unloaded ", a.GetID())
+		log.Printf("adapter:(%s)- unloaded ", a.GetId())
 	}
 }
 
-func (a *Adapter) HandleDeviceSaved(device IDevice) {
+func (a *Adapter) HandleDeviceSaved(device DeviceProxy) {
 	if a.verbose {
-		log.Printf("adapter:(%s)- HandleDeviceSaved() not implemented", a.GetID())
+		log.Printf("adapter:(%s)- HandleDeviceSaved() not implemented", device.GetId())
 	}
 }
 
-func (a *Adapter) HandleDeviceRemoved(device IDevice) {
-	delete(a.Devices, device.GetID())
+func (a *Adapter) HandleDeviceRemoved(device DeviceProxy) {
+	delete(a.Devices, device.GetId())
 }
 
-func (a *Adapter) getDevice(id string) IDevice {
+func (a *Adapter) getDevice(id string) DeviceProxy {
 	return a.Devices[id]
 }
 
@@ -131,11 +134,15 @@ func (a *Adapter) close() {
 	a.manager.close()
 }
 
-func (a *Adapter) Running() bool {
+func (a *Adapter) ProxyRunning() bool {
 	return a.manager.running
 }
 
-func (a *Adapter) setManager(m *AddonManager) {
+func (a *Adapter) CloseProxy() {
+	a.manager.close()
+}
+
+func (a *Adapter) setManager(m *Manager) {
 	a.manager = m
 }
 
@@ -145,4 +152,30 @@ func (a *Adapter) SetPin(deviceId string, pin any) {
 
 func (a *Adapter) SetCredentials(deviceId, username, password string) {
 
+}
+
+func (a *Adapter) GetAddonManager() *Manager {
+	return a.manager
+}
+
+func (a *Adapter) SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription) {
+	a.manager.send(messages.MessageType_DevicePropertyChangedNotification, messages.DevicePropertyChangedNotificationJsonData{
+		AdapterId: a.GetId(),
+		DeviceId:  deviceId,
+		PluginId:  a.pluginId,
+		Property: messages.Property{
+			Type:        property.Type,
+			AtType:      property.AtType,
+			Description: property.Description,
+			Enum:        property.Enum,
+			Maximum:     property.Maximum,
+			Minimum:     property.Minimum,
+			MultipleOf:  property.MultipleOf,
+			Name:        property.Name,
+			ReadOnly:    property.ReadOnly,
+			Title:       property.Title,
+			Unit:        property.Unit,
+			Value:       property.Value,
+		},
+	})
 }

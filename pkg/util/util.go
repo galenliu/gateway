@@ -84,17 +84,35 @@ func GetArch() string {
 	return runtime.GOOS + "-" + runtime.GOARCH
 }
 
-func GetPythonVersion() (version []string) {
-	cmd := exec.Command("python", "--version")
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	err := cmd.Run()
-	if err != nil {
-		return
+func GetPythonVersion() (versions []string) {
+	getPythonVersion := func(pyt string) string {
+		cmd := exec.Command(pyt, "--version")
+		var out bytes.Buffer
+		cmd.Stdout = &out
+		err := cmd.Run()
+		if err != nil {
+			return ""
+		}
+		return out.String()
 	}
-	v := strings.SplitAfter(strings.Split(out.String(), " ")[1], ".")
-	version = append(version, strings.TrimSuffix(v[0]+v[1], "."))
-	return version
+	str := getPythonVersion("python")
+	if str != "" {
+		if ar := strings.Split(str, " "); len(ar) == 2 {
+			v := strings.SplitAfter(ar[1], ".")
+			versions = append(versions, strings.TrimSuffix(v[0]+v[1], "."))
+		}
+	}
+	str = getPythonVersion("python3")
+	if str != "" {
+		if ar := strings.Split(str, " "); len(ar) == 2 {
+			v := strings.SplitAfter(ar[1], ".")
+			versions = append(versions, strings.TrimSuffix(v[0]+v[1], "."))
+		}
+	}
+	if versions == nil {
+		return []string{}
+	}
+	return versions
 }
 
 func GetNodeVersion() (version string) {
@@ -118,23 +136,4 @@ func JsonIndent(in any) string {
 		return ""
 	}
 	return string(d)
-}
-
-func IfThen[T any](b bool, trueValue, falseValue T) T {
-	if b {
-		return trueValue
-	} else {
-		return falseValue
-	}
-}
-
-func JsonGet[T any](data []byte, field string) T {
-	var t T
-	if v := json.Get(data, field); v.LastError() == nil {
-		v.ToVal(&t)
-		if &t != nil {
-			return t
-		}
-	}
-	return t
 }

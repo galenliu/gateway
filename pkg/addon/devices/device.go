@@ -1,129 +1,128 @@
 package devices
 
 import (
-	"github.com/galenliu/gateway/pkg/addon"
+	"github.com/galenliu/gateway/pkg/addon/actions"
+	"github.com/galenliu/gateway/pkg/addon/events"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 )
 
-type Device struct {
-	ID          string   `json:"id"`
-	Context     string   `json:"@context"`
-	AtType      []string `json:"@type"`
-	Title       string   `json:"title"`
-	Description string   `json:"description,omitempty"`
-
-	Links               []*Link                        `json:"links,omitempty"`
-	PinRequired         bool                           `json:"pinRequired"`
-	CredentialsRequired bool                           `json:"credentialsRequired"`
-	BaseHref            string                         `json:"baseHref"`
-	Pin                 *Pin                           `json:"pin,omitempty"`
-	Properties          map[string]properties.Property `json:"properties,omitempty"`
-	Actions             map[string]*addon.Action       `json:"action,omitempty"`
-	Events              map[string]*addon.Event        `json:"events,omitempty"`
+type PropertyProxy interface {
+	GetType() string
+	GetTitle() string
+	GetName() string
+	GetUnit() string
+	GetEnum() []any
+	GetAtType() string
+	GetDescription() string
+	GetMinimum() any
+	GetMaximum() any
+	GetMultipleOf() any
+	GetValue() any
+	IsReadOnly() bool
+	SetValue(a any) bool
+	SetTitle(s string) bool
+	SetDescription(description string) bool
+	ToDescription() properties.PropertyDescription
 }
 
-type Pin struct {
-	Required bool   `json:"required"`
+type DeviceProperties map[string]PropertyProxy
+type DeviceActions map[string]actions.Action
+type DeviceEvents map[string]events.Event
+
+type Device struct {
+	Context             string           `json:"@context,omitempty"`
+	AtType              []string         `json:"@type,omitempty"`
+	Id                  string           `json:"id,omitempty"`
+	Title               string           `json:"title,omitempty"`
+	Description         string           `json:"description,omitempty"`
+	Links               []DeviceLink     `json:"links,omitempty"`
+	Forms               []DeviceForm     `json:"forms,omitempty"`
+	BaseHref            string           `json:"baseHref,omitempty"`
+	Pin                 *DevicePin       `json:"pin,omitempty"`
+	Properties          DeviceProperties `json:"properties,omitempty"`
+	Actions             DeviceActions    `json:"actions,omitempty"`
+	Events              DeviceEvents     `json:"events,omitempty"`
+	CredentialsRequired bool             `json:"credentialsRequired,omitempty"`
+}
+
+type DeviceLink struct {
+	Href      string `json:"href,omitempty"`
+	Rel       string `json:"rel,omitempty"`
+	MediaType string `json:"mediaType,omitempty"`
+}
+
+type DeviceForm struct {
+}
+
+type DevicePin struct {
+	Required bool   `json:"required,omitempty"`
 	Pattern  string `json:"pattern,omitempty"`
 }
 
-type Link struct {
-	Href      string `protobuf:"bytes,1,opt,name=href,proto3" json:"href,omitempty"`
-	Rel       string `protobuf:"bytes,2,opt,name=rel,proto3" json:"rel,omitempty"`
-	MediaType string `protobuf:"bytes,3,opt,name=mediaType,proto3" json:"mediaType,omitempty"`
+func (d Device) AddProperty(n string, p PropertyProxy) {
+	d.Properties[n] = p
 }
 
-func NewDeviceFormMessage(dev *addon.Device) *Device {
-	device := &Device{
-		ID:                  dev.Id,
-		Context:             dev.GetAtContext(),
-		AtType:              dev.GetAtType(),
-		Title:               dev.Title,
-		Description:         dev.Description,
-		PinRequired:         dev.Pin.Required,
-		BaseHref:            dev.BaseHref,
-		CredentialsRequired: dev.CredentialsRequired,
-	}
-	if len(dev.Links) > 0 {
-		device.Links = make([]*Link, 2)
-		for _, l := range dev.Links {
-			device.Links = append(device.Links, &Link{
-				Href:      l.Href,
-				Rel:       l.Rel,
-				MediaType: l.MediaType,
-			})
-		}
-	}
-	if dev.Pin != nil {
-		device.Pin = &Pin{
-			Required: dev.Pin.Required,
-			Pattern:  dev.Pin.Pattern,
-		}
-	}
-	if len(dev.Properties) > 0 {
-		device.Properties = make(map[string]properties.Property)
-		//for name, property := range dev.Properties {
-		//	device.Properties[name] = properties.NewPropertyFormMessage(property)
-		//}
-	}
-
-	if len(dev.Events) > 0 {
-		device.Events = make(map[string]*addon.Event)
-		//for name, event := range dev.Events {
-		//device.Events[name] = events.NewEventFormMessage(event)
-		//}
-	}
-	if len(dev.Actions) > 0 {
-		device.Actions = make(map[string]*addon.Action)
-		//for name, action := range dev.actions {
-		//	device.actions[name] = actions.NewActionFormMessage(action)
-		//}
-	}
-	return device
+func (d Device) GetId() string {
+	return d.Id
 }
 
-func NewDeviceFormString(des string) *Device {
-	var device Device
-	//err := json.UnmarshalFromString(des, &device)
-	//if err != nil {
-	//	return nil
-	//}
-	return &device
+func (d Device) GetAtContext() string {
+	return d.Context
 }
 
-func (device *Device) GetID() string {
-	return device.ID
+func (d Device) GetAtType() []string {
+	return d.AtType
 }
 
-func (device *Device) GetAtContext() string {
-	return device.Context
+func (d Device) GetTitle() string {
+	return d.Title
 }
 
-func (device *Device) GetTitle() string {
-	return device.Title
+func (d Device) GetDescription() string {
+	return d.Description
 }
 
-func (device *Device) GetDescription() string {
-	return device.Description
+func (d Device) GetLink() []DeviceLink {
+	return d.Links
 }
 
-func (device *Device) AddProperty(property properties.Property) {
-	if device.Properties == nil {
-		device.Properties = make(map[string]properties.Property)
+func (d Device) GetBaseHref() string {
+	return d.BaseHref
+}
+
+func (d Device) GetProperties() map[string]PropertyProxy {
+	return d.Properties
+}
+
+func (d Device) GetProperty(id string) PropertyProxy {
+	p, ok := d.Properties[id]
+	if ok {
+		return p
 	}
-	device.Properties[property.GetName()] = property
+	return nil
 }
 
-func (device *Device) AddAction(action *addon.Action) {
-	if device.Actions == nil {
-		device.Actions = make(map[string]*addon.Action)
-	}
-	//device.actions[action.Name] = action
+func (d Device) GetActions() map[string]actions.Action {
+	return d.Actions
 }
 
-func (device *Device) AddEvent(event *addon.Event) {
-	if device.Events == nil {
-		device.Events = make(map[string]*addon.Event)
-	}
-	device.Events[event.Name] = event
+func (d Device) GetAction(id string) actions.Action {
+	return d.Actions[id]
+}
+
+func (d Device) GetPin() *DevicePin {
+	return d.Pin
+}
+
+func (d Device) GetEvents() map[string]events.Event {
+	return d.Events
+}
+
+func (d Device) GetEvent(id string) events.Event {
+	return d.Events[id]
+}
+
+func (d Device) GetCredentialsRequired() bool {
+	return d.CredentialsRequired
 }

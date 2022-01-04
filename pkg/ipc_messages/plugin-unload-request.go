@@ -34,7 +34,7 @@ type PluginUnloadRequestJson struct {
 	// Message-specific data
 	Data PluginUnloadRequestJsonData `json:"data" yaml:"data"`
 
-	// The message type, used by the IPC client and server to differentiate messages
+	// The message type, used by the IPC client and api to differentiate messages
 	MessageType int `json:"messageType" yaml:"messageType"`
 }
 

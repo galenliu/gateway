@@ -1,4 +1,4 @@
-package addon
+package events
 
 type Event struct {
 	AtType      string           `protobuf:"bytes,1,opt,name=atType,json=@type,proto3" json:"atType,omitempty"`

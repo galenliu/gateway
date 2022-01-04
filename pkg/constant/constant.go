@@ -52,7 +52,7 @@ const (
 	Connected = "connected"
 	Removed   = "Removed"
 	Created   = "created"
-	Event     = "event"
+	Event     = "events"
 	Modified  = "modified"
 
 	ThingModified = "thingModified"
@@ -71,7 +71,7 @@ const (
 	RequestAction   = "requestAction"
 	SetProperty     = "setProperty"
 
-	// WebServerStarted Web server event
+	// WebServerStarted Web api events
 	WebServerStarted  = "webServerStarted"
 	WebServerStopped  = "webServerStopped"
 	AccessToken       = "access_token"

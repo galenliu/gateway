@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/galenliu/gateway/server/models/container"
+	"github.com/galenliu/gateway/api/models/container"
 )
 
 func (s *Storage) CreateThing(id string, thing container.Thing) error {

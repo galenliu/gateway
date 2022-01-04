@@ -1,6 +1,6 @@
 package plugin
 
-//	plugin server
+//	plugin api
 import (
 	"encoding/json"
 	"fmt"

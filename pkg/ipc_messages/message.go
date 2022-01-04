@@ -288,7 +288,7 @@ package messages
 //	PluginId  string             `protobuf:"bytes,3,opt,name=pluginId,proto3" json:"pluginId,omitempty"`
 //	AdapterId string             `protobuf:"bytes,4,opt,name=adapterId,proto3" json:"adapterId,omitempty"`
 //	DeviceId  string             `protobuf:"bytes,5,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
-//	Action    *ActionDescription `protobuf:"bytes,6,opt,name=action,proto3" json:"action,omitempty"`
+//	Action    *ActionDescription `protobuf:"bytes,6,opt,name=actions,proto3" json:"actions,omitempty"`
 //}
 //
 //type DeviceConnectedStateNotificationMessage_Data struct {

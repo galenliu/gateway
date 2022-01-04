@@ -2,8 +2,9 @@ package container
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/addon"
-	"github.com/galenliu/gateway/pkg/addon/properties"
+	"github.com/galenliu/gateway/pkg/addon/actions"
+	"github.com/galenliu/gateway/pkg/addon/devices"
+	"github.com/galenliu/gateway/pkg/addon/events"
 	"github.com/galenliu/gateway/pkg/constant"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	ia "github.com/galenliu/gateway/pkg/wot/definitions/core/interaction_affordance"
@@ -12,7 +13,7 @@ import (
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 )
 
-func AsWebOfThing(device *addon.Device) Thing {
+func AsWebOfThing(device *devices.Device) Thing {
 	thing := Thing{
 		Thing: &wot.Thing{
 			AtContext:    controls.URI(device.GetAtContext()),
@@ -54,8 +55,8 @@ func AsWebOfThing(device *addon.Device) Thing {
 	return thing
 }
 
-func mapOfWotProperties(deviceId string, props addon.DeviceProperties) (mapOfProperty map[string]wot.PropertyAffordance) {
-	asWotProperty := func(deviceId string, p properties.Property) wot.PropertyAffordance {
+func mapOfWotProperties(deviceId string, props devices.DeviceProperties) (mapOfProperty map[string]wot.PropertyAffordance) {
+	asWotProperty := func(deviceId string, p devices.PropertyProxy) wot.PropertyAffordance {
 		var wp wot.PropertyAffordance
 		var i = &ia.InteractionAffordance{
 			AtType:       p.GetAtType(),
@@ -203,9 +204,9 @@ func mapOfWotProperties(deviceId string, props addon.DeviceProperties) (mapOfPro
 	return
 }
 
-func mapOfWotActions(deviceId string, actions addon.DeviceActions) (mapOfProperty wot.ThingActions) {
+func mapOfWotActions(deviceId string, as devices.DeviceActions) (mapOfProperty wot.ThingActions) {
 
-	asWotAction := func(deviceId, actionName string, a addon.Action) wot.ActionAffordance {
+	asWotAction := func(deviceId, actionName string, a actions.Action) wot.ActionAffordance {
 		var aa = wot.ActionAffordance{}
 		var i = &ia.InteractionAffordance{
 			AtType:       a.AtType,
@@ -231,7 +232,7 @@ func mapOfWotActions(deviceId string, actions addon.DeviceActions) (mapOfPropert
 	}
 
 	mapOfProperty = make(wot.ThingActions)
-	for name, a := range actions {
+	for name, a := range as {
 		if actionAffordance := asWotAction(deviceId, name, a); &actionAffordance != nil {
 			mapOfProperty[name] = actionAffordance
 		}
@@ -239,9 +240,9 @@ func mapOfWotActions(deviceId string, actions addon.DeviceActions) (mapOfPropert
 	return
 }
 
-func mapOfWotEvent(deviceId string, events addon.DeviceEvents) (es wot.ThingEvents) {
+func mapOfWotEvent(deviceId string, des devices.DeviceEvents) (es wot.ThingEvents) {
 
-	asWotEvent := func(deviceId string, a addon.Event) wot.EventAffordance {
+	asWotEvent := func(deviceId string, a events.Event) wot.EventAffordance {
 		ea := wot.EventAffordance{
 			InteractionAffordance: ia.InteractionAffordance{
 				AtType:       a.Type,
@@ -272,7 +273,7 @@ func mapOfWotEvent(deviceId string, events addon.DeviceEvents) (es wot.ThingEven
 	}
 
 	es = make(wot.ThingEvents)
-	for n, e := range events {
+	for n, e := range des {
 		es[n] = asWotEvent(deviceId, e)
 	}
 	return nil

@@ -3,7 +3,9 @@ package container
 import (
 	"context"
 	"fmt"
-	"github.com/galenliu/gateway/pkg/addon"
+	"github.com/galenliu/gateway/pkg/addon/actions"
+	"github.com/galenliu/gateway/pkg/addon/devices"
+	"github.com/galenliu/gateway/pkg/addon/events"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	bus "github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
@@ -192,7 +194,7 @@ func (c *ThingsContainer) handleDeviceRemoved(thingId string) {
 	}
 }
 
-func (c *ThingsContainer) handleDeviceAdded(deviceId string, _ *addon.Device) {
+func (c *ThingsContainer) handleDeviceAdded(deviceId string, _ *devices.Device) {
 	t := c.GetThing(deviceId)
 	if t != nil {
 		t.setConnected(true)
@@ -213,14 +215,14 @@ func (c *ThingsContainer) handleDevicePropertyChanged(deviceId string, property 
 	}
 }
 
-func (c *ThingsContainer) handleDeviceActionStatus(deviceId string, action *addon.ActionDescription) {
+func (c *ThingsContainer) handleDeviceActionStatus(deviceId string, action *actions.ActionDescription) {
 	t := c.GetThing(deviceId)
 	if t != nil {
 		t.bus.Pub(topic.ThingActionStatus, t.GetId(), action)
 	}
 }
 
-func (c *ThingsContainer) handleDeviceEvent(deviceId string, event *addon.Event) {
+func (c *ThingsContainer) handleDeviceEvent(deviceId string, event *events.Event) {
 	t := c.GetThing(deviceId)
 	if t != nil {
 		t.bus.Pub(topic.ThingEvent, t.GetId(), event)

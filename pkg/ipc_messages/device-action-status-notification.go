@@ -7,19 +7,19 @@ import "fmt"
 import "encoding/json"
 
 // Description of the Action
-// Notification that an action's status has changed on a device
+// Notification that an actions's status has changed on a device
 type DeviceActionStatusNotificationJson struct {
 	// Message-specific data
 	Data DeviceActionStatusNotificationJsonData `json:"data" yaml:"data"`
 
-	// The message type, used by the IPC client and server to differentiate messages
+	// The message type, used by the IPC client and api to differentiate messages
 	MessageType int `json:"messageType" yaml:"messageType"`
 }
 
 // Message-specific data
 type DeviceActionStatusNotificationJsonData struct {
-	// Description of the action
-	Action DeviceActionStatusNotificationJsonDataAction `json:"action" yaml:"action"`
+	// Description of the actions
+	Action DeviceActionStatusNotificationJsonDataAction `json:"actions" yaml:"actions"`
 
 	// ID of the adapter
 	AdapterId string `json:"adapterId" yaml:"adapterId"`
@@ -31,7 +31,7 @@ type DeviceActionStatusNotificationJsonData struct {
 	PluginId string `json:"pluginId" yaml:"pluginId"`
 }
 
-// Description of the action
+// Description of the actions
 type DeviceActionStatusNotificationJsonDataAction struct {
 	// ID of the Action
 	Id string `json:"id" yaml:"id"`
@@ -87,8 +87,8 @@ func (j *DeviceActionStatusNotificationJsonData) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
-	if v, ok := raw["action"]; !ok || v == nil {
-		return fmt.Errorf("field action in DeviceActionStatusNotificationJsonData: required")
+	if v, ok := raw["actions"]; !ok || v == nil {
+		return fmt.Errorf("field actions in DeviceActionStatusNotificationJsonData: required")
 	}
 	if v, ok := raw["adapterId"]; !ok || v == nil {
 		return fmt.Errorf("field adapterId in DeviceActionStatusNotificationJsonData: required")

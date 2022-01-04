@@ -7,10 +7,10 @@ import "encoding/json"
 
 // Message-specific data
 type DeviceRequestActionResponseJsonData struct {
-	// ID of the action
+	// ID of the actions
 	ActionId string `json:"actionId" yaml:"actionId"`
 
-	// Name of the action
+	// Name of the actions
 	ActionName string `json:"actionName" yaml:"actionName"`
 
 	// ID of the adapter
@@ -59,12 +59,12 @@ func (j *DeviceRequestActionResponseJsonData) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// Notice that an action has been requested on a device
+// Notice that an actions has been requested on a device
 type DeviceRequestActionResponseJson struct {
 	// Message-specific data
 	Data DeviceRequestActionResponseJsonData `json:"data" yaml:"data"`
 
-	// The message type, used by the IPC client and server to differentiate messages
+	// The message type, used by the IPC client and api to differentiate messages
 	MessageType int `json:"messageType" yaml:"messageType"`
 }
 

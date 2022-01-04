@@ -5,7 +5,6 @@ import (
 	"github.com/gorilla/websocket"
 	json "github.com/json-iterator/go"
 	"net/url"
-	"sync"
 )
 
 const (
@@ -36,11 +35,9 @@ type Units struct {
 
 type OnMessage func(data []byte)
 
-//为Plugin提供和gateway Server进行消息的通信
-
 type IpcClient struct {
-	ws *websocket.Conn
-
+	ws          *websocket.Conn
+	manager     *Manager
 	url         string
 	preferences Preferences
 	userProfile UserProfile
@@ -53,22 +50,20 @@ type IpcClient struct {
 	gatewayVersion string
 
 	onMessage OnMessage
-	mu        *sync.Mutex
 
 	status   string
-	pluginID string
+	pluginId string
 	origin   string
 	verbose  bool
 }
 
-//新建一个Client，注册消息Handler
-func NewClient(PluginId string, handler OnMessage) *IpcClient {
+// NewClient 新建一个Client，注册消息Handler
+func NewClient(PluginId string, manager *Manager) *IpcClient {
 	u := url.URL{Scheme: "ws", Host: "localhost:" + IpcDefaultPort, Path: "/"}
 	client := &IpcClient{}
-	client.pluginID = PluginId
+	client.pluginId = PluginId
 	client.url = u.String()
 	client.status = Disconnect
-	client.mu = new(sync.Mutex)
 
 	client.closeChan = make(chan any)
 	client.reConnect = make(chan any)
@@ -76,7 +71,7 @@ func NewClient(PluginId string, handler OnMessage) *IpcClient {
 	client.readCh = make(chan []byte)
 	client.writeCh = make(chan []byte)
 
-	client.onMessage = handler
+	client.onMessage = manager.onMessage
 	client.Register()
 	go client.readLoop()
 	return client
@@ -104,8 +99,7 @@ func (client *IpcClient) onData(data []byte) {
 }
 
 func (client *IpcClient) sendMessage(data []byte) {
-	client.mu.Lock()
-	defer client.mu.Unlock()
+
 	if client.ws != nil && client.status == Registered {
 		err := client.ws.WriteMessage(websocket.BinaryMessage, data)
 		if err != nil {
@@ -143,36 +137,34 @@ func (client *IpcClient) dial() error {
 		fmt.Printf("dial err: %s \r\n", err.Error())
 		return err
 	}
-	client.status = Connected
 	return nil
 }
 
 func (client *IpcClient) Register() {
 
-	if client.status == Disconnect {
-		_ = client.dial()
+	err := client.dial()
+	if err != nil {
+		return
 	}
 
-	if client.status == Connected {
-		message := struct {
-			MessageType int `json:"messageType"`
-			Data        any `json:"data"`
-		}{
-			MessageType: PluginRegisterRequest,
-			Data: struct {
-				PluginID string `json:"pluginId"`
-			}{PluginID: client.pluginID},
-		}
-
-		d, _ := json.MarshalIndent(message, "", " ")
-		_ = client.ws.WriteMessage(websocket.BinaryMessage, d)
-		_, data, err := client.ws.ReadMessage()
-		if err != nil {
-			fmt.Printf("read faild, websocket err", err.Error())
-			client.status = Disconnect
-		}
-		client.onData(data)
+	message := struct {
+		MessageType int `json:"messageType"`
+		Data        any `json:"data"`
+	}{
+		MessageType: PluginRegisterRequest,
+		Data: struct {
+			PluginID string `json:"pluginId"`
+		}{PluginID: client.pluginId},
 	}
+
+	d, _ := json.MarshalIndent(message, "", " ")
+	_ = client.ws.WriteMessage(websocket.BinaryMessage, d)
+	_, data, err := client.ws.ReadMessage()
+	if err != nil {
+		fmt.Printf("read faild, websocket err", err.Error())
+		client.status = Disconnect
+	}
+	client.onData(data)
 
 }
 

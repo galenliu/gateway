@@ -1,27 +1,11 @@
 package properties
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
-type Property interface {
-	GetType() string
-	GetTitle() string
-	GetName() string
-	GetUnit() string
-	GetEnum() []any
-	GetAtType() string
-	GetDescription() string
-	GetMinimum() any
-	GetMaximum() any
-	GetMultipleOf() any
-	GetValue() any
-	IsReadOnly() bool
-	SetValue(any2 any) bool
-	SetTitle(string2 string) bool
-	SetDescription(description string) bool
-	ToDescription() PropertyDescription
-}
-
-type Device interface {
+type DeviceProxy interface {
+	NotifyPropertyChanged(p PropertyDescription)
 }
 
 type PropertyDescription struct {
@@ -43,8 +27,8 @@ type PropertyDescription struct {
 type PropertyLinkElem struct {
 }
 
-type property struct {
-	device      Device
+type Property struct {
+	device      DeviceProxy
 	Name        string   `json:"name"`
 	Title       string   `json:"title,omitempty"`
 	Type        string   `json:"type"`
@@ -60,7 +44,7 @@ type property struct {
 	Value any `json:"value"`
 }
 
-func NewProperty(device Device, description PropertyDescription) *property {
+func NewProperty(device DeviceProxy, description PropertyDescription) *Property {
 	getString := func(s *string) string {
 		if s != nil {
 			return *s
@@ -71,7 +55,8 @@ func NewProperty(device Device, description PropertyDescription) *property {
 		description.Type != TypeBoolean {
 		return nil
 	}
-	return &property{
+	return &Property{
+		device:      device,
 		Name:        getString(description.Name),
 		Title:       getString(description.Title),
 		Type:        description.Type,
@@ -92,7 +77,7 @@ func NewProperty(device Device, description PropertyDescription) *property {
 	}
 }
 
-func (p *property) MarshalJSON() ([]byte, error) {
+func (p *Property) MarshalJSON() ([]byte, error) {
 	propertyDescription := PropertyDescription{
 		Name:        &p.Name,
 		AtType:      &p.AtType,
@@ -125,19 +110,19 @@ func (p *property) MarshalJSON() ([]byte, error) {
 	return json.Marshal(propertyDescription)
 }
 
-func (p *property) GetName() string {
+func (p *Property) GetName() string {
 	return p.Name
 }
 
-func (p *property) GetEnum() []any {
+func (p *Property) GetEnum() []any {
 	return p.Enum
 }
 
-func (p *property) GetTitle() string {
+func (p *Property) GetTitle() string {
 	return p.Title
 }
 
-func (p *property) SetTitle(t string) bool {
+func (p *Property) SetTitle(t string) bool {
 	if t == p.Title {
 		return false
 	}
@@ -145,7 +130,7 @@ func (p *property) SetTitle(t string) bool {
 	return true
 }
 
-func (p *property) SetDescription(d string) bool {
+func (p *Property) SetDescription(d string) bool {
 	if d == p.Description {
 		return false
 	}
@@ -153,42 +138,42 @@ func (p *property) SetDescription(d string) bool {
 	return true
 }
 
-func (p *property) GetType() string {
+func (p *Property) GetType() string {
 	return p.Type
 }
 
-func (p *property) GetAtType() string {
+func (p *Property) GetAtType() string {
 	return p.AtType
 }
 
-func (p *property) GetUnit() string {
+func (p *Property) GetUnit() string {
 	return p.Unit
 }
 
-func (p *property) GetDescription() string {
+func (p *Property) GetDescription() string {
 	return p.Description
 }
 
-func (p *property) GetMinimum() any {
+func (p *Property) GetMinimum() any {
 	return p.Minimum
 }
-func (p *property) GetMaximum() any {
+func (p *Property) GetMaximum() any {
 	return p.Maximum
 }
 
-func (p *property) IsReadOnly() bool {
+func (p *Property) IsReadOnly() bool {
 	return p.ReadOnly
 }
 
-func (p *property) GetMultipleOf() any {
+func (p *Property) GetMultipleOf() any {
 	return p.MultipleOf
 }
 
-func (p *property) GetValue() any {
+func (p *Property) GetValue() any {
 	return p.Value
 }
 
-func (p *property) SetValue(value any) bool {
+func (p *Property) SetValue(value any) bool {
 	if p.Value == value {
 		return false
 	}
@@ -196,7 +181,7 @@ func (p *property) SetValue(value any) bool {
 	return true
 }
 
-func (p *property) ToDescription() PropertyDescription {
+func (p *Property) ToDescription() PropertyDescription {
 	get := func(s string) *string {
 		if s == "" {
 			return nil
@@ -230,4 +215,17 @@ func (p *property) ToDescription() PropertyDescription {
 		Links:      nil,
 		Value:      p.Value,
 	}
+}
+
+func (p *Property) SetCachedValueAndNotify(value any) {
+	oldValue := p.GetValue()
+	p.SetCachedValue(value)
+	hasChanged := oldValue != p.GetValue()
+	if hasChanged {
+		p.device.NotifyPropertyChanged(p.ToDescription())
+	}
+}
+
+func (p *Property) SetCachedValue(value any) {
+	p.Value = value
 }

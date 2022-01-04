@@ -3,7 +3,7 @@ package plugin
 import (
 	"context"
 	"fmt"
-	"github.com/galenliu/gateway/pkg/addon"
+	"github.com/galenliu/gateway/pkg/addon/devices"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 )
 
@@ -12,8 +12,8 @@ func (m *Manager) SetPropertyValue(ctx context.Context, deviceId, propName strin
 	if device == nil {
 		return nil, fmt.Errorf("device:%s not found", deviceId)
 	}
-	_, ok := device.GetProperty(propName)
-	if !ok {
+	p := device.GetProperty(propName)
+	if p == nil {
 		return nil, fmt.Errorf("property:%s not found", propName)
 	}
 	return device.setPropertyValue(ctx, propName, newValue)
@@ -24,8 +24,8 @@ func (m *Manager) GetPropertyValue(thingId, propName string) (any, error) {
 	if device == nil {
 		return nil, fmt.Errorf("device:%s not found", thingId)
 	}
-	p, ok := device.GetProperty(propName)
-	if !ok {
+	p := device.GetProperty(propName)
+	if p == nil {
 		return nil, fmt.Errorf("property:%s not found", propName)
 	}
 	return p.GetValue(), nil
@@ -44,16 +44,16 @@ func (m *Manager) GetPropertiesValue(deviceId string) (map[string]any, error) {
 	return data, nil
 }
 
-func (m *Manager) GetMapOfDevices() (devices map[string]*addon.Device) {
+func (m *Manager) GetMapOfDevices() map[string]*devices.Device {
 	devs := m.GetDevices()
-	var devicesMap = make(map[string]*addon.Device)
+	var devicesMap = make(map[string]*devices.Device)
 	if devs != nil {
 		for _, dev := range devs {
 			devicesMap[dev.GetId()] = dev.Device
 		}
 		return devicesMap
 	}
-	return
+	return nil
 }
 
 func (m *Manager) GetDevices() (devices []*Device) {

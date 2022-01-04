@@ -2,11 +2,11 @@ package controllers
 
 import (
 	"context"
-	"github.com/galenliu/gateway/pkg/addon"
+	"github.com/galenliu/gateway/api/models/container"
+	"github.com/galenliu/gateway/pkg/addon/devices"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
-	"github.com/galenliu/gateway/server/models/container"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
 	json "github.com/json-iterator/go"
@@ -19,7 +19,7 @@ type ThingsManager interface {
 	SetPropertyValue(ctx context.Context, thingId, propertyName string, value any) (any, error)
 	GetPropertyValue(thingId, propertyName string) (any, error)
 	GetPropertiesValue(thingId string) (map[string]any, error)
-	GetMapOfDevices() map[string]*addon.Device
+	GetMapOfDevices() map[string]*devices.Device
 	SetPIN(ctx context.Context, thingId string, pin string) (*messages.Device, error)
 	SetCredentials(ctx context.Context, thingId, username, password string) (*messages.Device, error)
 }

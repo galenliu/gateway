@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"context"
+	"github.com/galenliu/gateway/api"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/db"
@@ -9,7 +10,6 @@ import (
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin"
-	"github.com/galenliu/gateway/server"
 	json "github.com/json-iterator/go"
 	"path"
 	"time"
@@ -34,7 +34,7 @@ type Gateway struct {
 	config       Config
 	bus          *bus.Bus
 	addonManager *plugin.Manager
-	sever        *server.WebServe
+	sever        *api.WebServe
 	logger       logging.Logger
 }
 
@@ -70,7 +70,7 @@ func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gat
 
 	//  EventBus init
 	newBus := bus.NewBusController(logger)
-	logger.Infof("event bus init.")
+	logger.Infof("events bus init.")
 
 	//Addon manager init
 	g.addonManager = plugin.NewAddonsManager(ctx, plugin.Config{
@@ -83,7 +83,7 @@ func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gat
 	logger.Infof("addon manager init.")
 
 	// Web service init
-	g.sever = server.NewServe(ctx, server.Config{
+	g.sever = api.NewServe(ctx, api.Config{
 		HttpAddr:    g.config.HttpAddr,
 		HttpsAddr:   g.config.HttpsAddr,
 		AddonUrls:   g.config.AddonUrls,
@@ -93,7 +93,7 @@ func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gat
 		LogDir:      path.Join(g.config.BaseDir, "log"),
 	}, g.addonManager, storage, newBus, logger)
 	g.bus = newBus
-	logger.Infof("web server running.")
+	logger.Infof("web api running.")
 	return g, nil
 }
 

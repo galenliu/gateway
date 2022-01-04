@@ -2,7 +2,8 @@ package plugin
 
 import (
 	"context"
-	"github.com/galenliu/gateway/pkg/addon"
+	"github.com/galenliu/gateway/pkg/addon/actions"
+	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/ipc"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
@@ -245,7 +246,7 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			plugin.logger.Errorf("Bad message : %s", err.Error())
 			return
 		}
-		device.notifyAction(&addon.ActionDescription{
+		device.notifyAction(&actions.ActionDescription{
 			Id:            message.Action.Id,
 			Name:          message.Action.Name,
 			Input:         message.Action.Input,
@@ -324,7 +325,21 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			plugin.logger.Errorf("Bad message")
 			return
 		}
-		go device.notifyValueChanged(message.Property)
+		go device.NotifyPropertyChanged(properties.PropertyDescription{
+			Name:        message.Property.Name,
+			AtType:      message.Property.AtType,
+			Title:       message.Property.Title,
+			Type:        message.Property.Type,
+			Unit:        message.Property.Unit,
+			Description: message.Property.Description,
+			Minimum:     message.Property.Minimum,
+			Maximum:     message.Property.Maximum,
+			Enum:        message.Property.Enum,
+			ReadOnly:    message.Property.ReadOnly,
+			MultipleOf:  message.Property.MultipleOf,
+			Links:       nil,
+			Value:       message.Property.Value,
+		})
 		return
 
 	case messages.MessageType_AdapterRemoveDeviceResponse:

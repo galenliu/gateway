@@ -16,7 +16,6 @@ const (
 type DeviceProperties map[string]Property
 
 // PropertyEnumElem The possible values of the property
-type PropertyEnumElem any
 
 // PropertyValue The value of the property
 type PropertyValue any
@@ -33,7 +32,7 @@ type Property struct {
 	Description *string `json:"description,omitempty" yaml:"description,omitempty"`
 
 	// Enum corresponds to the JSON schema field "enum".
-	Enum []PropertyEnumElem `json:"enum,omitempty" yaml:"enum,omitempty"`
+	Enum []any `json:"enum,omitempty" yaml:"enum,omitempty"`
 
 	// Forms corresponds to the JSON schema field "forms".
 	//Forms []PropertyFormsElem `json:"forms,omitempty" yaml:"forms,omitempty"`

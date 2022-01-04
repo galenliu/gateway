@@ -11,7 +11,7 @@ const (
 	MessageTypeAddEventSubscription = "addEventSubscription"
 	MessageTypePropertyStatus       = "propertyStatus"
 	MessageTypeActionStatus         = "actionStatus"
-	MessageTypeEvent                = "event"
+	MessageTypeEvent                = "events"
 )
 
 func handleWebsocket(model Container, bus controllerBus, log logging.Logger) func(conn *websocket.Conn) {

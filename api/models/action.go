@@ -2,12 +2,12 @@ package models
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/addon"
+	"github.com/galenliu/gateway/api/models/container"
+	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/server/models/container"
 	uuid "github.com/satori/go.uuid"
 	"time"
 )
@@ -97,7 +97,7 @@ func (action *Action) updateStatus(newStatus string) {
 		action.TimeCompleted = &t
 	}
 	action.Status = newStatus
-	action.logger.Infof("action.updateStatus: %s", newStatus)
+	action.logger.Infof("actions.updateStatus: %s", newStatus)
 	action.bus.Pub(topic.ThingActionStatus, action)
 }
 
@@ -106,7 +106,7 @@ func (action *Action) SetErr(err error) {
 	action.updateStatus(ActionError)
 }
 
-func (action *Action) update(ad *addon.ActionDescription) {
+func (action *Action) update(ad *actions.ActionDescription) {
 	t, _ := time.Parse("2006-1-2 15:04:05", ad.TimeRequested)
 	action.TimeRequested = &t
 	if ad.TimeCompleted != "" {

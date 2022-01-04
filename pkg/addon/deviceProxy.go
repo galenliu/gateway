@@ -2,13 +2,11 @@ package addon
 
 import (
 	"github.com/galenliu/gateway/pkg/addon/devices"
-	"github.com/galenliu/gateway/pkg/addon/properties"
 )
 
-type DeviceProxy struct {
-	*devices.Device
-}
-
-func (d DeviceProxy) AddProperty(property properties.Property) {
-	d.Properties[property.GetName()] = property
+type DeviceProxy interface {
+	GetId() string
+	GetAdapter() AdapterProxy
+	GetProperty(name string) devices.PropertyProxy
+	SetCredentials(username, password string) error
 }

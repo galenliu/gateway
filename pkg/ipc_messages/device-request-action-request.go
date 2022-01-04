@@ -5,12 +5,12 @@ package messages
 import "fmt"
 import "encoding/json"
 
-// Request a new action on a device
+// Request a new actions on a device
 type DeviceRequestActionRequestJson struct {
 	// Message-specific data
 	Data DeviceRequestActionRequestJsonData `json:"data" yaml:"data"`
 
-	// The message type, used by the IPC client and server to differentiate messages
+	// The message type, used by the IPC client and api to differentiate messages
 	MessageType int `json:"messageType" yaml:"messageType"`
 }
 
@@ -49,10 +49,10 @@ func (j *DeviceRequestActionRequestJsonData) UnmarshalJSON(b []byte) error {
 
 // Message-specific data
 type DeviceRequestActionRequestJsonData struct {
-	// Unique ID of this existing action
+	// Unique ID of this existing actions
 	ActionId string `json:"actionId" yaml:"actionId"`
 
-	// Name of the action
+	// Name of the actions
 	ActionName string `json:"actionName" yaml:"actionName"`
 
 	// ID of the adapter
@@ -61,14 +61,14 @@ type DeviceRequestActionRequestJsonData struct {
 	// ID of the device
 	DeviceId string `json:"deviceId" yaml:"deviceId"`
 
-	// Input to the action
+	// Input to the actions
 	Input DeviceRequestActionRequestJsonDataInput `json:"input" yaml:"input"`
 
 	// ID of the plugin
 	PluginId string `json:"pluginId" yaml:"pluginId"`
 }
 
-// Input to the action
+// Input to the actions
 type DeviceRequestActionRequestJsonDataInput any
 
 // UnmarshalJSON implements json.Unmarshaler.

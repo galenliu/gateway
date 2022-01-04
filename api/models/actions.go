@@ -3,9 +3,9 @@ package models
 import (
 	"context"
 	"fmt"
+	"github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/server/models/container"
 	"github.com/xiam/to"
 	"sync"
 )
@@ -55,7 +55,7 @@ func (m *ActionsModel) Add(a *Action) error {
 		thing := m.container.GetThing(a.GetThingId())
 		success := thing.AddAction(a.GetName())
 		if !success {
-			return fmt.Errorf("invalid thing action name: %s", a.GetName())
+			return fmt.Errorf("invalid thing actions name: %s", a.GetName())
 		}
 		return nil
 	}
@@ -90,7 +90,7 @@ func (m *ActionsModel) Add(a *Action) error {
 		}
 		m.container.RemoveThing(thingId)
 	default:
-		return fmt.Errorf("invalid action name: %s", a.GetName())
+		return fmt.Errorf("invalid actions name: %s", a.GetName())
 	}
 	return nil
 }
@@ -99,7 +99,7 @@ func (m *ActionsModel) Remove(id string) error {
 	action, _ := m.actions.Load(id)
 	a, ok := action.(*Action)
 	if action == nil || !ok {
-		return fmt.Errorf("invalid action id: %s", id)
+		return fmt.Errorf("invalid actions id: %s", id)
 	}
 	defer func() {
 		a.updateStatus(ActionDeleted)
@@ -110,13 +110,13 @@ func (m *ActionsModel) Remove(id string) error {
 			thing := m.container.GetThing(a.GetThingId())
 			if thing != nil {
 				if thing.RemoveAction(a.GetName()) {
-					return fmt.Errorf("invalid action name %s", a.GetName())
+					return fmt.Errorf("invalid actions name %s", a.GetName())
 				}
 			} else {
-				return fmt.Errorf("error removing thing action: %s", a.GetName())
+				return fmt.Errorf("error removing thing actions: %s", a.GetName())
 			}
 		} else {
-			return fmt.Errorf("error removing thing action: %s", a.GetName())
+			return fmt.Errorf("error removing thing actions: %s", a.GetName())
 		}
 	}
 	switch a.GetName() {
@@ -130,7 +130,7 @@ func (m *ActionsModel) Remove(id string) error {
 		}
 		m.manager.CancelRemoveThing(id)
 	default:
-		return fmt.Errorf("invaild action name: %s", a.GetName())
+		return fmt.Errorf("invaild actions name: %s", a.GetName())
 	}
 	return nil
 }

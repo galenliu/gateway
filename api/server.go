@@ -1,11 +1,11 @@
-package server
+package api
 
 import (
 	"context"
+	"github.com/galenliu/gateway/api/controllers"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/plugin"
-	"github.com/galenliu/gateway/server/controllers"
 )
 
 type Config struct {
