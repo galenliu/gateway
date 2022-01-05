@@ -8,7 +8,7 @@ import (
 )
 
 type VirtualAdapter struct {
-	*addon.Adapter
+	*addon.AddonAdapter
 }
 
 func NewVirtualAdapter(manager *addon.Manager, adapterId, name string) *VirtualAdapter {
@@ -32,12 +32,11 @@ func (a *VirtualAdapter) StartPairing(timeout time.Duration) {
 					fmt.Printf(err.Error())
 					continue
 				}
-				p, err := bulb.Discover()
+				_, err = bulb.Discover()
 				if err != nil {
 					fmt.Printf(err.Error())
 					continue
 				}
-				lihgt := New
 				fmt.Printf("bulb: %v", bulb)
 			}
 		}

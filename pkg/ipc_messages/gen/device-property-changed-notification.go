@@ -202,7 +202,7 @@ type Device struct {
 	// Properties corresponds to the JSON schema field "properties".
 	Properties DeviceProperties `json:"properties,omitempty" yaml:"properties,omitempty"`
 
-	// Title of the Device
+	// Title of the Addon_Device
 	Title *string `json:"title,omitempty" yaml:"title,omitempty"`
 }
 
@@ -282,7 +282,7 @@ func (j *Device) UnmarshalJSON(b []byte) error {
 		return err
 	}
 	if v, ok := raw["id"]; !ok || v == nil {
-		return fmt.Errorf("field id in Device: required")
+		return fmt.Errorf("field id in Addon_Device: required")
 	}
 	type Plain Device
 	var plain Plain
@@ -331,7 +331,7 @@ type DeviceWithoutId struct {
 	// Properties corresponds to the JSON schema field "properties".
 	Properties DeviceWithoutIdProperties `json:"properties,omitempty" yaml:"properties,omitempty"`
 
-	// Title of the Device
+	// Title of the Addon_Device
 	Title *string `json:"title,omitempty" yaml:"title,omitempty"`
 }
 

@@ -2,34 +2,17 @@ package devices
 
 import (
 	"github.com/galenliu/gateway/pkg/addon/actions"
+	"github.com/galenliu/gateway/pkg/addon/adapter"
 	"github.com/galenliu/gateway/pkg/addon/events"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 )
 
-type PropertyProxy interface {
-	GetType() string
-	GetTitle() string
-	GetName() string
-	GetUnit() string
-	GetEnum() []any
-	GetAtType() string
-	GetDescription() string
-	GetMinimum() any
-	GetMaximum() any
-	GetMultipleOf() any
-	GetValue() any
-	IsReadOnly() bool
-	SetValue(a any) bool
-	SetTitle(s string) bool
-	SetDescription(description string) bool
-	ToDescription() properties.PropertyDescription
-}
-
-type DeviceProperties map[string]PropertyProxy
+type DeviceProperties map[string]properties.PropertyProxy
 type DeviceActions map[string]actions.Action
 type DeviceEvents map[string]events.Event
 
 type Device struct {
+	adapter             adapter.AdapterProxy
 	Context             string           `json:"@context,omitempty"`
 	AtType              []string         `json:"@type,omitempty"`
 	Id                  string           `json:"id,omitempty"`
@@ -59,7 +42,7 @@ type DevicePin struct {
 	Pattern  string `json:"pattern,omitempty"`
 }
 
-func (d Device) AddProperty(n string, p PropertyProxy) {
+func (d Device) AddProperty(n string, p properties.PropertyProxy) {
 	d.Properties[n] = p
 }
 
@@ -83,6 +66,10 @@ func (d Device) GetDescription() string {
 	return d.Description
 }
 
+func (d Device) GetAdapter() adapter.AdapterProxy {
+	return d.adapter
+}
+
 func (d Device) GetLink() []DeviceLink {
 	return d.Links
 }
@@ -91,11 +78,11 @@ func (d Device) GetBaseHref() string {
 	return d.BaseHref
 }
 
-func (d Device) GetProperties() map[string]PropertyProxy {
+func (d Device) GetProperties() map[string]properties.PropertyProxy {
 	return d.Properties
 }
 
-func (d Device) GetProperty(id string) PropertyProxy {
+func (d Device) GetProperty(id string) properties.PropertyProxy {
 	p, ok := d.Properties[id]
 	if ok {
 		return p

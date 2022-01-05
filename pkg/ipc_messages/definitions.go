@@ -49,7 +49,7 @@ func (j *Device) UnmarshalJSON(b []byte) error {
 		return err
 	}
 	if v, ok := raw["id"]; !ok || v == nil {
-		return fmt.Errorf("field id in Device: required")
+		return fmt.Errorf("field id in Addon_Device: required")
 	}
 	type Plain Device
 	var plain Plain

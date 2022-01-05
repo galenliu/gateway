@@ -12,12 +12,12 @@ import (
 type AdapterProxy interface {
 	GetId() string
 	GetName() string
-	GetDevice(deviceId string) DeviceProxy
+	GetDevice(deviceId string) AddonDeviceProxy
 	Unload()
 	CancelPairing()
 	StartPairing(timeout time.Duration)
-	HandleDeviceSaved(DeviceProxy)
-	HandleDeviceRemoved(DeviceProxy)
+	HandleDeviceSaved(AddonDeviceProxy)
+	HandleDeviceRemoved(AddonDeviceProxy)
 }
 
 type Manager struct {
@@ -68,7 +68,7 @@ func (m *Manager) AddAdapters(adapters ...AdapterProxy) {
 	}
 }
 
-func (m *Manager) handleDeviceAdded(device DeviceProxy) {
+func (m *Manager) handleDeviceAdded(device AddonDeviceProxy) {
 	if m.verbose {
 		log.Printf("addonManager: handle_device_added: %s", device.GetId())
 	}
@@ -79,7 +79,7 @@ func (m *Manager) handleDeviceAdded(device DeviceProxy) {
 	})
 }
 
-func (m *Manager) handleDeviceRemoved(device DeviceProxy) {
+func (m *Manager) handleDeviceRemoved(device AddonDeviceProxy) {
 	if m.verbose {
 		log.Printf("addon manager handle devices added, deviceId:%v\n", device.GetId())
 	}
@@ -297,7 +297,7 @@ func (m *Manager) onMessage(data []byte) {
 	}
 }
 
-func (m *Manager) sendConnectedStateNotification(device DeviceProxy, connected bool) {
+func (m *Manager) sendConnectedStateNotification(device AddonDeviceProxy, connected bool) {
 	m.send(messages.MessageType_DeviceConnectedStateNotification, messages.DeviceConnectedStateNotificationJsonData{
 		AdapterId: device.GetAdapter().GetId(),
 		Connected: connected,

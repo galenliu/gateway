@@ -2,20 +2,20 @@ package addon
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/addon/devices"
+	"github.com/galenliu/gateway/pkg/addon/adapter"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"log"
 	"sync"
 )
 
-type OnDeviceSavedFunc func(deviceId string, device *devices.Device)
-type OnSetCredentialsFunc func(deviceId, username, password string)
+type AddonAdapterProxy interface {
+	adapter.AdapterProxy
+}
 
-//type OnSetPinFunc func(deivceId string, devices.P) error
-
-type Adapter struct {
-	Devices     map[string]DeviceProxy
+type AddonAdapter struct {
+	*adapter.Adapter
+	Devices     map[string]AddonDeviceProxy
 	manager     *Manager
 	locker      *sync.Mutex
 	cancelChan  chan struct{}
@@ -27,37 +27,37 @@ type Adapter struct {
 	pluginId    string
 }
 
-func NewAdapter(manager *Manager, adapterId, name string) *Adapter {
+func NewAdapter(manager *Manager, adapterId, name string) *AddonAdapter {
 
-	adapter := &Adapter{}
-	adapter.manager = manager
-	adapter.Id = adapterId
-	adapter.name = name
-	adapter.locker = new(sync.Mutex)
-	adapter.Devices = make(map[string]DeviceProxy)
-	adapter.cancelChan = make(chan struct{})
-	adapter.verbose = true
-	return adapter
+	a := &AddonAdapter{}
+	a.manager = manager
+	a.Id = adapterId
+	a.name = name
+	a.locker = new(sync.Mutex)
+	a.Devices = make(map[string]AddonDeviceProxy)
+	a.cancelChan = make(chan struct{})
+	a.verbose = true
+	return a
 }
 
-func (a *Adapter) HandleDeviceAdded(device DeviceProxy) {
+func (a *AddonAdapter) HandleDeviceAdded(device AddonDeviceProxy) {
 	a.Devices[device.GetId()] = device
 	a.manager.handleDeviceAdded(device)
 }
 
-func (a *Adapter) SendError(message string) {
+func (a *AddonAdapter) SendError(message string) {
 	a.manager.send(messages.MessageType_PluginErrorNotification, messages.PluginErrorNotificationJsonData{
 		Message:  message,
 		PluginId: a.manager.packageName,
 	})
 }
 
-//func (a *Adapter) ConnectedNotify(device *DeviceProxy, connected bool) {
+//func (a *AddonAdapter) ConnectedNotify(device *DeviceProxy, connected bool) {
 //	a.manager.sendConnectedStateNotification(device, connected)
 //}
 
 // SendPairingPrompt 向前端UI发送提示
-func (a *Adapter) SendPairingPrompt(prompt, url string, did string) {
+func (a *AddonAdapter) SendPairingPrompt(prompt, url string, did string) {
 
 	var u *string
 	if url != "" {
@@ -74,7 +74,7 @@ func (a *Adapter) SendPairingPrompt(prompt, url string, did string) {
 	})
 }
 
-func (a *Adapter) SendUnpairingPrompt(prompt, url string, did string) {
+func (a *AddonAdapter) SendUnpairingPrompt(prompt, url string, did string) {
 	var u *string
 	if url != "" {
 		u = &url
@@ -90,28 +90,28 @@ func (a *Adapter) SendUnpairingPrompt(prompt, url string, did string) {
 	})
 }
 
-func (a *Adapter) Send(mt messages.MessageType, data map[string]any) {
+func (a *AddonAdapter) Send(mt messages.MessageType, data map[string]any) {
 	a.manager.send(mt, data)
 }
 
-func (a *Adapter) CancelPairing() {
+func (a *AddonAdapter) CancelPairing() {
 	if a.verbose {
 		log.Printf("adapter:(%s)- CancelPairing() not implemented", a.GetId())
 	}
 }
 
-func (a *Adapter) GetId() string {
+func (a *AddonAdapter) GetId() string {
 	return a.Id
 }
 
-func (a *Adapter) GetName() string {
+func (a *AddonAdapter) GetName() string {
 	if a.name == "" {
 		return a.Id
 	}
 	return a.name
 }
 
-func (a *Adapter) GetDevice(id string) DeviceProxy {
+func (a *AddonAdapter) GetDevice(id string) AddonDeviceProxy {
 	device, ok := a.Devices[id]
 	if !ok {
 		return nil
@@ -119,56 +119,56 @@ func (a *Adapter) GetDevice(id string) DeviceProxy {
 	return device
 }
 
-func (a *Adapter) Unload() {
+func (a *AddonAdapter) Unload() {
 	if a.verbose {
 		log.Printf("adapter:(%s)- unloaded ", a.GetId())
 	}
 }
 
-func (a *Adapter) HandleDeviceSaved(device DeviceProxy) {
+func (a *AddonAdapter) HandleDeviceSaved(device AddonDeviceProxy) {
 	if a.verbose {
 		log.Printf("adapter:(%s)- HandleDeviceSaved() not implemented", device.GetId())
 	}
 }
 
-func (a *Adapter) HandleDeviceRemoved(device DeviceProxy) {
+func (a *AddonAdapter) HandleDeviceRemoved(device AddonDeviceProxy) {
 	delete(a.Devices, device.GetId())
 }
 
-func (a *Adapter) getDevice(id string) DeviceProxy {
+func (a *AddonAdapter) getDevice(id string) AddonDeviceProxy {
 	return a.Devices[id]
 }
 
-func (a *Adapter) close() {
+func (a *AddonAdapter) close() {
 	fmt.Print("do some thing while a close")
 	a.manager.close()
 }
 
-func (a *Adapter) ProxyRunning() bool {
+func (a *AddonAdapter) ProxyRunning() bool {
 	return a.manager.running
 }
 
-func (a *Adapter) CloseProxy() {
+func (a *AddonAdapter) CloseProxy() {
 	a.manager.close()
 }
 
-func (a *Adapter) setManager(m *Manager) {
+func (a *AddonAdapter) setManager(m *Manager) {
 	a.manager = m
 }
 
-func (a *Adapter) SetPin(deviceId string, pin any) {
+func (a *AddonAdapter) SetPin(deviceId string, pin any) {
 
 }
 
-func (a *Adapter) SetCredentials(deviceId, username, password string) {
+func (a *AddonAdapter) SetCredentials(deviceId, username, password string) {
 
 }
 
-func (a *Adapter) GetAddonManager() *Manager {
+func (a *AddonAdapter) GetAddonManager() *Manager {
 	return a.manager
 }
 
-func (a *Adapter) SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription) {
+func (a *AddonAdapter) SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription) {
 	a.manager.send(messages.MessageType_DevicePropertyChangedNotification, messages.DevicePropertyChangedNotificationJsonData{
 		AdapterId: a.GetId(),
 		DeviceId:  deviceId,

@@ -21,7 +21,7 @@ type LightBulb struct {
 //func NewLightBulb(id, title string) *LightBulb {
 //
 //	lightBulb := &LightBulb{}
-//	lightBulb.Device = addon.NewDevice(id, title)
+//	lightBulb.Addon_Device = addon.NewDevice(id, title)
 //
 //	lightBulb.AddTypes(addon.Light, addon.OnOffSwitch)
 //	return lightBulb
@@ -30,21 +30,21 @@ type LightBulb struct {
 //func (light *LightBulb) addProperty(p addon.IProperty) {
 //	if p.GetAtType() == properties.TypeOnOffProperty {
 //		light.On = p
-//		light.Device.addProperty(p)
+//		light.Addon_Device.addProperty(p)
 //		return
 //	}
 //	if p.GetAtType() == properties.TypeBrightnessProperty {
 //		light.Bright = p
-//		light.Device.addProperty(p)
+//		light.Addon_Device.addProperty(p)
 //		return
 //	}
 //	if p.GetAtType() == properties.TypeColorProperty {
 //
 //		light.Color = p
-//		light.Device.addProperty(p)
+//		light.Addon_Device.addProperty(p)
 //		return
 //	}
-//	light.Device.addProperty(p)
+//	light.Addon_Device.addProperty(p)
 //}
 
 func (light *LightBulb) TurnOn() {

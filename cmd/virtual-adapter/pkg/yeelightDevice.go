@@ -7,17 +7,17 @@ import (
 )
 
 type YeelightDevice struct {
-	*addon.Device
+	*addon.AddonDevice
 	*yeelight.YeelightParams
 	*yeelight.Bulb
 }
 
-func NewYeelightBulb(adapter *addon.Adapter, bulb *yeelight.Bulb, params *yeelight.YeelightParams) *YeelightDevice {
+func NewYeelightBulb(adapter *addon.AddonAdapter, bulb *yeelight.Bulb, params *yeelight.YeelightParams) *YeelightDevice {
 	yeeDevice := &YeelightDevice{
 		YeelightParams: params,
 		Bulb:           bulb,
 	}
-	yeeDevice.Device = addon.NewDevice(adapter, []string{"Light", "OnOffSwitch"}, params.Name, "yeelight"+params.Name)
+	yeeDevice.AddonDevice = addon.NewDevice(adapter, []string{"Light", "OnOffSwitch"}, params.Name, "yeelight"+params.Name)
 	for _, method := range params.Support {
 		switch method {
 		case "set_power":
@@ -57,7 +57,7 @@ func NewYeelightBulb(adapter *addon.Adapter, bulb *yeelight.Bulb, params *yeelig
 				Links:       nil,
 				Value:       nil,
 			})
-			yeeDevice.AddProperty("on", prop)
+			yeeDevice.AddProperty("bright", prop)
 		case "set_rgb":
 			var min float64 = 0
 			var max float64 = 100

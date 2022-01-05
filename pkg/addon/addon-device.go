@@ -5,13 +5,18 @@ import (
 	"github.com/galenliu/gateway/pkg/addon/properties"
 )
 
-type Device struct {
-	adapter *Adapter
+type AddonDeviceProxy interface {
+	properties.DeviceProxy
+	SetCredentials(username, password string) error
+}
+
+type AddonDevice struct {
+	adapter *AddonAdapter
 	*devices.Device
 }
 
-func NewDevice(adapter *Adapter, atType []string, id, title string) *Device {
-	return &Device{
+func NewDevice(adapter *AddonAdapter, atType []string, id, title string) *AddonDevice {
+	return &AddonDevice{
 		adapter: adapter,
 		Device: &devices.Device{
 			Context:             "https://webthings.io/schemas",
@@ -32,6 +37,6 @@ func NewDevice(adapter *Adapter, atType []string, id, title string) *Device {
 
 }
 
-func (d Device) NotifyPropertyChanged(prop properties.PropertyDescription) {
+func (d AddonDevice) NotifyPropertyChanged(prop properties.PropertyDescription) {
 	d.adapter.SendPropertyChangedNotification(d.GetId(), prop)
 }

@@ -2,9 +2,32 @@ package properties
 
 import (
 	"encoding/json"
+	"github.com/galenliu/gateway/pkg/addon/adapter"
 )
 
+type PropertyProxy interface {
+	GetType() string
+	GetTitle() string
+	GetName() string
+	GetUnit() string
+	GetEnum() []any
+	GetAtType() string
+	GetDescription() string
+	GetMinimum() any
+	GetMaximum() any
+	GetMultipleOf() any
+	GetValue() any
+	IsReadOnly() bool
+	SetValue(a any) bool
+	SetTitle(s string) bool
+	SetDescription(description string) bool
+	ToDescription() PropertyDescription
+}
+
 type DeviceProxy interface {
+	GetId() string
+	GetAdapter() adapter.AdapterProxy
+	GetProperty(id string) PropertyProxy
 	NotifyPropertyChanged(p PropertyDescription)
 }
 

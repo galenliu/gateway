@@ -71,8 +71,8 @@ package messages
 //	Data        *DeviceConnectedStateNotificationMessage_Data `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
 //}
 //
-//// Device
-//type Device struct {
+//// Addon_Device
+//type Addon_Device struct {
 //	AtContext           string               `protobuf:"bytes,1,opt,name=atContext,json=@context,proto3" json:"atContext,omitempty"`
 //	AtType              string               `protobuf:"bytes,2,opt,name=atType,json=@type,proto3" json:"atType,omitempty"`
 //	Id                  string               `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
@@ -274,7 +274,7 @@ package messages
 //
 //	PluginId  string  `protobuf:"bytes,1,opt,name=pluginId,proto3" json:"pluginId,omitempty"`
 //	AdapterId string  `protobuf:"bytes,2,opt,name=adapterId,proto3" json:"adapterId,omitempty"`
-//	Device    *Device `protobuf:"bytes,3,opt,name=addon,proto3" json:"addon,omitempty"`
+//	Addon_Device    *Addon_Device `protobuf:"bytes,3,opt,name=addon,proto3" json:"addon,omitempty"`
 //}
 //
 //type DevicePropertyChangedNotificationMessage_Data struct {
