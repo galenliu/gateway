@@ -1,4 +1,4 @@
-package pkg
+package yeelight
 
 import "github.com/galenliu/gateway/pkg/addon/properties"
 

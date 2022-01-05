@@ -5,6 +5,7 @@ import (
 	"github.com/galenliu/gateway/pkg/addon/adapter"
 	"github.com/galenliu/gateway/pkg/addon/events"
 	"github.com/galenliu/gateway/pkg/addon/properties"
+	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 )
 
 type DeviceProperties map[string]properties.PropertyProxy
@@ -43,6 +44,9 @@ type DevicePin struct {
 }
 
 func (d Device) AddProperty(n string, p properties.PropertyProxy) {
+	if d.Properties == nil {
+		d.Properties = make(DeviceProperties, 1)
+	}
 	d.Properties[n] = p
 }
 
@@ -112,4 +116,40 @@ func (d Device) GetEvent(id string) events.Event {
 
 func (d Device) GetCredentialsRequired() bool {
 	return d.CredentialsRequired
+}
+
+func (d Device) ToMessage() messages.Device {
+	baseHref := "/things/" + d.GetId()
+	return messages.Device{
+		Context:             &d.Context,
+		Type:                d.AtType,
+		BaseHref:            &baseHref,
+		CredentialsRequired: nil,
+		Description:         nil,
+		Id:                  d.GetId(),
+		Links:               nil,
+		Pin:                 nil,
+		Properties: func(props DeviceProperties) map[string]messages.Property {
+			var mmp = make(map[string]messages.Property)
+			for n, p := range props {
+				mmp[n] = p.ToMessage()
+			}
+			return mmp
+		}(d.Properties),
+		Events: func(es DeviceEvents) map[string]messages.Event {
+			var mme = make(map[string]messages.Event)
+			for n, e := range es {
+				mme[n] = e.ToMessage()
+			}
+			return mme
+		}(d.Events),
+		Actions: func(as DeviceActions) map[string]messages.Action {
+			var mma = make(map[string]messages.Action)
+			for n, e := range as {
+				mma[n] = e.ToMessage()
+			}
+			return mma
+		}(d.Actions),
+		Title: nil,
+	}
 }

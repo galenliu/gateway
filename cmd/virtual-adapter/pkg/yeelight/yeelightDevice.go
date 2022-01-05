@@ -1,4 +1,4 @@
-package pkg
+package yeelight
 
 import (
 	"github.com/akominch/yeelight"
@@ -12,7 +12,7 @@ type YeelightDevice struct {
 	*yeelight.Bulb
 }
 
-func NewYeelightBulb(adapter *addon.AddonAdapter, bulb *yeelight.Bulb, params *yeelight.YeelightParams) *YeelightDevice {
+func NewYeelightBulb(adapter addon.AddonAdapterProxy, bulb *yeelight.Bulb, params *yeelight.YeelightParams) *YeelightDevice {
 	yeeDevice := &YeelightDevice{
 		YeelightParams: params,
 		Bulb:           bulb,

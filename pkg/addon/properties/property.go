@@ -3,6 +3,7 @@ package properties
 import (
 	"encoding/json"
 	"github.com/galenliu/gateway/pkg/addon/adapter"
+	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 )
 
 type PropertyProxy interface {
@@ -22,6 +23,7 @@ type PropertyProxy interface {
 	SetTitle(s string) bool
 	SetDescription(description string) bool
 	ToDescription() PropertyDescription
+	ToMessage() messages.Property
 }
 
 type DeviceProxy interface {
@@ -237,6 +239,44 @@ func (p *Property) ToDescription() PropertyDescription {
 		MultipleOf: p.MultipleOf,
 		Links:      nil,
 		Value:      p.Value,
+	}
+}
+
+func (p *Property) ToMessage() messages.Property {
+	get := func(s string) *string {
+		if s == "" {
+			return nil
+		}
+		return &s
+	}
+	getFloat := func(s any) *float64 {
+		if s == nil {
+			return nil
+		}
+		switch s.(type) {
+		case float64:
+			return s.(*float64)
+		}
+		return nil
+	}
+	return messages.Property{
+		Type:        p.Type,
+		AtType:      get(p.AtType),
+		Description: get(p.Description),
+		Enum:        p.Enum,
+		Maximum:     getFloat(p.Maximum),
+		Minimum:     getFloat(p.Minimum),
+		MultipleOf:  p.MultipleOf,
+		Name:        get(p.Name),
+		ReadOnly: func(b bool) *bool {
+			if b {
+				return &b
+			}
+			return nil
+		}(p.ReadOnly),
+		Title: get(p.Title),
+		Unit:  get(p.Unit),
+		Value: p.Value,
 	}
 }
 

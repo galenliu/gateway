@@ -7,20 +7,27 @@ import (
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"log"
 	"sync"
+	"time"
 )
 
 type AddonAdapterProxy interface {
 	adapter.AdapterProxy
+	GetName() string
+	GetDevice(deviceId string) AddonDeviceProxy
+	SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription)
+	Unload()
+	CancelPairing()
+	StartPairing(timeout time.Duration)
+	HandleDeviceSaved(AddonDeviceProxy)
+	HandleDeviceRemoved(AddonDeviceProxy)
 }
 
 type AddonAdapter struct {
-	*adapter.Adapter
+	adapter.Adapter
 	Devices     map[string]AddonDeviceProxy
 	manager     *Manager
 	locker      *sync.Mutex
 	cancelChan  chan struct{}
-	Id          string
-	name        string
 	packageName string
 	IsPairing   bool
 	verbose     bool
@@ -28,11 +35,12 @@ type AddonAdapter struct {
 }
 
 func NewAdapter(manager *Manager, adapterId, name string) *AddonAdapter {
-
 	a := &AddonAdapter{}
+	a.Adapter = adapter.Adapter{
+		Id:   adapterId,
+		Name: name,
+	}
 	a.manager = manager
-	a.Id = adapterId
-	a.name = name
 	a.locker = new(sync.Mutex)
 	a.Devices = make(map[string]AddonDeviceProxy)
 	a.cancelChan = make(chan struct{})
@@ -105,10 +113,10 @@ func (a *AddonAdapter) GetId() string {
 }
 
 func (a *AddonAdapter) GetName() string {
-	if a.name == "" {
+	if a.Name == "" {
 		return a.Id
 	}
-	return a.name
+	return a.Name
 }
 
 func (a *AddonAdapter) GetDevice(id string) AddonDeviceProxy {

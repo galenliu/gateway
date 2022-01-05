@@ -207,7 +207,7 @@ func (device *Device) requestAction(ctx context.Context, id, name string, input 
 		var message = messages.DeviceRequestActionRequestJsonData{
 			ActionId:   id,
 			ActionName: name,
-			AdapterId:  device.getAdapter().getId(),
+			AdapterId:  device.getAdapter().GetId(),
 			DeviceId:   device.GetId(),
 			Input:      input,
 			PluginId:   device.getAdapter().getPlugin().pluginId,
@@ -262,7 +262,7 @@ func (device *Device) setPropertyValue(ctx context.Context, name string, value a
 	}()
 	if !ok {
 		data := messages.DeviceSetPropertyCommandJsonData{
-			AdapterId:     device.getAdapter().getId(),
+			AdapterId:     device.getAdapter().GetId(),
 			DeviceId:      device.GetId(),
 			PluginId:      device.getAdapter().getPlugin().getId(),
 			PropertyName:  name,

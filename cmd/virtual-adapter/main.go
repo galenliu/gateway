@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/cmd/virtual-adapter/pkg"
+	"github.com/galenliu/gateway/cmd/virtual-adapter/pkg/yeelight"
 	"github.com/galenliu/gateway/pkg/addon"
 	"os"
 	"os/signal"
@@ -16,7 +16,7 @@ func main() {
 		fmt.Printf("addon manager error: %s", err.Error())
 		return
 	}
-	adapter := pkg.NewVirtualAdapter(manager, "virtual-adapter", "virtual-adapter")
+	adapter := yeelight.NewVirtualAdapter(manager, "virtual-adapter", "virtual-adapter")
 	manager.AddAdapters(adapter)
 
 	interruptChannel := make(chan os.Signal, 1)

@@ -1,9 +1,10 @@
-package pkg
+package yeelight
 
 import (
 	"fmt"
 	"github.com/akominch/yeelight"
 	"github.com/galenliu/gateway/pkg/addon"
+	uuid "github.com/satori/go.uuid"
 	"time"
 )
 
@@ -25,19 +26,22 @@ func (a *VirtualAdapter) StartPairing(timeout time.Duration) {
 		for {
 			select {
 			case <-done:
+				fmt.Print("pairing timeout")
 				return
 			default:
 				bulb, err := yeelight.Discover()
 				if err != nil {
-					fmt.Printf(err.Error())
+					fmt.Println(err.Error())
 					continue
 				}
-				_, err = bulb.Discover()
+				_, err = bulb.SetName("Yeelight" + uuid.NewV4().String())
+				params, err := bulb.Discover()
 				if err != nil {
 					fmt.Printf(err.Error())
 					continue
 				}
-				fmt.Printf("bulb: %v", bulb)
+				device := NewYeelightBulb(a, bulb, params)
+				a.HandleDeviceAdded(device)
 			}
 		}
 	}

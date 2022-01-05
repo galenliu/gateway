@@ -94,7 +94,7 @@ func (m *Manager) AddNewThings(timeout int) error {
 	timeoutChan := time.After(time.Duration(timeout) * time.Millisecond)
 	var handlePairingTimeout = func() {
 		for _, adapter := range m.getAdapters() {
-			m.logger.Infof("%s to call startPairing on", adapter.name)
+			m.logger.Infof("%s to call startPairing on", adapter.GetId)
 			adapter.startPairing(timeout)
 		}
 		for {
@@ -180,7 +180,7 @@ func (m *Manager) CancelRemoveThing(deviceId string) {
 }
 
 func (m *Manager) handleAdapterAdded(adapter *Adapter) {
-	m.adapters.Store(adapter.getId(), adapter)
+	m.adapters.Store(adapter.GetId(), adapter)
 }
 
 func (m *Manager) handleAdapterUnload(adapterId string) {
@@ -421,7 +421,7 @@ func (m *Manager) loadAddon(packageId string) {
 }
 
 func (m *Manager) removeAdapter(adapter *Adapter) {
-	m.adapters.Delete(adapter.getId())
+	m.adapters.Delete(adapter.GetId())
 }
 
 func (m *Manager) getAddonPath(packageId string) string {

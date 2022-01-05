@@ -1,6 +1,9 @@
 package actions
 
-import json "github.com/json-iterator/go"
+import (
+	messages "github.com/galenliu/gateway/pkg/ipc_messages"
+	json "github.com/json-iterator/go"
+)
 
 type ActionInput map[string]any
 
@@ -36,6 +39,16 @@ func (a Action) GetDescription() string {
 
 func (a Action) GetInput() map[string]any {
 	return a.Input
+}
+
+func (a Action) ToMessage() messages.Action {
+	return messages.Action{
+		Type:        nil,
+		Description: nil,
+		Forms:       nil,
+		Input:       nil,
+		Title:       nil,
+	}
 }
 
 type ActionDescription struct {

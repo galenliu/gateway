@@ -48,7 +48,7 @@ func (plugin *Plugin) getName() string {
 }
 
 func (plugin *Plugin) handleAdapterAdded(adapter *Adapter) {
-	plugin.adapters.Store(adapter.getId(), adapter)
+	plugin.adapters.Store(adapter.GetId(), adapter)
 	plugin.manager.handleAdapterAdded(adapter)
 }
 

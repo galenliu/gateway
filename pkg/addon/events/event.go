@@ -1,5 +1,7 @@
 package events
 
+import messages "github.com/galenliu/gateway/pkg/ipc_messages"
+
 type Event struct {
 	AtType      string           `protobuf:"bytes,1,opt,name=atType,json=@type,proto3" json:"atType,omitempty"`
 	Name        string           `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
@@ -54,4 +56,19 @@ func (e Event) GetMinimum() float64 {
 
 func (e Event) GetMaximum() float64 {
 	return e.Maximum
+}
+
+func (e Event) ToMessage() messages.Event {
+	return messages.Event{
+		Type:        nil,
+		Description: nil,
+		Enum:        nil,
+		Forms:       nil,
+		Maximum:     nil,
+		Minimum:     nil,
+		MultipleOf:  nil,
+		Name:        nil,
+		Title:       nil,
+		Unit:        nil,
+	}
 }

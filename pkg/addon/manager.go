@@ -4,21 +4,9 @@ import (
 	"fmt"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	json "github.com/json-iterator/go"
-	"log"
 	"sync"
 	"time"
 )
-
-type AdapterProxy interface {
-	GetId() string
-	GetName() string
-	GetDevice(deviceId string) AddonDeviceProxy
-	Unload()
-	CancelPairing()
-	StartPairing(timeout time.Duration)
-	HandleDeviceSaved(AddonDeviceProxy)
-	HandleDeviceRemoved(AddonDeviceProxy)
-}
 
 type Manager struct {
 	ipcClient   *IpcClient
@@ -55,7 +43,7 @@ func NewAddonManager(packageName string) (*Manager, error) {
 	return instance, nil
 }
 
-func (m *Manager) AddAdapters(adapters ...AdapterProxy) {
+func (m *Manager) AddAdapters(adapters ...AddonAdapterProxy) {
 
 	for _, adapter := range adapters {
 		m.adapters.Store(adapter.GetId(), adapter)
@@ -70,18 +58,19 @@ func (m *Manager) AddAdapters(adapters ...AdapterProxy) {
 
 func (m *Manager) handleDeviceAdded(device AddonDeviceProxy) {
 	if m.verbose {
-		log.Printf("addonManager: handle_device_added: %s", device.GetId())
+		fmt.Printf("addonManager: handle_device_added: %s", device.GetId())
 	}
+	fmt.Print("=========")
 	m.send(messages.MessageType_DeviceAddedNotification, messages.DeviceAddedNotificationJsonData{
 		AdapterId: device.GetAdapter().GetId(),
-		Device:    messages.Device{},
+		Device:    device.ToMessage(),
 		PluginId:  m.packageName,
 	})
 }
 
 func (m *Manager) handleDeviceRemoved(device AddonDeviceProxy) {
 	if m.verbose {
-		log.Printf("addon manager handle devices added, deviceId:%v\n", device.GetId())
+		fmt.Printf("addon manager handle devices added, deviceId:%v\n", device.GetId())
 	}
 	m.send(messages.MessageType_AdapterRemoveDeviceResponse, messages.AdapterRemoveDeviceResponseJsonData{
 		AdapterId: device.GetAdapter().GetId(),
@@ -90,12 +79,12 @@ func (m *Manager) handleDeviceRemoved(device AddonDeviceProxy) {
 	})
 }
 
-func (m *Manager) getAdapter(adapterId string) AdapterProxy {
+func (m *Manager) getAdapter(adapterId string) AddonAdapterProxy {
 	adapter, ok := m.adapters.Load(adapterId)
 	if !ok {
 		return nil
 	}
-	return adapter.(AdapterProxy)
+	return adapter.(AddonAdapterProxy)
 }
 
 func (m *Manager) onMessage(data []byte) {
@@ -133,7 +122,7 @@ func (m *Manager) onMessage(data []byte) {
 	var adapterId = json.Get(data, "data", "adapterId").ToString()
 	adapter := m.getAdapter(adapterId)
 	if adapter == nil {
-		log.Printf("can not found adapter(%s)", adapterId)
+		fmt.Printf("can not found adapter(%s)", adapterId)
 		return
 	}
 
@@ -152,7 +141,7 @@ func (m *Manager) onMessage(data []byte) {
 
 	case messages.MessageType_AdapterUnloadRequest:
 		go adapter.Unload()
-		unloadFunc := func(proxy *Manager, adapter AdapterProxy) {
+		unloadFunc := func(proxy *Manager, adapter AddonAdapterProxy) {
 			data := make(map[string]any)
 			data["adapterId"] = adapter.GetId()
 			proxy.send(messages.MessageType_AdapterUnloadResponse, messages.AdapterUnloadResponseJsonData{
@@ -173,7 +162,7 @@ func (m *Manager) onMessage(data []byte) {
 	switch messageType {
 	case messages.MessageType_AdapterCancelRemoveDeviceCommand:
 		adapter := m.getAdapter(adapterId)
-		log.Printf(adapter.GetId())
+		fmt.Printf(adapter.GetId())
 
 	case messages.MessageType_DeviceSavedNotification:
 
@@ -192,7 +181,7 @@ func (m *Manager) onMessage(data []byte) {
 		newValue := json.Get(data, "data", "propertyValue").GetInterface()
 		prop := device.GetProperty(propName)
 		if prop == nil {
-			log.Printf("can not found propertyName(%s)", propName)
+			fmt.Printf("can not found propertyName(%s)", propName)
 			return
 		}
 		propChanged := func(newValue any) error {
@@ -201,7 +190,7 @@ func (m *Manager) onMessage(data []byte) {
 		}
 		e := propChanged(newValue)
 		if e != nil {
-			log.Printf(e.Error())
+			fmt.Printf(e.Error())
 			return
 		}
 		p := prop.ToDescription()

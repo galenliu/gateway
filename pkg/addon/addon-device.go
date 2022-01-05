@@ -3,19 +3,21 @@ package addon
 import (
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/properties"
+	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 )
 
 type AddonDeviceProxy interface {
 	properties.DeviceProxy
 	SetCredentials(username, password string) error
+	ToMessage() messages.Device
 }
 
 type AddonDevice struct {
-	adapter *AddonAdapter
+	adapter AddonAdapterProxy
 	*devices.Device
 }
 
-func NewDevice(adapter *AddonAdapter, atType []string, id, title string) *AddonDevice {
+func NewDevice(adapter AddonAdapterProxy, atType []string, id, title string) *AddonDevice {
 	return &AddonDevice{
 		adapter: adapter,
 		Device: &devices.Device{
@@ -34,9 +36,12 @@ func NewDevice(adapter *AddonAdapter, atType []string, id, title string) *AddonD
 			CredentialsRequired: false,
 		},
 	}
-
 }
 
 func (d AddonDevice) NotifyPropertyChanged(prop properties.PropertyDescription) {
 	d.adapter.SendPropertyChangedNotification(d.GetId(), prop)
+}
+
+func (d AddonDevice) SetCredentials(username, password string) error {
+	return nil
 }
