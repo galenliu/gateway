@@ -3,6 +3,7 @@ module github.com/galenliu/gateway
 go 1.18
 
 require (
+	github.com/akominch/yeelight v1.0.6
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/fasthttp/websocket v1.4.3-rc.10
 	github.com/gofiber/fiber/v2 v2.24.0
@@ -33,6 +34,7 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/klauspost/compress v1.13.4 // indirect
+	github.com/lucasb-eyer/go-colorful v1.0.3 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/mitchellh/mapstructure v1.4.2 // indirect
