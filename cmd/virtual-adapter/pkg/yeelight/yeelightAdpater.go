@@ -14,7 +14,7 @@ type VirtualAdapter struct {
 
 func NewVirtualAdapter(manager *addon.Manager, adapterId, name string) *VirtualAdapter {
 	v := &VirtualAdapter{
-		addon.NewAdapter(manager, adapterId, name),
+		addon.NewAddonAdapter(manager, adapterId, name),
 	}
 	v.StartPairing(300 * time.Duration(time.Millisecond))
 	return v

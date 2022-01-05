@@ -12,7 +12,6 @@ import (
 
 type AddonAdapterProxy interface {
 	adapter.AdapterProxy
-	GetName() string
 	GetDevice(deviceId string) AddonDeviceProxy
 	SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription)
 	Unload()
@@ -34,7 +33,7 @@ type AddonAdapter struct {
 	pluginId    string
 }
 
-func NewAdapter(manager *Manager, adapterId, name string) *AddonAdapter {
+func NewAddonAdapter(manager *Manager, adapterId, name string) *AddonAdapter {
 	a := &AddonAdapter{}
 	a.Adapter = adapter.Adapter{
 		Id:   adapterId,
