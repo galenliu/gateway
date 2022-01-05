@@ -4,9 +4,9 @@ type BooleanProperty struct {
 	*Property
 }
 
-func NewBooleanProperty(description PropertyDescription) *BooleanProperty {
+func NewBooleanProperty(device DeviceProxy, description PropertyDescription) *BooleanProperty {
 	p := &BooleanProperty{}
-	p.Property = NewProperty(nil, description)
+	p.Property = NewProperty(device, description)
 	if p.Property == nil {
 		return nil
 	}

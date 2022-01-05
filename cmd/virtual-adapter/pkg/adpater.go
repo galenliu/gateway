@@ -20,10 +20,28 @@ func NewVirtualAdapter(manager *addon.Manager, adapterId, name string) *VirtualA
 }
 
 func (a *VirtualAdapter) StartPairing(timeout time.Duration) {
-	bulb, err := yeelight.Discover()
-	if err != nil {
-		fmt.Printf(err.Error())
-		return
+
+	discover := func(done <-chan time.Time) {
+		for {
+			select {
+			case <-done:
+				return
+			default:
+				bulb, err := yeelight.Discover()
+				if err != nil {
+					fmt.Printf(err.Error())
+					continue
+				}
+				p, err := bulb.Discover()
+				if err != nil {
+					fmt.Printf(err.Error())
+					continue
+				}
+				lihgt := New
+				fmt.Printf("bulb: %v", bulb)
+			}
+		}
 	}
-	fmt.Printf("bulb: %v", bulb)
+	done := time.After(timeout)
+	go discover(done)
 }
