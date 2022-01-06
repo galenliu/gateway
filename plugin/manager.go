@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	things "github.com/galenliu/gateway/api/models/container"
+	"github.com/galenliu/gateway/pkg/addon/manager"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
@@ -36,12 +37,12 @@ type Config struct {
 }
 
 type Manager struct {
+	*manager.Manager
 	config         Config
 	configPath     string
 	pluginServer   *PluginsServer
 	preferences    messages.PluginRegisterResponseJsonDataPreferences
 	devices        sync.Map
-	adapters       sync.Map
 	outlets        sync.Map
 	installAddons  sync.Map
 	extensions     sync.Map
@@ -180,11 +181,11 @@ func (m *Manager) CancelRemoveThing(deviceId string) {
 }
 
 func (m *Manager) handleAdapterAdded(adapter *Adapter) {
-	m.adapters.Store(adapter.GetId(), adapter)
+	m.AddAdapter(adapter)
 }
 
 func (m *Manager) handleAdapterUnload(adapterId string) {
-	m.adapters.Delete(adapterId)
+	m.RemoveAdapter(adapterId)
 }
 
 func (m *Manager) handleDeviceAdded(device *Device) {
@@ -207,7 +208,7 @@ func (m *Manager) handleDeviceRemoved(device *Device) {
 }
 
 func (m *Manager) getAdapter(adapterId string) *Adapter {
-	a, ok := m.adapters.Load(adapterId)
+	a := m.GetAdapter(adapterId)
 	adapter, ok := a.(*Adapter)
 	if !ok {
 		return nil
@@ -216,13 +217,13 @@ func (m *Manager) getAdapter(adapterId string) *Adapter {
 }
 
 func (m *Manager) getAdapters() (adapters []*Adapter) {
-	m.adapters.Range(func(key, value any) bool {
-		adapter, ok := value.(*Adapter)
+	adapters = make([]*Adapter, 1)
+	for _, a := range m.GetAdapters() {
+		adp, ok := a.(*Adapter)
 		if ok {
-			adapters = append(adapters, adapter)
+			adapters = append(adapters, adp)
 		}
-		return true
-	})
+	}
 	return
 }
 
@@ -421,7 +422,7 @@ func (m *Manager) loadAddon(packageId string) {
 }
 
 func (m *Manager) removeAdapter(adapter *Adapter) {
-	m.adapters.Delete(adapter.GetId())
+	m.RemoveAdapter(adapter.GetId())
 }
 
 func (m *Manager) getAddonPath(packageId string) string {

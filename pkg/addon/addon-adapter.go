@@ -23,7 +23,6 @@ type AddonAdapterProxy interface {
 
 type AddonAdapter struct {
 	adapter.Adapter
-	Devices     map[string]AddonDeviceProxy
 	manager     *Manager
 	locker      *sync.Mutex
 	cancelChan  chan struct{}
@@ -41,14 +40,13 @@ func NewAddonAdapter(manager *Manager, adapterId, name string) *AddonAdapter {
 	}
 	a.manager = manager
 	a.locker = new(sync.Mutex)
-	a.Devices = make(map[string]AddonDeviceProxy)
 	a.cancelChan = make(chan struct{})
 	a.verbose = true
 	return a
 }
 
 func (a *AddonAdapter) HandleDeviceAdded(device AddonDeviceProxy) {
-	a.Devices[device.GetId()] = device
+	a.AddDevice(device)
 	a.manager.handleDeviceAdded(device)
 }
 
@@ -119,11 +117,14 @@ func (a *AddonAdapter) GetName() string {
 }
 
 func (a *AddonAdapter) GetDevice(id string) AddonDeviceProxy {
-	device, ok := a.Devices[id]
-	if !ok {
-		return nil
+	device := a.Adapter.GetDevice(id)
+	if device != nil {
+		d, ok := device.(AddonDeviceProxy)
+		if ok {
+			return d
+		}
 	}
-	return device
+	return nil
 }
 
 func (a *AddonAdapter) Unload() {
@@ -139,11 +140,7 @@ func (a *AddonAdapter) HandleDeviceSaved(device AddonDeviceProxy) {
 }
 
 func (a *AddonAdapter) HandleDeviceRemoved(device AddonDeviceProxy) {
-	delete(a.Devices, device.GetId())
-}
-
-func (a *AddonAdapter) getDevice(id string) AddonDeviceProxy {
-	return a.Devices[id]
+	a.Adapter.RemoveDevice(device.GetId())
 }
 
 func (a *AddonAdapter) close() {

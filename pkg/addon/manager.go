@@ -2,6 +2,7 @@ package addon
 
 import (
 	"fmt"
+	"github.com/galenliu/gateway/pkg/addon/manager"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	json "github.com/json-iterator/go"
 	"sync"
@@ -9,8 +10,8 @@ import (
 )
 
 type Manager struct {
+	*manager.Manager
 	ipcClient   *IpcClient
-	adapters    sync.Map
 	packageName string
 	verbose     bool
 	running     bool
@@ -44,9 +45,8 @@ func NewAddonManager(packageName string) (*Manager, error) {
 }
 
 func (m *Manager) AddAdapters(adapters ...AddonAdapterProxy) {
-
 	for _, adapter := range adapters {
-		m.adapters.Store(adapter.GetId(), adapter)
+		m.AddAdapter(adapter)
 		m.send(messages.MessageType_AdapterAddedNotification, messages.AdapterAddedNotificationJsonData{
 			AdapterId:   adapter.GetId(),
 			Name:        adapter.GetName(),
@@ -80,11 +80,14 @@ func (m *Manager) handleDeviceRemoved(device AddonDeviceProxy) {
 }
 
 func (m *Manager) getAdapter(adapterId string) AddonAdapterProxy {
-	adapter, ok := m.adapters.Load(adapterId)
-	if !ok {
-		return nil
+	adapter := m.Manager.GetAdapter(adapterId)
+	if adapter != nil {
+		adp, ok := adapter.(AddonAdapterProxy)
+		if ok {
+			return adp
+		}
 	}
-	return adapter.(AddonAdapterProxy)
+	return nil
 }
 
 func (m *Manager) onMessage(data []byte) {
@@ -150,7 +153,7 @@ func (m *Manager) onMessage(data []byte) {
 			})
 		}
 		go unloadFunc(m, adapter)
-		m.adapters.Delete(adapter.GetId())
+		m.RemoveAdapter(adapter.GetId())
 		break
 	}
 	var deviceId = json.Get(data, "data", "deviceId").ToString()
