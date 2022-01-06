@@ -26,14 +26,26 @@ func (a *Adapter) RemoveDevice(id string) {
 }
 
 func (a *Adapter) GetDevice(id string) Device {
-	i, ok := a.devices.Load(id)
+	v, ok := a.devices.Load(id)
 	if ok {
-		dev, ok := i.(Device)
+		v, ok := v.(Device)
 		if ok {
-			return dev
+			return v
 		}
 	}
 	return nil
+}
+
+func (a *Adapter) GetDevices() []Device {
+	devices := make([]Device, 1)
+	a.devices.Range(func(key, value any) bool {
+		device, ok := value.(Device)
+		if ok {
+			devices = append(devices, device)
+		}
+		return true
+	})
+	return devices
 }
 
 func (a *Adapter) GetId() string {

@@ -21,7 +21,7 @@ type AddonAdapterProxy interface {
 	HandleDeviceRemoved(AddonDeviceProxy)
 }
 
-type AddonAdapter struct {
+type Adapter struct {
 	adapter.Adapter
 	manager     *Manager
 	locker      *sync.Mutex
@@ -32,8 +32,8 @@ type AddonAdapter struct {
 	pluginId    string
 }
 
-func NewAddonAdapter(manager *Manager, adapterId, name string) *AddonAdapter {
-	a := &AddonAdapter{}
+func NewAdapter(manager *Manager, adapterId, name string) *Adapter {
+	a := &Adapter{}
 	a.Adapter = adapter.Adapter{
 		Id:   adapterId,
 		Name: name,
@@ -45,24 +45,24 @@ func NewAddonAdapter(manager *Manager, adapterId, name string) *AddonAdapter {
 	return a
 }
 
-func (a *AddonAdapter) HandleDeviceAdded(device AddonDeviceProxy) {
+func (a *Adapter) HandleDeviceAdded(device AddonDeviceProxy) {
 	a.AddDevice(device)
 	a.manager.handleDeviceAdded(device)
 }
 
-func (a *AddonAdapter) SendError(message string) {
+func (a *Adapter) SendError(message string) {
 	a.manager.send(messages.MessageType_PluginErrorNotification, messages.PluginErrorNotificationJsonData{
 		Message:  message,
 		PluginId: a.manager.packageName,
 	})
 }
 
-//func (a *AddonAdapter) ConnectedNotify(device *DeviceProxy, connected bool) {
+//func (a *Adapter) ConnectedNotify(device *DeviceProxy, connected bool) {
 //	a.manager.sendConnectedStateNotification(device, connected)
 //}
 
 // SendPairingPrompt 向前端UI发送提示
-func (a *AddonAdapter) SendPairingPrompt(prompt, url string, did string) {
+func (a *Adapter) SendPairingPrompt(prompt, url string, did string) {
 
 	var u *string
 	if url != "" {
@@ -79,7 +79,7 @@ func (a *AddonAdapter) SendPairingPrompt(prompt, url string, did string) {
 	})
 }
 
-func (a *AddonAdapter) SendUnpairingPrompt(prompt, url string, did string) {
+func (a *Adapter) SendUnpairingPrompt(prompt, url string, did string) {
 	var u *string
 	if url != "" {
 		u = &url
@@ -95,28 +95,28 @@ func (a *AddonAdapter) SendUnpairingPrompt(prompt, url string, did string) {
 	})
 }
 
-func (a *AddonAdapter) Send(mt messages.MessageType, data map[string]any) {
+func (a *Adapter) Send(mt messages.MessageType, data map[string]any) {
 	a.manager.send(mt, data)
 }
 
-func (a *AddonAdapter) CancelPairing() {
+func (a *Adapter) CancelPairing() {
 	if a.verbose {
 		log.Printf("adapter:(%s)- CancelPairing() not implemented", a.GetId())
 	}
 }
 
-func (a *AddonAdapter) GetId() string {
+func (a *Adapter) GetId() string {
 	return a.Id
 }
 
-func (a *AddonAdapter) GetName() string {
+func (a *Adapter) GetName() string {
 	if a.Name == "" {
 		return a.Id
 	}
 	return a.Name
 }
 
-func (a *AddonAdapter) GetDevice(id string) AddonDeviceProxy {
+func (a *Adapter) GetDevice(id string) AddonDeviceProxy {
 	device := a.Adapter.GetDevice(id)
 	if device != nil {
 		d, ok := device.(AddonDeviceProxy)
@@ -127,52 +127,52 @@ func (a *AddonAdapter) GetDevice(id string) AddonDeviceProxy {
 	return nil
 }
 
-func (a *AddonAdapter) Unload() {
+func (a *Adapter) Unload() {
 	if a.verbose {
 		log.Printf("adapter:(%s)- unloaded ", a.GetId())
 	}
 }
 
-func (a *AddonAdapter) HandleDeviceSaved(device AddonDeviceProxy) {
+func (a *Adapter) HandleDeviceSaved(device AddonDeviceProxy) {
 	if a.verbose {
 		log.Printf("adapter:(%s)- HandleDeviceSaved() not implemented", device.GetId())
 	}
 }
 
-func (a *AddonAdapter) HandleDeviceRemoved(device AddonDeviceProxy) {
+func (a *Adapter) HandleDeviceRemoved(device AddonDeviceProxy) {
 	a.Adapter.RemoveDevice(device.GetId())
 }
 
-func (a *AddonAdapter) close() {
+func (a *Adapter) close() {
 	fmt.Print("do some thing while a close")
 	a.manager.close()
 }
 
-func (a *AddonAdapter) ProxyRunning() bool {
+func (a *Adapter) ProxyRunning() bool {
 	return a.manager.running
 }
 
-func (a *AddonAdapter) CloseProxy() {
+func (a *Adapter) CloseProxy() {
 	a.manager.close()
 }
 
-func (a *AddonAdapter) setManager(m *Manager) {
+func (a *Adapter) setManager(m *Manager) {
 	a.manager = m
 }
 
-func (a *AddonAdapter) SetPin(deviceId string, pin any) {
+func (a *Adapter) SetPin(deviceId string, pin any) {
 
 }
 
-func (a *AddonAdapter) SetCredentials(deviceId, username, password string) {
+func (a *Adapter) SetCredentials(deviceId, username, password string) {
 
 }
 
-func (a *AddonAdapter) GetAddonManager() *Manager {
+func (a *Adapter) GetAddonManager() *Manager {
 	return a.manager
 }
 
-func (a *AddonAdapter) SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription) {
+func (a *Adapter) SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription) {
 	a.manager.send(messages.MessageType_DevicePropertyChangedNotification, messages.DevicePropertyChangedNotificationJsonData{
 		AdapterId: a.GetId(),
 		DeviceId:  deviceId,

@@ -3,18 +3,18 @@ package yeelight
 import (
 	"fmt"
 	"github.com/akominch/yeelight"
-	"github.com/galenliu/gateway/pkg/addon"
+	addon2 "github.com/galenliu/gateway/pkg/addon/addon"
 	uuid "github.com/satori/go.uuid"
 	"time"
 )
 
 type VirtualAdapter struct {
-	*addon.AddonAdapter
+	*addon2.Adapter
 }
 
-func NewVirtualAdapter(manager *addon.Manager, adapterId, name string) *VirtualAdapter {
+func NewVirtualAdapter(manager *addon2.Manager, adapterId, name string) *VirtualAdapter {
 	v := &VirtualAdapter{
-		addon.NewAddonAdapter(manager, adapterId, name),
+		addon2.NewAdapter(manager, adapterId, name),
 	}
 	v.StartPairing(300 * time.Duration(time.Millisecond))
 	return v

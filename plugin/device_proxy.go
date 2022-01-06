@@ -15,7 +15,7 @@ import (
 	"sync"
 )
 
-type Device struct {
+type device struct {
 	adapter *Adapter
 	*devices.Device
 	logger               logging.Logger
@@ -23,7 +23,7 @@ type Device struct {
 	setPropertyValueTask sync.Map
 }
 
-func newDevice(adapter *Adapter, msg messages.Device) *Device {
+func newDevice(adapter *Adapter, msg messages.Device) *device {
 
 	getString := func(s *string) string {
 		if s == nil {
@@ -118,7 +118,7 @@ func newDevice(adapter *Adapter, msg messages.Device) *Device {
 		return
 	}
 
-	device := &Device{
+	device := device{
 		adapter: adapter,
 		Device: &devices.Device{
 			Context: getString(msg.Context),
@@ -152,7 +152,7 @@ func newDevice(adapter *Adapter, msg messages.Device) *Device {
 		},
 	}
 	for n, p := range msg.Properties {
-		prop := properties.NewProperty(device, getPropertyDescription(p))
+		prop := properties.NewProperty(&device, getPropertyDescription(p))
 		if prop == nil {
 			continue
 		}
@@ -160,10 +160,10 @@ func newDevice(adapter *Adapter, msg messages.Device) *Device {
 	}
 
 	device.logger = adapter.logger
-	return device
+	return &device
 }
 
-func (device *Device) NotifyPropertyChanged(property properties.PropertyDescription) {
+func (device *device) NotifyPropertyChanged(property properties.PropertyDescription) {
 	t, ok := device.setPropertyValueTask.Load(*property.Name)
 	if ok {
 		task := t.(chan any)
@@ -192,15 +192,15 @@ func (device *Device) NotifyPropertyChanged(property properties.PropertyDescript
 	}
 }
 
-func (device *Device) notifyDeviceConnected(connected bool) {
+func (device *device) notifyDeviceConnected(connected bool) {
 	device.adapter.plugin.manager.bus.Pub(topic.DeviceConnected, device.GetId(), connected)
 }
 
-func (device *Device) notifyAction(actionDescription *actions.ActionDescription) {
+func (device *device) notifyAction(actionDescription *actions.ActionDescription) {
 	device.adapter.plugin.manager.bus.Pub(topic.DeviceActionStatus, device.GetId(), actionDescription)
 }
 
-func (device *Device) requestAction(ctx context.Context, id, name string, input map[string]any) error {
+func (device *device) requestAction(ctx context.Context, id, name string, input map[string]any) error {
 
 	t, ok := device.requestActionTask.LoadOrStore(id, make(chan bool))
 	if !ok {
@@ -231,7 +231,7 @@ func (device *Device) requestAction(ctx context.Context, id, name string, input 
 	}
 }
 
-func (device *Device) setPropertyValue(ctx context.Context, name string, value any) (any, error) {
+func (device *device) setPropertyValue(ctx context.Context, name string, value any) (any, error) {
 
 	p := device.GetProperty(name)
 	if p == nil {
@@ -281,6 +281,6 @@ func (device *Device) setPropertyValue(ctx context.Context, name string, value a
 	}
 }
 
-func (device *Device) getAdapter() *Adapter {
+func (device *device) getAdapter() *Adapter {
 	return device.adapter
 }

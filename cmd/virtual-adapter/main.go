@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/galenliu/gateway/cmd/virtual-adapter/pkg/yeelight"
-	"github.com/galenliu/gateway/pkg/addon"
+	"github.com/galenliu/gateway/pkg/addon/addon"
 	"os"
 	"os/signal"
 	"syscall"

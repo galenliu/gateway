@@ -23,17 +23,6 @@ func (m *Manager) RemoveDevice(id string) {
 	m.devices.Delete(id)
 }
 
-func (m *Manager) GetDevice(id string) Device {
-	i, ok := m.devices.Load(id)
-	if ok {
-		dev, ok := i.(Device)
-		if ok {
-			return dev
-		}
-	}
-	return nil
-}
-
 func (m *Manager) AddAdapter(a Adapter) {
 	m.devices.Store(a.GetId(), a)
 }
@@ -43,11 +32,11 @@ func (m *Manager) RemoveAdapter(id string) {
 }
 
 func (m *Manager) GetAdapter(id string) Adapter {
-	i, ok := m.adapters.Load(id)
+	v, ok := m.adapters.Load(id)
 	if ok {
-		a, ok := i.(Adapter)
+		v, ok := v.(Adapter)
 		if ok {
-			return a
+			return v
 		}
 	}
 	return nil
@@ -55,12 +44,23 @@ func (m *Manager) GetAdapter(id string) Adapter {
 
 func (m *Manager) GetAdapters() []Adapter {
 	adapters := make([]Adapter, 1)
-	m.adapters.Range(func(id any, v any) bool {
-		a, ok := v.(Adapter)
+	m.adapters.Range(func(key, value any) bool {
+		adp, ok := value.(Adapter)
 		if ok {
-			adapters = append(adapters, a)
+			adapters = append(adapters, adp)
 		}
 		return true
 	})
 	return adapters
+}
+
+func (m *Manager) GetDevice(id string) Device {
+	v, ok := m.devices.Load(id)
+	if ok {
+		v, ok := v.(Device)
+		if ok {
+			return v
+		}
+	}
+	return nil
 }

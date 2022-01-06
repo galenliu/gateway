@@ -223,8 +223,8 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 
 	//device handler
 	deviceId := json.Get(data, "deviceId").ToString()
-	device := plugin.manager.getDevice(deviceId)
-	if device == nil {
+	dev := plugin.manager.getDevice(deviceId)
+	if dev == nil {
 		plugin.logger.Errorf("device:%s not found", deviceId)
 		return
 	}
@@ -236,7 +236,7 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			plugin.logger.Errorf("Bad message : %s", err.Error())
 			return
 		}
-		device.notifyDeviceConnected(message.Connected)
+		dev.notifyDeviceConnected(message.Connected)
 		return
 
 	case messages.MessageType_DeviceActionStatusNotification:
@@ -246,7 +246,7 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			plugin.logger.Errorf("Bad message : %s", err.Error())
 			return
 		}
-		device.notifyAction(&actions.ActionDescription{
+		dev.notifyAction(&actions.ActionDescription{
 			Id:            message.Action.Id,
 			Name:          message.Action.Name,
 			Input:         message.Action.Input,
@@ -269,7 +269,7 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			return
 		}
 		go func() {
-			t, ok := device.requestActionTask.Load(message.ActionId)
+			t, ok := dev.requestActionTask.Load(message.ActionId)
 			if !ok {
 				return
 			}
@@ -298,14 +298,14 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 		}
 		go func() {
 			t, ok := adapter.setCredentialsTask.Load(message.MessageId)
-			task, ok1 := t.(chan *Device)
+			task, ok1 := t.(chan *device)
 			if !ok || task == nil || !ok1 {
 				plugin.logger.Errorf("unrecognized message id: %s", message.MessageId)
 				return
 			}
 			if message.Device != nil && message.Success {
 				newDev := newDevice(adapter, *message.Device)
-				adapter.devices.Store(newDev.GetId(), newDev)
+				adapter.AddDevice(newDev)
 				plugin.manager.devices.Store(newDev.GetId(), newDev)
 				select {
 				case task <- newDev:
@@ -325,7 +325,7 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			plugin.logger.Errorf("Bad message")
 			return
 		}
-		go device.NotifyPropertyChanged(properties.PropertyDescription{
+		go dev.NotifyPropertyChanged(properties.PropertyDescription{
 			Name:        message.Property.Name,
 			AtType:      message.Property.AtType,
 			Title:       message.Property.Title,
@@ -349,7 +349,7 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			plugin.logger.Errorf("Bad message : %s", err.Error())
 			return
 		}
-		go adapter.handleDeviceRemoved(device)
+		go adapter.handleDeviceRemoved(dev)
 		return
 
 	default:

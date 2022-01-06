@@ -15,7 +15,6 @@ type Adapter struct {
 	packageName        string
 	logger             logging.Logger
 	plugin             *Plugin
-	devices            sync.Map
 	setCredentialsTask sync.Map
 	setPinTask         sync.Map
 	nextId             int
@@ -103,7 +102,7 @@ func (adapter *Adapter) cancelPairing() {
 	adapter.send(messages.MessageType_AdapterCancelPairingCommand, data)
 }
 
-func (adapter *Adapter) removeThing(device *Device) {
+func (adapter *Adapter) removeThing(device *device) {
 	data := messages.AdapterRemoveDeviceResponseJsonData{
 		AdapterId: adapter.GetId(),
 		DeviceId:  device.GetId(),
@@ -113,7 +112,7 @@ func (adapter *Adapter) removeThing(device *Device) {
 	adapter.send(messages.MessageType_AdapterRemoveDeviceRequest, data)
 }
 
-func (adapter *Adapter) cancelRemoveThing(device *Device) {
+func (adapter *Adapter) cancelRemoveThing(device *device) {
 	data := messages.AdapterCancelRemoveDeviceCommandJsonData{
 		AdapterId: adapter.GetId(),
 		DeviceId:  device.GetId(),
@@ -127,34 +126,34 @@ func (adapter *Adapter) send(messageType messages.MessageType, data any) {
 	adapter.plugin.send(messageType, data)
 }
 
-func (adapter *Adapter) handleDeviceRemoved(d *Device) {
-	adapter.devices.Delete(d.GetId())
+func (adapter *Adapter) handleDeviceRemoved(d *device) {
+	adapter.RemoveDevice(d.GetId())
 	adapter.plugin.manager.handleDeviceRemoved(d)
 }
 
-func (adapter *Adapter) handleDeviceAdded(device *Device) {
-	adapter.devices.Store(device.GetId(), device)
+func (adapter *Adapter) handleDeviceAdded(device *device) {
+	adapter.AddDevice(device)
 	adapter.plugin.manager.handleDeviceAdded(device)
 }
 
-func (adapter *Adapter) getDevice(deviceId string) *Device {
-	d, ok := adapter.devices.Load(deviceId)
-	device, ok := d.(*Device)
+func (adapter *Adapter) getDevice(deviceId string) *device {
+	d := adapter.GetDevice(deviceId)
+	device, ok := d.(device)
 	if !ok {
 		return nil
 	}
-	return device
+	return &device
 }
 
-func (adapter *Adapter) getDevices() (devices []*Device) {
-	adapter.devices.Range(func(key, value any) bool {
-		device, ok := value.(*Device)
+func (adapter *Adapter) getDevices() (devices []*device) {
+	devices = make([]*device, 1)
+	for _, dev := range adapter.GetDevices() {
+		d, ok := dev.(*device)
 		if ok {
-			devices = append(devices, device)
+			devices = append(devices, d)
 		}
-		return true
-	})
-	return
+	}
+	return devices
 }
 
 func (adapter *Adapter) getPlugin() *Plugin {

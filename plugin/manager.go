@@ -188,13 +188,13 @@ func (m *Manager) handleAdapterUnload(adapterId string) {
 	m.RemoveAdapter(adapterId)
 }
 
-func (m *Manager) handleDeviceAdded(device *Device) {
+func (m *Manager) handleDeviceAdded(device *device) {
 	m.devices.Store(device.GetId(), device)
 	m.logger.Infof("Addon_Device added: %s", util.JsonIndent(things.AsWebOfThing(device.Device)))
 	m.bus.Pub(topic.DeviceAdded, device.GetId(), device.Device)
 }
 
-func (m *Manager) handleDeviceRemoved(device *Device) {
+func (m *Manager) handleDeviceRemoved(device *device) {
 	m.devices.Delete(device.GetId())
 	task, ok := m.deferredRemove.Load(device.GetId())
 	taskChan := task.(chan struct{})
@@ -247,16 +247,13 @@ func (m *Manager) getExtensions() (adapters []*Extension) {
 	return
 }
 
-func (m *Manager) getDevice(deviceId string) *Device {
-	d, ok := m.devices.Load(deviceId)
-	if !ok {
-		return nil
+func (m *Manager) getDevice(deviceId string) *device {
+	d := m.GetDevice(deviceId)
+	device, ok := d.(*device)
+	if ok {
+		return device
 	}
-	device, ok := d.(*Device)
-	if !ok {
-		return nil
-	}
-	return device
+	return nil
 }
 
 func (m *Manager) getInstallAddon(addonId string) *Addon {

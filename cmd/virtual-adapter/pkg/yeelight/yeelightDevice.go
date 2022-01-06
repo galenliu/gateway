@@ -3,21 +3,22 @@ package yeelight
 import (
 	"github.com/akominch/yeelight"
 	"github.com/galenliu/gateway/pkg/addon"
+	addon2 "github.com/galenliu/gateway/pkg/addon/addon"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 )
 
 type YeelightDevice struct {
-	*addon.AddonDevice
+	*addon2.AddonDevice
 	*yeelight.YeelightParams
 	*yeelight.Bulb
 }
 
-func NewYeelightBulb(adapter addon.AddonAdapterProxy, bulb *yeelight.Bulb, params *yeelight.YeelightParams) *YeelightDevice {
+func NewYeelightBulb(adapter addon2.AddonAdapterProxy, bulb *yeelight.Bulb, params *yeelight.YeelightParams) *YeelightDevice {
 	yeeDevice := &YeelightDevice{
 		YeelightParams: params,
 		Bulb:           bulb,
 	}
-	yeeDevice.AddonDevice = addon.NewDevice(adapter, []string{"Light", "OnOffSwitch"}, params.Name, "yeelight"+params.Name)
+	yeeDevice.AddonDevice = addon2.NewDevice(adapter, []string{"Light", "OnOffSwitch"}, params.Name, "yeelight"+params.Name)
 	for _, method := range params.Support {
 		switch method {
 		case "set_power":

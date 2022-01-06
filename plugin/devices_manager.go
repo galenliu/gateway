@@ -56,9 +56,9 @@ func (m *Manager) GetMapOfDevices() map[string]*devices.Device {
 	return nil
 }
 
-func (m *Manager) GetDevices() (devices []*Device) {
+func (m *Manager) GetDevices() (devices []*device) {
 	m.devices.Range(func(key, value any) bool {
-		device, ok := value.(*Device)
+		device, ok := value.(*device)
 		if ok {
 			devices = append(devices, device)
 		}
