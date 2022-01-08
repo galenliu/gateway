@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon/actions"
+	"github.com/galenliu/gateway/pkg/addon/adapter"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/events"
 	"github.com/galenliu/gateway/pkg/addon/properties"
@@ -201,10 +202,10 @@ func (device *device) requestAction(ctx context.Context, id, name string, input 
 		var message = messages.DeviceRequestActionRequestJsonData{
 			ActionId:   id,
 			ActionName: name,
-			AdapterId:  device.getAdapter().GetId(),
+			AdapterId:  device.GetAdapter().GetId(),
 			DeviceId:   device.GetId(),
 			Input:      input,
-			PluginId:   device.getAdapter().getPlugin().pluginId,
+			PluginId:   device.adapter.plugin.pluginId,
 		}
 		device.adapter.send(messages.MessageType_DeviceRequestActionRequest, message)
 	}
@@ -256,13 +257,13 @@ func (device *device) setPropertyValue(ctx context.Context, name string, value a
 	}()
 	if !ok {
 		data := messages.DeviceSetPropertyCommandJsonData{
-			AdapterId:     device.getAdapter().GetId(),
+			AdapterId:     device.GetAdapter().GetId(),
 			DeviceId:      device.GetId(),
-			PluginId:      device.getAdapter().getPlugin().getId(),
+			PluginId:      device.adapter.plugin.pluginId,
 			PropertyName:  name,
 			PropertyValue: value,
 		}
-		device.getAdapter().send(messages.MessageType_DeviceSetPropertyCommand, data)
+		device.adapter.send(messages.MessageType_DeviceSetPropertyCommand, data)
 	}
 
 	for {
@@ -275,6 +276,6 @@ func (device *device) setPropertyValue(ctx context.Context, name string, value a
 	}
 }
 
-func (device *device) getAdapter() *Adapter {
+func (device *device) GetAdapter() adapter.AdapterProxy {
 	return device.adapter
 }

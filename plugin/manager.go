@@ -140,7 +140,7 @@ func (m *Manager) RemoveThing(deviceId string) error {
 		m.logger.Infof("thing %s removed", deviceId)
 		return nil
 	}
-	adapter := device.getAdapter()
+	adapter := device.GetAdapter()
 	if adapter == nil {
 		return fmt.Errorf("adapter not found")
 	}
@@ -173,7 +173,7 @@ func (m *Manager) CancelRemoveThing(deviceId string) {
 	if device == nil {
 		return
 	}
-	adapter := device.getAdapter()
+	adapter := device.GetAdapter()
 	if adapter == nil {
 		return
 	}
