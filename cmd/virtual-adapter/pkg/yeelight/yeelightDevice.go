@@ -15,10 +15,10 @@ type YeelightDevice struct {
 
 func NewYeelightBulb(adapter addon2.AddonAdapterProxy, bulb *yeelight.Bulb, params *yeelight.YeelightParams) *YeelightDevice {
 	yeeDevice := &YeelightDevice{
+		AddonDevice:    addon2.NewDevice(adapter, []string{"Light", "OnOffSwitch"}, params.Name, "yeelight"+params.Name),
 		YeelightParams: params,
 		Bulb:           bulb,
 	}
-	yeeDevice.AddonDevice = addon2.NewDevice(adapter, []string{"Light", "OnOffSwitch"}, params.Name, "yeelight"+params.Name)
 	for _, method := range params.Support {
 		switch method {
 		case "set_power":

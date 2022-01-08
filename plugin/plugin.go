@@ -306,7 +306,7 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			if message.Device != nil && message.Success {
 				newDev := newDevice(adapter, *message.Device)
 				adapter.AddDevice(newDev)
-				plugin.manager.devices.Store(newDev.GetId(), newDev)
+				plugin.manager.AddDevice(newDev)
 				select {
 				case task <- newDev:
 				}

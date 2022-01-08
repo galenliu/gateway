@@ -57,14 +57,14 @@ func (m *Manager) GetMapOfDevices() map[string]*devices.Device {
 }
 
 func (m *Manager) GetDevices() (devices []*device) {
-	m.devices.Range(func(key, value any) bool {
-		device, ok := value.(*device)
+	devices = make([]*device, 1)
+	for _, s := range m.Manager.GetDevices() {
+		device, ok := s.(*device)
 		if ok {
 			devices = append(devices, device)
 		}
-		return true
-	})
-	return
+	}
+	return devices
 }
 
 func (m *Manager) SetPIN(ctx context.Context, thingId string, pin string) (*messages.Device, error) {

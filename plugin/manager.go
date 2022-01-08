@@ -42,7 +42,6 @@ type Manager struct {
 	configPath     string
 	pluginServer   *PluginsServer
 	preferences    messages.PluginRegisterResponseJsonDataPreferences
-	devices        sync.Map
 	outlets        sync.Map
 	installAddons  sync.Map
 	extensions     sync.Map
@@ -61,6 +60,7 @@ type Manager struct {
 
 func NewAddonsManager(ctx context.Context, conf Config, s managerStore, bus *bus.Bus, log logging.Logger) *Manager {
 	am := &Manager{}
+	am.Manager = manager.NewManager()
 	am.config = conf
 	am.ctx = ctx
 	am.logger = log
@@ -189,13 +189,13 @@ func (m *Manager) handleAdapterUnload(adapterId string) {
 }
 
 func (m *Manager) handleDeviceAdded(device *device) {
-	m.devices.Store(device.GetId(), device)
+	m.AddDevice(device)
 	m.logger.Infof("Addon_Device added: %s", util.JsonIndent(things.AsWebOfThing(device.Device)))
 	m.bus.Pub(topic.DeviceAdded, device.GetId(), device.Device)
 }
 
 func (m *Manager) handleDeviceRemoved(device *device) {
-	m.devices.Delete(device.GetId())
+	m.RemoveDevice(device.GetId())
 	task, ok := m.deferredRemove.Load(device.GetId())
 	taskChan := task.(chan struct{})
 	if ok {

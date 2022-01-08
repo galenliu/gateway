@@ -2,7 +2,6 @@ package devices
 
 import (
 	"github.com/galenliu/gateway/pkg/addon/actions"
-	"github.com/galenliu/gateway/pkg/addon/adapter"
 	"github.com/galenliu/gateway/pkg/addon/events"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
@@ -13,7 +12,6 @@ type DeviceActions map[string]actions.Action
 type DeviceEvents map[string]events.Event
 
 type Device struct {
-	adapter             adapter.AdapterProxy
 	Context             string           `json:"@context,omitempty"`
 	AtType              []string         `json:"@type,omitempty"`
 	Id                  string           `json:"id,omitempty"`
@@ -68,10 +66,6 @@ func (d Device) GetTitle() string {
 
 func (d Device) GetDescription() string {
 	return d.Description
-}
-
-func (d Device) GetAdapter() adapter.AdapterProxy {
-	return d.adapter
 }
 
 func (d Device) GetLink() []DeviceLink {

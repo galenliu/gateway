@@ -10,6 +10,10 @@ type Adapter interface {
 	GetId() string
 }
 
+func NewManager() *Manager {
+	return &Manager{}
+}
+
 type Manager struct {
 	devices  sync.Map
 	adapters sync.Map
@@ -62,5 +66,17 @@ func (m *Manager) GetDevice(id string) Device {
 			return v
 		}
 	}
+	return nil
+}
+
+func (m *Manager) GetDevices() []Device {
+	devices := make([]Device, 1)
+	m.devices.Range(func(key, value any) bool {
+		device, ok := value.(Device)
+		if ok {
+			devices = append(devices, device)
+		}
+		return true
+	})
 	return nil
 }

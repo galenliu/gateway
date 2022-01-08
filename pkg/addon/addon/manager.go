@@ -20,6 +20,17 @@ type Manager struct {
 	preferences messages.PluginRegisterResponseJsonDataPreferences
 }
 
+type DeviceProxy interface {
+	GetId() string
+	GetAdapter() AdapterProxy
+	ToMessage() messages.Device
+}
+
+type AdapterProxy interface {
+	GetId() string
+	GetName() string
+}
+
 var once sync.Once
 var instance *Manager
 
@@ -27,6 +38,7 @@ func NewAddonManager(packageName string) (*Manager, error) {
 	once.Do(
 		func() {
 			instance = &Manager{}
+			instance.Manager = manager.NewManager()
 			instance.packageName = packageName
 			instance.verbose = true
 			instance.registered = false
@@ -44,7 +56,7 @@ func NewAddonManager(packageName string) (*Manager, error) {
 	return instance, nil
 }
 
-func (m *Manager) AddAdapters(adapters ...AddonAdapterProxy) {
+func (m *Manager) AddAdapters(adapters ...AdapterProxy) {
 	for _, adapter := range adapters {
 		m.AddAdapter(adapter)
 		m.send(messages.MessageType_AdapterAddedNotification, messages.AdapterAddedNotificationJsonData{

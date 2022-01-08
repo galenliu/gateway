@@ -131,18 +131,12 @@ func newDevice(adapter *Adapter, msg messages.Device) *device {
 				}
 				return msg.Id
 			}(),
-			Description: func() string {
-				d := getString(msg.Description)
-				if d != "" {
-					return d
-				}
-				return *msg.Description
-			}(),
-			Links:    linksFunc(msg.Links),
-			BaseHref: *msg.BaseHref,
-			Pin:      pinFunc(msg.Pin),
-			Actions:  actionsFunc(msg.Actions),
-			Events:   eventsFunc(msg.Events),
+			Description: "",
+			Links:       linksFunc(msg.Links),
+			BaseHref:    *msg.BaseHref,
+			Pin:         pinFunc(msg.Pin),
+			Actions:     actionsFunc(msg.Actions),
+			Events:      eventsFunc(msg.Events),
 			CredentialsRequired: func() bool {
 				if msg.CredentialsRequired == nil {
 					return false

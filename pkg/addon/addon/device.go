@@ -1,6 +1,7 @@
 package addon
 
 import (
+	"github.com/galenliu/gateway/pkg/addon/adapter"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
@@ -8,6 +9,7 @@ import (
 
 type AddonDeviceProxy interface {
 	properties.DeviceProxy
+	GetId() string
 	SetCredentials(username, password string) error
 	ToMessage() messages.Device
 }
@@ -44,4 +46,8 @@ func (d AddonDevice) NotifyPropertyChanged(prop properties.PropertyDescription) 
 
 func (d AddonDevice) SetCredentials(username, password string) error {
 	return nil
+}
+
+func (d AddonDevice) GetAdapter() adapter.AdapterProxy {
+	return d.adapter
 }
