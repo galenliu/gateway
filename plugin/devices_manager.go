@@ -72,7 +72,7 @@ func (m *Manager) SetPIN(ctx context.Context, thingId string, pin string) (*mess
 	if device == nil {
 		return nil, fmt.Errorf("con not finid addon:" + thingId)
 	}
-	return device.GetAdapter().setDevicePin(ctx, thingId, pin)
+	return device.getAdapter().setDevicePin(ctx, thingId, pin)
 }
 
 func (m *Manager) SetCredentials(ctx context.Context, thingId, username, password string) (*messages.Device, error) {
@@ -80,5 +80,5 @@ func (m *Manager) SetCredentials(ctx context.Context, thingId, username, passwor
 	if device == nil {
 		return nil, fmt.Errorf("con not finid addon:" + thingId)
 	}
-	return device.GetAdapter().setDeviceCredentials(ctx, thingId, username, password)
+	return device.getAdapter().setDeviceCredentials(ctx, thingId, username, password)
 }

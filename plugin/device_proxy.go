@@ -279,3 +279,7 @@ func (device *device) setPropertyValue(ctx context.Context, name string, value a
 func (device *device) GetAdapter() adapter.AdapterProxy {
 	return device.adapter
 }
+
+func (device *device) getAdapter() *Adapter {
+	return device.adapter
+}
