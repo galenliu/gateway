@@ -3,10 +3,10 @@ package container
 import (
 	"context"
 	"fmt"
+	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/events"
-	"github.com/galenliu/gateway/pkg/addon/properties"
 	bus "github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/logging"
@@ -208,7 +208,7 @@ func (c *ThingsContainer) handleDeviceConnected(deviceId string, connected bool)
 	}
 }
 
-func (c *ThingsContainer) handleDevicePropertyChanged(deviceId string, property properties.PropertyDescription) {
+func (c *ThingsContainer) handleDevicePropertyChanged(deviceId string, property addon.PropertyDescription) {
 	t := c.GetThing(deviceId)
 	if t != nil {
 		t.bus.Pub(topic.ThingPropertyChanged, t.GetId(), property)

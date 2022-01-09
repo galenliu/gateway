@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"fmt"
 	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 )
@@ -36,9 +37,20 @@ func (d Device) NotifyPropertyChanged(prop addon.PropertyDescription) {
 }
 
 func (d Device) SetCredentials(username, password string) error {
-	return nil
+	return fmt.Errorf("SetCredentials not implemented")
 }
 
 func (d Device) GetAdapter() addon.AdapterProxy {
 	return d.adapter
+}
+
+func (d Device) GetProperty(id string) addon.PropertyProxy {
+	p := d.Device.GetProperty(id)
+	if p != nil {
+		p, ok := p.(addon.PropertyProxy)
+		if ok {
+			return p
+		}
+	}
+	return nil
 }

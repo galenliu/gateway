@@ -1,28 +1,17 @@
 package addon
 
 import (
+	"github.com/galenliu/gateway/pkg/addon/devices"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"time"
 )
 
 type PropertyProxy interface {
-	GetType() string
-	GetTitle() string
-	GetName() string
-	GetUnit() string
-	GetEnum() []any
-	GetAtType() string
-	GetDescription() string
-	GetMinimum() any
-	GetMaximum() any
-	GetMultipleOf() any
-	GetValue() any
-	IsReadOnly() bool
+	devices.PropertyEntity
 	SetValue(a any) bool
 	SetTitle(s string) bool
 	SetDescription(description string) bool
 	ToDescription() PropertyDescription
-	ToMessage() messages.Property
 }
 
 type DeviceProxy interface {

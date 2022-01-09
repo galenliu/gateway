@@ -1,15 +1,30 @@
 package devices
 
 import (
-	_type "github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/events"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 )
 
-type DeviceProperties map[string]_type.PropertyProxy
+type DeviceProperties map[string]PropertyEntity
 type DeviceActions map[string]actions.Action
 type DeviceEvents map[string]events.Event
+
+type PropertyEntity interface {
+	ToMessage() messages.Property
+	GetType() string
+	GetTitle() string
+	GetName() string
+	GetUnit() string
+	GetEnum() []any
+	GetAtType() string
+	GetDescription() string
+	GetMinimum() any
+	GetMaximum() any
+	GetMultipleOf() any
+	GetValue() any
+	IsReadOnly() bool
+}
 
 type Device struct {
 	Context             string           `json:"@context,omitempty"`
@@ -41,7 +56,7 @@ type DevicePin struct {
 	Pattern  string `json:"pattern,omitempty"`
 }
 
-func (d Device) AddProperty(n string, p _type.PropertyProxy) {
+func (d Device) AddProperty(n string, p PropertyEntity) {
 	if d.Properties == nil {
 		d.Properties = make(DeviceProperties, 1)
 	}
@@ -76,11 +91,11 @@ func (d Device) GetBaseHref() string {
 	return d.BaseHref
 }
 
-func (d Device) GetProperties() map[string]_type.PropertyProxy {
+func (d Device) GetProperties() map[string]PropertyEntity {
 	return d.Properties
 }
 
-func (d Device) GetProperty(id string) _type.PropertyProxy {
+func (d Device) GetProperty(id string) PropertyEntity {
 	p, ok := d.Properties[id]
 	if ok {
 		return p

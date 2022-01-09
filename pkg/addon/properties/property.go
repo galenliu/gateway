@@ -6,8 +6,12 @@ import (
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 )
 
+type DeviceHandler interface {
+	NotifyPropertyChanged(property _type.PropertyDescription)
+}
+
 type Property struct {
-	device      _type.DeviceProxy
+	device      DeviceHandler
 	Name        string   `json:"name"`
 	Title       string   `json:"title,omitempty"`
 	Type        string   `json:"type"`
@@ -23,7 +27,7 @@ type Property struct {
 	Value any `json:"value"`
 }
 
-func NewProperty(device _type.DeviceProxy, description _type.PropertyDescription) *Property {
+func NewProperty(device DeviceHandler, description _type.PropertyDescription) *Property {
 	getString := func(s *string) string {
 		if s != nil {
 			return *s

@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/addon/actions"
-	"github.com/galenliu/gateway/pkg/addon/adapter"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/events"
 	"github.com/galenliu/gateway/pkg/addon/properties"
@@ -57,8 +57,8 @@ func newDevice(adapter *Adapter, msg messages.Device) *device {
 		}
 	}
 
-	getPropertyDescription := func(p messages.Property) properties.PropertyDescription {
-		return properties.PropertyDescription{
+	getPropertyDescription := func(p messages.Property) addon.PropertyDescription {
+		return addon.PropertyDescription{
 			Name:        p.Name,
 			AtType:      p.AtType,
 			Title:       p.Title,
@@ -158,7 +158,7 @@ func newDevice(adapter *Adapter, msg messages.Device) *device {
 	return &device
 }
 
-func (device *device) NotifyPropertyChanged(property properties.PropertyDescription) {
+func (device *device) NotifyPropertyChanged(property addon.PropertyDescription) {
 	t, ok := device.setPropertyValueTask.Load(*property.Name)
 	if ok {
 		task := t.(chan any)
@@ -166,7 +166,7 @@ func (device *device) NotifyPropertyChanged(property properties.PropertyDescript
 		case task <- property.Value:
 		}
 	}
-	p := device.GetProperty(*property.Name)
+	p := device.getProperty(*property.Name)
 	if p == nil {
 		return
 	}
@@ -202,7 +202,7 @@ func (device *device) requestAction(ctx context.Context, id, name string, input 
 		var message = messages.DeviceRequestActionRequestJsonData{
 			ActionId:   id,
 			ActionName: name,
-			AdapterId:  device.GetAdapter().GetId(),
+			AdapterId:  device.getAdapter().GetId(),
 			DeviceId:   device.GetId(),
 			Input:      input,
 			PluginId:   device.adapter.plugin.pluginId,
@@ -257,7 +257,7 @@ func (device *device) setPropertyValue(ctx context.Context, name string, value a
 	}()
 	if !ok {
 		data := messages.DeviceSetPropertyCommandJsonData{
-			AdapterId:     device.GetAdapter().GetId(),
+			AdapterId:     device.getAdapter().GetId(),
 			DeviceId:      device.GetId(),
 			PluginId:      device.adapter.plugin.pluginId,
 			PropertyName:  name,
@@ -276,10 +276,21 @@ func (device *device) setPropertyValue(ctx context.Context, name string, value a
 	}
 }
 
-func (device *device) GetAdapter() adapter.AdapterProxy {
+func (device *device) getAdapter() *Adapter {
 	return device.adapter
 }
 
-func (device *device) getAdapter() *Adapter {
-	return device.adapter
+func (device *device) getProperty(id string) addon.PropertyProxy {
+	p := device.GetProperty(id)
+	if p != nil {
+		prop, ok := p.(addon.PropertyProxy)
+		if ok {
+			return prop
+		}
+	}
+	return nil
+}
+
+func (device *device) GetAdapter() addon.AdapterProxy {
+	return nil
 }

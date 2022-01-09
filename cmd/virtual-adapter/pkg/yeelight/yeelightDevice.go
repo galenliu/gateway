@@ -84,3 +84,7 @@ func NewYeelightBulb(adapter addon.AdapterProxy, bulb *yeelight.Bulb, params *ye
 	}
 	return yeeDevice
 }
+
+func (d YeelightDevice) SetCredentials(username, password string) error {
+	return nil
+}
