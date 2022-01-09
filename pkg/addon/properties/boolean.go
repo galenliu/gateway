@@ -1,10 +1,14 @@
 package properties
 
+import (
+	_type "github.com/galenliu/gateway/pkg/addon"
+)
+
 type BooleanProperty struct {
 	*Property
 }
 
-func NewBooleanProperty(device DeviceProxy, description PropertyDescription) *BooleanProperty {
+func NewBooleanProperty(device _type.DeviceProxy, description _type.PropertyDescription) *BooleanProperty {
 	p := &BooleanProperty{}
 	p.Property = NewProperty(device, description)
 	if p.Property == nil {

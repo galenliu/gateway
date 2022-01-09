@@ -1,31 +1,16 @@
-package addon
+package proxy
 
 import (
 	"fmt"
+	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/addon/adapter"
-	"github.com/galenliu/gateway/pkg/addon/properties"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"log"
-	"sync"
-	"time"
 )
-
-type AddonAdapterProxy interface {
-	adapter.AdapterProxy
-	GetDevice(deviceId string) AddonDeviceProxy
-	SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription)
-	Unload()
-	CancelPairing()
-	StartPairing(timeout time.Duration)
-	HandleDeviceSaved(AddonDeviceProxy)
-	HandleDeviceRemoved(AddonDeviceProxy)
-}
 
 type Adapter struct {
 	adapter.Adapter
 	manager     *Manager
-	locker      *sync.Mutex
-	cancelChan  chan struct{}
 	packageName string
 	IsPairing   bool
 	verbose     bool
@@ -39,13 +24,11 @@ func NewAdapter(manager *Manager, adapterId, name string) *Adapter {
 		Name: name,
 	}
 	a.manager = manager
-	a.locker = new(sync.Mutex)
-	a.cancelChan = make(chan struct{})
 	a.verbose = true
 	return a
 }
 
-func (a *Adapter) HandleDeviceAdded(device AddonDeviceProxy) {
+func (a *Adapter) HandleDeviceAdded(device addon.DeviceProxy) {
 	a.AddDevice(device)
 	a.manager.handleDeviceAdded(device)
 }
@@ -116,10 +99,10 @@ func (a *Adapter) GetName() string {
 	return a.Name
 }
 
-func (a *Adapter) GetDevice(id string) AddonDeviceProxy {
+func (a *Adapter) GetDevice(id string) addon.DeviceProxy {
 	device := a.Adapter.GetDevice(id)
 	if device != nil {
-		d, ok := device.(AddonDeviceProxy)
+		d, ok := device.(addon.DeviceProxy)
 		if ok {
 			return d
 		}
@@ -133,13 +116,13 @@ func (a *Adapter) Unload() {
 	}
 }
 
-func (a *Adapter) HandleDeviceSaved(device AddonDeviceProxy) {
+func (a *Adapter) HandleDeviceSaved(device addon.DeviceProxy) {
 	if a.verbose {
 		log.Printf("adapter:(%s)- HandleDeviceSaved() not implemented", device.GetId())
 	}
 }
 
-func (a *Adapter) HandleDeviceRemoved(device AddonDeviceProxy) {
+func (a *Adapter) HandleDeviceRemoved(device addon.DeviceProxy) {
 	a.Adapter.RemoveDevice(device.GetId())
 }
 
@@ -172,7 +155,7 @@ func (a *Adapter) GetAddonManager() *Manager {
 	return a.manager
 }
 
-func (a *Adapter) SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription) {
+func (a *Adapter) SendPropertyChangedNotification(deviceId string, property addon.PropertyDescription) {
 	a.manager.send(messages.MessageType_DevicePropertyChangedNotification, messages.DevicePropertyChangedNotificationJsonData{
 		AdapterId: a.GetId(),
 		DeviceId:  deviceId,

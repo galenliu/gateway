@@ -68,5 +68,3 @@ const (
 	VideoProperty             = "VideoProperty"
 	VoltageProperty           = "VoltageProperty"
 )
-
-const IpcDefaultPort = "9500"

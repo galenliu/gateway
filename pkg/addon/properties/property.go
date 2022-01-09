@@ -2,58 +2,12 @@ package properties
 
 import (
 	"encoding/json"
-	"github.com/galenliu/gateway/pkg/addon/adapter"
+	_type "github.com/galenliu/gateway/pkg/addon"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 )
 
-type PropertyProxy interface {
-	GetType() string
-	GetTitle() string
-	GetName() string
-	GetUnit() string
-	GetEnum() []any
-	GetAtType() string
-	GetDescription() string
-	GetMinimum() any
-	GetMaximum() any
-	GetMultipleOf() any
-	GetValue() any
-	IsReadOnly() bool
-	SetValue(a any) bool
-	SetTitle(s string) bool
-	SetDescription(description string) bool
-	ToDescription() PropertyDescription
-	ToMessage() messages.Property
-}
-
-type DeviceProxy interface {
-	GetId() string
-	GetAdapter() adapter.AdapterProxy
-	GetProperty(id string) PropertyProxy
-	NotifyPropertyChanged(p PropertyDescription)
-}
-
-type PropertyDescription struct {
-	Name        *string            `json:"name,omitempty"`
-	AtType      *string            `json:"@type,omitempty"`
-	Title       *string            `json:"title,omitempty"`
-	Type        string             `json:"type,omitempty"`
-	Unit        *string            `json:"unit,omitempty"`
-	Description *string            `json:"description,omitempty"`
-	Minimum     *float64           `json:"minimum,omitempty"`
-	Maximum     *float64           `json:"maximum,omitempty"`
-	Enum        []any              `json:"enum,omitempty"`
-	ReadOnly    *bool              `json:"readOnly,omitempty"`
-	MultipleOf  *float64           `json:"multipleOf,omitempty"`
-	Links       []PropertyLinkElem `json:"links,omitempty"`
-	Value       any                `json:"value,omitempty"`
-}
-
-type PropertyLinkElem struct {
-}
-
 type Property struct {
-	device      DeviceProxy
+	device      _type.DeviceProxy
 	Name        string   `json:"name"`
 	Title       string   `json:"title,omitempty"`
 	Type        string   `json:"type"`
@@ -69,7 +23,7 @@ type Property struct {
 	Value any `json:"value"`
 }
 
-func NewProperty(device DeviceProxy, description PropertyDescription) *Property {
+func NewProperty(device _type.DeviceProxy, description _type.PropertyDescription) *Property {
 	getString := func(s *string) string {
 		if s != nil {
 			return *s
@@ -103,7 +57,7 @@ func NewProperty(device DeviceProxy, description PropertyDescription) *Property 
 }
 
 func (p *Property) MarshalJSON() ([]byte, error) {
-	propertyDescription := PropertyDescription{
+	propertyDescription := _type.PropertyDescription{
 		Name:        &p.Name,
 		AtType:      &p.AtType,
 		Title:       &p.Title,
@@ -206,7 +160,7 @@ func (p *Property) SetValue(value any) bool {
 	return true
 }
 
-func (p *Property) ToDescription() PropertyDescription {
+func (p *Property) ToDescription() _type.PropertyDescription {
 	get := func(s string) *string {
 		if s == "" {
 			return nil
@@ -223,7 +177,7 @@ func (p *Property) ToDescription() PropertyDescription {
 		}
 		return nil
 	}
-	return PropertyDescription{
+	return _type.PropertyDescription{
 		Name:        get(p.Name),
 		AtType:      get(p.AtType),
 		Title:       get(p.Title),

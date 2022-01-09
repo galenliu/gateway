@@ -1,11 +1,14 @@
 package yeelight
 
-import "github.com/galenliu/gateway/pkg/addon/properties"
+import (
+	_type "github.com/galenliu/gateway/pkg/addon"
+	"github.com/galenliu/gateway/pkg/addon/properties"
+)
 
 type YeelightProperty struct {
 	*properties.Property
 }
 
-func NewYeelightProperty(device properties.DeviceProxy, description properties.PropertyDescription) *YeelightProperty {
+func NewYeelightProperty(device _type.DeviceProxy, description _type.PropertyDescription) *YeelightProperty {
 	return &YeelightProperty{properties.NewProperty(device, description)}
 }

@@ -3,19 +3,18 @@ package yeelight
 import (
 	"github.com/akominch/yeelight"
 	"github.com/galenliu/gateway/pkg/addon"
-	addon2 "github.com/galenliu/gateway/pkg/addon/addon"
-	"github.com/galenliu/gateway/pkg/addon/properties"
+	"github.com/galenliu/gateway/pkg/addon/proxy"
 )
 
 type YeelightDevice struct {
-	*addon2.AddonDevice
+	*proxy.Device
 	*yeelight.YeelightParams
 	*yeelight.Bulb
 }
 
-func NewYeelightBulb(adapter addon2.AddonAdapterProxy, bulb *yeelight.Bulb, params *yeelight.YeelightParams) *YeelightDevice {
+func NewYeelightBulb(adapter addon.AdapterProxy, bulb *yeelight.Bulb, params *yeelight.YeelightParams) *YeelightDevice {
 	yeeDevice := &YeelightDevice{
-		AddonDevice:    addon2.NewDevice(adapter, []string{"Light", "OnOffSwitch"}, params.Name, "yeelight"+params.Name),
+		Device:         proxy.NewDevice(adapter, []string{"Light", "OnOffSwitch"}, params.Name, "yeelight"+params.Name),
 		YeelightParams: params,
 		Bulb:           bulb,
 	}
@@ -23,7 +22,7 @@ func NewYeelightBulb(adapter addon2.AddonAdapterProxy, bulb *yeelight.Bulb, para
 		switch method {
 		case "set_power":
 			var atType = "OnOffProperty"
-			prop := NewYeelightProperty(yeeDevice, properties.PropertyDescription{
+			prop := NewYeelightProperty(yeeDevice, addon.PropertyDescription{
 				Name:        nil,
 				AtType:      &atType,
 				Title:       nil,
@@ -43,7 +42,7 @@ func NewYeelightBulb(adapter addon2.AddonAdapterProxy, bulb *yeelight.Bulb, para
 			var min float64 = 0
 			var max float64 = 100
 			var atType = "LevelProperty"
-			prop := NewYeelightProperty(yeeDevice, properties.PropertyDescription{
+			prop := NewYeelightProperty(yeeDevice, addon.PropertyDescription{
 				Name:        nil,
 				AtType:      &atType,
 				Title:       nil,
@@ -63,7 +62,7 @@ func NewYeelightBulb(adapter addon2.AddonAdapterProxy, bulb *yeelight.Bulb, para
 			var min float64 = 0
 			var max float64 = 100
 			var atType = "LevelProperty"
-			prop := NewYeelightProperty(yeeDevice, properties.PropertyDescription{
+			prop := NewYeelightProperty(yeeDevice, addon.PropertyDescription{
 				Name:        nil,
 				AtType:      &atType,
 				Title:       nil,

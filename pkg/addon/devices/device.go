@@ -1,13 +1,13 @@
 package devices
 
 import (
+	_type "github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/events"
-	"github.com/galenliu/gateway/pkg/addon/properties"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 )
 
-type DeviceProperties map[string]properties.PropertyProxy
+type DeviceProperties map[string]_type.PropertyProxy
 type DeviceActions map[string]actions.Action
 type DeviceEvents map[string]events.Event
 
@@ -41,7 +41,7 @@ type DevicePin struct {
 	Pattern  string `json:"pattern,omitempty"`
 }
 
-func (d Device) AddProperty(n string, p properties.PropertyProxy) {
+func (d Device) AddProperty(n string, p _type.PropertyProxy) {
 	if d.Properties == nil {
 		d.Properties = make(DeviceProperties, 1)
 	}
@@ -76,11 +76,11 @@ func (d Device) GetBaseHref() string {
 	return d.BaseHref
 }
 
-func (d Device) GetProperties() map[string]properties.PropertyProxy {
+func (d Device) GetProperties() map[string]_type.PropertyProxy {
 	return d.Properties
 }
 
-func (d Device) GetProperty(id string) properties.PropertyProxy {
+func (d Device) GetProperty(id string) _type.PropertyProxy {
 	p, ok := d.Properties[id]
 	if ok {
 		return p

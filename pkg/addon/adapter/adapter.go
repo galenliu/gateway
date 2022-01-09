@@ -6,11 +6,6 @@ type Device interface {
 	GetId() string
 }
 
-type AdapterProxy interface {
-	GetId() string
-	GetName() string
-}
-
 type Adapter struct {
 	Id      string
 	Name    string

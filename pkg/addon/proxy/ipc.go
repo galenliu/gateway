@@ -1,11 +1,12 @@
-package addon
+package proxy
 
 import (
 	"fmt"
 	"github.com/fasthttp/websocket"
-	"github.com/galenliu/gateway/pkg/addon"
 	"net/url"
 )
+
+const IpcDefaultPort = "9500"
 
 type IpcClient struct {
 	ws       *websocket.Conn
@@ -19,7 +20,7 @@ type IpcClient struct {
 
 // NewClient 新建一个Client，注册消息Handler
 func NewClient(PluginId string, manager *Manager) *IpcClient {
-	u := url.URL{Scheme: "ws", Host: "localhost:" + addon.IpcDefaultPort, Path: "/"}
+	u := url.URL{Scheme: "ws", Host: "localhost:" + IpcDefaultPort, Path: "/"}
 	client := &IpcClient{}
 	client.pluginId = PluginId
 	client.manager = manager

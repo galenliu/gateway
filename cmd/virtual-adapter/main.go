@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/galenliu/gateway/cmd/virtual-adapter/pkg/yeelight"
-	"github.com/galenliu/gateway/pkg/addon/addon"
+	"github.com/galenliu/gateway/pkg/addon/proxy"
 	"os"
 	"os/signal"
 	"syscall"
@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	manager, err := addon.NewAddonManager("virtual-adapter-golang")
+	manager, err := proxy.NewAddonManager("virtual-adapter-golang")
 	if err != nil {
 		fmt.Printf("addon manager error: %s", err.Error())
 		return

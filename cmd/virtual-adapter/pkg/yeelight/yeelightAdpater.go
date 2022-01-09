@@ -3,18 +3,18 @@ package yeelight
 import (
 	"fmt"
 	"github.com/akominch/yeelight"
-	"github.com/galenliu/gateway/pkg/addon/addon"
+	"github.com/galenliu/gateway/pkg/addon/proxy"
 	uuid "github.com/satori/go.uuid"
 	"time"
 )
 
 type VirtualAdapter struct {
-	*addon.Adapter
+	*proxy.Adapter
 }
 
-func NewVirtualAdapter(manager *addon.Manager, adapterId, name string) *VirtualAdapter {
+func NewVirtualAdapter(manager *proxy.Manager, adapterId, name string) *VirtualAdapter {
 	v := &VirtualAdapter{
-		addon.NewAdapter(manager, adapterId, name),
+		proxy.NewAdapter(manager, adapterId, name),
 	}
 	v.StartPairing(300 * time.Duration(time.Millisecond))
 	return v
@@ -34,7 +34,9 @@ func (a *VirtualAdapter) StartPairing(timeout time.Duration) {
 					fmt.Println(err.Error())
 					continue
 				}
+				bulb.TurnOff()
 				_, err = bulb.SetName("Yeelight" + uuid.NewV4().String())
+
 				params, err := bulb.Discover()
 				if err != nil {
 					fmt.Printf(err.Error())
@@ -46,5 +48,5 @@ func (a *VirtualAdapter) StartPairing(timeout time.Duration) {
 		}
 	}
 	done := time.After(timeout)
-	discover(done)
+	go discover(done)
 }

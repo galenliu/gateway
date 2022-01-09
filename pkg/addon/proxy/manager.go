@@ -1,7 +1,8 @@
-package addon
+package proxy
 
 import (
 	"fmt"
+	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/addon/manager"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	json "github.com/json-iterator/go"
@@ -18,17 +19,6 @@ type Manager struct {
 	registered  bool
 	userProfile messages.PluginRegisterResponseJsonDataUserProfile
 	preferences messages.PluginRegisterResponseJsonDataPreferences
-}
-
-type DeviceProxy interface {
-	GetId() string
-	GetAdapter() AdapterProxy
-	ToMessage() messages.Device
-}
-
-type AdapterProxy interface {
-	GetId() string
-	GetName() string
 }
 
 var once sync.Once
@@ -56,7 +46,7 @@ func NewAddonManager(packageName string) (*Manager, error) {
 	return instance, nil
 }
 
-func (m *Manager) AddAdapters(adapters ...AdapterProxy) {
+func (m *Manager) AddAdapters(adapters ...addon.AdapterProxy) {
 	for _, adapter := range adapters {
 		m.AddAdapter(adapter)
 		m.send(messages.MessageType_AdapterAddedNotification, messages.AdapterAddedNotificationJsonData{
@@ -68,7 +58,7 @@ func (m *Manager) AddAdapters(adapters ...AdapterProxy) {
 	}
 }
 
-func (m *Manager) handleDeviceAdded(device AddonDeviceProxy) {
+func (m *Manager) handleDeviceAdded(device addon.DeviceProxy) {
 	if m.verbose {
 		fmt.Printf("addonManager: handle_device_added: %s", device.GetId())
 	}
@@ -80,7 +70,7 @@ func (m *Manager) handleDeviceAdded(device AddonDeviceProxy) {
 	})
 }
 
-func (m *Manager) handleDeviceRemoved(device AddonDeviceProxy) {
+func (m *Manager) handleDeviceRemoved(device addon.DeviceProxy) {
 	if m.verbose {
 		fmt.Printf("addon manager handle devices added, deviceId:%v\n", device.GetId())
 	}
@@ -91,10 +81,10 @@ func (m *Manager) handleDeviceRemoved(device AddonDeviceProxy) {
 	})
 }
 
-func (m *Manager) getAdapter(adapterId string) AddonAdapterProxy {
+func (m *Manager) getAdapter(adapterId string) addon.AdapterProxy {
 	adapter := m.Manager.GetAdapter(adapterId)
 	if adapter != nil {
-		adp, ok := adapter.(AddonAdapterProxy)
+		adp, ok := adapter.(addon.AdapterProxy)
 		if ok {
 			return adp
 		}
@@ -156,7 +146,7 @@ func (m *Manager) onMessage(data []byte) {
 
 	case messages.MessageType_AdapterUnloadRequest:
 		go adapter.Unload()
-		unloadFunc := func(proxy *Manager, adapter AddonAdapterProxy) {
+		unloadFunc := func(proxy *Manager, adapter addon.AdapterProxy) {
 			data := make(map[string]any)
 			data["adapterId"] = adapter.GetId()
 			proxy.send(messages.MessageType_AdapterUnloadResponse, messages.AdapterUnloadResponseJsonData{
@@ -301,7 +291,7 @@ func (m *Manager) onMessage(data []byte) {
 	}
 }
 
-func (m *Manager) sendConnectedStateNotification(device AddonDeviceProxy, connected bool) {
+func (m *Manager) sendConnectedStateNotification(device addon.DeviceProxy, connected bool) {
 	m.send(messages.MessageType_DeviceConnectedStateNotification, messages.DeviceConnectedStateNotificationJsonData{
 		AdapterId: device.GetAdapter().GetId(),
 		Connected: connected,
