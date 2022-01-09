@@ -28,7 +28,7 @@ func (m *Manager) RemoveDevice(id string) {
 }
 
 func (m *Manager) AddAdapter(a Adapter) {
-	m.devices.Store(a.GetId(), a)
+	m.adapters.Store(a.GetId(), a)
 }
 
 func (m *Manager) RemoveAdapter(id string) {

@@ -57,8 +57,8 @@ func newDevice(adapter *Adapter, msg messages.Device) *device {
 		}
 	}
 
-	getPropertyDescription := func(p messages.Property) addon.PropertyDescription {
-		return addon.PropertyDescription{
+	getPropertyDescription := func(p messages.Property) properties.PropertyDescription {
+		return properties.PropertyDescription{
 			Name:        p.Name,
 			AtType:      p.AtType,
 			Title:       p.Title,
@@ -147,7 +147,7 @@ func newDevice(adapter *Adapter, msg messages.Device) *device {
 		},
 	}
 	for n, p := range msg.Properties {
-		prop := properties.NewProperty(&device, getPropertyDescription(p))
+		prop := properties.NewProperty(getPropertyDescription(p))
 		if prop == nil {
 			continue
 		}
@@ -158,7 +158,7 @@ func newDevice(adapter *Adapter, msg messages.Device) *device {
 	return &device
 }
 
-func (device *device) NotifyPropertyChanged(property addon.PropertyDescription) {
+func (device *device) NotifyPropertyChanged(property properties.PropertyDescription) {
 	t, ok := device.setPropertyValueTask.Load(*property.Name)
 	if ok {
 		task := t.(chan any)
@@ -173,7 +173,7 @@ func (device *device) NotifyPropertyChanged(property addon.PropertyDescription) 
 	if p.IsReadOnly() {
 		return
 	}
-	valueChanged := p.SetValue(property.Value)
+	valueChanged := p.SetCachedValue(property.Value)
 	titleChanged := false
 	if property.Title != nil {
 		titleChanged = p.SetTitle(*property.Title)
@@ -280,10 +280,10 @@ func (device *device) getAdapter() *Adapter {
 	return device.adapter
 }
 
-func (device *device) getProperty(id string) addon.PropertyProxy {
+func (device *device) getProperty(id string) devices.PropertyEntity {
 	p := device.GetProperty(id)
 	if p != nil {
-		prop, ok := p.(addon.PropertyProxy)
+		prop, ok := p.(devices.PropertyEntity)
 		if ok {
 			return prop
 		}

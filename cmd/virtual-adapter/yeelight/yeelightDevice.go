@@ -1,29 +1,28 @@
 package yeelight
 
 import (
-	"github.com/akominch/yeelight"
+	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg"
 	"github.com/galenliu/gateway/pkg/addon"
+	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/addon/proxy"
 )
 
 type YeelightDevice struct {
 	*proxy.Device
-	*yeelight.YeelightParams
-	*yeelight.Bulb
+	*yeelight.Yeelight
 }
 
-func NewYeelightBulb(adapter addon.AdapterProxy, bulb *yeelight.Bulb, params *yeelight.YeelightParams) *YeelightDevice {
+func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
 	yeeDevice := &YeelightDevice{
-		Device:         proxy.NewDevice(adapter, []string{"Light", "OnOffSwitch"}, params.Name, "yeelight"+params.Name),
-		YeelightParams: params,
-		Bulb:           bulb,
+		Device:   proxy.NewDevice([]string{"Light", "OnOffSwitch"}, bulb.GetAddr(), "yeelight"+bulb.GetAddr()),
+		Yeelight: bulb,
 	}
-	for _, method := range params.Support {
+	for _, method := range bulb.Supports {
 		switch method {
 		case "set_power":
-			var atType = "OnOffProperty"
-			prop := NewYeelightProperty(yeeDevice, addon.PropertyDescription{
-				Name:        nil,
+			var atType = addon.OnOffProperty
+			prop := NewYeelightProperty(bulb, properties.PropertyDescription{
+				Name:        &on,
 				AtType:      &atType,
 				Title:       nil,
 				Type:        addon.TypeBoolean,
@@ -37,13 +36,13 @@ func NewYeelightBulb(adapter addon.AdapterProxy, bulb *yeelight.Bulb, params *ye
 				Links:       nil,
 				Value:       nil,
 			})
-			yeeDevice.AddProperty("on", prop)
+			yeeDevice.AddProperty(prop)
 		case "set_bright":
 			var min float64 = 0
 			var max float64 = 100
-			var atType = "LevelProperty"
-			prop := NewYeelightProperty(yeeDevice, addon.PropertyDescription{
-				Name:        nil,
+			var atType = addon.LevelProperty
+			prop := NewYeelightProperty(bulb, properties.PropertyDescription{
+				Name:        &level,
 				AtType:      &atType,
 				Title:       nil,
 				Type:        addon.TypeInteger,
@@ -57,27 +56,23 @@ func NewYeelightBulb(adapter addon.AdapterProxy, bulb *yeelight.Bulb, params *ye
 				Links:       nil,
 				Value:       nil,
 			})
-			yeeDevice.AddProperty("bright", prop)
+			yeeDevice.AddProperty(prop)
 		case "set_rgb":
-			var min float64 = 0
-			var max float64 = 100
-			var atType = "LevelProperty"
-			prop := NewYeelightProperty(yeeDevice, addon.PropertyDescription{
-				Name:        nil,
+			var atType = addon.ColorProperty
+			prop := NewYeelightProperty(bulb, properties.PropertyDescription{
+				Name:        &color,
 				AtType:      &atType,
 				Title:       nil,
-				Type:        addon.TypeInteger,
+				Type:        addon.TypeString,
 				Unit:        nil,
 				Description: nil,
-				Minimum:     &min,
-				Maximum:     &max,
 				Enum:        nil,
 				ReadOnly:    nil,
 				MultipleOf:  nil,
 				Links:       nil,
 				Value:       nil,
 			})
-			yeeDevice.AddProperty("on", prop)
+			yeeDevice.AddProperty(prop)
 		default:
 			continue
 		}

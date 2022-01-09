@@ -2,8 +2,8 @@ package plugin
 
 import (
 	"context"
-	_type "github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/addon/actions"
+	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/ipc"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
@@ -325,7 +325,7 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			plugin.logger.Errorf("Bad message")
 			return
 		}
-		go dev.NotifyPropertyChanged(_type.PropertyDescription{
+		go dev.NotifyPropertyChanged(properties.PropertyDescription{
 			Name:        message.Property.Name,
 			AtType:      message.Property.AtType,
 			Title:       message.Property.Title,

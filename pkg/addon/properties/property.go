@@ -2,16 +2,34 @@ package properties
 
 import (
 	"encoding/json"
-	_type "github.com/galenliu/gateway/pkg/addon"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 )
 
+type PropertyLinkElem struct {
+}
+
+type PropertyDescription struct {
+	Name        *string            `json:"name,omitempty"`
+	AtType      *string            `json:"@type,omitempty"`
+	Title       *string            `json:"title,omitempty"`
+	Type        string             `json:"type,omitempty"`
+	Unit        *string            `json:"unit,omitempty"`
+	Description *string            `json:"description,omitempty"`
+	Minimum     *float64           `json:"minimum,omitempty"`
+	Maximum     *float64           `json:"maximum,omitempty"`
+	Enum        []any              `json:"enum,omitempty"`
+	ReadOnly    *bool              `json:"readOnly,omitempty"`
+	MultipleOf  *float64           `json:"multipleOf,omitempty"`
+	Links       []PropertyLinkElem `json:"links,omitempty"`
+	Value       any                `json:"value,omitempty"`
+}
+
 type DeviceHandler interface {
-	NotifyPropertyChanged(property _type.PropertyDescription)
+	NotifyPropertyChanged(property PropertyDescription)
 }
 
 type Property struct {
-	device      DeviceHandler
+	Handler     DeviceHandler
 	Name        string   `json:"name"`
 	Title       string   `json:"title,omitempty"`
 	Type        string   `json:"type"`
@@ -27,7 +45,7 @@ type Property struct {
 	Value any `json:"value"`
 }
 
-func NewProperty(device DeviceHandler, description _type.PropertyDescription) *Property {
+func NewProperty(description PropertyDescription) *Property {
 	getString := func(s *string) string {
 		if s != nil {
 			return *s
@@ -39,7 +57,7 @@ func NewProperty(device DeviceHandler, description _type.PropertyDescription) *P
 		return nil
 	}
 	return &Property{
-		device:      device,
+		Handler:     nil,
 		Name:        getString(description.Name),
 		Title:       getString(description.Title),
 		Type:        description.Type,
@@ -61,7 +79,7 @@ func NewProperty(device DeviceHandler, description _type.PropertyDescription) *P
 }
 
 func (p *Property) MarshalJSON() ([]byte, error) {
-	propertyDescription := _type.PropertyDescription{
+	propertyDescription := PropertyDescription{
 		Name:        &p.Name,
 		AtType:      &p.AtType,
 		Title:       &p.Title,
@@ -156,15 +174,7 @@ func (p *Property) GetValue() any {
 	return p.Value
 }
 
-func (p *Property) SetValue(value any) bool {
-	if p.Value == value {
-		return false
-	}
-	p.Value = value
-	return true
-}
-
-func (p *Property) ToDescription() _type.PropertyDescription {
+func (p *Property) ToDescription() PropertyDescription {
 	get := func(s string) *string {
 		if s == "" {
 			return nil
@@ -181,7 +191,7 @@ func (p *Property) ToDescription() _type.PropertyDescription {
 		}
 		return nil
 	}
-	return _type.PropertyDescription{
+	return PropertyDescription{
 		Name:        get(p.Name),
 		AtType:      get(p.AtType),
 		Title:       get(p.Title),
@@ -243,10 +253,14 @@ func (p *Property) SetCachedValueAndNotify(value any) {
 	p.SetCachedValue(value)
 	hasChanged := oldValue != p.GetValue()
 	if hasChanged {
-		p.device.NotifyPropertyChanged(p.ToDescription())
+		p.Handler.NotifyPropertyChanged(p.ToDescription())
 	}
 }
 
-func (p *Property) SetCachedValue(value any) {
+func (p *Property) SetCachedValue(value any) bool {
+	if p.Value == value {
+		return false
+	}
 	p.Value = value
+	return true
 }

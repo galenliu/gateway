@@ -1,16 +1,12 @@
 package properties
 
-import (
-	_type "github.com/galenliu/gateway/pkg/addon"
-)
-
 type StringProperty struct {
 	*Property
 }
 
-func NewStringProperty(description _type.PropertyDescription) *StringProperty {
+func NewStringProperty(description PropertyDescription) *StringProperty {
 	p := &StringProperty{}
-	p.Property = NewProperty(nil, description)
+	p.Property = NewProperty(description)
 	if p.Property == nil {
 		return nil
 	}

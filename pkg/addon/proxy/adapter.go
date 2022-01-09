@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/addon/adapter"
+	"github.com/galenliu/gateway/pkg/addon/properties"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"log"
+	"time"
 )
 
 type Adapter struct {
@@ -28,9 +30,14 @@ func NewAdapter(manager *Manager, adapterId, name string) *Adapter {
 	return a
 }
 
-func (a *Adapter) HandleDeviceAdded(device addon.DeviceProxy) {
-	a.AddDevice(device)
-	a.manager.handleDeviceAdded(device)
+func (a *Adapter) AddDevices(devices ...addon.DeviceProxy) {
+	for _, device := range devices {
+		if device != nil {
+			device.SetHandler(a)
+			a.Adapter.AddDevice(device)
+			a.manager.handleDeviceAdded(device)
+		}
+	}
 }
 
 func (a *Adapter) SendError(message string) {
@@ -155,7 +162,7 @@ func (a *Adapter) GetAddonManager() *Manager {
 	return a.manager
 }
 
-func (a *Adapter) SendPropertyChangedNotification(deviceId string, property addon.PropertyDescription) {
+func (a *Adapter) SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription) {
 	a.manager.send(messages.MessageType_DevicePropertyChangedNotification, messages.DevicePropertyChangedNotificationJsonData{
 		AdapterId: a.GetId(),
 		DeviceId:  deviceId,
@@ -175,4 +182,8 @@ func (a *Adapter) SendPropertyChangedNotification(deviceId string, property addo
 			Value:       property.Value,
 		},
 	})
+}
+
+func (a *Adapter) StartPairing(timeout time.Duration) {
+	fmt.Print("startPairing func not implemented")
 }

@@ -3,6 +3,7 @@ package devices
 import (
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/events"
+	"github.com/galenliu/gateway/pkg/addon/properties"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 )
 
@@ -11,7 +12,6 @@ type DeviceActions map[string]actions.Action
 type DeviceEvents map[string]events.Event
 
 type PropertyEntity interface {
-	ToMessage() messages.Property
 	GetType() string
 	GetTitle() string
 	GetName() string
@@ -24,6 +24,12 @@ type PropertyEntity interface {
 	GetMultipleOf() any
 	GetValue() any
 	IsReadOnly() bool
+	SetCachedValue(value any) bool
+	SetCachedValueAndNotify(value any)
+	ToMessage() messages.Property
+	ToDescription() properties.PropertyDescription
+	SetTitle(s string) bool
+	SetDescription(description string) bool
 }
 
 type Device struct {
@@ -56,46 +62,46 @@ type DevicePin struct {
 	Pattern  string `json:"pattern,omitempty"`
 }
 
-func (d Device) AddProperty(n string, p PropertyEntity) {
+func (d *Device) AddProperty(n string, p PropertyEntity) {
 	if d.Properties == nil {
 		d.Properties = make(DeviceProperties, 1)
 	}
 	d.Properties[n] = p
 }
 
-func (d Device) GetId() string {
+func (d *Device) GetId() string {
 	return d.Id
 }
 
-func (d Device) GetAtContext() string {
+func (d *Device) GetAtContext() string {
 	return d.Context
 }
 
-func (d Device) GetAtType() []string {
+func (d *Device) GetAtType() []string {
 	return d.AtType
 }
 
-func (d Device) GetTitle() string {
+func (d *Device) GetTitle() string {
 	return d.Title
 }
 
-func (d Device) GetDescription() string {
+func (d *Device) GetDescription() string {
 	return d.Description
 }
 
-func (d Device) GetLink() []DeviceLink {
+func (d *Device) GetLink() []DeviceLink {
 	return d.Links
 }
 
-func (d Device) GetBaseHref() string {
+func (d *Device) GetBaseHref() string {
 	return d.BaseHref
 }
 
-func (d Device) GetProperties() map[string]PropertyEntity {
+func (d *Device) GetProperties() map[string]PropertyEntity {
 	return d.Properties
 }
 
-func (d Device) GetProperty(id string) PropertyEntity {
+func (d *Device) GetProperty(id string) PropertyEntity {
 	p, ok := d.Properties[id]
 	if ok {
 		return p
@@ -103,31 +109,31 @@ func (d Device) GetProperty(id string) PropertyEntity {
 	return nil
 }
 
-func (d Device) GetActions() map[string]actions.Action {
+func (d *Device) GetActions() map[string]actions.Action {
 	return d.Actions
 }
 
-func (d Device) GetAction(id string) actions.Action {
+func (d *Device) GetAction(id string) actions.Action {
 	return d.Actions[id]
 }
 
-func (d Device) GetPin() *DevicePin {
+func (d *Device) GetPin() *DevicePin {
 	return d.Pin
 }
 
-func (d Device) GetEvents() map[string]events.Event {
+func (d *Device) GetEvents() map[string]events.Event {
 	return d.Events
 }
 
-func (d Device) GetEvent(id string) events.Event {
+func (d *Device) GetEvent(id string) events.Event {
 	return d.Events[id]
 }
 
-func (d Device) GetCredentialsRequired() bool {
+func (d *Device) GetCredentialsRequired() bool {
 	return d.CredentialsRequired
 }
 
-func (d Device) ToMessage() messages.Device {
+func (d *Device) ToMessage() messages.Device {
 	baseHref := "/things/" + d.GetId()
 	return messages.Device{
 		Context:             &d.Context,

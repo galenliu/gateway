@@ -17,6 +17,8 @@ const (
 
 	AlarmProperty                    = "AlarmProperty"
 	BarometricPressureProperty       = "BarometricPressureProperty"
+	BooleanProperty                  = "BooleanProperty"
+	BrightnessProperty               = "BrightnessProperty"
 	ColorModeProperty                = "ColorModeProperty"
 	ColorProperty                    = "ColorProperty"
 	ColorTemperatureProperty         = "ColorTemperatureProperty"
@@ -33,6 +35,15 @@ const (
 	LevelProperty                    = "LevelProperty"
 	LockedProperty                   = "LockedProperty"
 	MotionProperty                   = "MotionProperty"
+	OnOffProperty                    = "OnOffProperty"
+	OpenProperty                     = "OpenProperty"
+	PushedProperty                   = "PushedProperty"
+	SmokeProperty                    = "SmokeProperty"
+	TargetTemperatureProperty        = "TargetTemperatureProperty"
+	TemperatureProperty              = "TemperatureProperty"
+	ThermostatModeProperty           = "ThermostatModeProperty"
+	VideoProperty                    = "VideoProperty"
+	VoltageProperty                  = "VoltageProperty"
 
 	Alarm                    = "Alarm"
 	AirQualitySensor         = "AirQualitySensor"
@@ -58,13 +69,4 @@ const (
 	VideoCamera              = "VideoCamera"
 
 	Context = "https://webthings.io/schemas"
-
-	OpenProperty              = "OpenProperty"
-	PushedProperty            = "PushedProperty"
-	SmokeProperty             = "SmokeProperty"
-	TargetTemperatureProperty = "TargetTemperatureProperty"
-	TemperatureProperty       = "TemperatureProperty"
-	ThermostatModeProperty    = "ThermostatModeProperty"
-	VideoProperty             = "VideoProperty"
-	VoltageProperty           = "VoltageProperty"
 )

@@ -1,24 +1,24 @@
 ### trune on
-PUT http://localhost:9090/things/0x0000000010e2fa00/properties/on
+PUT http://localhost:9090/things/192.168.1.105:55443/properties/on
 Content-Type: application/x-www-form-urlencoded
 
 true
 
 ### trune level
-PUT http://localhost:9090/things/0x0000000010e2fa00/properties/level
+PUT http://localhost:9090/things/192.168.1.105:55443/properties/level
 Content-Type: application/x-www-form-urlencoded
 
 100
 
 ### set hue
-PUT http://localhost:9090/things/0x0000000010e2fa00/properties/hue
+PUT http://localhost:9090/things/192.168.1.105:55443/properties/color
 Content-Type: application/x-www-form-urlencoded
 
-"#F00FFF"
+"#0000FF"
 
 
 ### trune off
-PUT http://localhost:9090/things/0x0000000010e2fa00/properties/on
+PUT http://localhost:9090/things/192.168.1.105:55443/properties/on
 Content-Type: application/x-www-form-urlencoded
 
 false
@@ -29,7 +29,7 @@ Accept: application/json
 
 
 ### Delete thing
-DELETE http://localhost:9090/things/0x0000000010e2fa00
+DELETE http://localhost:9090/things/192.168.1.105:55443
 
 ###create thing
 POST http://localhost:9090/things
@@ -37,10 +37,11 @@ Content-Type: application/json
 
 {
   "@context": "https://webthings.io/schemas",
-  "title": "0x0000000010e2fa00",
-  "id": "0x0000000010e2fa00",
+  "title": "192.168.1.105:55443",
+  "id": "192.168.1.105:55443",
   "@type": [
-    "Light"
+    "Light",
+    "OnOffSwitch"
   ],
   "support": "liuguilin361@gmai.com",
   "version": {
@@ -48,20 +49,36 @@ Content-Type: application/json
     "model": ""
   },
   "properties": {
-    "hue": {"@type":"ColorProperty","title":"Hue","forms":[{"href":"/things/0x0000000010e2fa00/properties/hue"}],"type":"string"},
-    "on": {"@type":"OnOffProperty","title":"On/Off","forms":[{"href":"/things/0x0000000010e2fa00/properties/on"}],"type":"boolean"},
-    "level": {"@type":"BrightnessProperty","title":"Brightness","forms":[{"href":"/things/0x0000000010e2fa00/properties/level"}],"unit":"percent","type":"integer","minimum":0,"maximum":100}
-  },
-  "actions": {
-    "effect": {"forms":[{"href":"things/0x0000000010e2fa00/actions/effect","op":["observeallproperties"]}]}
-  },
-  "pin": {
-    "required": false,
-    "pattern": ""
+    "color": {
+      "forms": [
+        {
+          "href": "/things/192.168.1.105:55443/properties/color"
+        }
+      ],
+      "type": "string",
+      "minLength": 0
+    },
+    "level": {
+      "forms": [
+        {
+          "href": "/things/192.168.1.105:55443/properties/level"
+        }
+      ],
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 0,
+      "multipleOf": 0
+    },
+    "on": {
+      "forms": [
+        {
+          "href": "/things/192.168.1.105:55443/properties/on"
+        }
+      ],
+      "type": "boolean"
+    }
   }
 }
-
-
 
 
 
@@ -70,7 +87,12 @@ POST http://localhost:9090/things/0x0000000010e2fa00/actions
 Content-Type: application/json
 
 {
-  "effect": {"input": {"type": "smooth","duration": 100}}
+  "effect": {
+    "input": {
+      "type": "smooth",
+      "duration": 100
+    }
+  }
 }
 
 

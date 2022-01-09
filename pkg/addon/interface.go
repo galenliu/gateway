@@ -2,54 +2,38 @@ package addon
 
 import (
 	"github.com/galenliu/gateway/pkg/addon/devices"
+	"github.com/galenliu/gateway/pkg/addon/properties"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"time"
 )
 
 type PropertyProxy interface {
 	devices.PropertyEntity
-	SetValue(a any) bool
+	SetValue(a any)
 	SetTitle(s string) bool
+	SetHandler(DeviceProxy)
 	SetDescription(description string) bool
-	ToDescription() PropertyDescription
 }
 
 type DeviceProxy interface {
+	properties.DeviceHandler
+	SetHandler(proxy AdapterProxy)
 	GetId() string
 	GetAdapter() AdapterProxy
 	ToMessage() messages.Device
 	GetProperty(id string) PropertyProxy
 	SetCredentials(username, password string) error
-	NotifyPropertyChanged(p PropertyDescription)
+	NotifyPropertyChanged(p properties.PropertyDescription)
 }
 
 type AdapterProxy interface {
 	GetId() string
 	GetName() string
 	GetDevice(deviceId string) DeviceProxy
-	SendPropertyChangedNotification(deviceId string, property PropertyDescription)
+	SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription)
 	Unload()
 	CancelPairing()
 	StartPairing(timeout time.Duration)
 	HandleDeviceSaved(DeviceProxy)
 	HandleDeviceRemoved(DeviceProxy)
-}
-
-type PropertyLinkElem struct {
-}
-
-type PropertyDescription struct {
-	Name        *string            `json:"name,omitempty"`
-	AtType      *string            `json:"@type,omitempty"`
-	Title       *string            `json:"title,omitempty"`
-	Type        string             `json:"type,omitempty"`
-	Unit        *string            `json:"unit,omitempty"`
-	Description *string            `json:"description,omitempty"`
-	Minimum     *float64           `json:"minimum,omitempty"`
-	Maximum     *float64           `json:"maximum,omitempty"`
-	Enum        []any              `json:"enum,omitempty"`
-	ReadOnly    *bool              `json:"readOnly,omitempty"`
-	MultipleOf  *float64           `json:"multipleOf,omitempty"`
-	Links       []PropertyLinkElem `json:"links,omitempty"`
-	Value       any                `json:"value,omitempty"`
 }

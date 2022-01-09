@@ -60,9 +60,8 @@ func (m *Manager) AddAdapters(adapters ...addon.AdapterProxy) {
 
 func (m *Manager) handleDeviceAdded(device addon.DeviceProxy) {
 	if m.verbose {
-		fmt.Printf("addonManager: handle_device_added: %s", device.GetId())
+		fmt.Printf("manager device_added: %s \t\n", device.GetId())
 	}
-	fmt.Print("=========")
 	m.send(messages.MessageType_DeviceAddedNotification, messages.DeviceAddedNotificationJsonData{
 		AdapterId: device.GetAdapter().GetId(),
 		Device:    device.ToMessage(),
@@ -198,26 +197,7 @@ func (m *Manager) onMessage(data []byte) {
 			fmt.Printf(e.Error())
 			return
 		}
-		p := prop.ToDescription()
-		m.send(messages.MessageType_DevicePropertyChangedNotification, messages.DevicePropertyChangedNotificationJsonData{
-			AdapterId: adapter.GetId(),
-			DeviceId:  device.GetId(),
-			PluginId:  m.packageName,
-			Property: messages.Property{
-				Type:        p.Type,
-				AtType:      p.AtType,
-				Description: p.Description,
-				Enum:        p.Enum,
-				Maximum:     p.Maximum,
-				Minimum:     p.Minimum,
-				MultipleOf:  p.MultipleOf,
-				Name:        p.Name,
-				ReadOnly:    p.ReadOnly,
-				Title:       p.Title,
-				Unit:        p.Unit,
-				Value:       p.Value,
-			},
-		})
+		return
 
 	case messages.MessageType_DeviceSetPinRequest:
 		//var pin PIN

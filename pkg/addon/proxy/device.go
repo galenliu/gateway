@@ -4,16 +4,17 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/addon/devices"
+	"github.com/galenliu/gateway/pkg/addon/properties"
 )
 
 type Device struct {
-	adapter addon.AdapterProxy
+	handler addon.AdapterProxy
 	*devices.Device
 }
 
-func NewDevice(adapter addon.AdapterProxy, atType []string, id, title string) *Device {
+func NewDevice(atType []string, id, title string) *Device {
 	return &Device{
-		adapter: adapter,
+		handler: nil,
 		Device: &devices.Device{
 			Context:             "https://webthings.io/schemas",
 			AtType:              atType,
@@ -32,19 +33,24 @@ func NewDevice(adapter addon.AdapterProxy, atType []string, id, title string) *D
 	}
 }
 
-func (d Device) NotifyPropertyChanged(prop addon.PropertyDescription) {
-	d.adapter.SendPropertyChangedNotification(d.GetId(), prop)
+func (d *Device) NotifyPropertyChanged(prop properties.PropertyDescription) {
+	d.handler.SendPropertyChangedNotification(d.GetId(), prop)
 }
 
-func (d Device) SetCredentials(username, password string) error {
+func (d *Device) SetCredentials(username, password string) error {
 	return fmt.Errorf("SetCredentials not implemented")
 }
 
-func (d Device) GetAdapter() addon.AdapterProxy {
-	return d.adapter
+func (d *Device) AddProperty(p addon.PropertyProxy) {
+	p.SetHandler(d)
+	d.Device.AddProperty(p.GetName(), p)
 }
 
-func (d Device) GetProperty(id string) addon.PropertyProxy {
+func (d *Device) GetAdapter() addon.AdapterProxy {
+	return d.handler
+}
+
+func (d *Device) GetProperty(id string) addon.PropertyProxy {
 	p := d.Device.GetProperty(id)
 	if p != nil {
 		p, ok := p.(addon.PropertyProxy)
@@ -53,4 +59,8 @@ func (d Device) GetProperty(id string) addon.PropertyProxy {
 		}
 	}
 	return nil
+}
+
+func (d *Device) SetHandler(h addon.AdapterProxy) {
+	d.handler = h
 }

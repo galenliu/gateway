@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/cmd/virtual-adapter/pkg/yeelight"
+	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight"
 	"github.com/galenliu/gateway/pkg/addon/proxy"
 	"os"
 	"os/signal"

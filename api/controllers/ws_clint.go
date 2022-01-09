@@ -2,10 +2,10 @@ package controllers
 
 import (
 	things "github.com/galenliu/gateway/api/models/container"
-	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/events"
+	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
@@ -160,7 +160,7 @@ func (c *wsClint) addThing(t *things.Thing) {
 	}
 	removeThingEventStatusFunc := c.bus.Sub(topic.ThingEvent, onEvent)
 
-	onPropertyChanged := func(thingId string, property *addon.PropertyDescription) {
+	onPropertyChanged := func(thingId string, property *properties.PropertyDescription) {
 		if thingId != t.GetId() {
 			return
 		}
