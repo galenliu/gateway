@@ -28,6 +28,7 @@ func (a *VirtualAdapter) StartPairing(timeout time.Duration) {
 		bulb, err := yeelight.Discover()
 		if err != nil {
 			fmt.Printf(err.Error())
+			return
 		}
 		_, ok := devices[bulb.GetAddr()]
 		if !ok {

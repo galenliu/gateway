@@ -257,6 +257,10 @@ func (p *Property) SetCachedValueAndNotify(value any) {
 	}
 }
 
+func (p *Property) NotifyChanged() {
+	p.Handler.NotifyPropertyChanged(p.ToDescription())
+}
+
 func (p *Property) SetCachedValue(value any) bool {
 	if p.Value == value {
 		return false

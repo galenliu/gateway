@@ -20,10 +20,6 @@ func (p *Property) SetHandler(handler addon.DeviceProxy) {
 	p.Property.Handler = handler
 }
 
-func (p *Property) GetHandler() properties.DeviceHandler {
-	return p.Property.Handler
-}
-
 func (p *Property) SetValue(v interface{}) {
 	fmt.Print("property: %s SetValue func not implemented", p.GetName())
 }

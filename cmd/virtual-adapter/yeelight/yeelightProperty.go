@@ -40,7 +40,7 @@ func (p *YeelightProperty) SetValue(v interface{}) {
 		}
 		fmt.Printf("set on : %v \t\n", v)
 		p.SetCachedValue(v)
-		p.GetHandler().NotifyPropertyChanged(p.ToDescription())
+		p.NotifyChanged()
 		break
 	case level:
 		f, ok := v.(float64)
@@ -53,7 +53,7 @@ func (p *YeelightProperty) SetValue(v interface{}) {
 		}
 		fmt.Printf("set level : %v \t\n", v)
 		p.SetCachedValue(v)
-		p.GetHandler().NotifyPropertyChanged(p.ToDescription())
+		p.NotifyChanged()
 		return
 
 	case color:
@@ -71,7 +71,7 @@ func (p *YeelightProperty) SetValue(v interface{}) {
 		}
 		fmt.Printf("set color : %v \t\n", v)
 		p.SetCachedValue(v)
-		p.GetHandler().NotifyPropertyChanged(p.ToDescription())
+		p.NotifyChanged()
 		return
 
 	}
