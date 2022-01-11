@@ -120,7 +120,7 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			plugin.logger.Errorf("Bad message : %s", util.JsonIndent(dt))
 			return
 		}
-		adapter := NewAdapter(plugin, message.AdapterId, message.Name, message.PackageName, plugin.logger)
+		adapter := NewAdapter(plugin, message.AdapterId, message.PackageName, plugin.logger)
 		go plugin.handleAdapterAdded(adapter)
 		return
 

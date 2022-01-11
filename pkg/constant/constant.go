@@ -109,7 +109,7 @@ const (
 	EnNO = "en-NO"  //英语(挪威)
 	EnSG = "en-SG"  //英语(新加坡)
 	EnNZ = "en-NZ"  //英语(新西兰)
-	EnID = "en-Id"  //英语(印度尼西亚)
+	EnID = "en-id"  //英语(印度尼西亚)
 	EnPH = "en-PH"  //英语(菲律宾)
 	EnTH = "en-TH"  //英语(泰国)
 	EnMY = "en-MY"  // 英语(马来西亚)

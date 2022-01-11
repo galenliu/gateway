@@ -10,7 +10,7 @@ import (
 
 func main() {
 
-	adapter := yeelight.NewVirtualAdapter("virtual-adapter-golang", "virtual-adapter", "virtual-adapter")
+	adapter := yeelight.NewVirtualAdapter("virtual-adapter", "virtual-adapter-golang")
 	interruptChannel := make(chan os.Signal, 1)
 	signal.Notify(interruptChannel, syscall.SIGINT, syscall.SIGTERM)
 

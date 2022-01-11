@@ -11,7 +11,7 @@ import (
 )
 
 type Adapter struct {
-	adapter.Adapter
+	*adapter.Adapter
 	manager     *Manager
 	packageName string
 	IsPairing   bool
@@ -19,12 +19,9 @@ type Adapter struct {
 	pluginId    string
 }
 
-func NewAdapter(manager *Manager, adapterId, name string) *Adapter {
+func NewAdapter(manager *Manager, adapterId, packageName string) *Adapter {
 	a := &Adapter{}
-	a.Adapter = adapter.Adapter{
-		Id:   adapterId,
-		Name: name,
-	}
+	a.Adapter = adapter.NewAdapter(adapterId, packageName)
 	a.manager = manager
 	a.verbose = true
 	return a
@@ -95,15 +92,8 @@ func (a *Adapter) CancelPairing() {
 	}
 }
 
-func (a *Adapter) GetId() string {
-	return a.Id
-}
-
-func (a *Adapter) GetName() string {
-	if a.Name == "" {
-		return a.Id
-	}
-	return a.Name
+func (a *Adapter) GetPackageName() string {
+	return a.packageName
 }
 
 func (a *Adapter) GetDevice(id string) addon.DeviceProxy {

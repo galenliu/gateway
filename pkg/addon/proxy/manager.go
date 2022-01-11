@@ -51,7 +51,7 @@ func (m *Manager) AddAdapters(adapters ...addon.AdapterProxy) {
 		m.AddAdapter(adapter)
 		m.send(messages.MessageType_AdapterAddedNotification, messages.AdapterAddedNotificationJsonData{
 			AdapterId:   adapter.GetId(),
-			Name:        adapter.GetName(),
+			Name:        adapter.GetPackageName(),
 			PackageName: m.packageName,
 			PluginId:    m.packageName,
 		})

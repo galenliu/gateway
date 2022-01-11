@@ -1,55 +1,70 @@
 package yeelight
 
 import (
+	"bufio"
+	"encoding/json"
 	"fmt"
 	c "github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg/color"
 	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg/utils"
 	"image/color"
-	"log"
+	"math/rand"
 	"net"
+	"sync"
+	"time"
 )
 
-type EffectType string
-
 const (
-	Smooth EffectType = "smooth"
-	Sudden            = "sudden"
-)
+	discoverMSG = "M-SEARCH * HTTP/1.1\r\n HOST:239.255.255.250:1982\r\n MAN:\"ssdp:discover\"\r\n ST:wifi_bulb\r\n"
 
-type LightType int
-
-const (
-	Main    LightType = 0
-	Ambient           = 1
+	// timeout value for TCP and UDP commands
+	timeout = time.Second * 3
+	//SSDP discover address
+	ssdpAddr = "239.255.255.250:1982"
+	//CR-LF delimiter
+	crlf = "\r\n"
 )
 
 type Mode int
 
-const (
-	Last      Mode = 0
-	Normal         = 1
-	RGB            = 2
-	HSV            = 3
-	ColorFlow      = 4
-	Moonlight      = 5
-)
+type Yeelight struct {
+	addr       string
+	supports   []string
+	lastStatus sync.Map
+	rnd        *rand.Rand
+	sendChan   chan *Command
+}
 
-type (
-	PropsResult struct {
-		ID     int
-		Result map[string]string
-		Error  *Error
+func New(addr string, supports []string) *Yeelight {
+	y := &Yeelight{
+		addr:     addr,
+		supports: supports,
+		rnd:      rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
-)
+	return y
+}
 
-//Bulb represents device
-type Bulb struct {
-	conn   net.Conn
-	params *YeelightParams
-	ip     string
-	addr   string
-	effect EffectType
-	cmdId  int
+func (y *Yeelight) executeCommand(name string, params ...interface{}) (*CommandResult, error) {
+	return y.execute(y.newCommand(name, params))
+}
+
+func (y *Yeelight) execute(cmd *Command) (*CommandResult, error) {
+	select {
+	case y.sendChan <- cmd:
+		return nil, nil
+	}
+}
+
+func (y *Yeelight) newCommand(name string, params []interface{}) *Command {
+	return &Command{
+		Method: name,
+		ID:     y.randID(),
+		Params: params,
+	}
+}
+
+func (y *Yeelight) randID() int {
+	i := y.rnd.Intn(100)
+	return i
 }
 
 func (y *Yeelight) TurnOn() (*CommandResult, error) {
@@ -65,20 +80,27 @@ func (y *Yeelight) TurnOff() (*CommandResult, error) {
 }
 
 func (y *Yeelight) IsOn() (bool, error) {
-	res, err := y.GetProps([]string{"power"})
-	if err != nil {
-		return false, err
-	}
-	power := res.Result["power"]
+	on, _ := y.lastStatus.Load("power")
+	return on.(bool), nil
+}
 
-	return power == "on", nil
+func (y *Yeelight) SetPower(b bool) {
+	if b {
+		_, _ = y.TurnOn()
+
+	} else {
+		_, _ = y.TurnOff()
+	}
 }
 
 func (y *Yeelight) SetBrightness(brightness int) (*CommandResult, error) {
 	on, err := y.IsOn()
 	if err == nil {
 		if !on {
-			y.SetPower(true)
+			_, err := y.TurnOn()
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	return y.executeCommand("set_bright", utils.GetBrightnessValue(brightness))
@@ -88,7 +110,10 @@ func (y *Yeelight) SetRGB(rgba color.RGBA) (*CommandResult, error) {
 	on, err := y.IsOn()
 	if err == nil {
 		if !on {
-			y.SetPower(true)
+			_, err := y.TurnOn()
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	value := c.RGBToYeelight(rgba)
@@ -99,7 +124,10 @@ func (y *Yeelight) SetHSV(hue int, saturation int) (*CommandResult, error) {
 	on, err := y.IsOn()
 	if err == nil {
 		if !on {
-			y.SetPower(true)
+			_, err := y.TurnOn()
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	return y.executeCommand("set_rgb", hue, saturation)
@@ -109,13 +137,12 @@ func (y *Yeelight) SetBrightnessWithDuration(brightness int, duration int) (*Com
 	on, err := y.IsOn()
 	if err == nil {
 		if !on {
-			y.SetPower(true)
+			_, err := y.TurnOn()
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
-	if !checkBrightnessValue(brightness) {
-		log.Fatalln("The brightness value to set (1-100)")
-	}
-
 	return y.executeCommand("set_bright", brightness, duration)
 }
 
@@ -129,26 +156,68 @@ func (y *Yeelight) StopFlow() (*CommandResult, error) {
 	return y.executeCommand("stop_cf", "")
 }
 
-func (y *Yeelight) GetProps(props []string) (*PropsResult, error) {
-	res, err := y.executeCommand("get_prop", props)
-	if err != nil {
+// GetProp method is used to retrieve current property of smart LED.
+func (y *Yeelight) GetProp(values ...interface{}) ([]interface{}, error) {
+	r, err := y.executeCommand("get_prop", values...)
+	if nil != err {
 		return nil, err
 	}
-
-	propsMap := make(map[string]string)
-
-	for i, val := range res.Result {
-		key := props[i]
-		propsMap[key] = fmt.Sprintf("%v", val)
-	}
-
-	return &PropsResult{ID: res.ID, Error: res.Error, Result: propsMap}, nil
+	return r.Result, nil
 }
 
 func (y *Yeelight) GetAddr() string {
 	return y.addr
 }
 
+func (y *Yeelight) GetSupports() []string {
+	return y.supports
+}
+
 func (y *Yeelight) SetName(name string) (*CommandResult, error) {
 	return y.executeCommand("set_name", name)
+}
+
+func (y *Yeelight) Listen() (<-chan *Notification, chan<- struct{}, error) {
+
+	var err error
+	notifCh := make(chan *Notification)
+	done := make(chan struct{}, 1)
+
+	conn, err := net.DialTimeout("tcp", y.addr, time.Second*3)
+	if err != nil {
+		return nil, nil, fmt.Errorf("cannot connect to %s. %s", y.addr, err)
+	}
+
+	fmt.Println("Connection established")
+	go func(c net.Conn) {
+		//make sure connection is closed when method returns
+		defer closeConnection(conn)
+		connReader := bufio.NewReader(c)
+		for {
+			select {
+			case c := <-y.sendChan:
+				fmt.Printf("send Channel rev: %v \t\n", c)
+				b, _ := json.Marshal(c)
+				fmt.Fprint(conn, string(b)+crlf)
+			case <-done:
+				return
+			default:
+				data, err := connReader.ReadString('\n')
+				if nil == err {
+					var rs Notification
+					fmt.Println(data)
+					json.Unmarshal([]byte(data), &rs)
+					select {
+					case notifCh <- &rs:
+					default:
+						fmt.Println("Channel is full")
+					}
+				}
+			}
+
+		}
+
+	}(conn)
+
+	return notifCh, done, nil
 }

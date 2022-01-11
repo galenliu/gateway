@@ -7,9 +7,17 @@ type Device interface {
 }
 
 type Adapter struct {
-	Id      string
-	Name    string
-	devices sync.Map
+	id          string
+	packageName string
+	devices     sync.Map
+}
+
+func NewAdapter(id, packageName string) *Adapter {
+	return &Adapter{
+		id:          id,
+		packageName: packageName,
+		devices:     sync.Map{},
+	}
 }
 
 func (a *Adapter) AddDevice(dev Device) {
@@ -44,9 +52,5 @@ func (a *Adapter) GetDevices() []Device {
 }
 
 func (a *Adapter) GetId() string {
-	return a.Id
-}
-
-func (a *Adapter) GetName() string {
-	return a.Name
+	return a.id
 }

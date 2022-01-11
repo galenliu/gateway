@@ -17,7 +17,7 @@ func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
 		Device:   proxy.NewDevice([]string{"Light", "OnOffSwitch"}, bulb.GetAddr(), "yeelight"+bulb.GetAddr()),
 		Yeelight: bulb,
 	}
-	for _, method := range bulb.Supports {
+	for _, method := range bulb.GetSupports() {
 		switch method {
 		case "set_power":
 			var atType = addon.OnOffProperty

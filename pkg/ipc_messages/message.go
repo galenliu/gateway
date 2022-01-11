@@ -75,7 +75,7 @@ package messages
 //type Addon_Device struct {
 //	AtContext           string               `protobuf:"bytes,1,opt,name=atContext,json=@context,proto3" json:"atContext,omitempty"`
 //	AtType              string               `protobuf:"bytes,2,opt,name=atType,json=@type,proto3" json:"atType,omitempty"`
-//	Id                  string               `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
+//	id                  string               `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
 //	Title               string               `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`
 //	Description         string               `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
 //	Links               []*Link              `protobuf:"bytes,6,rep,name=links,proto3" json:"links,omitempty"`
@@ -152,7 +152,7 @@ package messages
 //}
 //
 //type ActionDescription struct {
-//	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+//	id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 //	Name          string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 //	Input         []byte `protobuf:"bytes,3,opt,name=input,proto3,oneof" json:"input,omitempty"`
 //	Status        string `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
@@ -172,7 +172,7 @@ package messages
 //
 //// Things
 //type ThingDescription struct {
-//	Id                  string               `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+//	id                  string               `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 //	Title               string               `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
 //	AtContext           string               `protobuf:"bytes,3,opt,name=atContext,json=@context,proto3" json:"atContext,omitempty"`
 //	AtType              string               `protobuf:"bytes,4,opt,name=atType,json=@type,proto3" json:"atType,omitempty"`

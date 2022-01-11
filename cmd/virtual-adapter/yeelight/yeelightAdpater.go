@@ -12,14 +12,14 @@ type VirtualAdapter struct {
 	*proxy.Adapter
 }
 
-func NewVirtualAdapter(packageName, adapterId, name string) *VirtualAdapter {
+func NewVirtualAdapter(adapterId, packageName string) *VirtualAdapter {
 	manager, err := proxy.NewAddonManager(packageName)
 	if err != nil {
 		fmt.Printf("addon manager error: %s", err.Error())
 		return nil
 	}
 	v := &VirtualAdapter{
-		proxy.NewAdapter(manager, adapterId, name),
+		proxy.NewAdapter(manager, adapterId, packageName),
 	}
 	manager.AddAdapters(v)
 	v.StartPairing(300 * time.Duration(time.Millisecond))
@@ -32,12 +32,6 @@ func (a *VirtualAdapter) StartPairing(timeout time.Duration) {
 
 	discover := func() {
 		bulb, err := yeelight.Discover()
-		go func() {
-			_, _, err := bulb.Listen()
-			if err != nil {
-				fmt.Println(err.Error())
-			}
-		}()
 		if err != nil {
 			fmt.Printf(err.Error())
 			return

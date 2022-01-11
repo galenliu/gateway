@@ -12,7 +12,7 @@ type Schema struct {
 }
 
 type ManifestJson struct {
-	ID                      string `json:"Id"`
+	ID                      string `json:"id"`
 	Name                    string `json:"name"`
 	ShortName               string `json:"short_name,omitempty"`
 	Author                  string `json:"author"`

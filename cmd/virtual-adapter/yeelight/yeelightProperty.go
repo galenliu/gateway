@@ -26,11 +26,7 @@ func (p *YeelightProperty) SetValue(v interface{}) {
 	case on:
 		b, ok := v.(bool)
 		if ok {
-			err := p.bulb.SetPower(b)
-			if err != nil {
-				fmt.Printf("turn on error:%s \t\n", err)
-				return
-			}
+			p.bulb.SetPower(b)
 		}
 		fmt.Printf("set on : %v \t\n", v)
 		p.SetCachedValue(v)

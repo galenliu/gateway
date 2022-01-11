@@ -28,7 +28,7 @@ type DeviceProxy interface {
 
 type AdapterProxy interface {
 	GetId() string
-	GetName() string
+	GetPackageName() string
 	GetDevice(deviceId string) DeviceProxy
 	SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription)
 	Unload()

@@ -65,7 +65,7 @@ func (m *Manager) InstallAddonFromUrl(id, url, checksum string) error {
 	data, _ := ioutil.ReadAll(resp.Body)
 	_ = ioutil.WriteFile(destPath, data, 777)
 	if !util.CheckSum(destPath, checksum) {
-		return fmt.Errorf("checksum err,pakage Id:%s", id)
+		return fmt.Errorf("checksum err,pakage id:%s", id)
 	}
 	m.logger.Infof("download %s successful", id)
 	err = m.installAddon(id, destPath)

@@ -10,7 +10,7 @@ import (
 )
 
 type Adapter struct {
-	adapter.Adapter
+	*adapter.Adapter
 	isPairing          bool
 	packageName        string
 	logger             logging.Logger
@@ -20,15 +20,11 @@ type Adapter struct {
 	nextId             int
 }
 
-func NewAdapter(plugin *Plugin, adapterId, name, packageName string, log logging.Logger) *Adapter {
+func NewAdapter(plugin *Plugin, adapterId, packageName string, log logging.Logger) *Adapter {
 	a := &Adapter{}
-	a.Adapter = adapter.Adapter{
-		Id:   adapterId,
-		Name: name,
-	}
+	a.Adapter = adapter.NewAdapter(adapterId, packageName)
 	a.plugin = plugin
 	a.logger = log
-	a.Id = adapterId
 	a.packageName = packageName
 	a.nextId = 0
 	return a
@@ -108,7 +104,7 @@ func (adapter *Adapter) removeThing(device *device) {
 		DeviceId:  device.GetId(),
 		PluginId:  adapter.plugin.getId(),
 	}
-	adapter.logger.Infof("adapter delete thing Id: %v", device.GetId())
+	adapter.logger.Infof("adapter delete thing id: %v", device.GetId())
 	adapter.send(messages.MessageType_AdapterRemoveDeviceRequest, data)
 }
 
@@ -118,7 +114,7 @@ func (adapter *Adapter) cancelRemoveThing(device *device) {
 		DeviceId:  device.GetId(),
 		PluginId:  adapter.plugin.getId(),
 	}
-	adapter.logger.Info("adapter: %s id: %s CancelRemoveThing:", adapter.GetName(), adapter.GetId(), device.GetId())
+	adapter.logger.Info("adapter: %s  device:%s CancelRemoveThing:", adapter.GetId(), device.GetId())
 	adapter.send(messages.MessageType_AdapterCancelRemoveDeviceCommand, data)
 }
 
