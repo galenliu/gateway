@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight"
-	"github.com/galenliu/gateway/pkg/addon/proxy"
 	"os"
 	"os/signal"
 	"syscall"
@@ -11,14 +9,8 @@ import (
 )
 
 func main() {
-	manager, err := proxy.NewAddonManager("virtual-adapter-golang")
-	if err != nil {
-		fmt.Printf("addon manager error: %s", err.Error())
-		return
-	}
-	adapter := yeelight.NewVirtualAdapter(manager, "virtual-adapter", "virtual-adapter")
-	manager.AddAdapters(adapter)
 
+	adapter := yeelight.NewVirtualAdapter("virtual-adapter-golang", "virtual-adapter", "virtual-adapter")
 	interruptChannel := make(chan os.Signal, 1)
 	signal.Notify(interruptChannel, syscall.SIGINT, syscall.SIGTERM)
 

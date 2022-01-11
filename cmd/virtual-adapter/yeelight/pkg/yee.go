@@ -115,6 +115,7 @@ func (y *Yeelight) Listen() (<-chan *Notification, chan<- struct{}, error) {
 		for {
 			select {
 			case c := <-y.sendChan:
+				fmt.Printf("send Channel rev: %v \t\n", c)
 				b, _ := json.Marshal(c)
 				fmt.Fprint(conn, string(b)+crlf)
 			case <-done:
@@ -182,6 +183,12 @@ func (y *Yeelight) executeCommand(name string, params ...interface{}) (*CommandR
 //executeCommand executes command
 func (y *Yeelight) execute(cmd *Command) (*CommandResult, error) {
 	if y.license {
+		for {
+			select {
+			case y.sendChan <- cmd:
+				return nil, nil
+			}
+		}
 
 	}
 	conn, err := net.Dial("tcp", y.addr)

@@ -18,12 +18,6 @@ type YeelightProperty struct {
 }
 
 func NewYeelightProperty(bulb *yeelight.Yeelight, description properties.PropertyDescription) *YeelightProperty {
-	go func() {
-		_, _, err := bulb.Listen()
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-	}()
 	return &YeelightProperty{bulb, proxy.NewProperty(description)}
 }
 
