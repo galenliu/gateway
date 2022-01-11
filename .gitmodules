@@ -1,6 +1,0 @@
-[submodule "virtual-things-adapter"]
-	path = virtual-things-adapter
-	url = https://github.com/galenliu/virtual-things-adapter.git
-[submodule "yeelight-adapter-python"]
-	path = yeelight-adapter-python
-	url = https://github.com/galenliu/yeelight-adapter-python
