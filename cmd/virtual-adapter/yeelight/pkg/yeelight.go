@@ -28,6 +28,7 @@ type Mode int
 
 type Yeelight struct {
 	addr       string
+	conn       net.Conn
 	supports   []string
 	lastStatus sync.Map
 	rnd        *rand.Rand
@@ -48,10 +49,34 @@ func (y *Yeelight) executeCommand(name string, params ...interface{}) (*CommandR
 }
 
 func (y *Yeelight) execute(cmd *Command) (*CommandResult, error) {
-	select {
-	case y.sendChan <- cmd:
-		return nil, nil
+	if y.conn == nil {
+		conn, err := net.Dial("tcp", y.addr)
+		if nil != err {
+			y.conn = nil
+			return nil, fmt.Errorf("cannot open connection to %s. %s", y.addr, err)
+		}
+		y.conn = conn
 	}
+	y.conn.SetReadDeadline(time.Now().Add(timeout))
+
+	//write request/command
+	b, _ := json.Marshal(cmd)
+	fmt.Fprint(y.conn, string(b)+crlf)
+
+	//wait and read for response
+	res, err := bufio.NewReader(y.conn).ReadString('\n')
+	if err != nil {
+		return nil, fmt.Errorf("cannot read command result %s", err)
+	}
+	var rs CommandResult
+	err = json.Unmarshal([]byte(res), &rs)
+	if nil != err {
+		return nil, fmt.Errorf("cannot parse command result %s", err)
+	}
+	if nil != rs.Error {
+		return nil, fmt.Errorf("command execution error. Code: %d, Message: %s", rs.Error.Code, rs.Error.Message)
+	}
+	return &rs, nil
 }
 
 func (y *Yeelight) newCommand(name string, params []interface{}) *Command {
@@ -195,10 +220,6 @@ func (y *Yeelight) Listen() (<-chan *Notification, chan<- struct{}, error) {
 		connReader := bufio.NewReader(c)
 		for {
 			select {
-			case c := <-y.sendChan:
-				fmt.Printf("send Channel rev: %v \t\n", c)
-				b, _ := json.Marshal(c)
-				fmt.Fprint(conn, string(b)+crlf)
 			case <-done:
 				return
 			default:
@@ -210,6 +231,7 @@ func (y *Yeelight) Listen() (<-chan *Notification, chan<- struct{}, error) {
 					select {
 					case notifCh <- &rs:
 					default:
+						fmt.Printf("data: %s", data)
 						fmt.Println("Channel is full")
 					}
 				}

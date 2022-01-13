@@ -39,6 +39,10 @@ func (a *Adapter) GetDevice(id string) Device {
 	return nil
 }
 
+func (a *Adapter) GetPluginId() string {
+	return a.packageName
+}
+
 func (a *Adapter) GetDevices() []Device {
 	devices := make([]Device, 1)
 	a.devices.Range(func(key, value any) bool {

@@ -1,6 +1,7 @@
 package yeelight
 
 import (
+	"fmt"
 	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg"
 	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/addon/properties"
@@ -77,9 +78,40 @@ func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
 			continue
 		}
 	}
+	go func() {
+		err := yeeDevice.Listen()
+		if err != nil {
+			fmt.Printf("error: %s", err.Error())
+		}
+	}()
 	return yeeDevice
 }
 
-func (d YeelightDevice) SetCredentials(username, password string) error {
+func (d *YeelightDevice) SetCredentials(username, password string) error {
+	return nil
+}
+
+func (d *YeelightDevice) Listen() error {
+	notify, _, err := d.Yeelight.Listen()
+	if err != nil {
+		return err
+	}
+	for {
+		select {
+		case msg := <-notify:
+			fmt.Printf("notify: %s", msg)
+			for n, v := range msg.Params {
+				if n == "power" {
+					d.GetProperty(on).SetCachedValueAndNotify(v)
+				}
+				if n == "bright" {
+					d.GetProperty(level).SetCachedValueAndNotify(v)
+				}
+				if n == "rgb" {
+					d.GetProperty(color).SetCachedValueAndNotify(v)
+				}
+			}
+		}
+	}
 	return nil
 }

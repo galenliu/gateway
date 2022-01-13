@@ -28,8 +28,8 @@ type (
 
 	// Notification represents notification response
 	Notification struct {
-		Method string            `json:"method"`
-		Params map[string]string `json:"params"`
+		Method string         `json:"method"`
+		Params map[string]any `json:"params"`
 	}
 
 	//Error struct represents error part of response

@@ -32,6 +32,7 @@ func (p *YeelightProperty) SetValue(v interface{}) {
 		p.SetCachedValue(v)
 		p.NotifyChanged()
 		break
+
 	case level:
 		f, ok := v.(float64)
 		if ok {
@@ -62,7 +63,6 @@ func (p *YeelightProperty) SetValue(v interface{}) {
 		fmt.Printf("set color : %v \t\n", v)
 		p.SetCachedValue(v)
 		p.NotifyChanged()
-		return
-
+		break
 	}
 }
