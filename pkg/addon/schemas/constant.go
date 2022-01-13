@@ -1,4 +1,4 @@
-package proxy
+package schemas
 
 const (
 	TypeString  = "string"

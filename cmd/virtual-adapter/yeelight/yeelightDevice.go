@@ -5,6 +5,7 @@ import (
 	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/addon/proxy"
+	"github.com/galenliu/gateway/pkg/addon/schemas"
 )
 
 type YeelightDevice struct {
@@ -14,18 +15,18 @@ type YeelightDevice struct {
 
 func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
 	yeeDevice := &YeelightDevice{
-		Device:   proxy.NewDevice([]string{"Light", "OnOffSwitch"}, bulb.GetAddr(), "yeelight"+bulb.GetAddr()),
+		Device:   proxy.NewDevice([]string{schemas.Light, schemas.OnOffSwitch}, bulb.GetAddr(), "yeelight"+bulb.GetAddr()),
 		Yeelight: bulb,
 	}
 	for _, method := range bulb.GetSupports() {
 		switch method {
 		case "set_power":
-			var atType = proxy.OnOffProperty
+			var atType = schemas.OnOffProperty
 			prop := NewYeelightProperty(bulb, properties.PropertyDescription{
 				Name:        &on,
 				AtType:      &atType,
 				Title:       nil,
-				Type:        proxy.TypeBoolean,
+				Type:        schemas.TypeBoolean,
 				Unit:        nil,
 				Description: nil,
 				Minimum:     nil,
@@ -40,12 +41,12 @@ func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
 		case "set_bright":
 			var min float64 = 0
 			var max float64 = 100
-			var atType = proxy.LevelProperty
+			var atType = schemas.LevelProperty
 			prop := NewYeelightProperty(bulb, properties.PropertyDescription{
 				Name:        &level,
 				AtType:      &atType,
 				Title:       nil,
-				Type:        proxy.TypeInteger,
+				Type:        schemas.TypeInteger,
 				Unit:        nil,
 				Description: nil,
 				Minimum:     &min,
@@ -58,12 +59,12 @@ func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
 			})
 			yeeDevice.AddProperty(prop)
 		case "set_rgb":
-			var atType = proxy.ColorProperty
+			var atType = schemas.ColorProperty
 			prop := NewYeelightProperty(bulb, properties.PropertyDescription{
 				Name:        &color,
 				AtType:      &atType,
 				Title:       nil,
-				Type:        proxy.TypeString,
+				Type:        schemas.TypeString,
 				Unit:        nil,
 				Description: nil,
 				Enum:        nil,
