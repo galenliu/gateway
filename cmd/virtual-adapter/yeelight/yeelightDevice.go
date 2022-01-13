@@ -3,7 +3,6 @@ package yeelight
 import (
 	"fmt"
 	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg"
-	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/addon/proxy"
 )
@@ -21,12 +20,12 @@ func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
 	for _, method := range bulb.GetSupports() {
 		switch method {
 		case "set_power":
-			var atType = addon.OnOffProperty
+			var atType = proxy.OnOffProperty
 			prop := NewYeelightProperty(bulb, properties.PropertyDescription{
 				Name:        &on,
 				AtType:      &atType,
 				Title:       nil,
-				Type:        addon.TypeBoolean,
+				Type:        proxy.TypeBoolean,
 				Unit:        nil,
 				Description: nil,
 				Minimum:     nil,
@@ -41,12 +40,12 @@ func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
 		case "set_bright":
 			var min float64 = 0
 			var max float64 = 100
-			var atType = addon.LevelProperty
+			var atType = proxy.LevelProperty
 			prop := NewYeelightProperty(bulb, properties.PropertyDescription{
 				Name:        &level,
 				AtType:      &atType,
 				Title:       nil,
-				Type:        addon.TypeInteger,
+				Type:        proxy.TypeInteger,
 				Unit:        nil,
 				Description: nil,
 				Minimum:     &min,
@@ -59,12 +58,12 @@ func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
 			})
 			yeeDevice.AddProperty(prop)
 		case "set_rgb":
-			var atType = addon.ColorProperty
+			var atType = proxy.ColorProperty
 			prop := NewYeelightProperty(bulb, properties.PropertyDescription{
 				Name:        &color,
 				AtType:      &atType,
 				Title:       nil,
-				Type:        addon.TypeString,
+				Type:        proxy.TypeString,
 				Unit:        nil,
 				Description: nil,
 				Enum:        nil,

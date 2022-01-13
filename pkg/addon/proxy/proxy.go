@@ -1,4 +1,4 @@
-package addon
+package proxy
 
 import (
 	"github.com/galenliu/gateway/pkg/addon/devices"
@@ -29,6 +29,7 @@ type DeviceProxy interface {
 type AdapterProxy interface {
 	GetId() string
 	GetPackageName() string
+	GetName() string
 	GetDevice(deviceId string) DeviceProxy
 	SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription)
 	Unload()

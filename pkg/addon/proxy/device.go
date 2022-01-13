@@ -2,13 +2,12 @@ package proxy
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 )
 
 type Device struct {
-	handler addon.AdapterProxy
+	handler AdapterProxy
 	*devices.Device
 }
 
@@ -41,19 +40,19 @@ func (d *Device) SetCredentials(username, password string) error {
 	return fmt.Errorf("SetCredentials not implemented")
 }
 
-func (d *Device) AddProperty(p addon.PropertyProxy) {
+func (d *Device) AddProperty(p PropertyProxy) {
 	p.SetHandler(d)
 	d.Device.AddProperty(p.GetName(), p)
 }
 
-func (d *Device) GetAdapter() addon.AdapterProxy {
+func (d *Device) GetAdapter() AdapterProxy {
 	return d.handler
 }
 
-func (d *Device) GetProperty(id string) addon.PropertyProxy {
+func (d *Device) GetProperty(id string) PropertyProxy {
 	p := d.Device.GetProperty(id)
 	if p != nil {
-		p, ok := p.(addon.PropertyProxy)
+		p, ok := p.(PropertyProxy)
 		if ok {
 			return p
 		}
@@ -61,6 +60,6 @@ func (d *Device) GetProperty(id string) addon.PropertyProxy {
 	return nil
 }
 
-func (d *Device) SetHandler(h addon.AdapterProxy) {
+func (d *Device) SetHandler(h AdapterProxy) {
 	d.handler = h
 }

@@ -2,7 +2,6 @@ package proxy
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/addon/adapter"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
@@ -12,11 +11,10 @@ import (
 
 type Adapter struct {
 	*adapter.Adapter
-	manager     *Manager
-	packageName string
-	IsPairing   bool
-	verbose     bool
-	pluginId    string
+	manager   *Manager
+	IsPairing bool
+	verbose   bool
+	pluginId  string
 }
 
 func NewAdapter(manager *Manager, adapterId, packageName string) *Adapter {
@@ -27,7 +25,7 @@ func NewAdapter(manager *Manager, adapterId, packageName string) *Adapter {
 	return a
 }
 
-func (a *Adapter) AddDevices(devices ...addon.DeviceProxy) {
+func (a *Adapter) AddDevices(devices ...DeviceProxy) {
 	for _, device := range devices {
 		if device != nil {
 			device.SetHandler(a)
@@ -40,7 +38,7 @@ func (a *Adapter) AddDevices(devices ...addon.DeviceProxy) {
 func (a *Adapter) SendError(message string) {
 	a.manager.send(messages.MessageType_PluginErrorNotification, messages.PluginErrorNotificationJsonData{
 		Message:  message,
-		PluginId: a.manager.packageName,
+		PluginId: a.manager.pluginId,
 	})
 }
 
@@ -60,7 +58,7 @@ func (a *Adapter) SendPairingPrompt(prompt, url string, did string) {
 	a.manager.send(messages.MessageType_AdapterPairingPromptNotification, messages.AdapterPairingPromptNotificationJsonData{
 		AdapterId: a.GetId(),
 		DeviceId:  &did,
-		PluginId:  a.packageName,
+		PluginId:  a.GetPackageName(),
 		Prompt:    prompt,
 		Url:       u,
 	})
@@ -76,7 +74,7 @@ func (a *Adapter) SendUnpairingPrompt(prompt, url string, did string) {
 	a.manager.send(messages.MessageType_AdapterUnpairingPromptNotification, messages.AdapterUnpairingPromptNotificationJsonData{
 		AdapterId: a.GetId(),
 		DeviceId:  &did,
-		PluginId:  a.packageName,
+		PluginId:  a.GetPackageName(),
 		Prompt:    prompt,
 		Url:       u,
 	})
@@ -92,14 +90,10 @@ func (a *Adapter) CancelPairing() {
 	}
 }
 
-func (a *Adapter) GetPackageName() string {
-	return a.packageName
-}
-
-func (a *Adapter) GetDevice(id string) addon.DeviceProxy {
+func (a *Adapter) GetDevice(id string) DeviceProxy {
 	device := a.Adapter.GetDevice(id)
 	if device != nil {
-		d, ok := device.(addon.DeviceProxy)
+		d, ok := device.(DeviceProxy)
 		if ok {
 			return d
 		}
@@ -113,13 +107,13 @@ func (a *Adapter) Unload() {
 	}
 }
 
-func (a *Adapter) HandleDeviceSaved(device addon.DeviceProxy) {
+func (a *Adapter) HandleDeviceSaved(device DeviceProxy) {
 	if a.verbose {
 		log.Printf("adapter:(%s)- HandleDeviceSaved() not implemented", device.GetId())
 	}
 }
 
-func (a *Adapter) HandleDeviceRemoved(device addon.DeviceProxy) {
+func (a *Adapter) HandleDeviceRemoved(device DeviceProxy) {
 	a.Adapter.RemoveDevice(device.GetId())
 }
 

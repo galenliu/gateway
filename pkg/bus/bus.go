@@ -58,7 +58,7 @@ func (b *Bus) Sub(topic topic.Topic, fn any) func() {
 }
 
 func (b *Bus) Pub(topic topic.Topic, args ...any) {
-	b.logger.Debugf("publish topic:[%s] Args:%#v", topic, args)
+	b.logger.Debugf("publish topic:[%s]", topic)
 	go b.Bus.Publish(topic.ToString(), args...)
 }
 

@@ -227,7 +227,10 @@ func (y *Yeelight) Listen() (<-chan *Notification, chan<- struct{}, error) {
 				if nil == err {
 					var rs Notification
 					fmt.Println(data)
-					json.Unmarshal([]byte(data), &rs)
+					err := json.Unmarshal([]byte(data), &rs)
+					if err != nil {
+						return
+					}
 					select {
 					case notifCh <- &rs:
 					default:

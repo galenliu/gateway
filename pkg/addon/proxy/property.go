@@ -2,7 +2,6 @@ package proxy
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 )
 
@@ -16,7 +15,7 @@ func NewProperty(des properties.PropertyDescription) *Property {
 	}
 }
 
-func (p *Property) SetHandler(handler addon.DeviceProxy) {
+func (p *Property) SetHandler(handler DeviceProxy) {
 	p.Property.Handler = handler
 }
 

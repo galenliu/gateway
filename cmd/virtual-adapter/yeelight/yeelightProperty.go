@@ -3,7 +3,6 @@ package yeelight
 import (
 	"fmt"
 	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg"
-	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/addon/proxy"
 )
@@ -50,7 +49,7 @@ func (p *YeelightProperty) SetValue(v interface{}) {
 	case color:
 		f, ok := v.(string)
 		if ok {
-			c, err := addon.HTMLToRGB(f)
+			c, err := proxy.HTMLToRGB(f)
 			if err != nil {
 				return
 			}

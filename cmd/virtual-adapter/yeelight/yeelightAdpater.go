@@ -3,7 +3,6 @@ package yeelight
 import (
 	"fmt"
 	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg"
-	"github.com/galenliu/gateway/pkg/addon"
 	"github.com/galenliu/gateway/pkg/addon/proxy"
 	"time"
 )
@@ -28,7 +27,7 @@ func NewVirtualAdapter(adapterId, packageName string) *VirtualAdapter {
 
 func (a *VirtualAdapter) StartPairing(timeout time.Duration) {
 
-	devices := make(map[string]addon.DeviceProxy, 1)
+	devices := make(map[string]proxy.DeviceProxy, 1)
 
 	discover := func() {
 		bulb, err := yeelight.Discover()
