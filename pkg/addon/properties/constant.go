@@ -1,7 +1,6 @@
 package properties
 
 const (
-	On               = "on"
 	Brightness       = "brightness"
 	Hue              = "hue"
 	ColorTemperature = "ct"

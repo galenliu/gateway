@@ -4,7 +4,6 @@ go 1.18
 
 require (
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
-	github.com/bytedance/sonic v1.0.0
 	github.com/fasthttp/websocket v1.4.3-rc.10
 	github.com/gofiber/fiber/v2 v2.24.0
 	github.com/gofiber/websocket/v2 v2.0.14

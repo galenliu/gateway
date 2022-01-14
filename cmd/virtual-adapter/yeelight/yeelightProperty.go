@@ -13,7 +13,7 @@ var color = "color"
 
 type YeelightProperty struct {
 	bulb *yeelight.Yeelight
-	*proxy.Property
+	proxy.PropertyProxy
 }
 
 func NewYeelightProperty(bulb *yeelight.Yeelight, description properties.PropertyDescription) *YeelightProperty {

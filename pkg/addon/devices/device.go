@@ -24,10 +24,10 @@ type PropertyEntity interface {
 	GetMultipleOf() any
 	GetValue() any
 	IsReadOnly() bool
-	SetCachedValue(value any) bool
-	SetCachedValueAndNotify(value any)
 	ToMessage() messages.Property
 	ToDescription() properties.PropertyDescription
+	SetCachedValue(value any) bool
+	SetCachedValueAndNotify(value any)
 	SetTitle(s string) bool
 	SetDescription(description string) bool
 }
