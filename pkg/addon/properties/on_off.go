@@ -1,34 +1,32 @@
 package properties
 
 import (
+	"fmt"
+	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/proxy"
-	"github.com/galenliu/gateway/pkg/addon/schemas"
 )
 
 const On = "on"
 
-type OnOffPropertyEntity interface {
-	proxy.PropertyProxy
-	Turn(b bool)
+type BooleanValuer interface {
+	devices.PropertyEntity
+	SetValue(b bool)
 }
 
 type OnOffProperty struct {
-	*BooleanProperty
+	BooleanValuer
 }
 
 func NewOnOffProperty(prop PropertyDescription) *OnOffProperty {
 	p := &OnOffProperty{}
-	p.BooleanProperty = NewBooleanProperty(prop)
-	p.Type = TypeBoolean
-	p.AtType = schemas.OnOffProperty
-	p.Name = On
+	p.BooleanValuer = NewBooleanProperty(prop)
 	return p
 }
 
-func (p *OnOffProperty) Turn(b bool) {
-
+func (p *OnOffProperty) SetValue(a any) {
+	fmt.Printf("property: %s SetValue func not implemented", p.GetName())
 }
 
-func (p *OnOffProperty) SetValue(a any) {
+func (p *OnOffProperty) SetHandler(handler proxy.DeviceProxy) {
 
 }

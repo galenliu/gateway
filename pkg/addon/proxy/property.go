@@ -19,6 +19,6 @@ func (p *Property) SetHandler(handler DeviceProxy) {
 	p.Property.Handler = handler
 }
 
-func (p *Property) SetValue(v interface{}) {
-	fmt.Print("property: %s SetValue func not implemented", p.GetName())
+func (p *Property) SetValue(v any) {
+	fmt.Printf("property: %s SetValue func not implemented", p.GetName())
 }

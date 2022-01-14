@@ -1,7 +1,17 @@
 package properties
 
+import (
+	"fmt"
+	"github.com/galenliu/gateway/pkg/addon/proxy"
+)
+
 type BooleanProperty struct {
-	*Property
+	*proxy.Boolean
+}
+
+func (prop *BooleanProperty) SetValue(b bool) {
+	//TODO implement me
+	fmt.Print()
 }
 
 func NewBooleanProperty(description PropertyDescription) *BooleanProperty {
@@ -12,15 +22,6 @@ func NewBooleanProperty(description PropertyDescription) *BooleanProperty {
 	}
 	p.Type = TypeBoolean
 	return p
-}
-
-// SetBooleanValue SetValue sets a value
-func (prop *BooleanProperty) SetBooleanValue(value bool) {
-}
-
-// GetValue returns the value as bool
-func (prop *BooleanProperty) GetValue() bool {
-	return prop.Property.GetValue().(bool)
 }
 
 // OnValueRemoteGet calls fn when the value was read by a client.
