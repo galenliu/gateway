@@ -25,10 +25,10 @@ false
 
 
 ### trune level
-PUT http://localhost:9090/things/192.168.1.105:55443/properties/level
+PUT http://localhost:9090/things/192.168.1.105:55443/properties/bright
 Content-Type: application/x-www-form-urlencoded
 
-80
+12
 
 ### set hue
 PUT http://localhost:9090/things/192.168.1.105:55443/properties/color
@@ -51,7 +51,7 @@ Content-Type: application/json
 {
   "@context": "https://webthings.io/schemas",
   "title": "192.168.1.105:55443",
-  "id": "0x0000000010e2fa00",
+  "id": "192.168.1.105:55443",
   "@type": [
     "Light",
     "OnOffSwitch"
@@ -63,10 +63,11 @@ Content-Type: application/json
   },
   "properties": {
     "color": {"forms":[{"href":"/things/192.168.1.105:55443/properties/color"}],"type":"string","minLength":0},
-    "level": {"forms":[{"href":"/things/192.168.1.105:55443/properties/level"}],"type":"integer","minimum":0,"maximum":0,"multipleOf":0},
-    "on": {"forms":[{"href":"/things/192.168.1.105:55443/properties/on"}],"type":"boolean"}
+    "on": {"forms":[{"href":"/things/192.168.1.105:55443/properties/on"}],"type":"boolean"},
+    "bright": {"forms":[{"href":"/things/192.168.1.105:55443/properties/bright"}],"unit":"percentage","type":"integer","minimum":0,"maximum":0,"multipleOf":0}
   }
 }
+
 
 
 ###create thing

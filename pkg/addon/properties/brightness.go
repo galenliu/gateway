@@ -1,7 +1,5 @@
 package properties
 
-const TypeBrightnessProperty = "BrightnessProperty"
-
 type BrightnessProperty struct {
 	*IntegerProperty
 }

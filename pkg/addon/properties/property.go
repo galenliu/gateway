@@ -64,9 +64,19 @@ func NewProperty(description PropertyDescription) *Property {
 		AtType:      getString(description.Description),
 		Unit:        getString(description.Unit),
 		Description: getString(description.Description),
-		Minimum:     description.Minimum,
-		Maximum:     description.Maximum,
-		Enum:        description.Enum,
+		Minimum: func() any {
+			if description.Minimum == nil {
+				return nil
+			}
+			return *description.Minimum
+		},
+		Maximum: func() any {
+			if description.Maximum == nil {
+				return nil
+			}
+			return *description.Maximum
+		},
+		Enum: description.Enum,
 		ReadOnly: func(b *bool) bool {
 			if b == nil {
 				return false
