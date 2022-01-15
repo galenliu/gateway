@@ -6,14 +6,24 @@ type BrightnessProperty struct {
 	*IntegerProperty
 }
 
-func NewBrightnessProperty() *BrightnessProperty {
+func NewBrightnessProperty(description PropertyDescription) *BrightnessProperty {
 	p := &IntegerProperty{}
-	p.Property.Type = TypeInteger
-	p.Name = "bright"
-	p.SetMinValue(0)
-	p.SetMaxValue(100)
-	//p.SetValue(0)
-	//p.SetUnit(UnitPercentage)
-
+	p.Property = NewProperty(description)
+	if description.Name == nil {
+		p.Name = "bright"
+	}
+	if description.Maximum == nil {
+		p.SetMinValue(100)
+	}
+	if description.Minimum == nil {
+		p.SetMinValue(0)
+	}
+	if description.Unit == nil {
+		p.Unit = UnitPercentage
+	}
 	return &BrightnessProperty{p}
+}
+
+func (b BrightnessProperty) SetBrightness(v int) {
+
 }

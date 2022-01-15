@@ -10,8 +10,8 @@ import (
 type PropertyProxy interface {
 	devices.PropertyEntity
 	SetValue(a any)
-	SetHandler(DeviceProxy)
-	NotifyChanged()
+	//SetHandler(DeviceProxy)
+	//NotifyChanged()
 }
 
 type DeviceProxy interface {

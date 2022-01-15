@@ -174,6 +174,10 @@ func (p *Property) GetValue() any {
 	return p.Value
 }
 
+func (p *Property) SetHandler(h DeviceHandler) {
+	p.Handler = h
+}
+
 func (p *Property) ToDescription() PropertyDescription {
 	get := func(s string) *string {
 		if s == "" {

@@ -4,23 +4,22 @@ import (
 	"github.com/galenliu/gateway/pkg/addon/devices"
 )
 
-type BooleanValuer interface {
+type BooleanPropertyInstance interface {
 	devices.PropertyEntity
-	SetValue(bool2 bool)
+	Turn(b bool)
 }
 
-type Boolean struct {
-	BooleanValuer
+type BooleanProperty struct {
+	BooleanPropertyInstance
 }
 
-func NewBoolean(b BooleanValuer) *Boolean {
-	return &Boolean{b}
+func NewBoolean(p BooleanPropertyInstance) *BooleanProperty {
+	return &BooleanProperty{p}
 }
 
-func (b Boolean) SetValue(a any) {
+func (b *BooleanProperty) SetValue(a any) {
 	v, ok := a.(bool)
 	if ok {
-		b.BooleanValuer.SetValue(v)
+		b.BooleanPropertyInstance.Turn(v)
 	}
-
 }

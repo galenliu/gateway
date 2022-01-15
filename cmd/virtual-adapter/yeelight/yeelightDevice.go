@@ -22,7 +22,7 @@ func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
 		switch method {
 		case "set_power":
 			var atType = schemas.OnOffProperty
-			prop := NewYeelightProperty(bulb, properties.PropertyDescription{
+			p := NewOn(properties.PropertyDescription{
 				Name:        &on,
 				AtType:      &atType,
 				Title:       nil,
@@ -37,7 +37,23 @@ func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
 				Links:       nil,
 				Value:       nil,
 			})
-			yeeDevice.AddProperty(prop)
+
+			//prop := NewYeelightProperty(bulb, properties.PropertyDescription{
+			//	Name:        &on,
+			//	AtType:      &atType,
+			//	Title:       nil,
+			//	Type:        schemas.TypeBoolean,
+			//	Unit:        nil,
+			//	Description: nil,
+			//	Minimum:     nil,
+			//	Maximum:     nil,
+			//	Enum:        nil,
+			//	ReadOnly:    nil,
+			//	MultipleOf:  nil,
+			//	Links:       nil,
+			//	Value:       nil,
+			//})
+			yeeDevice.AddProperty(p)
 		case "set_bright":
 			var min float64 = 0
 			var max float64 = 100

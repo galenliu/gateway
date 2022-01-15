@@ -2,16 +2,10 @@ package properties
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/addon/proxy"
 )
 
 type BooleanProperty struct {
-	*proxy.Boolean
-}
-
-func (prop *BooleanProperty) SetValue(b bool) {
-	//TODO implement me
-	fmt.Print()
+	*Property
 }
 
 func NewBooleanProperty(description PropertyDescription) *BooleanProperty {
@@ -20,8 +14,11 @@ func NewBooleanProperty(description PropertyDescription) *BooleanProperty {
 	if p.Property == nil {
 		return nil
 	}
-	p.Type = TypeBoolean
 	return p
+}
+
+func (prop *BooleanProperty) Turn(b bool) {
+	fmt.Printf("property: %s Turn func not implemented", prop.GetName())
 }
 
 // OnValueRemoteGet calls fn when the value was read by a client.
