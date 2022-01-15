@@ -3,7 +3,6 @@ package yeelight
 import (
 	"fmt"
 	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg"
-	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/addon/proxy"
 	"github.com/galenliu/gateway/pkg/addon/schemas"
 )
@@ -21,75 +20,14 @@ func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
 	for _, method := range bulb.GetSupports() {
 		switch method {
 		case "set_power":
-			var atType = schemas.OnOffProperty
-			p := NewOn(properties.PropertyDescription{
-				Name:        &on,
-				AtType:      &atType,
-				Title:       nil,
-				Type:        schemas.TypeBoolean,
-				Unit:        nil,
-				Description: nil,
-				Minimum:     nil,
-				Maximum:     nil,
-				Enum:        nil,
-				ReadOnly:    nil,
-				MultipleOf:  nil,
-				Links:       nil,
-				Value:       nil,
-			})
-
-			//prop := NewYeelightProperty(bulb, properties.PropertyDescription{
-			//	Name:        &on,
-			//	AtType:      &atType,
-			//	Title:       nil,
-			//	Type:        schemas.TypeBoolean,
-			//	Unit:        nil,
-			//	Description: nil,
-			//	Minimum:     nil,
-			//	Maximum:     nil,
-			//	Enum:        nil,
-			//	ReadOnly:    nil,
-			//	MultipleOf:  nil,
-			//	Links:       nil,
-			//	Value:       nil,
-			//})
-			yeeDevice.AddProperty(p)
+			prop := NewOn(bulb)
+			yeeDevice.AddProperty(proxy.NewOnOff(prop))
 		case "set_bright":
-			var min float64 = 0
-			var max float64 = 100
-			var atType = schemas.LevelProperty
-			prop := NewYeelightProperty(bulb, properties.PropertyDescription{
-				Name:        &level,
-				AtType:      &atType,
-				Title:       nil,
-				Type:        schemas.TypeInteger,
-				Unit:        nil,
-				Description: nil,
-				Minimum:     &min,
-				Maximum:     &max,
-				Enum:        nil,
-				ReadOnly:    nil,
-				MultipleOf:  nil,
-				Links:       nil,
-				Value:       nil,
-			})
-			yeeDevice.AddProperty(prop)
+			prop := NewBrightness(bulb)
+			yeeDevice.AddProperty(proxy.NewBrightness(prop))
 		case "set_rgb":
-			var atType = schemas.ColorProperty
-			prop := NewYeelightProperty(bulb, properties.PropertyDescription{
-				Name:        &color,
-				AtType:      &atType,
-				Title:       nil,
-				Type:        schemas.TypeString,
-				Unit:        nil,
-				Description: nil,
-				Enum:        nil,
-				ReadOnly:    nil,
-				MultipleOf:  nil,
-				Links:       nil,
-				Value:       nil,
-			})
-			yeeDevice.AddProperty(prop)
+			prop := NewColor(bulb)
+			yeeDevice.AddProperty(proxy.NewColor(prop))
 		default:
 			continue
 		}

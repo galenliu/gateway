@@ -6,28 +6,14 @@ type StringProperty struct {
 
 func NewStringProperty(description PropertyDescription) *StringProperty {
 	p := &StringProperty{}
+	description.Type = TypeString
 	p.Property = NewProperty(description)
-	if p.Property == nil {
-		return nil
-	}
-	p.Type = TypeBoolean
-	return p
-}
-
-func newStringProperty() *StringProperty {
-	p := &StringProperty{}
-	p.Type = TypeString
 	return p
 }
 
 // SetValue sets a value
 func (prop *StringProperty) SetValue(value string) {
 	//	prop.UpdateValue(value)
-}
-
-// GetValue returns the value as bool
-func (prop *StringProperty) GetValue() string {
-	return prop.Property.GetValue().(string)
 }
 
 // OnValueRemoteGet calls fn when the value was read by a client.

@@ -4,20 +4,11 @@ type IntegerProperty struct {
 	*Property
 }
 
-func NewIntegerProperty() *IntegerProperty {
-	return &IntegerProperty{&Property{
-		Type: TypeInteger,
-	}}
-}
-
-// SetValue sets a value
-func (prop *IntegerProperty) SetCachedValueAndNotify(value int) {
-	//prop.PropertyProxy.SetCachedValueAndNotify(value)
-}
-
-// GetValue returns the value as bool
-func (prop *IntegerProperty) GetValue() int {
-	return prop.Property.GetValue().(int)
+func NewIntegerProperty(description PropertyDescription) *IntegerProperty {
+	i := &IntegerProperty{}
+	description.Type = TypeInteger
+	i.Property = NewProperty(description)
+	return i
 }
 
 // OnValueRemoteGet calls fn when the value was read by a client.

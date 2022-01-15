@@ -1,17 +1,21 @@
 package properties
 
-const TypeColorProperty = "ColorProperty"
+import "fmt"
 
 type ColorProperty struct {
 	*StringProperty
 }
 
-func NewColorProperty() *ColorProperty {
-	p := &StringProperty{}
-	p.Type = TypeString
-	p.Name = ColorModel
-	p.SetValue("#121212")
-	p.Unit = UnitPercentage
+func NewColorProperty(p PropertyDescription) *ColorProperty {
+	prop := &ColorProperty{}
+	var name = "color"
+	p.Name = &name
+	var atType = "ColorProperty"
+	p.AtType = &atType
+	prop.StringProperty = NewStringProperty(p)
+	return prop
+}
 
-	return &ColorProperty{p}
+func (c *ColorProperty) SetValue(v string) {
+	fmt.Print("set value func not implemented")
 }

@@ -4,14 +4,16 @@ import (
 	"fmt"
 )
 
-const On = "on"
-
 type OnOffProperty struct {
 	*BooleanProperty
 }
 
 func NewOnOffProperty(prop PropertyDescription) *OnOffProperty {
 	p := &OnOffProperty{}
+	var name = "on"
+	prop.Name = &name
+	atType := "OnOffProperty"
+	prop.AtType = &atType
 	p.BooleanProperty = NewBooleanProperty(prop)
 	return p
 }

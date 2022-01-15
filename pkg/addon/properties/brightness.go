@@ -7,21 +7,27 @@ type BrightnessProperty struct {
 }
 
 func NewBrightnessProperty(description PropertyDescription) *BrightnessProperty {
-	p := &IntegerProperty{}
-	p.Property = NewProperty(description)
-	if description.Name == nil {
-		p.Name = "bright"
-	}
+	p := &BrightnessProperty{}
+	atType := "BrightnessProperty"
+	description.AtType = &atType
 	if description.Maximum == nil {
-		p.SetMinValue(100)
+		var v float64 = 100
+		description.Maximum = &v
 	}
 	if description.Minimum == nil {
-		p.SetMinValue(0)
+		var v float64 = 0
+		description.Minimum = &v
 	}
 	if description.Unit == nil {
-		p.Unit = UnitPercentage
+		var u = "percentage"
+		description.Unit = &u
 	}
-	return &BrightnessProperty{p}
+	if description.Name == nil {
+		var name = "bright"
+		description.Name = &name
+	}
+	p.IntegerProperty = NewIntegerProperty(description)
+	return p
 }
 
 func (b BrightnessProperty) SetBrightness(v int) {

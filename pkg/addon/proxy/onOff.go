@@ -12,7 +12,7 @@ type OnOfProperty struct {
 	OnOffPropertyInstance
 }
 
-func NewOnOffPropertyInstance(onOff OnOffPropertyInstance) *OnOfProperty {
+func NewOnOff(onOff OnOffPropertyInstance) *OnOfProperty {
 	return &OnOfProperty{onOff}
 }
 

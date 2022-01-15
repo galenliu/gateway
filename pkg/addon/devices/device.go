@@ -23,6 +23,7 @@ type PropertyEntity interface {
 	GetMaximum() any
 	GetMultipleOf() any
 	GetValue() any
+	SetHandler(handler properties.DeviceHandler)
 	IsReadOnly() bool
 	ToMessage() messages.Property
 	ToDescription() properties.PropertyDescription

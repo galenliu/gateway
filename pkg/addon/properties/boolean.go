@@ -10,10 +10,8 @@ type BooleanProperty struct {
 
 func NewBooleanProperty(description PropertyDescription) *BooleanProperty {
 	p := &BooleanProperty{}
+	description.Type = TypeBoolean
 	p.Property = NewProperty(description)
-	if p.Property == nil {
-		return nil
-	}
 	return p
 }
 
