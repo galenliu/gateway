@@ -20,12 +20,12 @@ type Adapter struct {
 	nextId             int
 }
 
-func NewAdapter(plugin *Plugin, adapterId, packageName string, log logging.Logger) *Adapter {
+func NewAdapter(plugin *Plugin, adapterId string, log logging.Logger) *Adapter {
 	a := &Adapter{}
-	a.Adapter = adapter.NewAdapter(adapterId, packageName)
+	a.Adapter = adapter.NewAdapter(adapterId)
 	a.plugin = plugin
 	a.logger = log
-	a.packageName = packageName
+	a.packageName = plugin.pluginId
 	a.nextId = 0
 	return a
 }
@@ -133,7 +133,7 @@ func (adapter *Adapter) handleDeviceAdded(device *device) {
 }
 
 func (adapter *Adapter) getDevice(deviceId string) *device {
-	d := adapter.GetDevice(deviceId)
+	d := adapter.GetDeviceEntity(deviceId)
 	device, ok := d.(device)
 	if !ok {
 		return nil

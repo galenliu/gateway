@@ -157,12 +157,12 @@ func newDevice(adapter *Adapter, msg messages.Device) *device {
 			}(),
 		},
 	}
-	for n, p := range msg.Properties {
+	for _, p := range msg.Properties {
 		prop := properties.NewProperty(getPropertyDescription(p))
 		if prop == nil {
 			continue
 		}
-		device.AddProperty(n, prop)
+		device.AddProperty(prop)
 	}
 
 	device.logger = adapter.logger
@@ -177,7 +177,7 @@ func (device *device) NotifyPropertyChanged(property properties.PropertyDescript
 		case task <- property.Value:
 		}
 	}
-	p := device.getProperty(property.Name)
+	p := device.GetPropertyEntity(property.Name)
 	if p == nil {
 		return
 	}
@@ -239,7 +239,7 @@ func (device *device) requestAction(ctx context.Context, id, name string, input 
 
 func (device *device) setPropertyValue(ctx context.Context, name string, value any) (any, error) {
 
-	p := device.GetProperty(name)
+	p := device.GetPropertyEntity(name)
 	if p == nil {
 		return nil, errors.New("property not found")
 	}
@@ -289,17 +289,6 @@ func (device *device) setPropertyValue(ctx context.Context, name string, value a
 
 func (device *device) getAdapter() *Adapter {
 	return device.adapter
-}
-
-func (device *device) getProperty(id string) devices.PropertyEntity {
-	p := device.GetProperty(id)
-	if p != nil {
-		prop, ok := p.(devices.PropertyEntity)
-		if ok {
-			return prop
-		}
-	}
-	return nil
 }
 
 func (device *device) GetAdapter() proxy.AdapterProxy {

@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"github.com/galenliu/gateway/pkg/addon/adapter"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
@@ -8,28 +9,33 @@ import (
 )
 
 type PropertyProxy interface {
-	devices.PropertyEntity
+	properties.Entity
 	SetValue(a any)
-	//SetHandler(DeviceProxy)
-	//NotifyChanged()
 }
 
 type DeviceProxy interface {
-	properties.DeviceHandler
-	SetHandler(proxy AdapterProxy)
-	GetId() string
-	GetAdapter() AdapterProxy
-	ToMessage() messages.Device
+	devices.Entity
 	GetProperty(id string) PropertyProxy
+	properties.DeviceHandler
 	SetCredentials(username, password string) error
-	NotifyPropertyChanged(p properties.PropertyDescription)
+}
+
+type ManagerProxy interface {
+	HandleDeviceAdded(device DeviceProxy)
+	HandleDeviceRemoved(device DeviceProxy)
+	Send(messageType messages.MessageType, v any)
+	Close()
+	GetPluginId() string
+	IsRunning() bool
 }
 
 type AdapterProxy interface {
-	GetId() string
-	GetPackageName() string
-	GetName() string
+	adapter.Entity
+	devices.AdapterHandler
 	GetDevice(deviceId string) DeviceProxy
+	GetName() string
+	GetPackageName() string
+	SetManager(m ManagerProxy)
 	SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription)
 	Unload()
 	CancelPairing()

@@ -5,6 +5,7 @@ import (
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/events"
+	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/constant"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	ia "github.com/galenliu/gateway/pkg/wot/definitions/core/interaction_affordance"
@@ -56,7 +57,7 @@ func AsWebOfThing(device *devices.Device) Thing {
 }
 
 func mapOfWotProperties(deviceId string, props devices.DeviceProperties) (mapOfProperty map[string]wot.PropertyAffordance) {
-	asWotProperty := func(deviceId string, p devices.PropertyEntity) wot.PropertyAffordance {
+	asWotProperty := func(deviceId string, p properties.Entity) wot.PropertyAffordance {
 		var wp wot.PropertyAffordance
 		var i = &ia.InteractionAffordance{
 			AtType:       p.GetAtType(),

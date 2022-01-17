@@ -11,16 +11,17 @@ import (
 
 type Adapter struct {
 	*adapter.Adapter
-	manager   *Manager
+	name      string
+	manager   ManagerProxy
 	IsPairing bool
 	verbose   bool
 	pluginId  string
 }
 
-func NewAdapter(manager *Manager, adapterId, packageName string) *Adapter {
+func NewAdapter(adapterId, name string) *Adapter {
 	a := &Adapter{}
-	a.Adapter = adapter.NewAdapter(adapterId, packageName)
-	a.manager = manager
+	a.Adapter = adapter.NewAdapter(adapterId)
+	a.name = name
 	a.verbose = true
 	return a
 }
@@ -30,15 +31,15 @@ func (a *Adapter) AddDevices(devices ...DeviceProxy) {
 		if device != nil {
 			device.SetHandler(a)
 			a.Adapter.AddDevice(device)
-			a.manager.handleDeviceAdded(device)
+			a.manager.HandleDeviceAdded(device)
 		}
 	}
 }
 
 func (a *Adapter) SendError(message string) {
-	a.manager.send(messages.MessageType_PluginErrorNotification, messages.PluginErrorNotificationJsonData{
+	a.manager.Send(messages.MessageType_PluginErrorNotification, messages.PluginErrorNotificationJsonData{
 		Message:  message,
-		PluginId: a.manager.pluginId,
+		PluginId: a.GetPackageName(),
 	})
 }
 
@@ -55,7 +56,7 @@ func (a *Adapter) SendPairingPrompt(prompt, url string, did string) {
 	} else {
 		u = nil
 	}
-	a.manager.send(messages.MessageType_AdapterPairingPromptNotification, messages.AdapterPairingPromptNotificationJsonData{
+	a.manager.Send(messages.MessageType_AdapterPairingPromptNotification, messages.AdapterPairingPromptNotificationJsonData{
 		AdapterId: a.GetId(),
 		DeviceId:  &did,
 		PluginId:  a.GetPackageName(),
@@ -71,7 +72,7 @@ func (a *Adapter) SendUnpairingPrompt(prompt, url string, did string) {
 	} else {
 		u = nil
 	}
-	a.manager.send(messages.MessageType_AdapterUnpairingPromptNotification, messages.AdapterUnpairingPromptNotificationJsonData{
+	a.manager.Send(messages.MessageType_AdapterUnpairingPromptNotification, messages.AdapterUnpairingPromptNotificationJsonData{
 		AdapterId: a.GetId(),
 		DeviceId:  &did,
 		PluginId:  a.GetPackageName(),
@@ -80,8 +81,8 @@ func (a *Adapter) SendUnpairingPrompt(prompt, url string, did string) {
 	})
 }
 
-func (a *Adapter) Send(mt messages.MessageType, data map[string]any) {
-	a.manager.send(mt, data)
+func (a *Adapter) send(mt messages.MessageType, data map[string]any) {
+	a.manager.Send(mt, data)
 }
 
 func (a *Adapter) CancelPairing() {
@@ -91,7 +92,7 @@ func (a *Adapter) CancelPairing() {
 }
 
 func (a *Adapter) GetDevice(id string) DeviceProxy {
-	device := a.Adapter.GetDevice(id)
+	device := a.Adapter.GetDeviceEntity(id)
 	if device != nil {
 		d, ok := device.(DeviceProxy)
 		if ok {
@@ -117,37 +118,25 @@ func (a *Adapter) HandleDeviceRemoved(device DeviceProxy) {
 	a.Adapter.RemoveDevice(device.GetId())
 }
 
-func (a *Adapter) close() {
+func (a *Adapter) Close() {
 	fmt.Print("do some thing while a close")
-	a.manager.close()
+	a.manager.Close()
 }
 
 func (a *Adapter) ProxyRunning() bool {
-	return a.manager.running
+	return a.manager.IsRunning()
 }
 
 func (a *Adapter) CloseProxy() {
-	a.manager.close()
-}
-
-func (a *Adapter) setManager(m *Manager) {
-	a.manager = m
+	a.manager.Close()
 }
 
 func (a *Adapter) SetPin(deviceId string, pin any) {
 
 }
 
-func (a *Adapter) SetCredentials(deviceId, username, password string) {
-
-}
-
-func (a *Adapter) GetAddonManager() *Manager {
-	return a.manager
-}
-
 func (a *Adapter) SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription) {
-	a.manager.send(messages.MessageType_DevicePropertyChangedNotification, messages.DevicePropertyChangedNotificationJsonData{
+	a.manager.Send(messages.MessageType_DevicePropertyChangedNotification, messages.DevicePropertyChangedNotificationJsonData{
 		AdapterId: a.GetId(),
 		DeviceId:  deviceId,
 		PluginId:  a.pluginId,
@@ -169,5 +158,22 @@ func (a *Adapter) SendPropertyChangedNotification(deviceId string, property prop
 }
 
 func (a *Adapter) StartPairing(timeout time.Duration) {
-	fmt.Print("startPairing func not implemented")
+	fmt.Printf("Adapter:%s StartPairing func not implemented\t\n", a.GetId())
+}
+
+func (a *Adapter) SetManager(manager ManagerProxy) {
+	a.manager = manager
+	a.pluginId = manager.GetPluginId()
+}
+
+func (a *Adapter) GetManager() ManagerProxy {
+	return a.manager
+}
+
+func (a *Adapter) GetPackageName() string {
+	return a.pluginId
+}
+
+func (a *Adapter) GetName() string {
+	return a.name
 }

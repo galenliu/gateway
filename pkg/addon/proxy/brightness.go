@@ -1,9 +1,11 @@
 package proxy
 
-import "github.com/galenliu/gateway/pkg/addon/devices"
+import (
+	"github.com/galenliu/gateway/pkg/addon/properties"
+)
 
 type BrightnessInstance interface {
-	devices.PropertyEntity
+	properties.Entity
 	SetBrightness(int)
 }
 

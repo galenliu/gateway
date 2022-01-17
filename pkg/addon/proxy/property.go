@@ -16,7 +16,7 @@ func NewProperty(des properties.PropertyDescription) *Property {
 }
 
 func (p *Property) SetHandler(handler DeviceProxy) {
-	p.Property.Handler = handler
+	p.Property.SetHandler(handler)
 }
 
 func (p *Property) SetValue(v any) {

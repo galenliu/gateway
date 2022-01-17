@@ -7,37 +7,28 @@ import (
 	"time"
 )
 
-type VirtualAdapter struct {
+type YeelightAdapter struct {
 	*proxy.Adapter
 }
 
-func NewVirtualAdapter(adapterId, packageName string) *VirtualAdapter {
-	manager, err := proxy.NewAddonManager(packageName)
-	if err != nil {
-		fmt.Printf("addon manager error: %s", err.Error())
-		return nil
+func NewVirtualAdapter(adapterId string) *YeelightAdapter {
+	v := &YeelightAdapter{
+		proxy.NewAdapter(adapterId, "yeelight"),
 	}
-	v := &VirtualAdapter{
-		proxy.NewAdapter(manager, adapterId, packageName),
-	}
-	manager.AddAdapters(v)
-	v.StartPairing(300 * time.Duration(time.Millisecond))
 	return v
 }
 
-func (a *VirtualAdapter) StartPairing(timeout time.Duration) {
-
+func (a *YeelightAdapter) StartPairing(timeout time.Duration) {
 	devices := make(map[string]proxy.DeviceProxy, 1)
-
 	discover := func() {
 		bulb, err := yeelight.Discover()
 		if err != nil {
-			fmt.Printf(err.Error())
+			fmt.Printf("adapter:%s StartPairing err:%s \t\n", a.GetId(), err.Error())
 			return
 		}
 		_, ok := devices[bulb.GetAddr()]
 		if !ok {
-			devices[bulb.GetAddr()] = NewYeelightBulb(bulb)
+			devices[bulb.GetAddr()] = proxy.NewDevice(NewYeelightBulb(bulb))
 		}
 	}
 	discover()

@@ -1,9 +1,11 @@
 package proxy
 
-import "github.com/galenliu/gateway/pkg/addon/devices"
+import (
+	"github.com/galenliu/gateway/pkg/addon/properties"
+)
 
 type OnOffPropertyInstance interface {
-	devices.PropertyEntity
+	properties.Entity
 	TurnOn()
 	TurnOff()
 }

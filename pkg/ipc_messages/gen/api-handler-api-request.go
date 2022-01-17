@@ -5,7 +5,7 @@ package messages
 import "fmt"
 import "encoding/json"
 
-// Handler an incoming API request
+// handler an incoming API request
 type ApiHandlerApiRequestJson struct {
 	// Message-specific data
 	Data ApiHandlerApiRequestJsonData `json:"data" yaml:"data"`

@@ -28,8 +28,32 @@ type DeviceHandler interface {
 	NotifyPropertyChanged(property PropertyDescription)
 }
 
+type Entity interface {
+	MarshalJSON() ([]byte, error)
+	GetType() string
+	GetTitle() string
+	GetName() string
+	GetUnit() string
+	GetEnum() []any
+	GetAtType() string
+	GetDescription() string
+	GetMinimum() *float64
+	GetMaximum() *float64
+	GetMultipleOf() *float64
+	GetValue() any
+	IsReadOnly() bool
+	ToMessage() messages.Property
+	ToDescription() PropertyDescription
+	SetCachedValue(value any) bool
+	SetCachedValueAndNotify(value any)
+	SetTitle(s string) bool
+	SetDescription(description string) bool
+	SetHandler(d DeviceHandler)
+	GetHandler() DeviceHandler
+}
+
 type Property struct {
-	Handler     DeviceHandler
+	handler     DeviceHandler
 	Name        string   `json:"name"`
 	Title       string   `json:"title,omitempty"`
 	Type        string   `json:"type"`
@@ -51,7 +75,7 @@ func NewProperty(description PropertyDescription) *Property {
 		return nil
 	}
 	return &Property{
-		Handler:     nil,
+		handler:     nil,
 		Name:        description.Name,
 		Title:       description.Title,
 		Type:        description.Type,
@@ -150,7 +174,11 @@ func (p *Property) GetValue() any {
 }
 
 func (p *Property) SetHandler(h DeviceHandler) {
-	p.Handler = h
+	p.handler = h
+}
+
+func (p *Property) GetHandler() DeviceHandler {
+	return p.handler
 }
 
 func (p *Property) ToDescription() PropertyDescription {
@@ -205,12 +233,12 @@ func (p *Property) SetCachedValueAndNotify(value any) {
 	p.SetCachedValue(value)
 	hasChanged := oldValue != p.GetValue()
 	if hasChanged {
-		p.Handler.NotifyPropertyChanged(p.ToDescription())
+		p.handler.NotifyPropertyChanged(p.ToDescription())
 	}
 }
 
 func (p *Property) NotifyChanged() {
-	p.Handler.NotifyPropertyChanged(p.ToDescription())
+	p.handler.NotifyPropertyChanged(p.ToDescription())
 }
 
 func (p *Property) SetCachedValue(value any) bool {

@@ -6,18 +6,21 @@ type Device interface {
 	GetId() string
 }
 
-type Adapter struct {
-	id          string
-	packageName string
-	devices     sync.Map
-	name        string
+type Entity interface {
+	GetId() string
+	GetDeviceEntity(id string) Device
+	GetDevices() []Device
 }
 
-func NewAdapter(id, packageName string) *Adapter {
+type Adapter struct {
+	id      string
+	devices sync.Map
+}
+
+func NewAdapter(id string) *Adapter {
 	return &Adapter{
-		id:          id,
-		packageName: packageName,
-		devices:     sync.Map{},
+		id:      id,
+		devices: sync.Map{},
 	}
 }
 
@@ -29,7 +32,7 @@ func (a *Adapter) RemoveDevice(id string) {
 	a.devices.Delete(id)
 }
 
-func (a *Adapter) GetDevice(id string) Device {
+func (a *Adapter) GetDeviceEntity(id string) Device {
 	v, ok := a.devices.Load(id)
 	if ok {
 		v, ok := v.(Device)
@@ -54,12 +57,4 @@ func (a *Adapter) GetDevices() []Device {
 
 func (a *Adapter) GetId() string {
 	return a.id
-}
-
-func (a *Adapter) GetName() string {
-	return a.name
-}
-
-func (a *Adapter) GetPackageName() string {
-	return a.packageName
 }

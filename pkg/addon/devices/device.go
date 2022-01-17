@@ -4,37 +4,39 @@ import (
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/events"
 	"github.com/galenliu/gateway/pkg/addon/properties"
+	"github.com/galenliu/gateway/pkg/addon/schemas"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 )
 
-type DeviceProperties map[string]PropertyEntity
+type DeviceProperties map[string]properties.Entity
 type DeviceActions map[string]actions.Action
 type DeviceEvents map[string]events.Event
 
-type PropertyEntity interface {
-	MarshalJSON() ([]byte, error)
-	GetType() string
-	GetTitle() string
-	GetName() string
-	GetUnit() string
-	GetEnum() []any
-	GetAtType() string
-	GetDescription() string
-	GetMinimum() *float64
-	GetMaximum() *float64
-	GetMultipleOf() *float64
-	GetValue() any
-	SetHandler(handler properties.DeviceHandler)
-	IsReadOnly() bool
-	ToMessage() messages.Property
-	ToDescription() properties.PropertyDescription
-	SetCachedValue(value any) bool
-	SetCachedValueAndNotify(value any)
-	SetTitle(s string) bool
-	SetDescription(description string) bool
+type AdapterHandler interface {
+	GetId() string
+	SendPropertyChangedNotification(deviceId string, p properties.PropertyDescription)
+}
+
+type Entity interface {
+	SetHandler(h AdapterHandler)
+	GetAdapter() AdapterHandler
+	GetId() string
+	GetAtContext() string
+	GetPropertyEntity(id string) properties.Entity
+	GetAtType() []string
+	ToMessage() messages.Device
+	NotifyPropertyChanged(p properties.PropertyDescription)
+}
+
+type DeviceDescription struct {
+	Id          string
+	AtType      []string
+	Title       string
+	Description string
 }
 
 type Device struct {
+	handler             AdapterHandler
 	Context             string           `json:"@context,omitempty"`
 	AtType              []string         `json:"@type,omitempty"`
 	Id                  string           `json:"id,omitempty"`
@@ -48,6 +50,25 @@ type Device struct {
 	Actions             DeviceActions    `json:"actions,omitempty"`
 	Events              DeviceEvents     `json:"events,omitempty"`
 	CredentialsRequired bool             `json:"credentialsRequired,omitempty"`
+}
+
+func NewDevice(description DeviceDescription) *Device {
+	return &Device{
+		handler:             nil,
+		Context:             schemas.Context,
+		AtType:              description.AtType,
+		Id:                  description.Id,
+		Title:               description.Title,
+		Description:         description.Description,
+		Links:               nil,
+		Forms:               nil,
+		BaseHref:            "",
+		Pin:                 nil,
+		Properties:          nil,
+		Actions:             nil,
+		Events:              nil,
+		CredentialsRequired: false,
+	}
 }
 
 type DeviceLink struct {
@@ -64,11 +85,11 @@ type DevicePin struct {
 	Pattern  string `json:"pattern,omitempty"`
 }
 
-func (d *Device) AddProperty(n string, p PropertyEntity) {
+func (d *Device) AddProperty(p properties.Entity) {
 	if d.Properties == nil {
 		d.Properties = make(DeviceProperties, 1)
 	}
-	d.Properties[n] = p
+	d.Properties[p.GetName()] = p
 }
 
 func (d *Device) GetId() string {
@@ -99,11 +120,11 @@ func (d *Device) GetBaseHref() string {
 	return d.BaseHref
 }
 
-func (d *Device) GetProperties() map[string]PropertyEntity {
+func (d *Device) GetProperties() map[string]properties.Entity {
 	return d.Properties
 }
 
-func (d *Device) GetProperty(id string) PropertyEntity {
+func (d *Device) GetPropertyEntity(id string) properties.Entity {
 	p, ok := d.Properties[id]
 	if ok {
 		return p
@@ -133,6 +154,18 @@ func (d *Device) GetEvent(id string) events.Event {
 
 func (d *Device) GetCredentialsRequired() bool {
 	return d.CredentialsRequired
+}
+
+func (d *Device) SetHandler(h AdapterHandler) {
+	d.handler = h
+}
+
+func (d *Device) GetAdapter() AdapterHandler {
+	return d.handler
+}
+
+func (d *Device) NotifyPropertyChanged(p properties.PropertyDescription) {
+	d.handler.SendPropertyChangedNotification(d.GetId(), p)
 }
 
 func (d *Device) ToMessage() messages.Device {

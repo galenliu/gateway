@@ -1,6 +1,7 @@
 package devices
 
 import (
+	"github.com/galenliu/gateway/pkg/addon/schemas"
 	"strconv"
 	"strings"
 )
@@ -13,39 +14,25 @@ type LightHandler interface {
 
 type LightBulb struct {
 	*Device
-	//On     addon.IProperty
-	//Bright addon.IProperty
-	//Color  addon.IProperty
 }
 
-//func NewLightBulb(id, title string) *LightBulb {
-//
-//	lightBulb := &LightBulb{}
-//	lightBulb.Addon_Device = addon.NewDevice(id, title)
-//
-//	lightBulb.AddTypes(addon.Light, addon.OnOffSwitch)
-//	return lightBulb
-//}
-//
-//func (light *LightBulb) addProperty(p addon.IProperty) {
-//	if p.GetAtType() == properties.TypeOnOffProperty {
-//		light.On = p
-//		light.Addon_Device.addProperty(p)
-//		return
-//	}
-//	if p.GetAtType() == properties.TypeBrightnessProperty {
-//		light.Bright = p
-//		light.Addon_Device.addProperty(p)
-//		return
-//	}
-//	if p.GetAtType() == properties.TypeColorProperty {
-//
-//		light.Color = p
-//		light.Addon_Device.addProperty(p)
-//		return
-//	}
-//	light.Addon_Device.addProperty(p)
-//}
+func NewLightBulb(description DeviceDescription) *LightBulb {
+	if description.Id == "" {
+		return nil
+	}
+	if description.Title == "" {
+		description.Title = description.Id
+	}
+	if description.AtType == nil {
+		description.AtType = make([]string, 1)
+		description.AtType = append(description.AtType, schemas.Light, schemas.OnOffSwitch)
+	} else {
+		description.AtType = append(description.AtType, schemas.Light, schemas.OnOffSwitch)
+	}
+	return &LightBulb{
+		NewDevice(description),
+	}
+}
 
 func (light *LightBulb) TurnOn() {
 	//light.On.SetValue(true)

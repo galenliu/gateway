@@ -3,18 +3,20 @@ package yeelight
 import (
 	"fmt"
 	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg"
+	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/proxy"
-	"github.com/galenliu/gateway/pkg/addon/schemas"
 )
 
 type YeelightDevice struct {
-	*proxy.Device
+	*devices.LightBulb
 	*yeelight.Yeelight
 }
 
 func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
 	yeeDevice := &YeelightDevice{
-		Device:   proxy.NewDevice([]string{schemas.Light, schemas.OnOffSwitch}, bulb.GetAddr(), "yeelight"+bulb.GetAddr()),
+		LightBulb: devices.NewLightBulb(devices.DeviceDescription{
+			Id: bulb.GetAddr(),
+		}), //proxy.NewDevice([]string{schemas.Light, schemas.OnOffSwitch}, bulb.GetAddr(), "yeelight"+bulb.GetAddr()),
 		Yeelight: bulb,
 	}
 	for _, method := range bulb.GetSupports() {
@@ -56,13 +58,13 @@ func (d *YeelightDevice) Listen() error {
 			fmt.Printf("notify: %s", msg)
 			for n, v := range msg.Params {
 				if n == "power" {
-					d.GetProperty("on").SetCachedValueAndNotify(v)
+					d.GetPropertyEntity("on").SetCachedValueAndNotify(v)
 				}
 				if n == "bright" {
-					d.GetProperty("bright").SetCachedValueAndNotify(v)
+					d.GetPropertyEntity("bright").SetCachedValueAndNotify(v)
 				}
 				if n == "rgb" {
-					d.GetProperty("color").SetCachedValueAndNotify(v)
+					d.GetPropertyEntity("color").SetCachedValueAndNotify(v)
 				}
 			}
 		}

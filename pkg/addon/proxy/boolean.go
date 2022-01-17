@@ -1,11 +1,11 @@
 package proxy
 
 import (
-	"github.com/galenliu/gateway/pkg/addon/devices"
+	"github.com/galenliu/gateway/pkg/addon/properties"
 )
 
 type BooleanPropertyInstance interface {
-	devices.PropertyEntity
+	properties.Entity
 	Turn(b bool)
 }
 

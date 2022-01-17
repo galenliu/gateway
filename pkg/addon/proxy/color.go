@@ -1,9 +1,11 @@
 package proxy
 
-import "github.com/galenliu/gateway/pkg/addon/devices"
+import (
+	"github.com/galenliu/gateway/pkg/addon/properties"
+)
 
 type ColorPropertyInstance interface {
-	devices.PropertyEntity
+	properties.Entity
 	SetValue(string2 string)
 }
 
