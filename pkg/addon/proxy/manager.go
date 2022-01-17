@@ -134,7 +134,7 @@ func (m *Manager) onMessage(data []byte) {
 	//adapter pairing command
 	case messages.MessageType_AdapterStartPairingCommand:
 		timeout := json.Get(data, "data", "timeout").ToFloat64()
-		go adapter.StartPairing(time.Duration(timeout) * time.Millisecond)
+		go adapter.StartPairing(time.After(time.Duration(timeout) * time.Millisecond))
 		return
 
 	case messages.MessageType_AdapterCancelPairingCommand:

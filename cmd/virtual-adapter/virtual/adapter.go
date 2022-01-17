@@ -1,7 +1,9 @@
 package virtual
 
 import (
+	"fmt"
 	"github.com/galenliu/gateway/pkg/addon/proxy"
+	"time"
 )
 
 type Adapter struct {
@@ -13,4 +15,8 @@ func NewVirtualAdapter(adapterId string) *Adapter {
 		proxy.NewAdapter(adapterId, "Virtual"),
 	}
 	return v
+}
+
+func (v *Adapter) StartPairing(t <-chan time.Time) {
+	fmt.Printf("adapter: %s StartPairing", v.GetId())
 }

@@ -157,7 +157,7 @@ func (a *Adapter) SendPropertyChangedNotification(deviceId string, property prop
 	})
 }
 
-func (a *Adapter) StartPairing(timeout time.Duration) {
+func (a *Adapter) StartPairing(timeout <-chan time.Time) {
 	fmt.Printf("Adapter:%s StartPairing func not implemented\t\n", a.GetId())
 }
 

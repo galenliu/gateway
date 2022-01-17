@@ -40,7 +40,7 @@ type AdapterProxy interface {
 	SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription)
 	Unload()
 	CancelPairing()
-	StartPairing(timeout time.Duration)
+	StartPairing(timeout <-chan time.Time)
 	HandleDeviceSaved(DeviceProxy)
 	HandleDeviceRemoved(DeviceProxy)
 }
