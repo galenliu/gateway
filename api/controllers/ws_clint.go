@@ -167,7 +167,7 @@ func (c *wsClint) addThing(t *things.Thing) {
 		err := c.ws.WriteJSON(map[string]any{
 			"id":          t.GetId(),
 			"messageType": constant.PropertyChanged,
-			"data":        map[string]any{*property.Name: property.Value},
+			"data":        map[string]any{property.Name: property.Value},
 		})
 		if err != nil {
 		}

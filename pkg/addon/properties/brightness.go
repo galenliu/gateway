@@ -6,8 +6,7 @@ type BrightnessProperty struct {
 
 func NewBrightnessProperty(description PropertyDescription) *BrightnessProperty {
 	p := &BrightnessProperty{}
-	atType := "BrightnessProperty"
-	description.AtType = &atType
+	description.AtType = "BrightnessProperty"
 	if description.Maximum == nil {
 		var v float64 = 100
 		description.Maximum = &v
@@ -16,13 +15,11 @@ func NewBrightnessProperty(description PropertyDescription) *BrightnessProperty 
 		var v float64 = 0
 		description.Minimum = &v
 	}
-	if description.Unit == nil {
-		var u = "percentage"
-		description.Unit = &u
+	if description.Unit == "" {
+		description.Unit = "percentage"
 	}
-	if description.Name == nil {
-		var name = "bright"
-		description.Name = &name
+	if description.Name == "" {
+		description.Name = "bright"
 	}
 	p.IntegerProperty = NewIntegerProperty(description)
 	return p

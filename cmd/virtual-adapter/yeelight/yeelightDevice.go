@@ -56,13 +56,13 @@ func (d *YeelightDevice) Listen() error {
 			fmt.Printf("notify: %s", msg)
 			for n, v := range msg.Params {
 				if n == "power" {
-					d.GetProperty(on).SetCachedValueAndNotify(v)
+					d.GetProperty("on").SetCachedValueAndNotify(v)
 				}
 				if n == "bright" {
-					d.GetProperty(level).SetCachedValueAndNotify(v)
+					d.GetProperty("bright").SetCachedValueAndNotify(v)
 				}
 				if n == "rgb" {
-					d.GetProperty(color).SetCachedValueAndNotify(v)
+					d.GetProperty("color").SetCachedValueAndNotify(v)
 				}
 			}
 		}

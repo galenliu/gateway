@@ -8,10 +8,8 @@ type ColorProperty struct {
 
 func NewColorProperty(p PropertyDescription) *ColorProperty {
 	prop := &ColorProperty{}
-	var name = "color"
-	p.Name = &name
-	var atType = "ColorProperty"
-	p.AtType = &atType
+	p.Name = "color"
+	p.AtType = "ColorProperty"
 	prop.StringProperty = NewStringProperty(p)
 	return prop
 }

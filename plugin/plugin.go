@@ -326,16 +326,16 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			return
 		}
 		go dev.NotifyPropertyChanged(properties.PropertyDescription{
-			Name:        message.Property.Name,
-			AtType:      message.Property.AtType,
-			Title:       message.Property.Title,
+			Name:        *message.Property.Name,
+			AtType:      *message.Property.AtType,
+			Title:       *message.Property.Title,
 			Type:        message.Property.Type,
-			Unit:        message.Property.Unit,
-			Description: message.Property.Description,
+			Unit:        *message.Property.Unit,
+			Description: *message.Property.Description,
 			Minimum:     message.Property.Minimum,
 			Maximum:     message.Property.Maximum,
 			Enum:        message.Property.Enum,
-			ReadOnly:    message.Property.ReadOnly,
+			ReadOnly:    *message.Property.ReadOnly,
 			MultipleOf:  message.Property.MultipleOf,
 			Links:       nil,
 			Value:       message.Property.Value,

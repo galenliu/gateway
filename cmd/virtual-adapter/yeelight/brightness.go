@@ -23,4 +23,5 @@ func (b Brightness) SetBrightness(v int) {
 	if err != nil {
 		fmt.Printf("Error setting brightness:%s", err.Error())
 	}
+	b.NotifyChanged()
 }

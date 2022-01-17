@@ -10,10 +10,8 @@ type OnOffProperty struct {
 
 func NewOnOffProperty(prop PropertyDescription) *OnOffProperty {
 	p := &OnOffProperty{}
-	var name = "on"
-	prop.Name = &name
-	atType := "OnOffProperty"
-	prop.AtType = &atType
+	prop.Name = "on"
+	prop.AtType = "OnOffProperty"
 	p.BooleanProperty = NewBooleanProperty(prop)
 	return p
 }

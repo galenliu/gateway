@@ -56,22 +56,33 @@ func newDevice(adapter *Adapter, msg messages.Device) *device {
 			Pattern:  getString(pin.Pattern),
 		}
 	}
+	getString = func(s *string) string {
+		if s == nil {
+			return ""
+		}
+		return *s
+	}
 
 	getPropertyDescription := func(p messages.Property) properties.PropertyDescription {
 		return properties.PropertyDescription{
-			Name:        p.Name,
-			AtType:      p.AtType,
-			Title:       p.Title,
+			Name:        getString(p.Name),
+			AtType:      getString(p.AtType),
+			Title:       getString(p.Title),
 			Type:        p.Type,
-			Unit:        p.Unit,
-			Description: p.Description,
+			Unit:        getString(p.Unit),
+			Description: getString(p.Description),
 			Minimum:     p.Minimum,
 			Maximum:     p.Maximum,
 			Enum:        p.Enum,
-			ReadOnly:    p.ReadOnly,
-			MultipleOf:  p.MultipleOf,
-			Links:       nil,
-			Value:       p.Value,
+			ReadOnly: func(b *bool) bool {
+				if b == nil {
+					return false
+				}
+				return *b
+			}(p.ReadOnly),
+			MultipleOf: p.MultipleOf,
+			Links:      nil,
+			Value:      p.Value,
 		}
 	}
 
@@ -159,14 +170,14 @@ func newDevice(adapter *Adapter, msg messages.Device) *device {
 }
 
 func (device *device) NotifyPropertyChanged(property properties.PropertyDescription) {
-	t, ok := device.setPropertyValueTask.Load(*property.Name)
+	t, ok := device.setPropertyValueTask.Load(property.Name)
 	if ok {
 		task := t.(chan any)
 		select {
 		case task <- property.Value:
 		}
 	}
-	p := device.getProperty(*property.Name)
+	p := device.getProperty(property.Name)
 	if p == nil {
 		return
 	}
@@ -175,12 +186,12 @@ func (device *device) NotifyPropertyChanged(property properties.PropertyDescript
 	}
 	valueChanged := p.SetCachedValue(property.Value)
 	titleChanged := false
-	if property.Title != nil {
-		titleChanged = p.SetTitle(*property.Title)
+	if property.Title != "" {
+		titleChanged = p.SetTitle(property.Title)
 	}
 	descriptionChanged := false
-	if property.Description != nil {
-		descriptionChanged = p.SetDescription(*property.Description)
+	if property.Description != "" {
+		descriptionChanged = p.SetDescription(property.Description)
 	}
 	if valueChanged || descriptionChanged || titleChanged {
 		device.adapter.plugin.manager.bus.Pub(topic.DevicePropertyChanged, device.GetId(), p.ToDescription())

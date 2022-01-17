@@ -16,8 +16,8 @@ func NewBrightness(p BrightnessInstance) *BrightnessProperty {
 }
 
 func (p *BrightnessProperty) SetValue(v any) {
-	value, ok := v.(int)
+	value, ok := v.(float64)
 	if ok {
-		p.SetBrightness(value)
+		p.SetBrightness(int(value))
 	}
 }

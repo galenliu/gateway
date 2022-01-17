@@ -12,6 +12,7 @@ type DeviceActions map[string]actions.Action
 type DeviceEvents map[string]events.Event
 
 type PropertyEntity interface {
+	MarshalJSON() ([]byte, error)
 	GetType() string
 	GetTitle() string
 	GetName() string
@@ -19,9 +20,9 @@ type PropertyEntity interface {
 	GetEnum() []any
 	GetAtType() string
 	GetDescription() string
-	GetMinimum() any
-	GetMaximum() any
-	GetMultipleOf() any
+	GetMinimum() *float64
+	GetMaximum() *float64
+	GetMultipleOf() *float64
 	GetValue() any
 	SetHandler(handler properties.DeviceHandler)
 	IsReadOnly() bool

@@ -101,30 +101,30 @@ func mapOfWotProperties(deviceId string, props devices.DeviceProperties) (mapOfP
 				IntegerSchema: &schema.IntegerSchema{
 					DataSchema: dataSchema,
 					Minimum: func() *controls.Integer {
-						var min controls.Integer
-						if m := p.GetMinimum(); m != nil {
-							min = controls.ToInteger(m)
-							return &min
+						v := p.GetMinimum()
+						if v == nil {
+							return nil
 						}
-						return nil
+						integer := controls.Integer(*v)
+						return &integer
 					}(),
 					ExclusiveMinimum: nil,
 					Maximum: func() *controls.Integer {
-						var max controls.Integer
-						if m := p.GetMaximum(); m != nil {
-							max = controls.ToInteger(m)
-							return &max
+						v := p.GetMaximum()
+						if v == nil {
+							return nil
 						}
-						return nil
+						integer := controls.Integer(*v)
+						return &integer
 					}(),
 					ExclusiveMaximum: nil,
 					MultipleOf: func() *controls.Integer {
-						var mo controls.Integer
-						if m := p.GetMultipleOf(); m != nil {
-							mo = controls.ToInteger(m)
-							return &mo
+						v := p.GetMultipleOf()
+						if v == nil {
+							return nil
 						}
-						return nil
+						integer := controls.Integer(*v)
+						return &integer
 					}(),
 				},
 				Observable: false,
