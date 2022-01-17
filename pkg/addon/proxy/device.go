@@ -30,5 +30,9 @@ func (d *Device) GetProperty(id string) PropertyProxy {
 }
 
 func (d *Device) SetCredentials(username, password string) error {
-	return fmt.Errorf("SetCredentials not implemented")
+	return fmt.Errorf("device:%s SetCredentials not implemented", d.GetId())
+}
+
+func (d *Device) SetPin(pin string) error {
+	return fmt.Errorf("device:%s SetPin not implemented", d.GetId())
 }

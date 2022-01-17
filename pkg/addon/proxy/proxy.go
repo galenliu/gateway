@@ -18,6 +18,7 @@ type DeviceProxy interface {
 	GetProperty(id string) PropertyProxy
 	properties.DeviceHandler
 	SetCredentials(username, password string) error
+	SetPin(pin string) error
 }
 
 type ManagerProxy interface {

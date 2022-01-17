@@ -69,5 +69,9 @@ func (d *YeelightDevice) Listen() error {
 			}
 		}
 	}
+}
+
+func (d *YeelightDevice) SetPin(pin string) error {
+	fmt.Printf("device: %s set pin: %s \n", d.GetId(), pin)
 	return nil
 }

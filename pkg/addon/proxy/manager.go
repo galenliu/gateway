@@ -64,7 +64,7 @@ func (m *Manager) HandleDeviceAdded(device DeviceProxy) {
 	}
 	m.Send(messages.MessageType_DeviceAddedNotification, messages.DeviceAddedNotificationJsonData{
 		AdapterId: device.GetAdapter().GetId(),
-		Device:    device.ToMessage(),
+		Device:    *device.ToMessage(),
 		PluginId:  m.pluginId,
 	})
 }
@@ -200,31 +200,31 @@ func (m *Manager) onMessage(data []byte) {
 		return
 
 	case messages.MessageType_DeviceSetPinRequest:
-		//var pin PIN
-		//pin.Pattern = json.Get(data, "data", "pin", "pattern").GetInterface()
-		//pin.Required = json.Get(data, "data", "pin", "required").ToBool()
-		//messageId := json.Get(data, "data", "message_id").ToInt()
-		//if messageId == 0 {
-		//	log.Fatal("DeviceSetPinRequest:  non  messageId")
-		//}
-		//
-		//handleFunc := func() {
-		//	data := make(map[string]interface{})
-		//	data[Aid] = adapterId
-		//	data[Did] = deviceId
-		//	data["devx"] = device
-		//	data["messageId"] = messageId
-		//	err := device.SetPin(pin)
-		//	if err == nil {
-		//		data["success"] = true
-		//		m.send(DeviceSetPinResponse, data)
-		//
-		//	} else {
-		//		data["success"] = false
-		//		m.send(DeviceSetPinResponse, data)
-		//	}
-		//}
-		//go handleFunc()
+
+		var msg messages.DeviceSetPinRequestJsonData
+		err := json.Unmarshal(data, &msg)
+		if err != nil {
+			fmt.Printf("message unmarshal err:%s", err.Error())
+			return
+		}
+		handleFunc := func() {
+			err := device.SetPin(msg.Pin)
+			id := device.GetId()
+			var success = true
+			if err != nil {
+				fmt.Printf("device set pin err:%s", err.Error())
+				success = false
+			}
+			m.Send(messages.MessageType_DeviceSetPinResponse, messages.DeviceSetPinResponseJsonData{
+				AdapterId: device.GetAdapter().GetId(),
+				Device:    device.ToMessage(),
+				DeviceId:  &id,
+				MessageId: msg.MessageId,
+				PluginId:  adapter.GetPackageName(),
+				Success:   success,
+			})
+		}
+		go handleFunc()
 
 	case messages.MessageType_DeviceSetCredentialsRequest:
 		messageId := json.Get(data, "data", "messageId").ToInt()

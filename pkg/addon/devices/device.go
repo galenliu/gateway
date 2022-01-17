@@ -24,7 +24,7 @@ type Entity interface {
 	GetAtContext() string
 	GetPropertyEntity(id string) properties.Entity
 	GetAtType() []string
-	ToMessage() messages.Device
+	ToMessage() *messages.Device
 	NotifyPropertyChanged(p properties.PropertyDescription)
 }
 
@@ -168,9 +168,9 @@ func (d *Device) NotifyPropertyChanged(p properties.PropertyDescription) {
 	d.handler.SendPropertyChangedNotification(d.GetId(), p)
 }
 
-func (d *Device) ToMessage() messages.Device {
+func (d *Device) ToMessage() *messages.Device {
 	baseHref := "/things/" + d.GetId()
-	return messages.Device{
+	return &messages.Device{
 		Context:             &d.Context,
 		Type:                d.AtType,
 		BaseHref:            &baseHref,
