@@ -16,6 +16,7 @@ type Manager struct {
 	verbose     bool
 	running     bool
 	registered  bool
+	components  sync.Map
 	userProfile messages.PluginRegisterResponseJsonDataUserProfile
 	preferences messages.PluginRegisterResponseJsonDataPreferences
 }
@@ -86,6 +87,17 @@ func (m *Manager) getAdapter(adapterId string) AdapterProxy {
 		adp, ok := adapter.(AdapterProxy)
 		if ok {
 			return adp
+		}
+	}
+	return nil
+}
+
+func (m *Manager) getComponent(id string) Component {
+	com := m.Manager.GetComponent(id)
+	if com != nil {
+		c, ok := com.(Component)
+		if ok {
+			return c
 		}
 	}
 	return nil

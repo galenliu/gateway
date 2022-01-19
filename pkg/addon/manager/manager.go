@@ -10,13 +10,18 @@ type Adapter interface {
 	GetId() string
 }
 
+type Component interface {
+	GetId() string
+}
+
 func NewManager() *Manager {
 	return &Manager{}
 }
 
 type Manager struct {
-	devices  sync.Map
-	adapters sync.Map
+	devices    sync.Map
+	adapters   sync.Map
+	components sync.Map
 }
 
 func (m *Manager) AddDevice(d Device) {
@@ -56,6 +61,33 @@ func (m *Manager) GetAdapters() []Adapter {
 		return true
 	})
 	return adapters
+}
+
+func (m *Manager) GetComponent(id string) Component {
+	v, ok := m.components.Load(id)
+	if ok {
+		v, ok := v.(Component)
+		if ok {
+			return v
+		}
+	}
+	return nil
+}
+
+func (m *Manager) AddComponent(com Component) {
+	m.components.Store(com.GetId(), com)
+}
+
+func (m *Manager) GetComponents() []Component {
+	components := make([]Component, 1)
+	m.components.Range(func(key, value any) bool {
+		com, ok := value.(Component)
+		if ok {
+			components = append(components, com)
+		}
+		return true
+	})
+	return components
 }
 
 func (m *Manager) GetDevice(id string) Device {
