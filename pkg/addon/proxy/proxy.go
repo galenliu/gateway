@@ -43,4 +43,5 @@ type AdapterProxy interface {
 	StartPairing(timeout <-chan time.Time)
 	HandleDeviceSaved(DeviceProxy)
 	HandleDeviceRemoved(DeviceProxy)
+	CancelRemoveThing(id string)
 }

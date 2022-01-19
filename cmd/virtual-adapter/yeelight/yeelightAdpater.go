@@ -18,7 +18,7 @@ func NewVirtualAdapter(adapterId string) *YeelightAdapter {
 	return v
 }
 
-func (a *YeelightAdapter) StartPairing(timeout time.Duration) {
+func (a *YeelightAdapter) StartPairing(timeout <-chan time.Time) {
 	devices := make(map[string]proxy.DeviceProxy, 1)
 	discover := func() {
 		bulb, err := yeelight.Discover()

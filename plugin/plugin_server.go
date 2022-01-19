@@ -12,17 +12,15 @@ import (
 )
 
 type PluginsServer struct {
-	Plugins   sync.Map
-	manager   *Manager
-	ipc       *ipc.WebSocketServer
-	closeChan chan struct{}
-	logger    logging.Logger
+	Plugins sync.Map
+	manager *Manager
+	ipc     *ipc.WebSocketServer
+	logger  logging.Logger
 }
 
 func NewPluginServer(manager *Manager) *PluginsServer {
 	s := &PluginsServer{}
 	s.logger = manager.logger
-	s.closeChan = make(chan struct{})
 	s.manager = manager
 	s.ipc = ipc.NewIPCServer(s, manager.config.IPCPort, manager.config.UserProfile, s.logger)
 	return s

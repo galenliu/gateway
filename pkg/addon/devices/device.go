@@ -89,6 +89,7 @@ func (d *Device) AddProperty(p properties.Entity) {
 	if d.Properties == nil {
 		d.Properties = make(DeviceProperties, 1)
 	}
+	p.SetHandler(d)
 	d.Properties[p.GetName()] = p
 }
 

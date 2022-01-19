@@ -127,10 +127,6 @@ func (a *Adapter) ProxyRunning() bool {
 	return a.manager.IsRunning()
 }
 
-func (a *Adapter) CloseProxy() {
-	a.manager.Close()
-}
-
 func (a *Adapter) SetPin(deviceId string, pin any) {
 
 }
@@ -159,6 +155,15 @@ func (a *Adapter) SendPropertyChangedNotification(deviceId string, property prop
 
 func (a *Adapter) StartPairing(timeout <-chan time.Time) {
 	fmt.Printf("Adapter:%s StartPairing func not implemented\t\n", a.GetId())
+}
+
+func (a *Adapter) CancelRemoveThing(id string) {
+	device := a.GetDevice(id)
+	if device == nil {
+		fmt.Printf("no device found")
+		return
+	}
+	fmt.Printf("Adapter:%s CancelRemoveThing func not implemented\t\n", a.GetId())
 }
 
 func (a *Adapter) SetManager(manager ManagerProxy) {

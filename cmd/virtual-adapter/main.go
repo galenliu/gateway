@@ -21,8 +21,8 @@ func main() {
 	virtualAdapter := virtual.NewVirtualAdapter("virtual-adapter")
 	manager.AddAdapters(yeeAdapter, virtualAdapter)
 
-	yeeAdapter.StartPairing(1 * time.Duration(1))
-	virtualAdapter.StartPairing(1 * time.Duration(1))
+	yeeAdapter.StartPairing(time.After(3 * time.Second))
+	virtualAdapter.StartPairing(time.After(3 * time.Second))
 	interruptChannel := make(chan os.Signal, 1)
 	signal.Notify(interruptChannel, syscall.SIGINT, syscall.SIGTERM)
 
@@ -30,14 +30,13 @@ func main() {
 		for {
 			select {
 			case _ = <-interruptChannel:
-				yeeAdapter.CloseProxy()
-				virtualAdapter.CloseProxy()
+				manager.Close()
 			}
 		}
 	}()
 
 	for {
-		if yeeAdapter.ProxyRunning() {
+		if manager.IsRunning() {
 			time.Sleep(2 * time.Second)
 		} else {
 			return

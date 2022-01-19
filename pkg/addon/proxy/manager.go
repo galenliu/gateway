@@ -38,10 +38,6 @@ func NewAddonManager(pluginId string) (*Manager, error) {
 			instance.register()
 		},
 	)
-	if instance.ipcClient == nil {
-		return nil, fmt.Errorf("ipc client not available")
-	}
-	instance.running = true
 	return instance, nil
 }
 
@@ -80,6 +76,10 @@ func (m *Manager) HandleDeviceRemoved(device DeviceProxy) {
 	})
 }
 
+func (m *Manager) HandleAdapterRemoved(id string) {
+	m.Manager.RemoveAdapter(id)
+}
+
 func (m *Manager) getAdapter(adapterId string) AdapterProxy {
 	adapter := m.Manager.GetAdapter(adapterId)
 	if adapter != nil {
@@ -93,18 +93,25 @@ func (m *Manager) getAdapter(adapterId string) AdapterProxy {
 
 func (m *Manager) onMessage(data []byte) {
 
-	var messageType = messages.MessageType(json.Get(data, "messageType").ToInt())
-	var dataAny = json.Get(data, "data")
+	mt := json.Get(data, "messageType")
+	dataNode := json.Get(data, "data")
+	if mt.LastError() != nil || dataNode.LastError() != nil {
+		fmt.Printf("message unmarshal err: %s", data)
+		return
+	}
+	messageType := messages.MessageType(mt.ToInt())
 
 	switch messageType {
 	case messages.MessageType_PluginRegisterResponse:
 		var msg messages.PluginRegisterResponseJsonData
-		dataAny.ToVal(&msg)
-		if &m != nil {
-			m.registered = true
-			m.preferences = msg.Preferences
-			m.userProfile = msg.UserProfile
+		dataNode.ToVal(&msg)
+		if dataNode.LastError() != nil {
+			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
+			return
 		}
+		m.registered = true
+		m.preferences = msg.Preferences
+		m.userProfile = msg.UserProfile
 		return
 	}
 	if !m.registered {
@@ -112,104 +119,127 @@ func (m *Manager) onMessage(data []byte) {
 		return
 	}
 	switch messageType {
-
 	case messages.MessageType_PluginUnloadRequest:
-		m.Send(messages.MessageType_PluginUnloadResponse, messages.PluginUnloadResponseJsonData{PluginId: m.pluginId})
-		m.running = false
-		var closeFun = func() {
-			time.AfterFunc(500*time.Millisecond, func() { m.Close() })
+		var msg messages.PluginUnloadRequestJsonData
+		dataNode.ToVal(&msg)
+		if dataNode.LastError() != nil {
+			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
+			return
 		}
-		go closeFun()
+		m.Send(messages.MessageType_PluginUnloadResponse, messages.PluginUnloadResponseJsonData{PluginId: msg.PluginId})
+		m.running = false
+		go func() {
+			time.AfterFunc(500*time.Millisecond, func() { m.Close() })
+		}()
 		return
 	}
 
-	var adapterId = json.Get(data, "data", "adapterId").ToString()
+	adapterId := dataNode.Get("adapterId").ToString()
 	adapter := m.getAdapter(adapterId)
 	if adapter == nil {
 		fmt.Printf("can not found adapter(%s)", adapterId)
 		return
 	}
-
 	switch messageType {
-	//adapter pairing command
 	case messages.MessageType_AdapterStartPairingCommand:
-		timeout := json.Get(data, "data", "timeout").ToFloat64()
-		go adapter.StartPairing(time.After(time.Duration(timeout) * time.Millisecond))
+		var msg messages.AdapterStartPairingCommandJsonData
+		dataNode.ToVal(&msg)
+		if dataNode.LastError() != nil {
+			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
+			return
+		}
+		go adapter.StartPairing(time.After(time.Duration(msg.Timeout) * time.Millisecond))
 		return
 
 	case messages.MessageType_AdapterCancelPairingCommand:
+		var msg messages.AdapterCancelPairingCommandJsonData
+		dataNode.ToVal(&msg)
+		if dataNode.LastError() != nil {
+			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
+			return
+		}
 		go adapter.CancelPairing()
 		return
 
-		//adapter unload request
-
 	case messages.MessageType_AdapterUnloadRequest:
+		var msg messages.AdapterUnloadRequestJsonData
+		dataNode.ToVal(&msg)
+		if dataNode.LastError() != nil {
+			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
+			return
+		}
 		go adapter.Unload()
-		unloadFunc := func(proxy *Manager, adapter AdapterProxy) {
-			data := make(map[string]any)
-			data["adapterId"] = adapter.GetId()
-			proxy.Send(messages.MessageType_AdapterUnloadResponse, messages.AdapterUnloadResponseJsonData{
+		unloadFunc := func() {
+			m.Send(messages.MessageType_AdapterUnloadResponse, messages.AdapterUnloadResponseJsonData{
 				AdapterId: adapter.GetId(),
 				PluginId:  m.pluginId,
 			})
+			m.HandleAdapterRemoved(adapter.GetId())
 		}
-		go unloadFunc(m, adapter)
-		m.RemoveAdapter(adapter.GetId())
+		go unloadFunc()
 		break
 	}
-	var deviceId = json.Get(data, "data", "deviceId").ToString()
+	deviceId := dataNode.Get("deviceId").ToString()
 	device := adapter.GetDevice(deviceId)
 	if device == nil {
+		fmt.Printf("device %s not found", deviceId)
 		return
 	}
-
 	switch messageType {
 	case messages.MessageType_AdapterCancelRemoveDeviceCommand:
-		adapter := m.getAdapter(adapterId)
-		fmt.Printf(adapter.GetId())
+		var msg messages.AdapterCancelRemoveDeviceCommandJsonData
+		dataNode.ToVal(&msg)
+		if dataNode.LastError() != nil {
+			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
+			return
+		}
+		go adapter.CancelRemoveThing(msg.DeviceId)
+		return
 
 	case messages.MessageType_DeviceSavedNotification:
-
+		var msg messages.DeviceSavedNotificationJsonData
+		dataNode.ToVal(&msg)
+		if dataNode.LastError() != nil {
+			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
+			return
+		}
 		go adapter.HandleDeviceSaved(device)
 		return
 
-		//adapter remove devices request
-
 	case messages.MessageType_AdapterRemoveDeviceRequest:
-		adapter.HandleDeviceRemoved(device)
-
-		//devices set properties command
+		var msg messages.AdapterRemoveDeviceRequestJsonData
+		dataNode.ToVal(&msg)
+		if dataNode.LastError() != nil {
+			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
+			return
+		}
+		go adapter.HandleDeviceRemoved(device)
+		return
 
 	case messages.MessageType_DeviceSetPropertyCommand:
-		propName := json.Get(data, "data", "propertyName").ToString()
-		newValue := json.Get(data, "data", "propertyValue").GetInterface()
-		prop := device.GetProperty(propName)
+		var msg messages.DeviceSetPropertyCommandJsonData
+		dataNode.ToVal(&msg)
+		if dataNode.LastError() != nil {
+			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
+			return
+		}
+		prop := device.GetProperty(msg.PropertyName)
 		if prop == nil {
-			fmt.Printf("can not found propertyName(%s)", propName)
+			fmt.Printf("can not found propertyName(%s)", msg.PropertyName)
 			return
 		}
-		propChanged := func(newValue any) error {
-			prop.SetValue(newValue)
-			return nil
-		}
-		e := propChanged(newValue)
-		if e != nil {
-			fmt.Printf(e.Error())
-			return
-		}
+		go prop.SetValue(msg.PropertyValue)
 		return
 
 	case messages.MessageType_DeviceSetPinRequest:
-
 		var msg messages.DeviceSetPinRequestJsonData
-		err := json.Unmarshal(data, &msg)
-		if err != nil {
-			fmt.Printf("message unmarshal err:%s", err.Error())
+		dataNode.ToVal(&msg)
+		if dataNode.LastError() != nil {
+			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
 			return
 		}
 		handleFunc := func() {
 			err := device.SetPin(msg.Pin)
-			id := device.GetId()
 			var success = true
 			if err != nil {
 				fmt.Printf("device set pin err:%s", err.Error())
@@ -218,7 +248,7 @@ func (m *Manager) onMessage(data []byte) {
 			m.Send(messages.MessageType_DeviceSetPinResponse, messages.DeviceSetPinResponseJsonData{
 				AdapterId: device.GetAdapter().GetId(),
 				Device:    device.ToMessage(),
-				DeviceId:  &id,
+				DeviceId:  &deviceId,
 				MessageId: msg.MessageId,
 				PluginId:  adapter.GetPackageName(),
 				Success:   success,
@@ -227,44 +257,27 @@ func (m *Manager) onMessage(data []byte) {
 		go handleFunc()
 
 	case messages.MessageType_DeviceSetCredentialsRequest:
-		messageId := json.Get(data, "data", "messageId").ToInt()
-		username := json.Get(data, "data", "username").ToString()
-		password := json.Get(data, "data", "password").ToString()
-
-		handleFunc := func() {
-			err := device.SetCredentials(username, password)
-			if err != nil {
-				m.Send(messages.MessageType_DeviceSetCredentialsResponse, messages.DeviceSetCredentialsResponseJsonData{
-					AdapterId: adapter.GetId(),
-					Device:    nil,
-					DeviceId: func(s string) *string {
-						if s == "" {
-							return nil
-						}
-						return &s
-					}(device.GetId()),
-					MessageId: messageId,
-					PluginId:  m.pluginId,
-					Success:   true,
-				})
-				fmt.Printf(err.Error())
-				return
-			}
-
-			m.Send(messages.MessageType_DeviceSetCredentialsResponse, messages.DeviceSetCredentialsResponseJsonData{
-				AdapterId: adapter.GetId(),
-				Device:    nil,
-				DeviceId: func(s string) *string {
-					if s == "" {
-						return nil
-					}
-					return &s
-				}(device.GetId()),
-				MessageId: messageId,
-				PluginId:  m.pluginId,
-				Success:   false,
-			})
+		var msg messages.DeviceSetCredentialsRequestJsonData
+		dataNode.ToVal(&msg)
+		if dataNode.LastError() != nil {
+			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
 			return
+		}
+		handleFunc := func() {
+			err := device.SetCredentials(msg.Username, msg.Password)
+			success := true
+			if err != nil {
+				success = false
+				fmt.Printf(err.Error())
+			}
+			m.Send(messages.MessageType_DeviceSetCredentialsResponse, messages.DeviceSetCredentialsResponseJsonData{
+				AdapterId: adapterId,
+				Device:    nil,
+				DeviceId:  &deviceId,
+				MessageId: msg.MessageId,
+				PluginId:  m.pluginId,
+				Success:   success,
+			})
 		}
 		go handleFunc()
 		break
@@ -276,7 +289,7 @@ func (m *Manager) sendConnectedStateNotification(device DeviceProxy, connected b
 		AdapterId: device.GetAdapter().GetId(),
 		Connected: connected,
 		DeviceId:  device.GetId(),
-		PluginId:  m.pluginId,
+		PluginId:  m.GetPluginId(),
 	})
 }
 
@@ -302,7 +315,10 @@ func (m *Manager) Close() {
 }
 
 func (m *Manager) IsRunning() bool {
-	return m.running
+	if len(m.GetAdapters()) > 0 && m.running {
+		return true
+	}
+	return false
 }
 
 func (m *Manager) GetPluginId() string {

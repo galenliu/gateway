@@ -1,6 +1,7 @@
 package ipc
 
 import (
+	"fmt"
 	"github.com/fasthttp/websocket"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
@@ -19,6 +20,7 @@ type WebSocketServer struct {
 	path         string
 	port         string
 	locker       *sync.Mutex
+	closeChan    chan struct{}
 	pluginServer PluginServer
 	userProfile  *messages.PluginRegisterResponseJsonDataUserProfile
 }
@@ -27,6 +29,7 @@ func NewIPCServer(pluginServer PluginServer, port string, userProfile *messages.
 	ipc := &WebSocketServer{}
 	ipc.pluginServer = pluginServer
 	ipc.logger = log
+	ipc.closeChan = make(chan struct{})
 	ipc.port = port
 	ipc.userProfile = userProfile
 	go ipc.Run()
@@ -34,16 +37,18 @@ func NewIPCServer(pluginServer PluginServer, port string, userProfile *messages.
 }
 
 func (s *WebSocketServer) Run() {
-
-	http.HandleFunc("/", s.handle)
-	http.HandleFunc("/ws", s.handle)
-	s.logger.Infof("ipc listen addr: %s", s.port)
-	err := http.ListenAndServe("localhost"+s.port, nil)
-	if err != nil {
-		s.logger.Errorf("ipcServer Listen err : %s", err.Error())
-	}
-	if err != nil {
-		s.logger.Errorf("ipcServer Listen err : %s", err.Error())
+	for {
+		http.HandleFunc("/", s.handle)
+		http.HandleFunc("/ws", s.handle)
+		fmt.Printf("ipc listen addr: %s \t\n", s.port)
+		err := http.ListenAndServe("localhost"+s.port, nil)
+		if err != nil {
+			s.logger.Errorf("ipcServer Listen err : %s", err.Error())
+		}
+		select {
+		case _ = <-s.closeChan:
+			return
+		}
 	}
 }
 
@@ -91,5 +96,11 @@ func (s *WebSocketServer) readLoop(conn *websocket.Conn) {
 			return
 		}
 		pluginHandler.OnMsg(mt, data)
+	}
+}
+
+func (s *WebSocketServer) Close() {
+	select {
+	case s.closeChan <- struct{}{}:
 	}
 }

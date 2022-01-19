@@ -3,6 +3,7 @@ package yeelight
 import (
 	yeelight "github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg"
 	"github.com/galenliu/gateway/pkg/addon/properties"
+	"image/color"
 )
 
 type Color struct {
@@ -17,6 +18,10 @@ func NewColor(bulb *yeelight.Yeelight) *Color {
 	}
 }
 
-func (on *Color) SetValue(v string) {
-
+func (on *Color) SetValue(c color.RGBA) error {
+	_, err := on.bulb.SetRGB(c)
+	if err != nil {
+		return err
+	}
+	return nil
 }

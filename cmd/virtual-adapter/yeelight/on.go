@@ -17,18 +17,18 @@ func NewOn(bulb *yeelight.Yeelight) *On {
 	}
 }
 
-func (on *On) TurnOff() {
+func (on *On) TurnOff() error {
 	_, err := on.bulb.TurnOff()
 	if err != nil {
-		return
+		return err
 	}
-	on.NotifyChanged()
+	return nil
 }
 
-func (on *On) TurnOn() {
+func (on *On) TurnOn() error {
 	_, err := on.bulb.TurnOn()
 	if err != nil {
-		return
+		return nil
 	}
-	on.NotifyChanged()
+	return nil
 }

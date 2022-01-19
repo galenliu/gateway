@@ -18,10 +18,10 @@ func NewBrightness(bulb *yeelight.Yeelight) *Brightness {
 	}
 }
 
-func (b Brightness) SetBrightness(v int) {
+func (b Brightness) SetBrightness(v int) error {
 	_, err := b.bulb.SetBrightness(v)
 	if err != nil {
-		fmt.Printf("Error setting brightness:%s", err.Error())
+		return fmt.Errorf("Error setting brightness:%s", err.Error())
 	}
-	b.NotifyChanged()
+	return nil
 }

@@ -1,13 +1,14 @@
 package proxy
 
 import (
+	"fmt"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 )
 
 type OnOffPropertyInstance interface {
 	properties.Entity
-	TurnOn()
-	TurnOff()
+	TurnOn() error
+	TurnOff() error
 }
 
 type OnOfProperty struct {
@@ -22,9 +23,18 @@ func (on *OnOfProperty) SetValue(a any) {
 	b, ok := a.(bool)
 	if ok {
 		if b {
-			on.OnOffPropertyInstance.TurnOn()
+			err := on.OnOffPropertyInstance.TurnOn()
+			if err != nil {
+				fmt.Printf(err.Error())
+				return
+			}
 		} else {
-			on.OnOffPropertyInstance.TurnOff()
+			err := on.OnOffPropertyInstance.TurnOff()
+			if err != nil {
+				fmt.Printf(err.Error())
+				return
+			}
 		}
+		on.SetCachedValueAndNotify(b)
 	}
 }

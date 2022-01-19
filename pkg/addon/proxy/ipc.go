@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/fasthttp/websocket"
 	"net/url"
+	"sync"
 )
 
 const IpcDefaultPort = "9500"
@@ -12,7 +13,7 @@ type IpcClient struct {
 	ws       *websocket.Conn
 	manager  *Manager
 	url      string
-	status   string
+	sendLock sync.Mutex
 	pluginId string
 	origin   string
 	verbose  bool
@@ -36,6 +37,8 @@ func NewClient(PluginId string, manager *Manager) *IpcClient {
 }
 
 func (client *IpcClient) send(message any) {
+	client.sendLock.Lock()
+	defer client.sendLock.Unlock()
 	err := client.ws.WriteJSON(message)
 	if err != nil {
 		fmt.Printf("client.send err: %s \r\n", err.Error())
