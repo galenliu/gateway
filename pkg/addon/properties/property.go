@@ -50,6 +50,7 @@ type Entity interface {
 	SetDescription(description string) bool
 	SetHandler(d DeviceHandler)
 	GetHandler() DeviceHandler
+	NotifyChanged()
 }
 
 type Property struct {
@@ -79,7 +80,7 @@ func NewProperty(description PropertyDescription) *Property {
 		Name:        description.Name,
 		Title:       description.Title,
 		Type:        description.Type,
-		AtType:      description.Description,
+		AtType:      description.AtType,
 		Unit:        description.Unit,
 		Description: description.Description,
 		Minimum:     description.Minimum,
@@ -87,7 +88,7 @@ func NewProperty(description PropertyDescription) *Property {
 		Enum:        description.Enum,
 		ReadOnly:    description.ReadOnly,
 		MultipleOf:  description.MultipleOf,
-		Value:       nil,
+		Value:       description.Value,
 	}
 }
 

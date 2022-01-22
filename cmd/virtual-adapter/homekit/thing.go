@@ -1,28 +1,19 @@
 package homekit
 
 import (
-	things "github.com/galenliu/gateway/api/models/container"
-	"github.com/galenliu/gateway/pkg/addon/schemas"
-
 	"github.com/brutella/hc/service"
+	things "github.com/galenliu/gateway/api/models/container"
+	"github.com/galenliu/gateway/pkg/addon/integration"
 )
 
 type Thing struct {
-	*things.Thing
-
+	*integration.ThingEntity
+	*service.Service
 }
 
-func (t *Thing) ToAccessory() {
-	if t.AtType
-		service.New()
-}
-
-func GetService(t string) *service.Service {
-	switch t {
-	case schemas.Light:
-		light := service.NewLightbulb()
-		light.Service
-		return light.Service
+func NewThing(thing things.Thing) *Thing {
+	return &Thing{
+		integration.NewThingEntity(&thing),
+		nil,
 	}
-	return nil
 }

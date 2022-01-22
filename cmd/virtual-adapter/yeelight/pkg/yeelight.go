@@ -28,7 +28,6 @@ type Mode int
 
 type Yeelight struct {
 	addr       string
-	conn       net.Conn
 	supports   []string
 	lastStatus sync.Map
 	rnd        *rand.Rand
@@ -49,22 +48,21 @@ func (y *Yeelight) executeCommand(name string, params ...interface{}) (*CommandR
 }
 
 func (y *Yeelight) execute(cmd *Command) (*CommandResult, error) {
-	if y.conn == nil {
-		conn, err := net.Dial("tcp", y.addr)
-		if nil != err {
-			y.conn = nil
-			return nil, fmt.Errorf("cannot open connection to %s. %s", y.addr, err)
-		}
-		y.conn = conn
+
+	conn, err := net.Dial("tcp", y.addr)
+	if nil != err {
+		conn = nil
+		return nil, fmt.Errorf("cannot open connection to %s. %s", y.addr, err)
 	}
-	y.conn.SetReadDeadline(time.Now().Add(timeout))
+	defer conn.Close()
+
+	conn.SetReadDeadline(time.Now().Add(timeout))
 
 	//write request/command
 	b, _ := json.Marshal(cmd)
-	fmt.Fprint(y.conn, string(b)+crlf)
-
+	fmt.Fprint(conn, string(b)+crlf)
 	//wait and read for response
-	res, err := bufio.NewReader(y.conn).ReadString('\n')
+	res, err := bufio.NewReader(conn).ReadString('\n')
 	if err != nil {
 		return nil, fmt.Errorf("cannot read command result %s", err)
 	}
@@ -106,7 +104,7 @@ func (y *Yeelight) TurnOff() (*CommandResult, error) {
 
 func (y *Yeelight) IsOn() (bool, error) {
 	on, _ := y.lastStatus.Load("power")
-	return on.(bool), nil
+	return on.(string) == "on", nil
 }
 
 func (y *Yeelight) SetPower(b bool) {
@@ -230,6 +228,9 @@ func (y *Yeelight) Listen() (<-chan *Notification, chan<- struct{}, error) {
 					err := json.Unmarshal([]byte(data), &rs)
 					if err != nil {
 						return
+					}
+					for n, v := range rs.Params {
+						y.lastStatus.Store(n, v)
 					}
 					select {
 					case notifCh <- &rs:

@@ -1,40 +1,26 @@
 ### trune on
-PUT http://localhost:9090/things/192.168.1.105:55443/properties/on
+PUT http://localhost:9090/things/192.168.1.103:55443/properties/on
 Content-Type: application/x-www-form-urlencoded
 
 true
 
 ### trune off
-PUT http://localhost:9090/things/192.168.1.105:55443/properties/on
+PUT http://localhost:9090/things/192.168.1.103:55443/properties/on
 Content-Type: application/x-www-form-urlencoded
 
 false
-
-### trune on
-PUT http://localhost:9090/things/0x0000000010e2fa00/properties/on
-Content-Type: application/x-www-form-urlencoded
-
-true
-
-### trune off
-PUT http://localhost:9090/things/0x0000000010e2fa00/properties/on
-Content-Type: application/x-www-form-urlencoded
-
-false
-
-
 
 ### trune level
-PUT http://localhost:9090/things/192.168.1.105:55443/properties/bright
+PUT http://localhost:9090/things/192.168.1.103:55443/properties/bright
 Content-Type: application/x-www-form-urlencoded
 
-10
+67
 
 ### set hue
-PUT http://localhost:9090/things/192.168.1.105:55443/properties/color
+PUT http://localhost:9090/things/192.168.1.103:55443/properties/color
 Content-Type: application/x-www-form-urlencoded
 
-"#FF00FF"
+"#1100FF"
 
 ###GET Things
 GET http://localhost:9090/things
@@ -42,7 +28,7 @@ Accept: application/json
 
 
 ### Delete thing
-DELETE http://localhost:9090/things/192.168.1.105:55443
+DELETE http://localhost:9090/things/192.168.1.103:55443
 
 ###create thing
 POST http://localhost:9090/things
@@ -50,9 +36,10 @@ Content-Type: application/json
 
 {
   "@context": "https://webthings.io/schemas",
-  "title": "192.168.1.105:55443",
-  "id": "192.168.1.105:55443",
+  "title": "192.168.1.103:55443",
+  "id": "192.168.1.103:55443",
   "@type": [
+    "",
     "Light",
     "OnOffSwitch"
   ],
@@ -62,11 +49,13 @@ Content-Type: application/json
     "model": ""
   },
   "properties": {
-    "on": {"forms":[{"href":"/things/192.168.1.105:55443/properties/on"}],"type":"boolean"},
-    "bright": {"forms":[{"href":"/things/192.168.1.105:55443/properties/bright"}],"unit":"percentage","type":"integer","minimum":0,"maximum":100},
-    "color": {"forms":[{"href":"/things/192.168.1.105:55443/properties/color"}],"type":"string"}
+    "color": {"@type":"ColorProperty","forms":[{"href":"/things/192.168.1.103:55443/properties/color"}],"type":"string"},
+    "on": {"@type":"OnOffProperty","forms":[{"href":"/things/192.168.1.103:55443/properties/on"}],"type":"boolean"},
+    "bright": {"@type":"BrightnessProperty","forms":[{"href":"/things/192.168.1.103:55443/properties/bright"}],"unit":"percentage","type":"integer","minimum":0,"maximum":100}
   }
 }
+
+
 
 
 
@@ -89,12 +78,50 @@ Content-Type: application/json
     "model": ""
   },
   "properties": {
-    "level": {"title":"Brightness","forms":[{"href":"/things/0x0000000010e2fa00/properties/level"}],"unit":"percent","type":"integer","minimum":0,"maximum":0,"multipleOf":0},
-    "hue": {"title":"Hue","forms":[{"href":"/things/0x0000000010e2fa00/properties/hue"}],"type":"string","minLength":0},
-    "on": {"title":"On/Off","forms":[{"href":"/things/0x0000000010e2fa00/properties/on"}],"type":"boolean"}
+    "level": {
+      "title": "Brightness",
+      "forms": [
+        {
+          "href": "/things/0x0000000010e2fa00/properties/level"
+        }
+      ],
+      "unit": "percent",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 0,
+      "multipleOf": 0
+    },
+    "hue": {
+      "title": "Hue",
+      "forms": [
+        {
+          "href": "/things/0x0000000010e2fa00/properties/hue"
+        }
+      ],
+      "type": "string",
+      "minLength": 0
+    },
+    "on": {
+      "title": "On/Off",
+      "forms": [
+        {
+          "href": "/things/0x0000000010e2fa00/properties/on"
+        }
+      ],
+      "type": "boolean"
+    }
   },
   "actions": {
-    "effect": {"forms":[{"href":"things/0x0000000010e2fa00/actions/effect","op":["observeallproperties"]}]}
+    "effect": {
+      "forms": [
+        {
+          "href": "things/0x0000000010e2fa00/actions/effect",
+          "op": [
+            "observeallproperties"
+          ]
+        }
+      ]
+    }
   },
   "pin": {
     "required": false,

@@ -2,13 +2,12 @@ package proxy
 
 import (
 	"github.com/galenliu/gateway/pkg/addon/properties"
-	"github.com/xiam/to"
 	"image/color"
 )
 
 type ColorPropertyInstance interface {
 	properties.Entity
-	SetValue(c color.RGBA) error
+	SetValue(c color.RGBA)
 }
 
 type ColorProperty struct {
@@ -23,12 +22,8 @@ func (p *ColorProperty) SetValue(v any) {
 	value, ok := v.(string)
 	if ok {
 		c, err := HTMLToRGB(value)
-		if err != nil {
-			err := p.ColorPropertyInstance.SetValue(c)
-			if err != nil {
-				p.SetCachedValueAndNotify(to.String(v))
-				return
-			}
+		if err == nil {
+			p.ColorPropertyInstance.SetValue(c)
 		}
 	}
 }

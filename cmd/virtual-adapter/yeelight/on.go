@@ -22,6 +22,8 @@ func (on *On) TurnOff() error {
 	if err != nil {
 		return err
 	}
+	on.SetCachedValue(false)
+	on.NotifyChanged()
 	return nil
 }
 
@@ -30,5 +32,7 @@ func (on *On) TurnOn() error {
 	if err != nil {
 		return nil
 	}
+	on.SetCachedValue(true)
+	on.NotifyChanged()
 	return nil
 }

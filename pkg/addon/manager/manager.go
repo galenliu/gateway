@@ -10,7 +10,7 @@ type Adapter interface {
 	GetId() string
 }
 
-type Component interface {
+type Integration interface {
 	GetId() string
 }
 
@@ -19,9 +19,9 @@ func NewManager() *Manager {
 }
 
 type Manager struct {
-	devices    sync.Map
-	adapters   sync.Map
-	components sync.Map
+	devices      sync.Map
+	adapters     sync.Map
+	Integrations sync.Map
 }
 
 func (m *Manager) AddDevice(d Device) {
@@ -63,10 +63,10 @@ func (m *Manager) GetAdapters() []Adapter {
 	return adapters
 }
 
-func (m *Manager) GetComponent(id string) Component {
-	v, ok := m.components.Load(id)
+func (m *Manager) GetComponent(id string) Integration {
+	v, ok := m.Integrations.Load(id)
 	if ok {
-		v, ok := v.(Component)
+		v, ok := v.(Integration)
 		if ok {
 			return v
 		}
@@ -74,20 +74,20 @@ func (m *Manager) GetComponent(id string) Component {
 	return nil
 }
 
-func (m *Manager) AddComponent(com Component) {
-	m.components.Store(com.GetId(), com)
+func (m *Manager) AddComponent(com Integration) {
+	m.Integrations.Store(com.GetId(), com)
 }
 
-func (m *Manager) GetComponents() []Component {
-	components := make([]Component, 1)
-	m.components.Range(func(key, value any) bool {
-		com, ok := value.(Component)
+func (m *Manager) GetComponents() []Integration {
+	integrations := make([]Integration, 1)
+	m.Integrations.Range(func(key, value any) bool {
+		com, ok := value.(Integration)
 		if ok {
-			components = append(components, com)
+			integrations = append(integrations, com)
 		}
 		return true
 	})
-	return components
+	return integrations
 }
 
 func (m *Manager) GetDevice(id string) Device {

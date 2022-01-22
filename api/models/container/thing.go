@@ -2,6 +2,9 @@ package container
 
 import (
 	"fmt"
+	"github.com/galenliu/gateway/pkg/addon/actions"
+	"github.com/galenliu/gateway/pkg/addon/events"
+	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
@@ -30,10 +33,8 @@ type Thing struct {
 	//FloorplanX          uint `json:"floorplanX"`
 	//FloorplanY          uint `json:"floorplanY"`
 	//LayoutIndex         uint `json:"layoutIndex"`
-	GroupId string `json:"groupId,omitempty"`
-
+	GroupId   string `json:"groupId,omitempty"`
 	container *ThingsContainer
-	bus       eventBus
 }
 
 func (t *Thing) UnmarshalJSON(data []byte) error {
@@ -60,7 +61,6 @@ func (t *Thing) UnmarshalJSON(data []byte) error {
 			t.Pin = &pin
 		}
 	}
-
 	t.CredentialsRequired = json.Get(data, "credentialsRequired").ToBool()
 	t.Connected = json.Get(data, "connected").ToBool()
 	t.GroupId = json.Get(data, "groupId").ToString()
@@ -85,7 +85,11 @@ func (t *Thing) SetSelectedCapability(selectedCapability string) bool {
 	for _, s := range t.AtType {
 		if s == selectedCapability {
 			t.SelectedCapability = selectedCapability
-			t.bus.Pub(topic.ThingModify, t.GetId())
+			err := t.container.store.UpdateThing(t.GetId(), *t)
+			if err != nil {
+				return false
+			}
+			t.container.bus.Pub(topic.ThingModify, t.GetId())
 			return true
 		}
 	}
@@ -97,7 +101,11 @@ func (t *Thing) SetTitle(title string) bool {
 		return false
 	}
 	t.Title = title
-	t.bus.Pub(topic.ThingModify, t.GetId())
+	err := t.container.store.UpdateThing(t.GetId(), *t)
+	if err != nil {
+		return false
+	}
+	t.container.bus.Pub(topic.ThingModify, t.GetId())
 	return true
 }
 
@@ -106,15 +114,43 @@ func (t *Thing) setConnected(connected bool) {
 		return
 	}
 	t.Connected = connected
-	t.bus.Pub(topic.ThingConnected, t.GetId(), connected)
+	t.container.bus.Pub(topic.ThingConnected, t.GetId(), connected)
 }
 
-func (t *Thing) remove() {
-	t.bus.Pub(topic.ThingRemoved, t.GetId())
+func (t *Thing) removed() {
+	err := t.container.store.RemoveThing(t.GetId())
+	if err != nil {
+		fmt.Printf("delete thing err:%s", err.Error())
+	}
+	t.container.bus.Pub(topic.ThingRemoved, t.GetId())
+}
+
+func (t *Thing) update() {
+	err := t.container.store.UpdateThing(t.GetId(), *t)
+	if err != nil {
+		return
+	}
+	t.container.bus.Pub(topic.ThingModify, t.GetId())
 }
 
 func (t *Thing) added() {
-	t.bus.Pub(topic.ThingAdded, t.GetId())
+	err := t.container.store.CreateThing(t.GetId(), *t)
+	if err != nil {
+		return
+	}
+	t.container.bus.Pub(topic.ThingAdded, t.GetId())
+}
+
+func (t *Thing) onPropertyChanged(prop *properties.PropertyDescription) {
+	t.container.bus.Pub(topic.ThingPropertyChanged, t.GetId(), prop)
+}
+
+func (t *Thing) onActionStatus(action *actions.ActionDescription) {
+	t.container.bus.Pub(topic.ThingActionStatus, t.GetId(), action)
+}
+
+func (t *Thing) OnEvent(event *events.EventDescription) {
+	t.container.bus.Pub(topic.ThingActionStatus, t.GetId(), event)
 }
 
 func (t *Thing) AddAction(name string) bool {

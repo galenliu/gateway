@@ -6,17 +6,14 @@ import (
 	"github.com/galenliu/gateway/pkg/addon/proxy"
 	"github.com/galenliu/gateway/pkg/constant"
 	json "github.com/json-iterator/go"
-	"io/ioutil"
-	"net/http"
-	"net/url"
-	"strings"
 	"sync"
 )
 
 type Thing interface {
 	GetId() string
-	GetProperty(string2 string) Property
+	GetProperty(id string) Property
 }
+
 type Property interface {
 	OnValueChanged(v any)
 }
@@ -26,6 +23,11 @@ type Integration struct {
 	container  sync.Map
 	token      string
 	thingsPath string
+	dbPath     string
+}
+
+func NewIntegration() *Integration {
+	return &Integration{}
 }
 
 func (c *Integration) AddThing(t Thing) {
@@ -69,25 +71,20 @@ func (c *Integration) OnMessage(data []byte) {
 			property := t.GetProperty(propName)
 			property.OnValueChanged(value)
 		}
+	case constant.ThingModified:
+		thingId := d.Get("thingId").ToString()
+		ts := proxy.LoadThings(c.dbPath)
+		for n, t := range ts {
+			if n == thingId {
+				c.HandleThingModified(t)
+			}
+		}
+
 	}
 }
 
-func (c *Integration) UpdateThings() {
-	header := url.Values{}
-	header.Add("Authorization", c.token)
-	data := header.Encode()
-	clint := http.Client{}
-	request, _ := http.NewRequest("GET", c.thingsPath, strings.NewReader(data))
-	response, err := clint.Do(request)
-	var ts []*things.Thing
-	d, err := ioutil.ReadAll(response.Body)
-	err = json.Unmarshal(d, &ts)
-	if err != nil {
-		return
-	}
-	for _, t := range ts {
-		c.container.Store(t.GetId(), t)
-	}
+func (c *Integration) LoadThings() map[string]things.Thing {
+	return proxy.LoadThings(c.dbPath)
 }
 
 func (c *Integration) GetThing(id string) Thing {
@@ -103,6 +100,10 @@ func (c *Integration) GetThing(id string) Thing {
 
 func (c *Integration) SetProperty() {
 
+}
+
+func (c *Integration) HandleThingModified(thing things.Thing) {
+	fmt.Println("HandleThingModified")
 }
 
 type Message struct {

@@ -35,6 +35,5 @@ func (on *OnOfProperty) SetValue(a any) {
 				return
 			}
 		}
-		on.SetCachedValueAndNotify(b)
 	}
 }

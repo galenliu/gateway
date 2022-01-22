@@ -13,8 +13,11 @@ import (
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/xiam/to"
+	"golang.org/x/sync/singleflight"
 	"sync"
 )
+
+var gsf singleflight.Group
 
 type device struct {
 	adapter *Adapter
@@ -194,7 +197,8 @@ func (device *device) NotifyPropertyChanged(property properties.PropertyDescript
 		descriptionChanged = p.SetDescription(property.Description)
 	}
 	if valueChanged || descriptionChanged || titleChanged {
-		device.adapter.plugin.manager.bus.Pub(topic.DevicePropertyChanged, device.GetId(), p.ToDescription())
+		des := p.ToDescription()
+		device.adapter.plugin.manager.bus.Pub(topic.DevicePropertyChanged, device.GetId(), &des)
 	}
 }
 
@@ -257,12 +261,10 @@ func (device *device) setPropertyValue(ctx context.Context, name string, value a
 	}
 
 	t, ok := device.setPropertyValueTask.LoadOrStore(name, make(chan any))
-	task := t.(chan any)
-
 	defer func() {
 		device.setPropertyValueTask.Delete(name)
 	}()
-
+	task := t.(chan any)
 	if !ok {
 		data := messages.DeviceSetPropertyCommandJsonData{
 			AdapterId:     device.getAdapter().GetId(),
@@ -273,15 +275,17 @@ func (device *device) setPropertyValue(ctx context.Context, name string, value a
 		}
 		device.adapter.send(messages.MessageType_DeviceSetPropertyCommand, data)
 	}
-
-	for {
-		select {
-		case <-ctx.Done():
-			return nil, fmt.Errorf("timeout for setPropertyValue")
-		case v := <-task:
-			return v, nil
+	v, err, _ := gsf.Do(name, func() (any, error) {
+		for {
+			select {
+			case <-ctx.Done():
+				return nil, fmt.Errorf("timeout for setPropertyValue")
+			case v := <-task:
+				return v, nil
+			}
 		}
-	}
+	})
+	return v, err
 }
 
 func (device *device) getAdapter() *Adapter {

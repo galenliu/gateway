@@ -26,6 +26,5 @@ func (p *BrightnessProperty) SetValue(v any) {
 			fmt.Println(err.Error())
 			return
 		}
-		p.SetCachedValueAndNotify(value)
 	}
 }

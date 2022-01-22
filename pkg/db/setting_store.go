@@ -5,7 +5,7 @@ import (
 )
 
 func (s *Storage) GetSetting(key string) (value string, err error) {
-	err = s.db.QueryRow("SELECT value FROM settings where key = @key", sql.Named("key", key), sql.Named("key", key)).Scan(&value)
+	err = s.db.QueryRow("SELECT value FROM settings where key = @key", sql.Named("key", key)).Scan(&value)
 	return value, err
 }
 
@@ -14,7 +14,7 @@ func (s *Storage) SetSetting(key, value string) error {
 	s.logger.Debugf("set setting key:%v value:%v ", key, value)
 	_, err := s.GetSetting(key)
 	if err == nil {
-		_, e := s.db.Exec(`update settings set value=@value where key=@key`, sql.Named("value", value), sql.Named("key", key))
+		_, e := s.db.Exec(`update settings set value=@value where key=@key`, sql.Named("value", value))
 		if e != nil {
 			s.logger.Errorf("update setting key: %s err:", key, err.Error())
 		}

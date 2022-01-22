@@ -18,5 +18,5 @@ func HTMLToRGB(in string) (color.RGBA, error) {
 	if n, err := fmt.Sscanf(in, "%2x%2x%2x", &r, &g, &b); err != nil || n != 3 {
 		return color.RGBA{}, err
 	}
-	return color.RGBA{R: uint8(r) / 255, G: uint8(g) / 255, B: uint8(b) / 255}, nil
+	return color.RGBA{R: uint8(r), G: uint8(g), B: uint8(b)}, nil
 }

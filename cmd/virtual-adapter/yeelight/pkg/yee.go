@@ -105,49 +105,42 @@ func (y *Yeelight) parseStatus(msg string) {
 	}
 	power := strings.TrimPrefix(resp.Header.Get("power"), " ")
 	if power != "" {
-		b := toBool(power)
-		y.lastStatus.Store("power", b)
+		y.lastStatus.Store("power", power)
 	}
 
 	bright := strings.TrimPrefix(resp.Header.Get("bright"), " ")
 	if bright != "" {
-		i := toInt(bright)
-		y.lastStatus.Store("bright", i)
+		y.lastStatus.Store("bright", bright)
 	}
 
 	colorMode := strings.TrimPrefix(resp.Header.Get("color_mode"), " ")
 	if colorMode != "" {
-		i := toInt(colorMode)
-		y.lastStatus.Store("color_mode", i)
+		y.lastStatus.Store("color_mode", colorMode)
 	}
 
 	ct := strings.TrimPrefix(resp.Header.Get("ct"), " ")
 	if ct != "" {
-		i := toInt(colorMode)
-		y.lastStatus.Store("ct", i)
+		y.lastStatus.Store("ct", ct)
 	}
 
 	rgb := strings.TrimPrefix(resp.Header.Get("rgb"), " ")
 	if rgb != "" {
-		i := toInt(colorMode)
-		y.lastStatus.Store("rgb", i)
+		y.lastStatus.Store("rgb", rgb)
 	}
 
 	hue := strings.TrimPrefix(resp.Header.Get("hue"), " ")
 	if hue != "" {
-		i := toInt(colorMode)
-		y.lastStatus.Store("hue", i)
+		y.lastStatus.Store("hue", hue)
 	}
 
 	sat := strings.TrimPrefix(resp.Header.Get("sat"), " ")
 	if sat != "" {
-		i := toInt(colorMode)
-		y.lastStatus.Store("sat", i)
+		y.lastStatus.Store("sat", sat)
 	}
 
 	name := strings.TrimPrefix(resp.Header.Get("name"), " ")
 	if name != "" {
-		y.lastStatus.Store("sat", name)
+		y.lastStatus.Store("name", name)
 	}
 }
 

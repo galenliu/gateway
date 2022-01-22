@@ -16,6 +16,9 @@ type Event struct {
 	Enum        []EventEnumElem  `protobuf:"bytes,11,rep,name=enum,proto3" json:"enum,omitempty"`
 }
 
+type EventDescription struct {
+}
+
 type EventLinksElem struct {
 }
 

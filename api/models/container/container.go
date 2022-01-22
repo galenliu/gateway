@@ -75,7 +75,7 @@ func (c *ThingsContainer) SetThingProperty(thingId, propName string, value any) 
 	}
 	prop, ok := thing.Properties[propName]
 	if !ok {
-		return nil, fiber.NewError(fiber.StatusNotFound, "property not found")
+		return nil, fiber.NewError(fiber.StatusNotFound, "property:%s not found", propName)
 	}
 	if prop.IsReadOnly() {
 		return nil, fiber.NewError(fiber.StatusNotFound, "property read only")
@@ -119,30 +119,22 @@ func (c *ThingsContainer) CreateThing(data []byte) (*Thing, error) {
 		return nil, err
 	}
 	thing.container = c
-	thing.bus = c.bus
 	thing.Created = &controls.DataTime{Time: time.Now()}
 	thing.Modified = &controls.DataTime{Time: time.Now()}
-	err = c.store.CreateThing(thing.GetId(), thing)
-	if err != nil {
-		return nil, err
-	}
-	id := thing.GetId()
 	th := &thing
-	c.things[id] = th
+	th.added()
+	c.things[thing.GetId()] = th
 	return th, nil
 }
 
 func (c *ThingsContainer) RemoveThing(thingId string) {
-	err := c.store.RemoveThing(thingId)
-	if err != nil {
-		c.logger.Errorf("delete thing from db err:", err.Error())
-	}
+
 	t, _ := c.things[thingId]
 	if t == nil {
 		c.logger.Errorf("thing with id %s not found", thingId)
 		return
 	}
-	t.remove()
+	t.removed()
 	delete(c.things, thingId)
 	return
 }
@@ -152,14 +144,6 @@ func (c *ThingsContainer) UpdateThing(data []byte) error {
 	if id.ValueType() != json.StringValue {
 		return fmt.Errorf("thing id invaild")
 	}
-	err := c.handleUpdateThing(data)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c *ThingsContainer) handleUpdateThing(data []byte) error {
 	thingId := json.Get(data, "id").ToString()
 	if _, ok := c.things[thingId]; ok {
 		var newThing Thing
@@ -167,12 +151,10 @@ func (c *ThingsContainer) handleUpdateThing(data []byte) error {
 		if err != nil {
 			return err
 		}
-		c.things[newThing.Id.GetId()] = &newThing
-		err = c.store.UpdateThing(newThing.GetId(), newThing)
-		if err != nil {
-			return err
-		}
+		newThing.container = c
 
+		c.things[newThing.Id.GetId()] = &newThing
+		newThing.update()
 	}
 	return nil
 }
@@ -181,7 +163,6 @@ func (c *ThingsContainer) updateThings() {
 	if len(c.things) < 1 {
 		for id, thing := range c.store.GetThings() {
 			thing.container = c
-			thing.bus = c.bus
 			c.things[id] = &thing
 		}
 	}
@@ -208,23 +189,17 @@ func (c *ThingsContainer) handleDeviceConnected(deviceId string, connected bool)
 	}
 }
 
-func (c *ThingsContainer) handleDevicePropertyChanged(deviceId string, property properties.PropertyDescription) {
+func (c *ThingsContainer) handleDevicePropertyChanged(deviceId string, property *properties.PropertyDescription) {
 	t := c.GetThing(deviceId)
-	if t != nil {
-		t.bus.Pub(topic.ThingPropertyChanged, t.GetId(), property)
-	}
+	t.onPropertyChanged(property)
 }
 
 func (c *ThingsContainer) handleDeviceActionStatus(deviceId string, action *actions.ActionDescription) {
 	t := c.GetThing(deviceId)
-	if t != nil {
-		t.bus.Pub(topic.ThingActionStatus, t.GetId(), action)
-	}
+	t.onActionStatus(action)
 }
 
-func (c *ThingsContainer) handleDeviceEvent(deviceId string, event *events.Event) {
+func (c *ThingsContainer) handleDeviceEvent(deviceId string, event *events.EventDescription) {
 	t := c.GetThing(deviceId)
-	if t != nil {
-		t.bus.Pub(topic.ThingEvent, t.GetId(), event)
-	}
+	t.OnEvent(event)
 }

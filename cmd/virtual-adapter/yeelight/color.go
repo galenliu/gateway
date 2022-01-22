@@ -1,6 +1,7 @@
 package yeelight
 
 import (
+	"fmt"
 	yeelight "github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	"image/color"
@@ -18,10 +19,14 @@ func NewColor(bulb *yeelight.Yeelight) *Color {
 	}
 }
 
-func (on *Color) SetValue(c color.RGBA) error {
+func (on *Color) SetValue(c color.RGBA) {
 	_, err := on.bulb.SetRGB(c)
 	if err != nil {
-		return err
+		fmt.Print(err.Error())
+		return
 	}
-	return nil
+	v := fmt.Sprintf("#%X%X%X", c.R, c.G, c.B)
+	on.SetCachedValue(v)
+	on.NotifyChanged()
+	return
 }

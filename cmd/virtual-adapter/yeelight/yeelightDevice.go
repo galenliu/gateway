@@ -5,6 +5,7 @@ import (
 	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/proxy"
+	"github.com/xiam/to"
 )
 
 type YeelightDevice struct {
@@ -58,12 +59,16 @@ func (d *YeelightDevice) Listen() error {
 			fmt.Printf("notify: %s", msg)
 			for n, v := range msg.Params {
 				if n == "power" {
-					d.GetPropertyEntity("on").SetCachedValueAndNotify(v)
+					b := v == "on"
+
+					d.GetPropertyEntity("on").SetCachedValueAndNotify(b)
 				}
 				if n == "bright" {
 					d.GetPropertyEntity("bright").SetCachedValueAndNotify(v)
 				}
 				if n == "rgb" {
+					i := to.Int64(v)
+					v := "#" + fmt.Sprintf("%X", i)
 					d.GetPropertyEntity("color").SetCachedValueAndNotify(v)
 				}
 			}
