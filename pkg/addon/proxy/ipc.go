@@ -7,24 +7,24 @@ import (
 	"sync"
 )
 
-const IpcDefaultPort = "9500"
+type handler interface {
+	OnMessage([]byte)
+}
 
 type IpcClient struct {
 	ws       *websocket.Conn
-	manager  *Manager
+	handler  handler
 	url      string
 	sendLock sync.Mutex
-	pluginId string
 	origin   string
 	verbose  bool
 }
 
 // NewClient 新建一个Client，注册消息Handler
-func NewClient(PluginId string, manager *Manager) *IpcClient {
-	u := url.URL{Scheme: "ws", Host: "localhost:" + IpcDefaultPort, Path: "/"}
+func NewClient(handler handler, path string) *IpcClient {
+	u := url.URL{Scheme: "ws", Host: "localhost:" + path, Path: "/"}
 	client := &IpcClient{}
-	client.pluginId = PluginId
-	client.manager = manager
+	client.handler = handler
 	client.url = u.String()
 	var err error = nil
 	client.ws, _, err = websocket.DefaultDialer.Dial(client.url, nil)
@@ -36,12 +36,12 @@ func NewClient(PluginId string, manager *Manager) *IpcClient {
 	return client
 }
 
-func (client *IpcClient) send(message any) {
+func (client *IpcClient) Send(message any) {
 	client.sendLock.Lock()
 	defer client.sendLock.Unlock()
 	err := client.ws.WriteJSON(message)
 	if err != nil {
-		fmt.Printf("client.send err: %s \r\n", err.Error())
+		fmt.Printf("client.Send err: %s \r\n", err.Error())
 		return
 	}
 }
@@ -53,7 +53,7 @@ func (client *IpcClient) readLoop() {
 			fmt.Printf("read messages error: %s", err.Error())
 			return
 		}
-		client.manager.onMessage(message)
+		client.handler.OnMessage(message)
 	}
 }
 

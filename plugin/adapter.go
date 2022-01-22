@@ -133,7 +133,7 @@ func (adapter *Adapter) handleDeviceAdded(device *device) {
 }
 
 func (adapter *Adapter) getDevice(deviceId string) *device {
-	d := adapter.GetDeviceEntity(deviceId)
+	d := adapter.GetDeviceById(deviceId)
 	device, ok := d.(device)
 	if !ok {
 		return nil

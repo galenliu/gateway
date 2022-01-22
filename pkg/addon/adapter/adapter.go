@@ -8,7 +8,7 @@ type Device interface {
 
 type Entity interface {
 	GetId() string
-	GetDeviceEntity(id string) Device
+	GetDeviceById(id string) Device
 	GetDevices() []Device
 }
 
@@ -32,7 +32,7 @@ func (a *Adapter) RemoveDevice(id string) {
 	a.devices.Delete(id)
 }
 
-func (a *Adapter) GetDeviceEntity(id string) Device {
+func (a *Adapter) GetDeviceById(id string) Device {
 	v, ok := a.devices.Load(id)
 	if ok {
 		v, ok := v.(Device)

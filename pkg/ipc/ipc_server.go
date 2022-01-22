@@ -64,10 +64,10 @@ func (s *WebSocketServer) handle(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *WebSocketServer) readLoop(conn *websocket.Conn) {
-	//conn.SetPongHandler(func(appData string) error {
-	//	s.logger.Info("ping request: %s", appData)
-	//	return conn.WriteMessage(websocket.PongMessage, nil)
-	//})
+	conn.SetPongHandler(func(appData string) error {
+		s.logger.Info("ping request: %s", appData)
+		return conn.WriteMessage(websocket.PongMessage, nil)
+	})
 	con := newConnection(conn, s.logger)
 	pluginHandler, err := s.pluginServer.RegisterPlugin(con)
 	if err != nil {

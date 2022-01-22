@@ -263,9 +263,6 @@ func (device *device) setPropertyValue(ctx context.Context, name string, value a
 		device.setPropertyValueTask.Delete(name)
 	}()
 
-	defer func() {
-		device.setPropertyValueTask.Delete(name)
-	}()
 	if !ok {
 		data := messages.DeviceSetPropertyCommandJsonData{
 			AdapterId:     device.getAdapter().GetId(),

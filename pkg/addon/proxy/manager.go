@@ -32,7 +32,7 @@ func NewAddonManager(pluginId string) (*Manager, error) {
 			instance.pluginId = pluginId
 			instance.verbose = true
 			instance.registered = false
-			instance.ipcClient = NewClient(pluginId, instance)
+			instance.ipcClient = NewClient(instance, "9500")
 			if instance.ipcClient != nil {
 				instance.running = true
 			}
@@ -103,7 +103,7 @@ func (m *Manager) getComponent(id string) Component {
 	return nil
 }
 
-func (m *Manager) onMessage(data []byte) {
+func (m *Manager) OnMessage(data []byte) {
 
 	mt := json.Get(data, "messageType")
 	dataNode := json.Get(data, "data")
@@ -310,7 +310,7 @@ func (m *Manager) Send(messageType messages.MessageType, data any) {
 		MessageType messages.MessageType `json:"messageType"`
 		Data        any                  `json:"data"`
 	}{MessageType: messageType, Data: data}
-	m.ipcClient.send(message)
+	m.ipcClient.Send(message)
 }
 
 func (m *Manager) register() {

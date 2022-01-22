@@ -92,7 +92,7 @@ func (a *Adapter) CancelPairing() {
 }
 
 func (a *Adapter) GetDevice(id string) DeviceProxy {
-	device := a.Adapter.GetDeviceEntity(id)
+	device := a.Adapter.GetDeviceById(id)
 	if device != nil {
 		d, ok := device.(DeviceProxy)
 		if ok {

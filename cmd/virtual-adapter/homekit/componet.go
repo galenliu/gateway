@@ -3,7 +3,7 @@ package homekit
 import (
 	"github.com/brutella/hc/accessory"
 	things "github.com/galenliu/gateway/api/models/container"
-	"github.com/galenliu/gateway/pkg/addon/componet"
+	"github.com/galenliu/gateway/pkg/addon/integration"
 )
 
 type manager interface {
@@ -11,7 +11,7 @@ type manager interface {
 }
 
 type Component struct {
-	*componet.Component
+	*integration.Integration
 	*accessory.Bridge
 	manager manager
 }
