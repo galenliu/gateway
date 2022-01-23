@@ -32,3 +32,8 @@ func (prop *BooleanProperty) OnValueRemoteUpdate(fn func(bool)) {
 	//	fn(newValue.(bool))
 	//})
 }
+
+func (prop *BooleanProperty) GetValue() bool {
+	v := prop.Value.(bool)
+	return v
+}

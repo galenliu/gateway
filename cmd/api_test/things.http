@@ -14,13 +14,13 @@ false
 PUT http://localhost:9090/things/192.168.1.103:55443/properties/bright
 Content-Type: application/x-www-form-urlencoded
 
-30
+44
 
 ### set hue
 PUT http://localhost:9090/things/192.168.1.103:55443/properties/color
 Content-Type: application/x-www-form-urlencoded
 
-"FFFFFF"
+"0000FF"
 
 ###GET Things
 GET http://localhost:9090/things
@@ -54,9 +54,6 @@ Content-Type: application/json
     "bright": {"@type":"BrightnessProperty","forms":[{"href":"/things/192.168.1.103:55443/properties/bright"}],"unit":"percentage","type":"integer","minimum":0,"maximum":100}
   }
 }
-
-
-
 
 
 

@@ -25,6 +25,7 @@ type ManagerProxy interface {
 	HandleDeviceAdded(device DeviceProxy)
 	HandleDeviceRemoved(device DeviceProxy)
 	Send(messageType messages.MessageType, v any)
+	GetUserProfile() *messages.PluginRegisterResponseJsonDataUserProfile
 	Close()
 	GetPluginId() string
 	IsRunning() bool
@@ -36,7 +37,7 @@ type AdapterProxy interface {
 	GetDevice(deviceId string) DeviceProxy
 	GetName() string
 	GetPackageName() string
-	SetManager(m ManagerProxy)
+	Registered(m ManagerProxy)
 	SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription)
 	Unload()
 	CancelPairing()
@@ -44,4 +45,10 @@ type AdapterProxy interface {
 	HandleDeviceSaved(DeviceProxy)
 	HandleDeviceRemoved(DeviceProxy)
 	CancelRemoveThing(id string)
+}
+
+type IntegrationProxy interface {
+	GetName() string
+	GetId() string
+	GetPackageName() string
 }

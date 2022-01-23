@@ -1,25 +1,30 @@
 package proxy
 
 import (
+	"fmt"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 )
 
-type StringPropertyInstance interface {
+type StringInstance interface {
 	properties.Entity
-	SetValue(string2 string)
+	SetValue(v string)
 }
 
-type StringProperty struct {
-	StringPropertyInstance
+type StringProxy struct {
+	StringInstance
 }
 
-func NewString(p StringPropertyInstance) *StringProperty {
-	return &StringProperty{p}
+func NewStringProxy(p StringInstance) *StringProxy {
+	return &StringProxy{p}
 }
 
-func (p *StringProperty) SetValue(v any) {
+func (p *StringProxy) SetValue(v any) {
 	value, ok := v.(string)
+	if !ok {
+		fmt.Printf("value error:%s", v)
+		return
+	}
 	if ok {
-		p.StringPropertyInstance.SetValue(value)
+		p.StringInstance.SetValue(value)
 	}
 }

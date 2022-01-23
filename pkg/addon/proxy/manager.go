@@ -17,8 +17,8 @@ type Manager struct {
 	running     bool
 	registered  bool
 	components  sync.Map
-	userProfile messages.PluginRegisterResponseJsonDataUserProfile
-	preferences messages.PluginRegisterResponseJsonDataPreferences
+	userProfile *messages.PluginRegisterResponseJsonDataUserProfile
+	preferences *messages.PluginRegisterResponseJsonDataPreferences
 }
 
 var once sync.Once
@@ -42,14 +42,27 @@ func NewAddonManager(pluginId string) (*Manager, error) {
 	return instance, nil
 }
 
-func (m *Manager) AddAdapters(adapters ...AdapterProxy) {
+func (m *Manager) RegisteredAdapter(adapters ...AdapterProxy) {
 	for _, adapter := range adapters {
-		adapter.SetManager(m)
+		adapter.Registered(m)
 		m.AddAdapter(adapter)
 		m.Send(messages.MessageType_AdapterAddedNotification, messages.AdapterAddedNotificationJsonData{
 			AdapterId:   adapter.GetId(),
 			Name:        adapter.GetName(),
 			PackageName: adapter.GetPackageName(),
+			PluginId:    m.pluginId,
+		})
+	}
+}
+
+func (m *Manager) RegisteredIntegration(integrations ...IntegrationProxy) {
+	for _, ig := range integrations {
+
+		m.AddIntegration(ig)
+		m.Send(messages.MessageType_AdapterAddedNotification, messages.AdapterAddedNotificationJsonData{
+			AdapterId:   ig.GetId(),
+			Name:        ig.GetName(),
+			PackageName: ig.GetPackageName(),
 			PluginId:    m.pluginId,
 		})
 	}
@@ -92,17 +105,6 @@ func (m *Manager) getAdapter(adapterId string) AdapterProxy {
 	return nil
 }
 
-func (m *Manager) getComponent(id string) Component {
-	com := m.Manager.GetComponent(id)
-	if com != nil {
-		c, ok := com.(Component)
-		if ok {
-			return c
-		}
-	}
-	return nil
-}
-
 func (m *Manager) OnMessage(data []byte) {
 
 	mt := json.Get(data, "messageType")
@@ -122,8 +124,8 @@ func (m *Manager) OnMessage(data []byte) {
 			return
 		}
 		m.registered = true
-		m.preferences = msg.Preferences
-		m.userProfile = msg.UserProfile
+		m.preferences = &msg.Preferences
+		m.userProfile = &msg.UserProfile
 		return
 	}
 	if !m.registered {
@@ -335,4 +337,8 @@ func (m *Manager) IsRunning() bool {
 
 func (m *Manager) GetPluginId() string {
 	return m.pluginId
+}
+
+func (m *Manager) GetUserProfile() *messages.PluginRegisterResponseJsonDataUserProfile {
+	return m.userProfile
 }

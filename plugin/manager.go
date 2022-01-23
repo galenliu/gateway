@@ -457,6 +457,10 @@ func (m *Manager) GetPreferences() *messages.PluginRegisterResponseJsonDataPrefe
 	return &m.preferences
 }
 
+func (m *Manager) GetUserProfile() *messages.PluginRegisterResponseJsonDataUserProfile {
+	return m.config.UserProfile
+}
+
 func (m *Manager) UpdatePreferences() {
 	r := messages.PluginRegisterResponseJsonDataPreferences{
 		Language: "en-US",

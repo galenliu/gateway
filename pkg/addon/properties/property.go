@@ -15,11 +15,11 @@ type PropertyDescription struct {
 	Type        string             `json:"type,omitempty"`
 	Unit        string             `json:"unit,omitempty"`
 	Description string             `json:"description,omitempty"`
-	Minimum     *float64           `json:"minimum,omitempty"`
-	Maximum     *float64           `json:"maximum,omitempty"`
+	Minimum     any                `json:"minimum,omitempty"`
+	Maximum     any                `json:"maximum,omitempty"`
 	Enum        []any              `json:"enum,omitempty"`
 	ReadOnly    bool               `json:"readOnly,omitempty"`
-	MultipleOf  *float64           `json:"multipleOf,omitempty"`
+	MultipleOf  any                `json:"multipleOf,omitempty"`
 	Links       []PropertyLinkElem `json:"links,omitempty"`
 	Value       any                `json:"value,omitempty"`
 }
@@ -37,10 +37,9 @@ type Entity interface {
 	GetEnum() []any
 	GetAtType() string
 	GetDescription() string
-	GetMinimum() *float64
-	GetMaximum() *float64
-	GetMultipleOf() *float64
-	GetValue() any
+	GetMinimum() any
+	GetMaximum() any
+	GetMultipleOf() any
 	IsReadOnly() bool
 	ToMessage() messages.Property
 	ToDescription() PropertyDescription
@@ -51,22 +50,23 @@ type Entity interface {
 	SetHandler(d DeviceHandler)
 	GetHandler() DeviceHandler
 	NotifyChanged()
+	GetCachedValue() any
 }
 
 type Property struct {
 	handler     DeviceHandler
-	Name        string   `json:"name"`
-	Title       string   `json:"title,omitempty"`
-	Type        string   `json:"type"`
-	AtType      string   `json:"@type,omitempty"`
-	Unit        string   `json:"unit,omitempty"`
-	Description string   `json:"description,omitempty"`
-	Minimum     *float64 `json:"minimum,omitempty"`
-	Maximum     *float64 `json:"maximum,omitempty"`
-	Enum        []any    `json:"enum,omitempty"`
-	ReadOnly    bool     `json:"readOnly"`
-	MultipleOf  *float64 `json:"multipleOf,omitempty"`
-	Value       any      `json:"value"`
+	Name        string `json:"name"`
+	Title       string `json:"title,omitempty"`
+	Type        string `json:"type"`
+	AtType      string `json:"@type,omitempty"`
+	Unit        string `json:"unit,omitempty"`
+	Description string `json:"description,omitempty"`
+	Minimum     any    `json:"minimum,omitempty"`
+	Maximum     any    `json:"maximum,omitempty"`
+	Enum        []any  `json:"enum,omitempty"`
+	ReadOnly    bool   `json:"readOnly"`
+	MultipleOf  any    `json:"multipleOf,omitempty"`
+	Value       any    `json:"value"`
 }
 
 func NewProperty(description PropertyDescription) *Property {
@@ -155,10 +155,10 @@ func (p *Property) GetDescription() string {
 	return p.Description
 }
 
-func (p *Property) GetMinimum() *float64 {
+func (p *Property) GetMinimum() any {
 	return p.Minimum
 }
-func (p *Property) GetMaximum() *float64 {
+func (p *Property) GetMaximum() any {
 	return p.Maximum
 }
 
@@ -166,11 +166,11 @@ func (p *Property) IsReadOnly() bool {
 	return p.ReadOnly
 }
 
-func (p *Property) GetMultipleOf() *float64 {
+func (p *Property) GetMultipleOf() any {
 	return p.MultipleOf
 }
 
-func (p *Property) GetValue() any {
+func (p *Property) GetCachedValue() any {
 	return p.Value
 }
 
@@ -213,10 +213,34 @@ func (p *Property) ToMessage() messages.Property {
 		AtType:      get(p.AtType),
 		Description: get(p.Description),
 		Enum:        p.Enum,
-		Maximum:     p.Maximum,
-		Minimum:     p.Minimum,
-		MultipleOf:  p.MultipleOf,
-		Name:        get(p.Name),
+		Maximum: func() *float64 {
+			if v := p.GetMaximum(); v != nil {
+				f, ok := v.(float64)
+				if ok {
+					return &f
+				}
+			}
+			return nil
+		}(),
+		Minimum: func() *float64 {
+			if v := p.GetMinimum(); v != nil {
+				f, ok := v.(float64)
+				if ok {
+					return &f
+				}
+			}
+			return nil
+		}(),
+		MultipleOf: func() *float64 {
+			if v := p.GetMultipleOf(); v != nil {
+				f, ok := v.(float64)
+				if ok {
+					return &f
+				}
+			}
+			return nil
+		}(),
+		Name: get(p.Name),
 		ReadOnly: func(b bool) *bool {
 			if b {
 				return &b
@@ -230,16 +254,20 @@ func (p *Property) ToMessage() messages.Property {
 }
 
 func (p *Property) SetCachedValueAndNotify(value any) {
-	oldValue := p.GetValue()
+	oldValue := p.GetCachedValue()
 	p.SetCachedValue(value)
-	hasChanged := oldValue != p.GetValue()
+	hasChanged := oldValue != p.GetCachedValue()
 	if hasChanged {
-		p.handler.NotifyPropertyChanged(p.ToDescription())
+		if p.handler != nil {
+			p.handler.NotifyPropertyChanged(p.ToDescription())
+		}
 	}
 }
 
 func (p *Property) NotifyChanged() {
-	p.handler.NotifyPropertyChanged(p.ToDescription())
+	if p.handler != nil {
+		p.handler.NotifyPropertyChanged(p.ToDescription())
+	}
 }
 
 func (p *Property) SetCachedValue(value any) bool {

@@ -152,8 +152,15 @@ func (c *command) setHomeDir() (err error) {
 	return nil
 }
 
+func (c *command) findWebThingsHomeDir() string {
+	if p := os.Getenv("WEBTHINGS_HOME"); p != "" {
+		return p
+	}
+	return filepath.Join(c.homeDir, ".webthings")
+}
+
 func (c *command) setAllFlags(cmd *cobra.Command) {
-	cmd.Flags().String(optionNameDataDir, filepath.Join(c.homeDir, ".gateway"), "data directory")
+	cmd.Flags().String(optionNameDataDir, c.findWebThingsHomeDir(), "data directory")
 
 	dataDir, _ := cmd.Flags().GetString(optionNameDataDir)
 	cmd.Flags().String(optionNameMediaDir, filepath.Join(dataDir, "media"), "media directory")

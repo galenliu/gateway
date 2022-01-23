@@ -28,7 +28,7 @@ func (m *Manager) GetPropertyValue(thingId, propName string) (any, error) {
 	if p == nil {
 		return nil, fmt.Errorf("property:%s not found", propName)
 	}
-	return p.GetValue(), nil
+	return p.GetCachedValue(), nil
 }
 
 func (m *Manager) GetPropertiesValue(deviceId string) (map[string]any, error) {
@@ -39,7 +39,7 @@ func (m *Manager) GetPropertiesValue(deviceId string) (map[string]any, error) {
 	}
 	propMap := device.GetProperties()
 	for n, p := range propMap {
-		data[n] = p.GetValue()
+		data[n] = p.GetCachedValue()
 	}
 	return data, nil
 }

@@ -29,3 +29,8 @@ func (prop *StringProperty) OnValueRemoteUpdate(fn func(string)) {
 	//	fn(newValue.(string))
 	//)
 }
+
+func (prop *StringProperty) GetValue() string {
+	v := prop.Value.(string)
+	return v
+}

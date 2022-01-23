@@ -16,6 +16,7 @@ type Adapter struct {
 	IsPairing bool
 	verbose   bool
 	pluginId  string
+	client    *IpcClient
 }
 
 func NewAdapter(adapterId, name string) *Adapter {
@@ -141,14 +142,38 @@ func (a *Adapter) SendPropertyChangedNotification(deviceId string, property prop
 			AtType:      &property.AtType,
 			Description: &property.Description,
 			Enum:        property.Enum,
-			Maximum:     property.Maximum,
-			Minimum:     property.Minimum,
-			MultipleOf:  property.MultipleOf,
-			Name:        &property.Name,
-			ReadOnly:    &property.ReadOnly,
-			Title:       &property.Title,
-			Unit:        &property.Unit,
-			Value:       property.Value,
+			Maximum: func() *float64 {
+				if v := property.Maximum; v != nil {
+					f, ok := v.(float64)
+					if ok {
+						return &f
+					}
+				}
+				return nil
+			}(),
+			Minimum: func() *float64 {
+				if v := property.Minimum; v != nil {
+					f, ok := v.(float64)
+					if ok {
+						return &f
+					}
+				}
+				return nil
+			}(),
+			MultipleOf: func() *float64 {
+				if v := property.MultipleOf; v != nil {
+					f, ok := v.(float64)
+					if ok {
+						return &f
+					}
+				}
+				return nil
+			}(),
+			Name:     &property.Name,
+			ReadOnly: &property.ReadOnly,
+			Title:    &property.Title,
+			Unit:     &property.Unit,
+			Value:    property.Value,
 		},
 	})
 }
@@ -166,7 +191,7 @@ func (a *Adapter) CancelRemoveThing(id string) {
 	fmt.Printf("Adapter:%s CancelRemoveThing func not implemented\t\n", a.GetId())
 }
 
-func (a *Adapter) SetManager(manager ManagerProxy) {
+func (a *Adapter) Registered(manager ManagerProxy) {
 	a.manager = manager
 	a.pluginId = manager.GetPluginId()
 }
@@ -181,4 +206,8 @@ func (a *Adapter) GetPackageName() string {
 
 func (a *Adapter) GetName() string {
 	return a.name
+}
+
+func (a *Adapter) OnMessage(data []byte) {
+
 }

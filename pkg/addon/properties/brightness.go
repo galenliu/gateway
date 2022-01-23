@@ -24,7 +24,3 @@ func NewBrightnessProperty(description PropertyDescription) *BrightnessProperty 
 	p.IntegerProperty = NewIntegerProperty(description)
 	return p
 }
-
-func (b BrightnessProperty) SetBrightness(v int) {
-
-}

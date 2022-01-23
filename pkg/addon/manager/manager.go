@@ -21,7 +21,7 @@ func NewManager() *Manager {
 type Manager struct {
 	devices      sync.Map
 	adapters     sync.Map
-	Integrations sync.Map
+	integrations sync.Map
 }
 
 func (m *Manager) AddDevice(d Device) {
@@ -34,6 +34,10 @@ func (m *Manager) RemoveDevice(id string) {
 
 func (m *Manager) AddAdapter(a Adapter) {
 	m.adapters.Store(a.GetId(), a)
+}
+
+func (m *Manager) AddIntegration(ig Integration) {
+	m.integrations.Store(ig.GetId(), ig)
 }
 
 func (m *Manager) RemoveAdapter(id string) {
@@ -63,8 +67,8 @@ func (m *Manager) GetAdapters() []Adapter {
 	return adapters
 }
 
-func (m *Manager) GetComponent(id string) Integration {
-	v, ok := m.Integrations.Load(id)
+func (m *Manager) GetIntegration(id string) Integration {
+	v, ok := m.integrations.Load(id)
 	if ok {
 		v, ok := v.(Integration)
 		if ok {
@@ -74,13 +78,9 @@ func (m *Manager) GetComponent(id string) Integration {
 	return nil
 }
 
-func (m *Manager) AddComponent(com Integration) {
-	m.Integrations.Store(com.GetId(), com)
-}
-
-func (m *Manager) GetComponents() []Integration {
+func (m *Manager) GetIntegrations() []Integration {
 	integrations := make([]Integration, 1)
-	m.Integrations.Range(func(key, value any) bool {
+	m.integrations.Range(func(key, value any) bool {
 		com, ok := value.(Integration)
 		if ok {
 			integrations = append(integrations, com)

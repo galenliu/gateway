@@ -4,7 +4,6 @@ import (
 	"fmt"
 	yeelight "github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg"
 	"github.com/galenliu/gateway/pkg/addon/properties"
-	"image/color"
 )
 
 type Color struct {
@@ -19,13 +18,17 @@ func NewColor(bulb *yeelight.Yeelight) *Color {
 	}
 }
 
-func (on *Color) SetValue(c color.RGBA) {
-	_, err := on.bulb.SetRGB(c)
+func (on *Color) SetValue(v string) {
+	c, err := properties.HTMLToRGB(v)
 	if err != nil {
 		fmt.Print(err.Error())
 		return
 	}
-	v := fmt.Sprintf("#%X%X%X", c.R, c.G, c.B)
+	_, err = on.bulb.SetRGB(c)
+	if err != nil {
+		fmt.Print(err.Error())
+		return
+	}
 	on.SetCachedValue(v)
 	on.NotifyChanged()
 	return

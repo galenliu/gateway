@@ -24,13 +24,13 @@ func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
 		switch method {
 		case "set_power":
 			prop := NewOn(bulb)
-			yeeDevice.AddProperty(proxy.NewOnOff(prop))
+			yeeDevice.AddProperty(proxy.NewBooleanProxy(prop))
 		case "set_bright":
 			prop := NewBrightness(bulb)
-			yeeDevice.AddProperty(proxy.NewBrightness(prop))
+			yeeDevice.AddProperty(proxy.NewIntegerProxy(prop))
 		case "set_rgb":
 			prop := NewColor(bulb)
-			yeeDevice.AddProperty(proxy.NewColor(prop))
+			yeeDevice.AddProperty(proxy.NewStringProxy(prop))
 		default:
 			continue
 		}

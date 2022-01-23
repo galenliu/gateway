@@ -6,6 +6,10 @@ type Device interface {
 	GetId() string
 }
 
+type Thing interface {
+	GetId() string
+}
+
 type Entity interface {
 	GetId() string
 	GetDeviceById(id string) Device
@@ -15,6 +19,7 @@ type Entity interface {
 type Adapter struct {
 	id      string
 	devices sync.Map
+	things  sync.Map
 }
 
 func NewAdapter(id string) *Adapter {
@@ -53,6 +58,29 @@ func (a *Adapter) GetDevices() []Device {
 		return true
 	})
 	return devices
+}
+
+func (a *Adapter) GetThings() []Thing {
+	things := make([]Thing, 1)
+	a.things.Range(func(key, value any) bool {
+		device, ok := value.(Device)
+		if ok {
+			things = append(things, device)
+		}
+		return true
+	})
+	return things
+}
+
+func (a *Adapter) GetThingById(id string) Thing {
+	v, ok := a.things.Load(id)
+	if ok {
+		v, ok := v.(Thing)
+		if ok {
+			return v
+		}
+	}
+	return nil
 }
 
 func (a *Adapter) GetId() string {

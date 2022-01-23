@@ -5,6 +5,7 @@ import (
 	things "github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/addon/proxy"
 	"github.com/galenliu/gateway/pkg/constant"
+	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	json "github.com/json-iterator/go"
 	"sync"
 )
@@ -20,14 +21,18 @@ type Property interface {
 
 type Integration struct {
 	*proxy.IpcClient
-	container  sync.Map
-	token      string
-	thingsPath string
-	dbPath     string
+	container sync.Map
+	token     string
+
+	dbPath string
+	messages.PluginRegisterResponseJsonDataUserProfile
 }
 
-func NewIntegration() *Integration {
-	return &Integration{}
+func NewIntegration(dbPath string) *Integration {
+	i := &Integration{}
+	i.dbPath = dbPath
+
+	return i
 }
 
 func (c *Integration) AddThing(t Thing) {

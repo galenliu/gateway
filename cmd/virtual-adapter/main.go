@@ -19,7 +19,7 @@ func main() {
 	}
 	yeeAdapter := yeelight.NewVirtualAdapter("yeelight-adapter")
 	virtualAdapter := virtual.NewVirtualAdapter("virtual-adapter")
-	manager.AddAdapters(yeeAdapter, virtualAdapter)
+	manager.RegisteredAdapter(yeeAdapter, virtualAdapter)
 
 	yeeAdapter.StartPairing(time.After(3 * time.Second))
 	virtualAdapter.StartPairing(time.After(3 * time.Second))

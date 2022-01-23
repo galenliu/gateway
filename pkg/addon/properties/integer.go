@@ -1,5 +1,16 @@
 package properties
 
+import "math"
+
+type Integer int64
+
+type IntegerEntity interface {
+	Entity
+	GetMinValue() Integer
+	GetMaxValue() Integer
+	GetValue() Integer
+}
+
 type IntegerProperty struct {
 	*Property
 }
@@ -23,10 +34,27 @@ func (prop *IntegerProperty) OnValueRemoteUpdate(fn func(int)) {
 	//})
 }
 
-func (prop *IntegerProperty) SetMinValue(v int64) {
-	//prop.PropertyProxy.SetMinValue(v)
+func (prop *IntegerProperty) GetMinValue() Integer {
+	if v := prop.GetMinimum(); v != nil {
+		f, ok := v.(Integer)
+		if ok {
+			return f
+		}
+	}
+	return math.MinInt64
 }
 
-func (prop *IntegerProperty) SetMaxValue(v int64) {
-	//prop.PropertyProxy.SetMaxValue(v)
+func (prop *IntegerProperty) GetMaxValue() Integer {
+	if v := prop.GetMaximum(); v != nil {
+		f, ok := v.(Integer)
+		if ok {
+			return f
+		}
+	}
+	return math.MaxInt64
+}
+
+func (prop *IntegerProperty) GetValue() Integer {
+	v := prop.Value.(Integer)
+	return v
 }

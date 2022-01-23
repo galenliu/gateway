@@ -156,7 +156,7 @@ func (tc *thingsController) handleSetThing(c *fiber.Ctx) error {
 // Patch thing
 func (tc *thingsController) handleUpdateThing(c *fiber.Ctx) error {
 
-	ctx, cancelFunc := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx, cancelFunc := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancelFunc()
 	thingId := c.Params("thingId")
 	username := json.Get(c.Body(), "username").ToString()

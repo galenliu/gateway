@@ -35,7 +35,6 @@ func (s *Storage) CreateThing(id string, thing container.Thing) error {
 }
 
 func (s *Storage) GetThings() map[string]container.Thing {
-
 	things := make(map[string]container.Thing)
 	rows, err := s.db.Query("SELECT id, description FROM things")
 	defer func(rows *sql.Rows) {
