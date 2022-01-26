@@ -23,3 +23,7 @@ func (trg *Trigger) ToDescription() *TriggerDescription {
 		Label: trg.label,
 	}
 }
+
+func FromDescription(des TriggerDescription) *Trigger {
+	return nil
+}

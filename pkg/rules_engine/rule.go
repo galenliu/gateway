@@ -6,24 +6,37 @@ import (
 )
 
 type RuleDescription struct {
+	Enabled bool
+	Trigger triggers.TriggerDescription
+	Effect  effects.EffectDescription
+	Id      int64
+	Name    string
 }
 
 type Rule struct {
-	Id      int64
-	Name    string
-	Enabled bool
-	Trigger triggers.Trigger
-	Effect  effects.Effect
+	id      int64
+	name    string
+	enabled bool
+	trigger triggers.Trigger
+	effect  effects.Effect
 }
 
 func (r *Rule) setId(id int64) {
-	r.Id = id
+	r.id = id
 }
 
 func (r *Rule) setName(name string) {
-	r.Name = name
+	r.name = name
+}
+
+func (r *Rule) Start() {
+
 }
 
 func (r *Rule) onTriggerStateChanged() {
 
+}
+
+func FromDescription(des RuleDescription) *Rule {
+	return nil
 }
