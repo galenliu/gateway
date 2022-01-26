@@ -51,7 +51,6 @@ func NewProperty(description PropertyDescription, bus Bus, handler ThingsHandler
 		href:        description.Href,
 		cleanUp:     make([]func(), 1),
 	}
-	p.getInitialValue()
 	return p
 }
 
@@ -63,12 +62,20 @@ func (p *Property) onPropertyChanged(property properties.Entity) {
 
 func (p *Property) onThingAdded(thingId string) {
 	if p.thing == thingId {
-		p.getInitialValue()
+		err := p.getInitialValue()
+		if err != nil {
+			fmt.Println(err.Error())
+		}
 	}
 }
 
 func (p *Property) start() {
 	p.cleanUp = append(p.cleanUp, p.bus.Sub(topic.DevicePropertyChanged, p.onPropertyChanged))
+	err := p.getInitialValue()
+	if err != nil {
+		p.cleanUp = append(p.cleanUp, p.bus.Sub(topic.ThingAdded, p.onThingAdded))
+		return
+	}
 }
 
 func (p *Property) stop() {
@@ -81,22 +88,26 @@ func (p *Property) get() (any, error) {
 	return p.things.GetThingProperty(p.thing, p.id)
 }
 
-func (p *Property) getInitialValue() {
+func (p *Property) getInitialValue() error {
 	v, err := p.get()
 	if err != nil {
-		p.cleanUp = append(p.cleanUp, p.bus.Sub(topic.ThingAdded, p.onThingAdded))
+
+		return err
 	}
 	p.bus.Pub(rules_engine.ValueChanged, p.thing, p.id, v)
+	return nil
 }
 
-func (p *Property) Set(value any) any {
-	err, v := p.things.SetThingProperty(p.thing, p.id, value)
+func (p *Property) Set(value any) (any, error) {
+	v, err := p.things.SetThingProperty(p.thing, p.id, value)
 	if err != nil {
-		err, v := p.things.SetThingProperty(p.thing, p.id, value)
+		v, err = p.things.SetThingProperty(p.thing, p.id, value)
 		if err != nil {
 			fmt.Println(err.Error())
+			return nil, err
 		}
 	}
+	return v, err
 }
 
 func (p *Property) ToDescription() PropertyDescription {
@@ -108,4 +119,8 @@ func (p *Property) ToDescription() PropertyDescription {
 		Description: p.description,
 		Href:        p.href,
 	}
+}
+
+func (p *Property) GetType() string {
+	return p.typ
 }
