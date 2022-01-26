@@ -21,7 +21,6 @@ const (
 	optionNameDataDir            = "data-dir"
 	optionNameMediaDir           = "media-dir"
 	optionNameLogDir             = "log-dir"
-	optionNameAttachAddonDirs    = "attach-addons-dir"
 	optionNameVerbosity          = "verbosity"
 	optionNameDBRemoveBeforeOpen = "db-remove-before-open"
 	optionNameAPIPort            = "api-port"
@@ -166,7 +165,6 @@ func (c *command) setAllFlags(cmd *cobra.Command) {
 	cmd.Flags().String(optionNameMediaDir, filepath.Join(dataDir, "media"), "media directory")
 
 	cmd.Flags().String(optionNameLogDir, filepath.Join(dataDir, "log"), "media directory")
-	cmd.Flags().String(optionNameAttachAddonDirs, "", "add-ons directory")
 	cmd.Flags().Bool(optionNameDBRemoveBeforeOpen, false, "remove db before open")
 	cmd.Flags().String(optionNameVerbosity, "trace", "log verbosity level 0=silent, 1=error, 2=warn, 3=info, 4=debug, 5=trace")
 	cmd.Flags().StringArray(optionNameAddonUrls, []string{"https://api.webthings.io:8443/addons"}, "addon urls")

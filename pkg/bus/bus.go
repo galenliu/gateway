@@ -6,6 +6,14 @@ import (
 	"github.com/galenliu/gateway/pkg/logging"
 )
 
+type Publisher interface {
+	Pub(topic topic.Topic, args ...any)
+}
+
+type Subscriber interface {
+	Sub(topic2 topic.Topic, fn any) func()
+}
+
 type Bus struct {
 	bus.Bus
 	logger logging.Logger

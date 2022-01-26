@@ -52,7 +52,6 @@ func (c *command) initStartCmd() (err error) {
 			ctx, cancelFunc := context.WithCancel(context.Background())
 			gw, err := gateway.NewGateway(ctx, gateway.Config{
 				BaseDir:          c.config.GetString(optionNameDataDir),
-				AttachAddonsDir:  c.config.GetString(optionNameAttachAddonDirs),
 				RemoveBeforeOpen: c.config.GetBool(optionNameDBRemoveBeforeOpen),
 				Verbosity:        c.config.GetString(optionNameVerbosity),
 				AddonUrls:        c.config.GetStringSlice(optionNameAddonUrls),

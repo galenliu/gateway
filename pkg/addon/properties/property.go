@@ -25,6 +25,7 @@ type PropertyDescription struct {
 }
 
 type DeviceHandler interface {
+	GetId() string
 	NotifyPropertyChanged(property PropertyDescription)
 }
 
@@ -48,7 +49,7 @@ type Entity interface {
 	SetTitle(s string) bool
 	SetDescription(description string) bool
 	SetHandler(d DeviceHandler)
-	GetHandler() DeviceHandler
+	GetDevice() DeviceHandler
 	NotifyChanged()
 	GetCachedValue() any
 }
@@ -178,7 +179,7 @@ func (p *Property) SetHandler(h DeviceHandler) {
 	p.handler = h
 }
 
-func (p *Property) GetHandler() DeviceHandler {
+func (p *Property) GetDevice() DeviceHandler {
 	return p.handler
 }
 

@@ -197,8 +197,7 @@ func (device *device) NotifyPropertyChanged(property properties.PropertyDescript
 		descriptionChanged = p.SetDescription(property.Description)
 	}
 	if valueChanged || descriptionChanged || titleChanged {
-		des := p.ToDescription()
-		device.adapter.plugin.manager.bus.Pub(topic.DevicePropertyChanged, device.GetId(), &des)
+		device.adapter.plugin.manager.bus.Pub(topic.DevicePropertyChanged, p)
 	}
 }
 

@@ -17,7 +17,6 @@ import (
 
 type Config struct {
 	BaseDir          string
-	AttachAddonsDir  string
 	RemoveBeforeOpen bool
 	Verbosity        string
 	AddonUrls        []string
@@ -74,11 +73,10 @@ func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gat
 
 	//Addon manager init
 	g.addonManager = plugin.NewAddonsManager(ctx, plugin.Config{
-		UserProfile:     u,
-		AddonsDir:       u.AddonsDir,
-		AttachAddonsDir: g.config.AttachAddonsDir,
-		IPCPort:         config.IPCPort,
-		RPCPort:         config.RPCPort,
+		UserProfile: u,
+		AddonsDir:   u.AddonsDir,
+		IPCPort:     config.IPCPort,
+		RPCPort:     config.RPCPort,
 	}, storage, newBus, logger)
 	logger.Infof("addon manager init.")
 
