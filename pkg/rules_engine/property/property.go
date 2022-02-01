@@ -39,9 +39,8 @@ type Property struct {
 	cleanUp     []func()
 }
 
-func NewProperty(description PropertyDescription, bus Bus, handler ThingsHandler) *Property {
+func NewProperty(description PropertyDescription, handler ThingsHandler) *Property {
 	p := &Property{
-		bus:         bus,
 		things:      handler,
 		id:          description.Id,
 		typ:         description.Type,
@@ -91,7 +90,6 @@ func (p *Property) get() (any, error) {
 func (p *Property) getInitialValue() error {
 	v, err := p.get()
 	if err != nil {
-
 		return err
 	}
 	p.bus.Pub(rules_engine.ValueChanged, p.thing, p.id, v)

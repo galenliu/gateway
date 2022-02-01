@@ -5,9 +5,9 @@ import (
 	"compress/gzip"
 	"context"
 	"fmt"
+	"github.com/asaskevich/EventBus"
 	things "github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/addon/manager"
-	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
@@ -46,7 +46,7 @@ type Manager struct {
 	installAddons  sync.Map
 	extensions     sync.Map
 	container      *things.ThingsContainer
-	bus            *bus.Bus
+	bus            EventBus.Bus
 	addonsLoaded   bool
 	isPairing      bool
 	running        bool
@@ -58,7 +58,7 @@ type Manager struct {
 	deferredRemove sync.Map
 }
 
-func NewAddonsManager(ctx context.Context, conf Config, s managerStore, bus *bus.Bus, log logging.Logger) *Manager {
+func NewAddonsManager(ctx context.Context, conf Config, s managerStore, log logging.Logger) *Manager {
 	am := &Manager{}
 	am.Manager = manager.NewManager()
 	am.config = conf
@@ -67,7 +67,7 @@ func NewAddonsManager(ctx context.Context, conf Config, s managerStore, bus *bus
 	am.addonsLoaded = false
 	am.isPairing = false
 	am.running = false
-	am.bus = bus
+	am.bus = EventBus.New()
 	am.storage = s
 	am.locker = new(sync.Mutex)
 	am.UpdatePreferences()
@@ -103,7 +103,7 @@ func (m *Manager) AddNewThings(timeout int) error {
 			case <-timeoutChan:
 				m.pairTask = nil
 				m.logger.Info("pairing timeout")
-				m.bus.Pub(topic.PairingTimeout)
+				m.Publish(topic.PairingTimeout)
 				m.CancelAddNewThing()
 				return
 			case <-m.pairTask:
@@ -127,6 +127,30 @@ func (m *Manager) CancelAddNewThing() {
 		adapter.cancelPairing()
 	}
 	return
+}
+
+func (m *Manager) Publish(t topic.Topic, args ...any) {
+	m.bus.Publish(string(t), args...)
+}
+
+func (m *Manager) Subscribe(t topic.Topic, f any) func() {
+	err := m.bus.Subscribe(string(t), f)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	return func() {
+		err := m.bus.Unsubscribe(string(t), f)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+	}
+}
+
+func (m *Manager) Unsubscribe(t topic.Topic, f any) {
+	err := m.bus.Unsubscribe(string(t), f)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 }
 
 func (m *Manager) RemoveThing(deviceId string) error {
@@ -191,7 +215,7 @@ func (m *Manager) handleAdapterUnload(adapterId string) {
 func (m *Manager) handleDeviceAdded(device *device) {
 	m.AddDevice(device)
 	m.logger.Infof("Addon_Device added: %s", util.JsonIndent(things.AsWebOfThing(device.Device)))
-	m.bus.Pub(topic.DeviceAdded, device.GetId(), device.Device)
+	m.Publish(topic.DeviceAdded, device.GetId(), device.Device)
 }
 
 func (m *Manager) handleDeviceRemoved(device *device) {
@@ -204,7 +228,7 @@ func (m *Manager) handleDeviceRemoved(device *device) {
 			m.logger.Infof("handle device removed")
 		}
 	}
-	m.bus.Pub(topic.DeviceRemoved, device.GetId())
+	m.Publish(topic.DeviceRemoved, device.GetId())
 }
 
 func (m *Manager) getAdapter(adapterId string) *Adapter {

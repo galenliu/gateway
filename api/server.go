@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"github.com/galenliu/gateway/api/controllers"
-	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/plugin"
 )
@@ -24,7 +23,7 @@ type WebServe struct {
 	options Config
 }
 
-func NewServe(ctx context.Context, config Config, addonManager *plugin.Manager, store controllers.Storage, bus *bus.Bus, log logging.Logger) *WebServe {
+func NewServe(ctx context.Context, config Config, addonManager *plugin.Manager, store controllers.Storage, log logging.Logger) *WebServe {
 	sev := &WebServe{}
 	sev.options = config
 	sev.logger = log
@@ -32,6 +31,6 @@ func NewServe(ctx context.Context, config Config, addonManager *plugin.Manager, 
 		HttpAddr:  sev.options.HttpAddr,
 		HttpsAddr: sev.options.HttpsAddr,
 		AddonUrls: config.AddonUrls,
-	}, addonManager, store, bus, log)
+	}, addonManager, store, log)
 	return sev
 }

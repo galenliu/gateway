@@ -197,16 +197,16 @@ func (device *device) NotifyPropertyChanged(property properties.PropertyDescript
 		descriptionChanged = p.SetDescription(property.Description)
 	}
 	if valueChanged || descriptionChanged || titleChanged {
-		device.adapter.plugin.manager.bus.Pub(topic.DevicePropertyChanged, p)
+		device.adapter.plugin.manager.Publish(topic.DevicePropertyChanged, p)
 	}
 }
 
 func (device *device) notifyDeviceConnected(connected bool) {
-	device.adapter.plugin.manager.bus.Pub(topic.DeviceConnected, device.GetId(), connected)
+	device.adapter.plugin.manager.Publish(topic.DeviceConnected, device.GetId(), connected)
 }
 
 func (device *device) notifyAction(actionDescription *actions.ActionDescription) {
-	device.adapter.plugin.manager.bus.Pub(topic.DeviceActionStatus, device.GetId(), actionDescription)
+	device.adapter.plugin.manager.Publish(topic.DeviceActionStatus, device.GetId(), actionDescription)
 }
 
 func (device *device) requestAction(ctx context.Context, id, name string, input map[string]any) error {

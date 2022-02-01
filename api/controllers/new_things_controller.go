@@ -3,6 +3,7 @@ package controllers
 import (
 	things "github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/addon/devices"
+	"github.com/galenliu/gateway/pkg/bus"
 	b "github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/gofiber/websocket/v2"
@@ -11,6 +12,7 @@ import (
 
 type deviceManager interface {
 	GetMapOfDevices() map[string]*devices.Device
+	bus.Bus
 }
 type thingContainer interface {
 	GetMapOfThings() map[string]*things.Thing
@@ -33,7 +35,7 @@ func NewNewThingsController(log logging.Logger) *NewThingsController {
 	return c
 }
 
-func (c *NewThingsController) handleNewThingsWebsocket(m deviceManager, t thingContainer, bus controllerBus) func(conn *websocket.Conn) {
+func (c *NewThingsController) handleNewThingsWebsocket(m deviceManager, t thingContainer) func(conn *websocket.Conn) {
 	return func(conn *websocket.Conn) {
 		addThing := func(deviceId string, device *devices.Device) {
 			err := conn.WriteJSON(things.AsWebOfThing(device))
@@ -42,7 +44,7 @@ func (c *NewThingsController) handleNewThingsWebsocket(m deviceManager, t thingC
 			}
 		}
 		addonDevices := m.GetMapOfDevices()
-		unSub := bus.Sub(b.DeviceAdded, addThing)
+		unSub := m.Subscribe(b.DeviceAdded, addThing)
 		defer func() {
 			//removeFunc()
 			unSub()

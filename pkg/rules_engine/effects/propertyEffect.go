@@ -11,7 +11,7 @@ type PropertyEffect struct {
 }
 
 func NewPropertyEffect(des PropertyEffectDescription, bus property.Bus, things property.ThingsHandler) *PropertyEffect {
-	e := &PropertyEffect{property.NewProperty(des.PropertyDescription, bus, things)}
+	e := &PropertyEffect{property.NewProperty(des.PropertyDescription, things)}
 	return e
 }
 

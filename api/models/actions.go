@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/galenliu/gateway/api/models/container"
-	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/xiam/to"
 	"sync"
@@ -34,12 +33,11 @@ type ActionsModel struct {
 	actions   sync.Map
 	container *container.ThingsContainer
 	manager   ActionsManager
-	bus       *bus.Bus
 }
 
-func NewActionsModel(m ActionsManager, container *container.ThingsContainer, bus *bus.Bus, log logging.Logger) *ActionsModel {
+func NewActionsModel(m ActionsManager, container *container.ThingsContainer, log logging.Logger) *ActionsModel {
 	return &ActionsModel{
-		bus:       bus,
+
 		logger:    log,
 		container: container,
 		manager:   m,

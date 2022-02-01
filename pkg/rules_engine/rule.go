@@ -17,8 +17,8 @@ type Rule struct {
 	id      int64
 	name    string
 	enabled bool
-	trigger triggers.Trigger
-	effect  effects.Effect
+	trigger triggers.Entity
+	effect  effects.Entity
 }
 
 func (r *Rule) setId(id int64) {
@@ -29,12 +29,16 @@ func (r *Rule) setName(name string) {
 	r.name = name
 }
 
+func (r *Rule) onTriggerStateChanged() {
+
+}
+
 func (r *Rule) Start() {
 
 }
 
-func (r *Rule) onTriggerStateChanged() {
-
+func (r *Rule) Stop() {
+	r.trigger.Stop()
 }
 
 func FromDescription(des RuleDescription) *Rule {

@@ -16,10 +16,6 @@ type ThingPin struct {
 	Pattern  string `json:"pattern"`
 }
 
-type eventBus interface {
-	Pub(topic.Topic, ...any)
-}
-
 type Thing struct {
 	*wot.Thing
 	Pin                 *ThingPin `json:"pin,omitempty"`
@@ -89,7 +85,7 @@ func (t *Thing) SetSelectedCapability(selectedCapability string) bool {
 			if err != nil {
 				return false
 			}
-			t.container.bus.Pub(topic.ThingModify, t.GetId())
+			t.container.Publish(topic.ThingModify, t.GetId())
 			return true
 		}
 	}
@@ -105,7 +101,7 @@ func (t *Thing) SetTitle(title string) bool {
 	if err != nil {
 		return false
 	}
-	t.container.bus.Pub(topic.ThingModify, t.GetId())
+	t.container.Publish(topic.ThingModify, t.GetId())
 	return true
 }
 
@@ -114,7 +110,7 @@ func (t *Thing) setConnected(connected bool) {
 		return
 	}
 	t.Connected = connected
-	t.container.bus.Pub(topic.ThingConnected, t.GetId(), connected)
+	t.container.Publish(topic.ThingConnected, t.GetId(), connected)
 }
 
 func (t *Thing) removed() {
@@ -122,7 +118,7 @@ func (t *Thing) removed() {
 	if err != nil {
 		fmt.Printf("delete thing err:%s", err.Error())
 	}
-	t.container.bus.Pub(topic.ThingRemoved, t.GetId())
+	t.container.Publish(topic.ThingRemoved, t.GetId())
 }
 
 func (t *Thing) update() {
@@ -130,7 +126,7 @@ func (t *Thing) update() {
 	if err != nil {
 		return
 	}
-	t.container.bus.Pub(topic.ThingModify, t.GetId())
+	t.container.Publish(topic.ThingModify, t.GetId())
 }
 
 func (t *Thing) added() {
@@ -138,19 +134,19 @@ func (t *Thing) added() {
 	if err != nil {
 		return
 	}
-	t.container.bus.Pub(topic.ThingAdded, t.GetId())
+	t.container.Publish(topic.ThingAdded, t.GetId())
 }
 
 func (t *Thing) onPropertyChanged(prop *properties.PropertyDescription) {
-	t.container.bus.Pub(topic.ThingPropertyChanged, t.GetId(), prop)
+	t.container.Publish(topic.ThingPropertyChanged, t.GetId(), prop)
 }
 
 func (t *Thing) onActionStatus(action *actions.ActionDescription) {
-	t.container.bus.Pub(topic.ThingActionStatus, t.GetId(), action)
+	t.container.Publish(topic.ThingActionStatus, t.GetId(), action)
 }
 
 func (t *Thing) OnEvent(event *events.EventDescription) {
-	t.container.bus.Pub(topic.ThingActionStatus, t.GetId(), event)
+	t.container.Publish(topic.ThingActionStatus, t.GetId(), event)
 }
 
 func (t *Thing) AddAction(name string) bool {

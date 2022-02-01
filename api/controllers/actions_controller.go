@@ -20,13 +20,12 @@ type ActionsController struct {
 	bus            *bus.Bus
 }
 
-func NewActionsController(model *models.ActionsModel, thing *container.ThingsContainer, manager models.ActionsManager, bus *bus.Bus, log logging.Logger) *ActionsController {
+func NewActionsController(model *models.ActionsModel, thing *container.ThingsContainer, manager models.ActionsManager, log logging.Logger) *ActionsController {
 	return &ActionsController{
 		logger:         log,
 		manager:        manager,
 		thingContainer: thing,
 		actions:        model,
-		bus:            bus,
 	}
 }
 

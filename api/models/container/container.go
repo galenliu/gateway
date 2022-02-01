@@ -3,11 +3,11 @@ package container
 import (
 	"context"
 	"fmt"
+	"github.com/asaskevich/EventBus"
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/events"
 	"github.com/galenliu/gateway/pkg/addon/properties"
-	bus "github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/logging"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
@@ -20,6 +20,8 @@ type ThingsManager interface {
 	SetPropertyValue(ctx context.Context, thingId, propertyName string, value any) (any, error)
 	GetPropertyValue(thingId, propertyName string) (any, error)
 	GetPropertiesValue(thingId string) (map[string]any, error)
+	Publish(topic2 topic.Topic, args ...any)
+	Subscribe(topic2 topic.Topic, f any) func()
 }
 
 // ThingsStorage CRUD
@@ -35,28 +37,23 @@ type ThingsContainer struct {
 	manager ThingsManager
 	store   ThingsStorage
 	logger  logging.Logger
-	bus     containerBus
+	bus     EventBus.Bus
 }
 
-type containerBus interface {
-	Sub(topic topic.Topic, fn any) func()
-	Pub(topic topic.Topic, args ...any)
-}
-
-func NewThingsContainerModel(manager ThingsManager, store ThingsStorage, b *bus.Bus, log logging.Logger) *ThingsContainer {
+func NewThingsContainerModel(manager ThingsManager, store ThingsStorage, log logging.Logger) *ThingsContainer {
 	t := &ThingsContainer{}
 	t.store = store
 	t.manager = manager
+	t.bus = EventBus.New()
 	t.logger = log
-	t.bus = b
 	t.things = make(map[string]*Thing, 20)
 	t.updateThings()
-	_ = b.Sub(topic.DeviceAdded, t.handleDeviceAdded)
-	_ = b.Sub(topic.DeviceRemoved, t.handleDeviceRemoved)
-	_ = b.Sub(topic.DeviceConnected, t.handleDeviceConnected)
-	_ = b.Sub(topic.DevicePropertyChanged, t.handleDevicePropertyChanged)
-	_ = b.Sub(topic.DeviceActionStatus, t.handleDeviceActionStatus)
-	_ = b.Sub(topic.DeviceEvent, t.handleDeviceEvent)
+	_ = manager.Subscribe(topic.DeviceAdded, t.handleDeviceAdded)
+	_ = manager.Subscribe(topic.DeviceRemoved, t.handleDeviceRemoved)
+	_ = manager.Subscribe(topic.DeviceConnected, t.handleDeviceConnected)
+	_ = manager.Subscribe(topic.DevicePropertyChanged, t.handleDevicePropertyChanged)
+	_ = manager.Subscribe(topic.DeviceActionStatus, t.handleDeviceActionStatus)
+	_ = manager.Subscribe(topic.DeviceEvent, t.handleDeviceEvent)
 	return t
 }
 
@@ -97,6 +94,30 @@ func (c *ThingsContainer) GetThings() (ts []*Thing) {
 		ts = append(ts, t)
 	}
 	return
+}
+
+func (c *ThingsContainer) Publish(t topic.Topic, args ...any) {
+	c.bus.Publish(string(t), args...)
+}
+
+func (c *ThingsContainer) Subscribe(t topic.Topic, f any) func() {
+	err := c.bus.Subscribe(string(t), f)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	return func() {
+		err := c.bus.Unsubscribe(string(t), f)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+	}
+}
+
+func (c *ThingsContainer) Unsubscribe(t topic.Topic, f any) {
+	err := c.bus.Unsubscribe(string(t), f)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 }
 
 func (c *ThingsContainer) GetMapOfThings() map[string]*Thing {

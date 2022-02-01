@@ -5,7 +5,6 @@ import (
 	"github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/bus"
-	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
 	uuid "github.com/satori/go.uuid"
@@ -98,7 +97,6 @@ func (action *Action) updateStatus(newStatus string) {
 	}
 	action.Status = newStatus
 	action.logger.Infof("actions.updateStatus: %s", newStatus)
-	action.bus.Pub(topic.ThingActionStatus, action)
 }
 
 func (action *Action) SetErr(err error) {

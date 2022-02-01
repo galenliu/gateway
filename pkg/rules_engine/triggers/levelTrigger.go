@@ -28,7 +28,7 @@ type LevelTrigger struct {
 func NewLevelTrigger(des LevelTriggerDescription, bus property.Bus, things property.ThingsHandler) *LevelTrigger {
 	return &LevelTrigger{
 		bus:             bus,
-		PropertyTrigger: NewPropertyTrigger(des.PropertyTriggerDescription, bus, things),
+		PropertyTrigger: NewPropertyTrigger(des.PropertyTriggerDescription, things),
 	}
 }
 
@@ -51,5 +51,5 @@ func (t *LevelTrigger) onValueChanged(v controls.Number) {
 		}
 		break
 	}
-	t.bus.Pub(rules_engine.StateChanged, t.Property.ToDescription().Thing, t.Property.ToDescription().Id, rules_engine.State{On: on, Value: v})
+	t.bus.Pub(rules_engine.StateChanged, t.Property.ToDescription().Thing, t.Property.ToDescription().Id, State{On: on, Value: v})
 }

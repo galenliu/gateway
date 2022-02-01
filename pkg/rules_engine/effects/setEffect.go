@@ -2,8 +2,8 @@ package effects
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/rules_engine"
 	"github.com/galenliu/gateway/pkg/rules_engine/property"
+	"github.com/galenliu/gateway/pkg/rules_engine/triggers"
 )
 
 type SetEffectDescription struct {
@@ -30,7 +30,7 @@ func (s *SetEffect) ToDescription() SetEffectDescription {
 	}
 }
 
-func (s *SetEffect) SetState(state rules_engine.State) {
+func (s *SetEffect) SetState(state triggers.State) {
 	if !s.on && state.On {
 		s.on = true
 		_, err := s.Property.Set(state.Value)

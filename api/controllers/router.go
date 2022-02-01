@@ -6,8 +6,6 @@ import (
 	"github.com/galenliu/gateway/api/middleware"
 	"github.com/galenliu/gateway/api/models"
 	things "github.com/galenliu/gateway/api/models/container"
-	"github.com/galenliu/gateway/pkg/bus"
-	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/plugin"
@@ -19,11 +17,6 @@ import (
 	"github.com/gofiber/websocket/v2"
 	"net/http"
 )
-
-type controllerBus interface {
-	Pub(topic topic.Topic, args ...any)
-	Sub(topic topic.Topic, fun any) func()
-}
 
 type Storage interface {
 	models.UsersStore
@@ -62,7 +55,7 @@ type Router struct {
 	config Config
 }
 
-func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, store Storage, bus *bus.Bus, log logging.Logger) *Router {
+func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, store Storage, log logging.Logger) *Router {
 
 	//router init
 	app := Router{}
@@ -76,14 +69,14 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 
 	//models init
 	settingModel := models.NewSettingsModel(config.AddonUrls, store, log)
-	containerModel := things.NewThingsContainerModel(manager, store, bus, log)
+	containerModel := things.NewThingsContainerModel(manager, store, log)
 	jwtMiddleware := middleware.NewJWTMiddleware(store, log)
 	auth := jwtMiddleware.Auth
 	usersModel := models.NewUsersModel(store, log)
 	addonModel := models.NewAddonsModel(store, log)
 	jsonwebtokenModel := models.NewJsonwebtokenModel(settingModel, store, log)
 
-	actionsModel := models.NewActionsModel(manager, containerModel, bus, log)
+	actionsModel := models.NewActionsModel(manager, containerModel, log)
 	//serviceModel := models.NewServicesModel(deviceManager)
 	//newThingsModel := models.NewNewThingsModel(deviceManager, log)
 
@@ -159,7 +152,7 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		usersGroup.Post("/", usersController.createUser)
 	}
 
-	actionsController := NewActionsController(actionsModel, containerModel, manager, bus, log)
+	actionsController := NewActionsController(actionsModel, containerModel, manager, log)
 	//actions Controller
 	{
 		actionsGroup := app.Group(constant.ActionsPath)
@@ -185,8 +178,8 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		thingsGroup.Patch("/:thingId", thingsController.handleUpdateThing)
 		thingsGroup.Get("/", thingsController.handleGetThings)
 
-		thingsGroup.Get("/:thingId", websocket.New(handleWebsocket(containerModel, bus, log)))
-		thingsGroup.Get("/", websocket.New(handleWebsocket(containerModel, bus, log)))
+		thingsGroup.Get("/:thingId", websocket.New(handleWebsocket(containerModel, manager, log)))
+		thingsGroup.Get("/", websocket.New(handleWebsocket(containerModel, manager, log)))
 
 		//Get the properties of a thing
 		thingsGroup.Get("/:thingId"+constant.PropertiesPath, thingsController.handleGetProperties)
@@ -212,7 +205,7 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 			}
 			return fiber.ErrUpgradeRequired
 		})
-		newThingsGroup.Get("/", websocket.New(newThingsController.handleNewThingsWebsocket(manager, containerModel, bus)))
+		newThingsGroup.Get("/", websocket.New(newThingsController.handleNewThingsWebsocket(manager, containerModel)))
 	}
 
 	//Addons Controller

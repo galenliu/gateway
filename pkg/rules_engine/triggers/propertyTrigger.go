@@ -12,8 +12,8 @@ type PropertyTrigger struct {
 	*property.Property
 }
 
-func NewPropertyTrigger(des PropertyTriggerDescription, bus property.Bus, things property.ThingsHandler) *PropertyTrigger {
+func NewPropertyTrigger(des PropertyTriggerDescription, things property.ThingsHandler) *PropertyTrigger {
 	return &PropertyTrigger{
-		Property: property.NewProperty(des.Property, bus, things),
+		Property: property.NewProperty(des.Property, things),
 	}
 }
