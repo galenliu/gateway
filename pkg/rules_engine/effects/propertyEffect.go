@@ -6,6 +6,7 @@ import (
 )
 
 type PropertyEffectDescription struct {
+	EffectDescription
 	property.PropertyDescription
 }
 

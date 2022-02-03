@@ -6,31 +6,32 @@ import (
 	"github.com/galenliu/gateway/pkg/rules_engine/triggers"
 )
 
-type SetEffectDescription struct {
+type PulseEffectDescription struct {
 	PropertyEffectDescription
 	Value any
 }
 
-type SetEffect struct {
+type PulseEffect struct {
 	*PropertyEffect
-	on    bool
-	value any
+	on       bool
+	value    any
+	oldValue any
 }
 
-func NewSetEffect(des SetEffectDescription, container container.Container) *SetEffect {
-	e := &SetEffect{}
+func NewPulseEffect(des PulseEffectDescription, container container.Container) *PulseEffect {
+	e := &PulseEffect{}
 	e.PropertyEffect = NewPropertyEffect(des.PropertyEffectDescription, container)
 	return e
 }
 
-func (s *SetEffect) ToDescription() SetEffectDescription {
+func (s *PulseEffect) ToDescription() SetEffectDescription {
 	return SetEffectDescription{
 		PropertyEffectDescription: s.PropertyEffect.ToDescription(),
 		Value:                     s.value,
 	}
 }
 
-func (s *SetEffect) SetState(state triggers.State) {
+func (s *PulseEffect) SetState(state triggers.State) {
 	if !s.on && state.On {
 		s.on = true
 		_, err := s.Property.Set(state.Value)
