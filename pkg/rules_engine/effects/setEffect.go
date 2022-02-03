@@ -17,7 +17,7 @@ type SetEffect struct {
 	value any
 }
 
-func NewSetEffect(des SetEffectDescription, bus property.Bus, things property.ThingsHandler) *SetEffect {
+func NewSetEffect(des SetEffectDescription, bus property.Bus, things property.Manager) *SetEffect {
 	e := &SetEffect{}
 	e.PropertyEffect = NewPropertyEffect(des.PropertyEffectDescription, bus, things)
 	return e

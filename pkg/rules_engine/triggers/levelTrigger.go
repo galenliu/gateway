@@ -1,8 +1,8 @@
 package triggers
 
 import (
+	"github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/rules_engine"
-	"github.com/galenliu/gateway/pkg/rules_engine/property"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 )
 
@@ -19,16 +19,14 @@ type LevelTriggerDescription struct {
 }
 
 type LevelTrigger struct {
-	bus property.Bus
 	*PropertyTrigger
 	value     controls.Number
 	levelType string
 }
 
-func NewLevelTrigger(des LevelTriggerDescription, bus property.Bus, things property.ThingsHandler) *LevelTrigger {
+func NewLevelTrigger(des LevelTriggerDescription, container container.Container) *LevelTrigger {
 	return &LevelTrigger{
-		bus:             bus,
-		PropertyTrigger: NewPropertyTrigger(des.PropertyTriggerDescription, things),
+		PropertyTrigger: NewPropertyTrigger(des.PropertyTriggerDescription, container),
 	}
 }
 
@@ -51,5 +49,5 @@ func (t *LevelTrigger) onValueChanged(v controls.Number) {
 		}
 		break
 	}
-	t.bus.Pub(rules_engine.StateChanged, t.Property.ToDescription().Thing, t.Property.ToDescription().Id, State{On: on, Value: v})
+	t.Publish(rules_engine.StateChanged, t.PropertyTrigger.property.ToDescription().Thing, t.property.ToDescription().Id, State{On: on, Value: v})
 }

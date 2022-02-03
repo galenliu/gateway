@@ -29,15 +29,20 @@ func (r *Rule) setName(name string) {
 	r.name = name
 }
 
-func (r *Rule) onTriggerStateChanged() {
-
+func (r *Rule) onTriggerStateChanged(state triggers.State) {
+	if !r.enabled {
+		return
+	}
+	r.effect.SetState(state)
 }
 
 func (r *Rule) Start() {
-
+	r.trigger.Subscribe(StateChanged, r.onTriggerStateChanged)
+	r.trigger.Start()
 }
 
 func (r *Rule) Stop() {
+	r.trigger.Unsubscribe(StateChanged, r.onTriggerStateChanged)
 	r.trigger.Stop()
 }
 

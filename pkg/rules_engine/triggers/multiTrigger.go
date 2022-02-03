@@ -49,7 +49,7 @@ func (m *MultiTrigger) onStateChanged(triggerIndex int, state State) {
 	}
 	if value != m.state {
 		m.state = value
-		m.Pub(rules_engine.StateChanged, State{
+		m.Publish(rules_engine.StateChanged, State{
 			On: m.state,
 		})
 	}
@@ -57,7 +57,7 @@ func (m *MultiTrigger) onStateChanged(triggerIndex int, state State) {
 
 func (m *MultiTrigger) Start() {
 	for i, t := range m.triggers {
-		t.Sub(rules_engine.StateChanged, func(state State) {
+		t.Publish(rules_engine.StateChanged, func(state State) {
 			m.onStateChanged(i, state)
 		})
 	}

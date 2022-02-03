@@ -3,11 +3,11 @@ package container
 import (
 	"context"
 	"fmt"
-	"github.com/asaskevich/EventBus"
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/events"
 	"github.com/galenliu/gateway/pkg/addon/properties"
+	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/logging"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
@@ -16,7 +16,14 @@ import (
 	"time"
 )
 
-type ThingsManager interface {
+type Container interface {
+	SetThingPropertyValue(thingId, propertyName string, value any) (any, error)
+	GetThingPropertyValue(thingId, propertyName string) (any, error)
+	Publish(topic2 topic.Topic, args ...any)
+	Subscribe(topic2 topic.Topic, f any) func()
+}
+
+type Manager interface {
 	SetPropertyValue(ctx context.Context, thingId, propertyName string, value any) (any, error)
 	GetPropertyValue(thingId, propertyName string) (any, error)
 	GetPropertiesValue(thingId string) (map[string]any, error)
@@ -34,17 +41,17 @@ type ThingsStorage interface {
 
 type ThingsContainer struct {
 	things  map[string]*Thing
-	manager ThingsManager
+	manager Manager
 	store   ThingsStorage
 	logger  logging.Logger
-	bus     EventBus.Bus
+	*bus.Controller
 }
 
-func NewThingsContainerModel(manager ThingsManager, store ThingsStorage, log logging.Logger) *ThingsContainer {
+func NewThingsContainerModel(manager Manager, store ThingsStorage, log logging.Logger) *ThingsContainer {
 	t := &ThingsContainer{}
 	t.store = store
 	t.manager = manager
-	t.bus = EventBus.New()
+	t.Controller = bus.NewBusController()
 	t.logger = log
 	t.things = make(map[string]*Thing, 20)
 	t.updateThings()
@@ -65,7 +72,7 @@ func (c *ThingsContainer) GetThing(id string) *Thing {
 	return t
 }
 
-func (c *ThingsContainer) SetThingProperty(thingId, propName string, value any) (any, error) {
+func (c *ThingsContainer) SetThingPropertyValue(thingId, propName string, value any) (any, error) {
 	thing := c.GetThing(thingId)
 	if thing == nil {
 		return nil, fiber.NewError(fiber.StatusNotFound, "Thing not found")
@@ -96,28 +103,8 @@ func (c *ThingsContainer) GetThings() (ts []*Thing) {
 	return
 }
 
-func (c *ThingsContainer) Publish(t topic.Topic, args ...any) {
-	c.bus.Publish(string(t), args...)
-}
-
-func (c *ThingsContainer) Subscribe(t topic.Topic, f any) func() {
-	err := c.bus.Subscribe(string(t), f)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	return func() {
-		err := c.bus.Unsubscribe(string(t), f)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-	}
-}
-
-func (c *ThingsContainer) Unsubscribe(t topic.Topic, f any) {
-	err := c.bus.Unsubscribe(string(t), f)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+func (c *ThingsContainer) GetThingPropertyValue(thingId, propName string) (any, error) {
+	return c.manager.GetPropertyValue(thingId, propName)
 }
 
 func (c *ThingsContainer) GetMapOfThings() map[string]*Thing {

@@ -1,6 +1,11 @@
 package effects
 
+import (
+	"github.com/galenliu/gateway/pkg/rules_engine/triggers"
+)
+
 type Entity interface {
+	SetState(state2 triggers.State)
 }
 
 type EffectDescription struct {

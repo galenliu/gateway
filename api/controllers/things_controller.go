@@ -109,7 +109,7 @@ func (tc *thingsController) handleSetProperty(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	v, err := tc.model.SetThingProperty(thingId, propName, value)
+	v, err := tc.model.SetThingPropertyValue(thingId, propName, value)
 	if err != nil {
 		return err
 	}

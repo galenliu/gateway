@@ -2,20 +2,23 @@ package property
 
 import (
 	"fmt"
+	things "github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/rules_engine"
 )
 
-type Bus interface {
-	bus.Publisher
-	bus.Subscriber
-}
-
-type ThingsHandler interface {
-	SetThingProperty(thingId, propertyName string, value any) (any, error)
-	GetThingProperty(thingId, propertyName string) (any, error)
+type Property struct {
+	container things.Container
+	*bus.Controller
+	id          string
+	typ         string
+	thing       string
+	unit        string
+	description string
+	href        string
+	cleanUp     []func()
 }
 
 type PropertyDescription struct {
@@ -27,21 +30,9 @@ type PropertyDescription struct {
 	Href        string `json:"href"`
 }
 
-type Property struct {
-	bus         Bus
-	things      ThingsHandler
-	id          string
-	typ         string
-	thing       string
-	unit        string
-	description string
-	href        string
-	cleanUp     []func()
-}
-
-func NewProperty(description PropertyDescription, handler ThingsHandler) *Property {
+func NewProperty(description PropertyDescription, container things.Container) *Property {
 	p := &Property{
-		things:      handler,
+		container:   container,
 		id:          description.Id,
 		typ:         description.Type,
 		thing:       description.Thing,
@@ -55,7 +46,7 @@ func NewProperty(description PropertyDescription, handler ThingsHandler) *Proper
 
 func (p *Property) onPropertyChanged(property properties.Entity) {
 	if property.GetDevice().GetId() == p.thing && property.GetName() == p.id {
-		p.bus.Pub(rules_engine.ValueChanged, property.GetDevice().GetId(), property.GetName(), property.GetCachedValue())
+		p.Publish(rules_engine.ValueChanged, property.GetDevice().GetId(), property.GetName(), property.GetCachedValue())
 	}
 }
 
@@ -69,10 +60,10 @@ func (p *Property) onThingAdded(thingId string) {
 }
 
 func (p *Property) start() {
-	p.cleanUp = append(p.cleanUp, p.bus.Sub(topic.DevicePropertyChanged, p.onPropertyChanged))
+	p.cleanUp = append(p.cleanUp, p.container.Subscribe(topic.DevicePropertyChanged, p.onPropertyChanged))
 	err := p.getInitialValue()
 	if err != nil {
-		p.cleanUp = append(p.cleanUp, p.bus.Sub(topic.ThingAdded, p.onThingAdded))
+		p.cleanUp = append(p.cleanUp, p.container.Subscribe(topic.ThingAdded, p.onThingAdded))
 		return
 	}
 }
@@ -84,7 +75,7 @@ func (p *Property) stop() {
 }
 
 func (p *Property) get() (any, error) {
-	return p.things.GetThingProperty(p.thing, p.id)
+	return p.container.GetThingPropertyValue(p.thing, p.id)
 }
 
 func (p *Property) getInitialValue() error {
@@ -92,20 +83,25 @@ func (p *Property) getInitialValue() error {
 	if err != nil {
 		return err
 	}
-	p.bus.Pub(rules_engine.ValueChanged, p.thing, p.id, v)
+	p.Publish(rules_engine.ValueChanged, p.thing, p.id, v)
 	return nil
 }
 
 func (p *Property) Set(value any) (any, error) {
-	v, err := p.things.SetThingProperty(p.thing, p.id, value)
+
+	v, err := p.container.SetThingPropertyValue(p.thing, p.id, value)
 	if err != nil {
-		v, err = p.things.SetThingProperty(p.thing, p.id, value)
+		v, err = p.container.SetThingPropertyValue(p.thing, p.id, value)
 		if err != nil {
 			fmt.Println(err.Error())
 			return nil, err
 		}
 	}
 	return v, err
+}
+
+func (p *Property) GetThing() string {
+	return p.thing
 }
 
 func (p *Property) ToDescription() PropertyDescription {
