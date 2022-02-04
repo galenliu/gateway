@@ -12,6 +12,7 @@ type MultiEffectDescription struct {
 
 type MultiEffect struct {
 	*Effect
+	effects []Entity
 }
 
 func (e *MultiEffect) ToDescription() *MultiEffectDescription {
@@ -19,7 +20,9 @@ func (e *MultiEffect) ToDescription() *MultiEffectDescription {
 }
 
 func (e *MultiEffect) SetState(state triggers.State) {
-
+	for _, e := range e.effects {
+		e.SetState(state)
+	}
 }
 
 func NewMultiEffect(desc MultiEffectDescription, container container.Container) *MultiEffect {
