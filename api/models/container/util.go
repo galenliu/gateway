@@ -14,7 +14,7 @@ import (
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 )
 
-func AsWebOfThing(device *devices.Device) Thing {
+func AsWebOfThing(device devices.Device) Thing {
 	thing := Thing{
 		Thing: &wot.Thing{
 			AtContext:    controls.URI(device.GetAtContext()),

@@ -34,7 +34,7 @@ func (s *Storage) CreateRule(description rules_engine.Rule) (int64, error) {
 	return id, nil
 }
 
-func (s *Storage) UpdateRule(ruleId int64, r rules_engine.RuleDescription) error {
+func (s *Storage) UpdateRule(ruleId int64, r rules_engine.Rule) error {
 	bytes, err := json.Marshal(r)
 	if err != nil {
 		return fmt.Errorf("thing marshal error: %s", err.Error())

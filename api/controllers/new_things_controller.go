@@ -4,7 +4,7 @@ import (
 	things "github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/bus"
-	b "github.com/galenliu/gateway/pkg/bus/topic"
+	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/gofiber/websocket/v2"
 	"sync"
@@ -37,14 +37,14 @@ func NewNewThingsController(log logging.Logger) *NewThingsController {
 
 func (c *NewThingsController) handleNewThingsWebsocket(m deviceManager, t thingContainer) func(conn *websocket.Conn) {
 	return func(conn *websocket.Conn) {
-		addThing := func(deviceId string, device *devices.Device) {
-			err := conn.WriteJSON(things.AsWebOfThing(device))
+		addThing := func(msg topic.DeviceAddedMessage) {
+			err := conn.WriteJSON(things.AsWebOfThing(msg.Device))
 			if err != nil {
 				return
 			}
 		}
 		addonDevices := m.GetMapOfDevices()
-		unSub := m.Subscribe(b.DeviceAdded, addThing)
+		unSub := m.Subscribe(topic.DeviceAdded, addThing)
 		defer func() {
 			//removeFunc()
 			unSub()
@@ -54,7 +54,10 @@ func (c *NewThingsController) handleNewThingsWebsocket(m deviceManager, t thingC
 		for id, dev := range addonDevices {
 			_, ok := savedThings[id]
 			if !ok {
-				addThing(dev.GetId(), dev)
+				addThing(topic.DeviceAddedMessage{
+					DeviceId: dev.GetId(),
+					Device:   *dev,
+				})
 			}
 		}
 		for {

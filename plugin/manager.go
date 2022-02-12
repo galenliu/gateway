@@ -190,8 +190,11 @@ func (m *Manager) handleAdapterUnload(adapterId string) {
 
 func (m *Manager) handleDeviceAdded(device *device) {
 	m.AddDevice(device)
-	m.logger.Infof("Addon_Device added: %s", util.JsonIndent(things.AsWebOfThing(device.Device)))
-	m.Publish(topic.DeviceAdded, device.GetId(), device.Device)
+	m.logger.Debug("Addon_Device added: %s", util.JsonIndent(things.AsWebOfThing(*device.Device)))
+	m.Publish(topic.DeviceAdded, topic.DeviceAddedMessage{
+		DeviceId: device.GetId(),
+		Device:   *device.Device,
+	})
 }
 
 func (m *Manager) handleDeviceRemoved(device *device) {

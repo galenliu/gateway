@@ -137,8 +137,12 @@ func (t *Thing) added() {
 	t.container.Publish(topic.ThingAdded, t.GetId())
 }
 
-func (t *Thing) onPropertyChanged(prop *properties.PropertyDescription) {
-	t.container.Publish(topic.ThingPropertyChanged, t.GetId(), prop)
+func (t *Thing) onPropertyChanged(prop properties.PropertyDescription) {
+	t.container.Publish(topic.ThingPropertyChanged, topic.ThingPropertyChangedMessage{
+		ThingId:      t.GetId(),
+		PropertyName: prop.Name,
+		Value:        prop.Value,
+	})
 }
 
 func (t *Thing) onActionStatus(action *actions.ActionDescription) {

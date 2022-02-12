@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/rules_engine/state"
+	json "github.com/json-iterator/go"
 )
 
 type SetEffectDescription struct {
@@ -31,10 +32,14 @@ func (s *SetEffect) ToDescription() SetEffectDescription {
 	}
 }
 
+func (s *SetEffect) MarshalJSON() ([]byte, error) {
+	return json.Marshal(s.ToDescription())
+}
+
 func (s *SetEffect) SetState(state state.State) {
 	if !s.on && state.On {
 		s.on = true
-		_, err := s.property.Set(state.Value)
+		_, err := s.property.Set(s.value)
 		if err != nil {
 			fmt.Print(err.Error())
 			return

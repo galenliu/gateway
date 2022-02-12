@@ -3,9 +3,7 @@ package controllers
 import (
 	things "github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/addon/actions"
-	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/events"
-	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
@@ -39,8 +37,8 @@ func (c *wsClint) handle() {
 	var unsubscribe func()
 	if c.thingId == "" {
 		ts := c.container.GetThings()
-		unsubscribe = c.bus.Subscribe(topic.DeviceAdded, func(deviceId string, device *devices.Device) {
-			thing := things.AsWebOfThing(device)
+		unsubscribe = c.bus.Subscribe(topic.DeviceAdded, func(msg topic.DeviceAddedMessage) {
+			thing := things.AsWebOfThing(msg.Device)
 			c.addThing(&thing)
 		})
 		for _, t := range ts {
@@ -161,14 +159,14 @@ func (c *wsClint) addThing(t *things.Thing) {
 	}
 	removeThingEventStatusFunc := c.bus.Subscribe(topic.ThingEvent, onEvent)
 
-	onPropertyChanged := func(thingId string, property *properties.PropertyDescription) {
-		if thingId != t.GetId() {
+	onPropertyChanged := func(message topic.ThingPropertyChangedMessage) {
+		if message.ThingId != t.GetId() {
 			return
 		}
 		err := c.ws.WriteJSON(map[string]any{
 			"id":          t.GetId(),
 			"messageType": constant.PropertyChanged,
-			"data":        map[string]any{property.Name: property.Value},
+			"data":        map[string]any{message.PropertyName: message.Value},
 		})
 		if err != nil {
 		}

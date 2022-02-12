@@ -28,6 +28,9 @@ type Rule struct {
 func FromDescription(desc RuleDescription, container things.Container) *Rule {
 	tri := triggers.FromDescription(desc.Trigger, container)
 	eff := effects.FromDescription(desc.Effect, container)
+	if tri == nil || eff == nil {
+		return nil
+	}
 	enabled := desc.Enabled
 	name := desc.Name
 	return NewRule(name, enabled, tri, eff)
@@ -75,6 +78,9 @@ func (r *Rule) onTriggerStateChanged(state state.State) {
 }
 
 func (r *Rule) Start() {
+	if r.trigger == nil {
+		return
+	}
 	r.trigger.Subscribe(topic.StateChanged, r.onTriggerStateChanged)
 	r.trigger.Start()
 }

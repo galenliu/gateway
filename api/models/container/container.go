@@ -4,9 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon/actions"
-	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/events"
-	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/logging"
@@ -183,8 +181,8 @@ func (c *ThingsContainer) handleDeviceRemoved(thingId string) {
 	}
 }
 
-func (c *ThingsContainer) handleDeviceAdded(deviceId string, _ *devices.Device) {
-	t := c.GetThing(deviceId)
+func (c *ThingsContainer) handleDeviceAdded(msg topic.DeviceAddedMessage) {
+	t := c.GetThing(msg.DeviceId)
 	if t != nil {
 		t.setConnected(true)
 	}
@@ -197,9 +195,9 @@ func (c *ThingsContainer) handleDeviceConnected(deviceId string, connected bool)
 	}
 }
 
-func (c *ThingsContainer) handleDevicePropertyChanged(deviceId string, property *properties.PropertyDescription) {
-	t := c.GetThing(deviceId)
-	t.onPropertyChanged(property)
+func (c *ThingsContainer) handleDevicePropertyChanged(message topic.DevicePropertyChangedMessage) {
+	t := c.GetThing(message.DeviceId)
+	t.onPropertyChanged(message.PropertyDescription)
 }
 
 func (c *ThingsContainer) handleDeviceActionStatus(deviceId string, action *actions.ActionDescription) {

@@ -1,6 +1,7 @@
 package triggers
 
 import (
+	"encoding/json"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/rules_engine/state"
 	"strconv"
@@ -11,8 +12,8 @@ import (
 
 type TimerTriggerDescription struct {
 	TriggerDescription
-	Time      string
-	Localized bool
+	Time      string `json:"time"`
+	Localized bool   `json:"localized"`
 }
 
 type TimerTrigger struct {
@@ -51,10 +52,10 @@ func (t *TimerTrigger) scheduleNext() {
 	}
 	now := time.Now()
 	tm := time.Date(now.Year(), now.Month(), now.Day(), hours, minutes, 0, 0, time.Local)
-	if now.Before(tm) {
+	if now.After(tm) {
 		tm = time.Date(now.Year(), now.Month(), now.Day()+1, hours, minutes, 0, 0, time.Local)
 	}
-	duration := now.Sub(tm)
+	duration := tm.Sub(now)
 	t.Stop()
 	t.timeOut = time.AfterFunc(duration, t.SendOn)
 }
@@ -75,6 +76,18 @@ func (t *TimerTrigger) SendOn() {
 	})
 	t.Stop()
 	t.timeOut = time.AfterFunc(time.Duration(60*1000), t.SendOff)
+}
+
+func (t *TimerTrigger) ToDescription() TimerTriggerDescription {
+	return TimerTriggerDescription{
+		TriggerDescription: t.Trigger.ToDescription(),
+		Time:               t.time,
+		Localized:          t.localized,
+	}
+}
+
+func (t *TimerTrigger) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.ToDescription())
 }
 
 func (t *TimerTrigger) SendOff() {

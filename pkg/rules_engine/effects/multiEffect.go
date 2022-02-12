@@ -5,8 +5,7 @@ import (
 	"github.com/galenliu/gateway/pkg/rules_engine/state"
 )
 
-type Description interface {
-}
+type Description = any
 
 type MultiEffectDescription struct {
 	Effects []Description
@@ -18,20 +17,20 @@ type MultiEffect struct {
 	effects []Entity
 }
 
-//func (e *MultiEffect) ToDescription() Description {
-//	mulEffect := &MultiEffectDescription{}
-//	mulEffect.EffectDescription = EffectDescription{
-//		Type:  e.t,
-//		Label: e.l,
-//	}
-//	if len(e.effects) > 0 {
-//		mulEffect.Effects = make([]Description, 1)
-//		for _, ef := range e.effects {
-//			mulEffect.Effects = append(mulEffect.Effects, ef.ToDescription())
-//		}
-//	}
-//	return mulEffect
-//}
+func (e *MultiEffect) ToDescription() MultiEffectDescription {
+	mulEffect := MultiEffectDescription{}
+	mulEffect.EffectDescription = EffectDescription{
+		Type:  e.t,
+		Label: e.l,
+	}
+	if len(e.effects) > 0 {
+		mulEffect.Effects = make([]Description, 1)
+		for _, ef := range e.effects {
+			mulEffect.Effects = append(mulEffect.Effects, ef)
+		}
+	}
+	return mulEffect
+}
 
 func (e *MultiEffect) SetState(state state.State) {
 	for _, e := range e.effects {

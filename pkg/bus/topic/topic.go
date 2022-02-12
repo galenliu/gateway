@@ -1,5 +1,10 @@
 package topic
 
+import (
+	"github.com/galenliu/gateway/pkg/addon/devices"
+	"github.com/galenliu/gateway/pkg/addon/properties"
+)
+
 const (
 	SetProperty = "SetProperty"
 	GetDevices  = "GetDevices"
@@ -17,19 +22,36 @@ const (
 	ThingRemoved         Topic = "thingRemoved"
 	ThingConnected       Topic = "thingConnected"
 	ThingModify          Topic = "thingModify"
+	ThingPropertyChanged Topic = "thingPropertyChanged"
 	ThingEvent           Topic = "thingEvent"
 	ThingActionStatus    Topic = "thingActionStatus"
-	ThingPropertyChanged Topic = "thingPropertyChanged"
 
 	DeviceAdded           Topic = "deviceAdded"
+	DevicePropertyChanged Topic = "devicePropertyChanged"
 	DeviceActionStatus    Topic = "deviceActionStatus"
 	DeviceEvent           Topic = "deviceEvent"
-	DevicePropertyChanged Topic = "devicePropertyChanged"
 	DeviceRemoved         Topic = "deviceRemoved"
 	DeviceConnected       Topic = "deviceConnected"
 
 	PairingTimeout Topic = "pairingTimeout"
 )
+
+type DeviceAddedMessage struct {
+	DeviceId string
+	devices.Device
+}
+
+type DevicePropertyChangedMessage struct {
+	DeviceId string
+	propNane string
+	properties.PropertyDescription
+}
+
+type ThingPropertyChangedMessage struct {
+	ThingId      string
+	PropertyName string
+	Value        any
+}
 
 func (t Topic) ToString() string {
 	return string(t)

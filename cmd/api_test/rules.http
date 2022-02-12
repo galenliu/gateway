@@ -1,0 +1,57 @@
+###GET rules
+GET http://localhost:9090/rules
+Accept: application/json
+
+
+### Delete thing
+DELETE http://localhost:9090/rules/192.168.1.103:55443
+
+###create time rule
+POST http://localhost:9090/rules
+Content-Type: application/json
+
+{
+  "name": "testRule",
+  "enabled": true,
+  "trigger": {
+    "time": "0:53",
+    "type": "TimeTrigger",
+    "onValue": true
+  },
+  "effect": {
+    "property": {
+      "type": "boolean",
+      "thing": "192.168.1.101:55443",
+      "id": "on"
+    },
+    "type": "SetEffect",
+    "value": true
+  }
+}
+
+###create rule
+POST http://localhost:9090/rules
+Content-Type: application/json
+
+{
+  "name": "testRule",
+  "enabled": true,
+  "trigger": {
+    "property": {
+      "type": "boolean",
+      "id": "on",
+      "thing": "192.168.1.103:55443"
+    },
+    "type": "BooleanTrigger",
+    "onValue": true
+  },
+  "effect": {
+    "property": {
+      "type": "boolean",
+      "thing": "192.168.1.103:55443",
+      "id": "on"
+    },
+    "type": "SetEffect",
+    "value": true
+  }
+}

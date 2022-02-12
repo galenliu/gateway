@@ -231,11 +231,14 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		settingsGroup.Get("/addonsInfo", settingsController.handleGetAddonsInfo)
 	}
 
-	//Rules Controller
+	//rules Controller
 	{
 		rulesGroup := app.Group(constant.RulesPath)
 		rulesController := NewRulesController(store, containerModel)
 		rulesGroup.Get("/", rulesController.handleGetRules)
+		rulesGroup.Get("/:id", rulesController.handleGetRule)
+		rulesGroup.Get("/:id", rulesController.handlerDeleteRule)
+		rulesGroup.Put("/:id", rulesController.handlerUpdateRule)
 		rulesGroup.Post("/", rulesController.handleCreateRule)
 	}
 
