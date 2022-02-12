@@ -107,11 +107,19 @@ func (s *Storage) createTable() error {
         subscription TEXT UNIQUE
     );
     `
+
+	rulesTable := `
+    CREATE TABLE IF NOT EXISTS rules(
+        id INTEGER PRIMARY KEY ,
+        description TEXT NOT NULL 
+    );
+    `
 	_, err := s.db.Exec(thingsTable)
 	_, err = s.db.Exec(userTable)
 	_, err = s.db.Exec(jsonWebTokensTable)
 	_, err = s.db.Exec(settingsTable)
 	_, err = s.db.Exec(pushSubscriptionsTable)
+	_, err = s.db.Exec(rulesTable)
 	if err != nil {
 		return err
 	}

@@ -3,12 +3,14 @@ package effects
 import (
 	"fmt"
 	"github.com/galenliu/gateway/api/models/container"
-	"github.com/galenliu/gateway/pkg/rules_engine/triggers"
+	"github.com/galenliu/gateway/pkg/rules_engine/state"
 	json "github.com/json-iterator/go"
 )
 
 type Entity interface {
-	SetState(state2 triggers.State)
+	SetState(state2 state.State)
+	GetType() string
+	GetLabel() string
 }
 
 type EffectDescription struct {
@@ -29,22 +31,37 @@ func NewEffect(des EffectDescription) *Effect {
 	return e
 }
 
-func (e *Effect) ToDescription() *EffectDescription {
-	des := &EffectDescription{
+func (e *Effect) ToDescription() EffectDescription {
+	des := EffectDescription{
 		Type:  e.t,
 		Label: e.l,
 	}
 	return des
 }
 
-func FromDescription(data []byte, container container.Container) Entity {
+func (e *Effect) GetType() string {
+	return e.t
+}
+
+func (e *Effect) GetLabel() string {
+	return e.l
+}
+
+func (e *Effect) SetState(s state.State) {
+}
+
+func FromDescription(a any, container container.Container) Entity {
+	data, err := json.Marshal(a)
+	if err != nil {
+		fmt.Printf("marshal error: %s\n", err.Error())
+	}
 	t := json.Get(data, "type").ToString()
 	switch t {
 	case TypeSetEffect:
 		var desc SetEffectDescription
 		err := json.Unmarshal(data, &desc)
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Printf("marshal error: %s\n", err.Error())
 			return nil
 		}
 		return NewSetEffect(desc, container)
@@ -52,7 +69,7 @@ func FromDescription(data []byte, container container.Container) Entity {
 		var desc MultiEffectDescription
 		err := json.Unmarshal(data, &desc)
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Printf("marshal error: %s\n", err.Error())
 			return nil
 		}
 		return NewMultiEffect(desc, container)
@@ -60,11 +77,18 @@ func FromDescription(data []byte, container container.Container) Entity {
 		var desc PulseEffectDescription
 		err := json.Unmarshal(data, &desc)
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Printf("marshal error: %s\n", err.Error())
 			return nil
 		}
 		return NewPulseEffect(desc, container)
-
+	case TypeEffect:
+		var desc EffectDescription
+		err := json.Unmarshal(data, &desc)
+		if err != nil {
+			fmt.Printf("marshal error: %s\n", err.Error())
+			return nil
+		}
+		return NewEffect(desc)
 	default:
 		fmt.Println("type error")
 		return nil

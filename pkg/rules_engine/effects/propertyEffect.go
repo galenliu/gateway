@@ -7,20 +7,23 @@ import (
 
 type PropertyEffectDescription struct {
 	EffectDescription
-	property.PropertyDescription
+	Property property.Description `json:"property"`
 }
 
 type PropertyEffect struct {
-	*property.Property
-}
-
-func NewPropertyEffect(des PropertyEffectDescription, container container.Container) *PropertyEffect {
-	e := &PropertyEffect{property.NewProperty(des.PropertyDescription, container)}
-	return e
+	*Effect
+	property *property.Property
 }
 
 func (e *PropertyEffect) ToDescription() PropertyEffectDescription {
-	des := PropertyEffectDescription{}
-	des.PropertyDescription = e.Property.ToDescription()
+	des := PropertyEffectDescription{
+		EffectDescription: e.Effect.ToDescription(),
+		Property:          e.property.ToDescription(),
+	}
 	return des
+}
+
+func NewPropertyEffect(des PropertyEffectDescription, container container.Container) *PropertyEffect {
+	e := &PropertyEffect{NewEffect(des.EffectDescription), property.NewProperty(des.Property, container)}
+	return e
 }

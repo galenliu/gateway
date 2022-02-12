@@ -6,7 +6,6 @@ import (
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
-	"github.com/galenliu/gateway/pkg/rules_engine"
 )
 
 type Property struct {
@@ -21,16 +20,16 @@ type Property struct {
 	cleanUp     []func()
 }
 
-type PropertyDescription struct {
+type Description struct {
 	Id          string `json:"id"`
 	Type        string `json:"type"`
 	Thing       string `json:"thing"`
-	Unit        string `json:"unit"`
-	Description string `json:"description"`
-	Href        string `json:"href"`
+	Unit        string `json:"unit,omitempty"`
+	Description string `json:"description,omitempty"`
+	Href        string `json:"href,omitempty"`
 }
 
-func NewProperty(description PropertyDescription, container things.Container) *Property {
+func NewProperty(description Description, container things.Container) *Property {
 	p := &Property{
 		container:   container,
 		id:          description.Id,
@@ -46,7 +45,7 @@ func NewProperty(description PropertyDescription, container things.Container) *P
 
 func (p *Property) onPropertyChanged(property properties.Entity) {
 	if property.GetDevice().GetId() == p.thing && property.GetName() == p.id {
-		p.Publish(rules_engine.ValueChanged, property.GetDevice().GetId(), property.GetName(), property.GetCachedValue())
+		p.Publish(topic.ValueChanged, property.GetDevice().GetId(), property.GetName(), property.GetCachedValue())
 	}
 }
 
@@ -59,7 +58,7 @@ func (p *Property) onThingAdded(thingId string) {
 	}
 }
 
-func (p *Property) start() {
+func (p *Property) Start() {
 	p.cleanUp = append(p.cleanUp, p.container.Subscribe(topic.DevicePropertyChanged, p.onPropertyChanged))
 	err := p.getInitialValue()
 	if err != nil {
@@ -68,7 +67,7 @@ func (p *Property) start() {
 	}
 }
 
-func (p *Property) stop() {
+func (p *Property) Stop() {
 	for _, f := range p.cleanUp {
 		f()
 	}
@@ -83,7 +82,7 @@ func (p *Property) getInitialValue() error {
 	if err != nil {
 		return err
 	}
-	p.Publish(rules_engine.ValueChanged, p.thing, p.id, v)
+	p.Publish(topic.ValueChanged, p.thing, p.id, v)
 	return nil
 }
 
@@ -104,8 +103,8 @@ func (p *Property) GetThing() string {
 	return p.thing
 }
 
-func (p *Property) ToDescription() PropertyDescription {
-	return PropertyDescription{
+func (p *Property) ToDescription() Description {
+	return Description{
 		Id:          p.id,
 		Type:        p.typ,
 		Thing:       p.thing,

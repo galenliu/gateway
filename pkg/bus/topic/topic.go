@@ -34,3 +34,8 @@ const (
 func (t Topic) ToString() string {
 	return string(t)
 }
+
+const (
+	ValueChanged Topic = "valueChanged"
+	StateChanged Topic = "stateChanged"
+)

@@ -3,12 +3,12 @@ package effects
 import (
 	"fmt"
 	"github.com/galenliu/gateway/api/models/container"
-	"github.com/galenliu/gateway/pkg/rules_engine/triggers"
+	"github.com/galenliu/gateway/pkg/rules_engine/state"
 )
 
 type SetEffectDescription struct {
 	PropertyEffectDescription
-	Value any
+	Value any `json:"value"`
 }
 
 type SetEffect struct {
@@ -19,6 +19,7 @@ type SetEffect struct {
 
 func NewSetEffect(des SetEffectDescription, container container.Container) *SetEffect {
 	e := &SetEffect{}
+	e.value = des.Value
 	e.PropertyEffect = NewPropertyEffect(des.PropertyEffectDescription, container)
 	return e
 }
@@ -30,10 +31,10 @@ func (s *SetEffect) ToDescription() SetEffectDescription {
 	}
 }
 
-func (s *SetEffect) SetState(state triggers.State) {
+func (s *SetEffect) SetState(state state.State) {
 	if !s.on && state.On {
 		s.on = true
-		_, err := s.Property.Set(state.Value)
+		_, err := s.property.Set(state.Value)
 		if err != nil {
 			fmt.Print(err.Error())
 			return

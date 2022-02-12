@@ -2,7 +2,8 @@ package triggers
 
 import (
 	"github.com/galenliu/gateway/api/models/container"
-	"github.com/galenliu/gateway/pkg/rules_engine"
+	"github.com/galenliu/gateway/pkg/bus/topic"
+	"github.com/galenliu/gateway/pkg/rules_engine/state"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 )
 
@@ -49,5 +50,5 @@ func (t *LevelTrigger) onValueChanged(v controls.Number) {
 		}
 		break
 	}
-	t.Publish(rules_engine.StateChanged, t.PropertyTrigger.property.ToDescription().Thing, t.property.ToDescription().Id, State{On: on, Value: v})
+	t.Publish(topic.StateChanged, t.PropertyTrigger.property.ToDescription().Thing, t.property.ToDescription().Id, state.State{On: on, Value: v})
 }

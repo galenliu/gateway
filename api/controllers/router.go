@@ -8,6 +8,7 @@ import (
 	things "github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/rules_engine"
 	"github.com/galenliu/gateway/plugin"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
@@ -24,6 +25,7 @@ type Storage interface {
 	models.SettingsStore
 	models.JsonwebtokenStore
 	models.AddonStore
+	rules_engine.RuleDB
 }
 
 type Config struct {
@@ -227,6 +229,14 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		settingsGroup := app.Group(constant.SettingsPath)
 		settingsController := NewSettingController(settingModel, log)
 		settingsGroup.Get("/addonsInfo", settingsController.handleGetAddonsInfo)
+	}
+
+	//Rules Controller
+	{
+		rulesGroup := app.Group(constant.RulesPath)
+		rulesController := NewRulesController(store, containerModel)
+		rulesGroup.Get("/", rulesController.handleGetRules)
+		rulesGroup.Post("/", rulesController.handleCreateRule)
 	}
 
 	app.Start()
