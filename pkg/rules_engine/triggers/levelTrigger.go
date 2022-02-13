@@ -5,6 +5,7 @@ import (
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/rules_engine/state"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
+	json "github.com/json-iterator/go"
 )
 
 const (
@@ -28,11 +29,17 @@ type LevelTrigger struct {
 func NewLevelTrigger(des LevelTriggerDescription, container container.Container) *LevelTrigger {
 	return &LevelTrigger{
 		PropertyTrigger: NewPropertyTrigger(des.PropertyTriggerDescription, container),
+		value:           des.Value,
+		levelType:       des.LevelType,
 	}
 }
 
-func (t *LevelTrigger) onValueChanged(v controls.Number) {
-	on := true
+func (t *LevelTrigger) OnValueChanged(a any) {
+	v, ok := a.(controls.Number)
+	if !ok {
+		return
+	}
+	on := false
 	switch t.levelType {
 	case LESS:
 		if v < t.value {
@@ -50,5 +57,27 @@ func (t *LevelTrigger) onValueChanged(v controls.Number) {
 		}
 		break
 	}
-	t.Publish(topic.StateChanged, t.PropertyTrigger.property.ToDescription().Thing, t.property.ToDescription().Id, state.State{On: on, Value: v})
+	t.Publish(topic.StateChanged, state.State{On: on, Value: v})
+}
+
+func (t *LevelTrigger) ToDescription() LevelTriggerDescription {
+	return LevelTriggerDescription{
+		PropertyTriggerDescription: t.PropertyTrigger.ToDescription(),
+		Value:                      t.value,
+		LevelType:                  t.levelType,
+	}
+}
+
+func (t *LevelTrigger) Start() {
+	t.PropertyTrigger.Start()
+	t.property.Subscribe(topic.ValueChanged, t.OnValueChanged)
+}
+
+func (t *LevelTrigger) Stop() {
+	t.PropertyTrigger.Stop()
+	t.property.Unsubscribe(topic.ValueChanged, t.OnValueChanged)
+}
+
+func (t *LevelTrigger) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.ToDescription())
 }

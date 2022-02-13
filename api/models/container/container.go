@@ -19,6 +19,7 @@ type Container interface {
 	GetThingPropertyValue(thingId, propertyName string) (any, error)
 	Publish(topic2 topic.Topic, args ...any)
 	Subscribe(topic2 topic.Topic, f any) func()
+	GetThing(thing string) *Thing
 }
 
 type Manager interface {

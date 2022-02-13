@@ -3,7 +3,6 @@ package property
 import (
 	"fmt"
 	things "github.com/galenliu/gateway/api/models/container"
-	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 )
@@ -43,9 +42,9 @@ func NewProperty(description Description, container things.Container) *Property 
 	return p
 }
 
-func (p *Property) onPropertyChanged(property properties.Entity) {
-	if property.GetDevice().GetId() == p.thing && property.GetName() == p.id {
-		p.Publish(topic.ValueChanged, property.GetDevice().GetId(), property.GetName(), property.GetCachedValue())
+func (p *Property) onPropertyChanged(msg topic.ThingPropertyChangedMessage) {
+	if msg.ThingId == p.thing && msg.PropertyName == p.id {
+		p.Publish(topic.ValueChanged, msg.Value)
 	}
 }
 
@@ -59,7 +58,7 @@ func (p *Property) onThingAdded(thingId string) {
 }
 
 func (p *Property) Start() {
-	p.cleanUp = append(p.cleanUp, p.container.Subscribe(topic.DevicePropertyChanged, p.onPropertyChanged))
+	p.cleanUp = append(p.cleanUp, p.container.Subscribe(topic.ThingPropertyChanged, p.onPropertyChanged))
 	err := p.getInitialValue()
 	if err != nil {
 		p.cleanUp = append(p.cleanUp, p.container.Subscribe(topic.ThingAdded, p.onThingAdded))

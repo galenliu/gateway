@@ -27,12 +27,12 @@ func NewBooleanTrigger(des BooleanTriggerDescription, container container.Contai
 
 func (b *BooleanTrigger) Start() {
 	b.PropertyTrigger.Start()
-	b.property.Subscribe(topic.StateChanged, b.OnValueChanged)
+	b.property.Subscribe(topic.ValueChanged, b.OnValueChanged)
 }
 
 func (b *BooleanTrigger) Stop() {
 	b.PropertyTrigger.Stop()
-	b.property.Unsubscribe(topic.StateChanged, b.OnValueChanged)
+	b.property.Unsubscribe(topic.ValueChanged, b.OnValueChanged)
 }
 
 func (b *BooleanTrigger) ToDescription() BooleanTriggerDescription {

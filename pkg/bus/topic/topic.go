@@ -42,8 +42,8 @@ type DeviceAddedMessage struct {
 }
 
 type DevicePropertyChangedMessage struct {
-	DeviceId string
-	propNane string
+	DeviceId     string
+	PropertyName string
 	properties.PropertyDescription
 }
 
