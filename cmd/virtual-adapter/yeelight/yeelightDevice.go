@@ -55,9 +55,10 @@ func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
 			prop := NewColor(bulb)
 			propValue := bulb.GetPropertyValue("rgb")
 			if propValue != nil {
-				v, ok := propValue.(string)
+				_, ok := propValue.(string)
 				if ok {
-					prop.SetCachedValue(v)
+					color := "#" + fmt.Sprintf("%X", to.Int64(propValue))
+					prop.SetCachedValue(color)
 				}
 			}
 			yeeDevice.AddProperty(proxy.NewStringProxy(prop))

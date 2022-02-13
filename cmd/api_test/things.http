@@ -14,13 +14,13 @@ false
 PUT http://localhost:9090/things/192.168.1.101:55443/properties/bright
 Content-Type: application/x-www-form-urlencoded
 
-11
+100
 
 ### set hue
 PUT http://localhost:9090/things/192.168.1.101:55443/properties/color
 Content-Type: application/x-www-form-urlencoded
 
-"FFFFFF"
+"123456"
 
 ###GET Things
 GET http://localhost:9090/things
@@ -39,6 +39,7 @@ Content-Type: application/json
   "title": "192.168.1.101:55443",
   "id": "192.168.1.101:55443",
   "@type": [
+    "",
     "Light",
     "OnOffSwitch"
   ],
@@ -48,38 +49,12 @@ Content-Type: application/json
     "model": ""
   },
   "properties": {
-    "color": {
-      "@type": "ColorProperty",
-      "forms": [
-        {
-          "href": "/things/192.168.1.103:55443/properties/color"
-        }
-      ],
-      "type": "string"
-    },
-    "on": {
-      "@type": "OnOffProperty",
-      "forms": [
-        {
-          "href": "/things/192.168.1.103:55443/properties/on"
-        }
-      ],
-      "type": "boolean"
-    },
-    "bright": {
-      "@type": "BrightnessProperty",
-      "forms": [
-        {
-          "href": "/things/192.168.1.103:55443/properties/bright"
-        }
-      ],
-      "unit": "percentage",
-      "type": "integer",
-      "minimum": 0,
-      "maximum": 100
-    }
+    "bright": {"@type":"BrightnessProperty","forms":[{"href":"/things/192.168.1.101:55443/properties/bright"}],"unit":"percentage","type":"integer"},
+    "color": {"@type":"ColorProperty","forms":[{"href":"/things/192.168.1.101:55443/properties/color"}],"type":"string","minLength":0},
+    "on": {"@type":"OnOffProperty","forms":[{"href":"/things/192.168.1.101:55443/properties/on"}],"type":"boolean"}
   }
 }
+
 
 ###create thing
 POST http://localhost:9090/things

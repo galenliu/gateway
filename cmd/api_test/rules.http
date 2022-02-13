@@ -18,7 +18,7 @@ Content-Type: application/json
     "type": "MultiTrigger",
     "triggers": [
       {
-        "time": "19:07",
+        "time": "22:18",
         "type": "TimeTrigger",
         "onValue": true
       },
@@ -46,12 +46,12 @@ Content-Type: application/json
       },
       {
         "property": {
-          "type": "number",
+          "type": "boolean",
           "thing": "192.168.1.101:55443",
-          "id": "bright"
+          "id": "on"
         },
         "type": "SetEffect",
-        "value": 11
+        "value": false
       }
     ],
     "type": "MultiEffect",

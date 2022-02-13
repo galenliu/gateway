@@ -24,7 +24,7 @@ func NewLightBulb(description DeviceDescription) *LightBulb {
 		description.Title = description.Id
 	}
 	if description.AtType == nil {
-		description.AtType = make([]string, 1)
+		description.AtType = make([]string, 0)
 		description.AtType = append(description.AtType, schemas.Light, schemas.OnOffSwitch)
 	} else {
 		description.AtType = append(description.AtType, schemas.Light, schemas.OnOffSwitch)
