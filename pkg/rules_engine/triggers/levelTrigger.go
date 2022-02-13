@@ -69,8 +69,8 @@ func (t *LevelTrigger) ToDescription() LevelTriggerDescription {
 }
 
 func (t *LevelTrigger) Start() {
-	t.PropertyTrigger.Start()
 	t.property.Subscribe(topic.ValueChanged, t.OnValueChanged)
+	t.PropertyTrigger.Start()
 }
 
 func (t *LevelTrigger) Stop() {

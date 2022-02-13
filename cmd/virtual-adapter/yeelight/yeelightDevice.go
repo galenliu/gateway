@@ -6,6 +6,7 @@ import (
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/proxy"
 	"github.com/xiam/to"
+	"strconv"
 )
 
 type YeelightDevice struct {
@@ -24,12 +25,41 @@ func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
 		switch method {
 		case "set_power":
 			prop := NewOn(bulb)
+			propValue := bulb.GetPropertyValue("power")
+			if propValue != nil {
+				v, ok := propValue.(string)
+				if ok {
+					if v == "off" {
+						prop.SetCachedValue(false)
+					}
+					if v == "on" {
+						prop.SetCachedValue(true)
+					}
+				}
+			}
 			yeeDevice.AddProperty(proxy.NewBooleanProxy(prop))
 		case "set_bright":
 			prop := NewBrightness(bulb)
+			propValue := bulb.GetPropertyValue("bright")
+			if propValue != nil {
+				s, ok := propValue.(string)
+				if ok {
+					v, err := strconv.Atoi(s)
+					if err == nil {
+						prop.SetCachedValue(v)
+					}
+				}
+			}
 			yeeDevice.AddProperty(proxy.NewIntegerProxy(prop))
 		case "set_rgb":
 			prop := NewColor(bulb)
+			propValue := bulb.GetPropertyValue("rgb")
+			if propValue != nil {
+				v, ok := propValue.(string)
+				if ok {
+					prop.SetCachedValue(v)
+				}
+			}
 			yeeDevice.AddProperty(proxy.NewStringProxy(prop))
 		default:
 			continue
@@ -60,7 +90,6 @@ func (d *YeelightDevice) Listen() error {
 			for n, v := range msg.Params {
 				if n == "power" {
 					b := v == "on"
-
 					d.GetPropertyEntity("on").SetCachedValueAndNotify(b)
 				}
 				if n == "bright" {

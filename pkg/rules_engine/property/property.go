@@ -31,6 +31,7 @@ type Description struct {
 func NewProperty(description Description, container things.Container) *Property {
 	p := &Property{
 		container:   container,
+		Controller:  bus.NewBusController(),
 		id:          description.Id,
 		typ:         description.Type,
 		thing:       description.Thing,
@@ -57,11 +58,21 @@ func (p *Property) onThingAdded(thingId string) {
 	}
 }
 
+func (p *Property) onThingConnected(msg topic.ThingConnectedMessage) {
+	if msg.ThingId == p.thing && msg.Connected {
+		err := p.getInitialValue()
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+	}
+}
+
 func (p *Property) Start() {
 	p.cleanUp = append(p.cleanUp, p.container.Subscribe(topic.ThingPropertyChanged, p.onPropertyChanged))
 	err := p.getInitialValue()
 	if err != nil {
 		p.cleanUp = append(p.cleanUp, p.container.Subscribe(topic.ThingAdded, p.onThingAdded))
+		p.cleanUp = append(p.cleanUp, p.container.Subscribe(topic.ThingConnected, p.onThingConnected))
 		return
 	}
 }
@@ -72,16 +83,12 @@ func (p *Property) Stop() {
 	}
 }
 
-func (p *Property) get() (any, error) {
-	return p.container.GetThingPropertyValue(p.thing, p.id)
-}
-
 func (p *Property) getInitialValue() error {
-	v, err := p.get()
+	v, err := p.container.GetThingPropertyValue(p.thing, p.id)
 	if err != nil {
 		return err
 	}
-	p.Publish(topic.ValueChanged, p.thing, p.id, v)
+	p.Publish(topic.ValueChanged, v)
 	return nil
 }
 

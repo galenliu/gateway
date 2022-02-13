@@ -26,8 +26,8 @@ func NewBooleanTrigger(des BooleanTriggerDescription, container container.Contai
 }
 
 func (b *BooleanTrigger) Start() {
-	b.PropertyTrigger.Start()
 	b.property.Subscribe(topic.ValueChanged, b.OnValueChanged)
+	b.PropertyTrigger.Start()
 }
 
 func (b *BooleanTrigger) Stop() {

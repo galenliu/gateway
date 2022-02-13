@@ -14,17 +14,47 @@ Content-Type: application/json
   "name": "testRule",
   "enabled": true,
   "trigger": {
-    "time": "0:53",
-    "type": "TimeTrigger",
-    "onValue": true
+    "op": "AND",
+    "type": "MultiTrigger",
+    "triggers": [
+      {
+        "time": "19:07",
+        "type": "TimeTrigger",
+        "onValue": true
+      },
+      {
+        "property": {
+          "type": "boolean",
+          "id": "on",
+          "thing": "192.168.1.101:55443"
+        },
+        "type": "BooleanTrigger",
+        "onValue": true
+      }
+    ]
   },
   "effect": {
-    "property": {
-      "type": "boolean",
-      "thing": "192.168.1.101:55443",
-      "id": "on"
-    },
-    "type": "SetEffect",
+    "effects": [
+      {
+        "property": {
+          "type": "boolean",
+          "thing": "192.168.1.101:55443",
+          "id": "color"
+        },
+        "type": "SetEffect",
+        "value": "#0000FF"
+      },
+      {
+        "property": {
+          "type": "number",
+          "thing": "192.168.1.101:55443",
+          "id": "bright"
+        },
+        "type": "SetEffect",
+        "value": 11
+      }
+    ],
+    "type": "MultiEffect",
     "value": true
   }
 }

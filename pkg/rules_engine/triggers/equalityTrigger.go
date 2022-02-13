@@ -26,8 +26,8 @@ func NewEqualityTrigger(desc EqualityTriggerDescription, container things.Contai
 }
 
 func (e *EqualityTrigger) Start() {
-	e.PropertyTrigger.Start()
 	e.property.Subscribe(topic.ValueChanged, e.OnValueChanged)
+	e.PropertyTrigger.Start()
 }
 
 func (e *EqualityTrigger) Stop() {

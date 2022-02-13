@@ -35,10 +35,13 @@ func NewAddonManager(pluginId string) (*Manager, error) {
 			instance.ipcClient = NewClient(instance, "9500")
 			if instance.ipcClient != nil {
 				instance.running = true
+				instance.register()
 			}
-			instance.register()
 		},
 	)
+	if !instance.registered {
+		return nil, fmt.Errorf("plugin not registered: %v", pluginId)
+	}
 	return instance, nil
 }
 
@@ -321,6 +324,7 @@ func (m *Manager) register() {
 		return
 	}
 	m.Send(messages.MessageType_PluginRegisterRequest, messages.PluginRegisterRequestJsonData{PluginId: m.pluginId})
+	time.Sleep(time.Duration(10) * time.Millisecond)
 }
 
 func (m *Manager) Close() {

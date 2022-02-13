@@ -110,7 +110,10 @@ func (t *Thing) setConnected(connected bool) {
 		return
 	}
 	t.Connected = connected
-	t.container.Publish(topic.ThingConnected, t.GetId(), connected)
+	t.container.Publish(topic.ThingConnected, topic.ThingConnectedMessage{
+		ThingId:   t.GetId(),
+		Connected: connected,
+	})
 }
 
 func (t *Thing) removed() {

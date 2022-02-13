@@ -53,6 +53,11 @@ type ThingPropertyChangedMessage struct {
 	Value        any
 }
 
+type ThingConnectedMessage struct {
+	ThingId   string
+	Connected bool
+}
+
 func (t Topic) ToString() string {
 	return string(t)
 }

@@ -247,3 +247,11 @@ func (y *Yeelight) Listen() (<-chan *Notification, chan<- struct{}, error) {
 
 	return notifCh, done, nil
 }
+
+func (y *Yeelight) GetPropertyValue(name string) any {
+	v, ok := y.lastStatus.Load(name)
+	if ok {
+		return v
+	}
+	return nil
+}

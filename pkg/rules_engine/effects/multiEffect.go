@@ -3,12 +3,13 @@ package effects
 import (
 	"github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/rules_engine/state"
+	json "github.com/json-iterator/go"
 )
 
 type Description = any
 
 type MultiEffectDescription struct {
-	Effects []Description
+	Effects []Description `json:"effects"`
 	EffectDescription
 }
 
@@ -24,12 +25,16 @@ func (e *MultiEffect) ToDescription() MultiEffectDescription {
 		Label: e.l,
 	}
 	if len(e.effects) > 0 {
-		mulEffect.Effects = make([]Description, 1)
+		mulEffect.Effects = make([]Description, 0)
 		for _, ef := range e.effects {
 			mulEffect.Effects = append(mulEffect.Effects, ef)
 		}
 	}
 	return mulEffect
+}
+
+func (e *MultiEffect) MarshalJSON() ([]byte, error) {
+	return json.Marshal(e.ToDescription())
 }
 
 func (e *MultiEffect) SetState(state state.State) {
@@ -39,5 +44,14 @@ func (e *MultiEffect) SetState(state state.State) {
 }
 
 func NewMultiEffect(desc MultiEffectDescription, container container.Container) *MultiEffect {
-	return nil
+	me := &MultiEffect{
+		Effect: NewEffect(desc.EffectDescription),
+	}
+	for _, dsc := range desc.Effects {
+		e := FromDescription(dsc, container)
+		if e != nil {
+			me.effects = append(me.effects, e)
+		}
+	}
+	return me
 }

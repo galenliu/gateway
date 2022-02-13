@@ -11,8 +11,9 @@ const OpAND = "AND"
 const OpOR = "OR"
 
 type MultiTriggerDescription struct {
-	Op       string `json:"op"`
-	Triggers []any  `json:"triggers"`
+	Op string `json:"op"`
+	TriggerDescription
+	Triggers []any `json:"triggers"`
 }
 
 type MultiTrigger struct {
@@ -32,13 +33,15 @@ func NewMultiTrigger(des MultiTriggerDescription, container things.Container) *M
 	for i, e := range des.Triggers {
 		m.triggers[i] = FromDescription(e, container)
 	}
+	m.Trigger = NewTrigger(des.TriggerDescription)
 	m.states = make([]bool, len(m.triggers))
 	return m
 }
 
 func (m *MultiTrigger) ToDescription() MultiTriggerDescription {
 	return MultiTriggerDescription{
-		Op: m.op,
+		Op:                 m.op,
+		TriggerDescription: m.Trigger.ToDescription(),
 		Triggers: func() []any {
 			arr := make([]any, 0)
 			for _, t := range m.triggers {
@@ -73,10 +76,12 @@ func (m *MultiTrigger) onStateChanged(triggerIndex int, s state.State) {
 
 func (m *MultiTrigger) Start() {
 	for i, t := range m.triggers {
+		t.Subscribe(topic.StateChanged, func(i int) func(state2 state.State) {
+			return func(s state.State) {
+				m.onStateChanged(i, s)
+			}
+		}(i))
 		t.Start()
-		t.Subscribe(topic.StateChanged, func(state state.State) {
-			m.onStateChanged(i, state)
-		})
 	}
 }
 
@@ -84,7 +89,8 @@ func (m *MultiTrigger) Stop() {
 	for i, t := range m.triggers {
 		t.Stop()
 		t.Unsubscribe(topic.StateChanged, func(state state.State) {
-			m.onStateChanged(i, state)
+			index := i
+			m.onStateChanged(index, state)
 		})
 	}
 }

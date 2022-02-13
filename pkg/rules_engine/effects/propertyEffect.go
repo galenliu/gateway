@@ -3,6 +3,7 @@ package effects
 import (
 	"github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/rules_engine/property"
+	json "github.com/json-iterator/go"
 )
 
 type PropertyEffectDescription struct {
@@ -21,6 +22,10 @@ func (e *PropertyEffect) ToDescription() PropertyEffectDescription {
 		Property:          e.property.ToDescription(),
 	}
 	return des
+}
+
+func (e *PropertyEffect) MarshalJSON() ([]byte, error) {
+	return json.Marshal(e.ToDescription())
 }
 
 func NewPropertyEffect(des PropertyEffectDescription, container container.Container) *PropertyEffect {

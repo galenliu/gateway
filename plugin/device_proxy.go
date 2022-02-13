@@ -198,8 +198,22 @@ func (device *device) NotifyPropertyChanged(property properties.PropertyDescript
 	}
 	if valueChanged || descriptionChanged || titleChanged {
 		device.adapter.plugin.manager.Publish(topic.DevicePropertyChanged, topic.DevicePropertyChangedMessage{
-			DeviceId:            device.GetId(),
-			PropertyDescription: properties.PropertyDescription{},
+			DeviceId: device.GetId(),
+			PropertyDescription: properties.PropertyDescription{
+				Name:        p.GetName(),
+				AtType:      p.GetType(),
+				Title:       p.GetTitle(),
+				Type:        p.GetType(),
+				Unit:        p.GetUnit(),
+				Description: p.GetDescription(),
+				Minimum:     p.GetMinimum(),
+				Maximum:     p.GetMaximum(),
+				Enum:        p.GetEnum(),
+				ReadOnly:    p.IsReadOnly(),
+				MultipleOf:  p.GetMultipleOf(),
+				Links:       nil,
+				Value:       p.GetCachedValue(),
+			},
 		})
 	}
 }
