@@ -2,21 +2,21 @@ package events
 
 import messages "github.com/galenliu/gateway/pkg/ipc_messages"
 
-type Event struct {
-	AtType      string           `protobuf:"bytes,1,opt,name=atType,json=@type,proto3" json:"atType,omitempty"`
-	Name        string           `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Title       string           `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
-	Description string           `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
-	Links       []EventLinksElem `protobuf:"bytes,5,rep,name=links,proto3" json:"links,omitempty"`
-	Type        string           `protobuf:"bytes,6,opt,name=type,proto3" json:"type,omitempty"`
-	Unit        string           `protobuf:"bytes,7,opt,name=unit,proto3" json:"unit,omitempty"`
-	Minimum     float64          `protobuf:"fixed32,8,opt,name=minimum,proto3" json:"minimum,omitempty"`
-	Maximum     float64          `protobuf:"fixed32,9,opt,name=maximum,proto3" json:"maximum,omitempty"`
-	MultipleOf  float64          `protobuf:"fixed32,10,opt,name=multipleOf,proto3" json:"multipleOf,omitempty"`
-	Enum        []EventEnumElem  `protobuf:"bytes,11,rep,name=enum,proto3" json:"enum,omitempty"`
+type EventDescription struct {
 }
 
-type EventDescription struct {
+type Event struct {
+	AtType      string           `json:"@type,omitempty"`
+	Name        string           `json:"name,omitempty"`
+	Title       string           `json:"title,omitempty"`
+	Description string           `json:"description,omitempty"`
+	Links       []EventLinksElem `json:"links,omitempty"`
+	Type        string           `json:"type,omitempty"`
+	Unit        string           `json:"unit,omitempty"`
+	Minimum     float64          `json:"minimum,omitempty"`
+	Maximum     float64          `json:"maximum,omitempty"`
+	MultipleOf  float64          `json:"multipleOf,omitempty"`
+	Enum        []EventEnumElem  `json:"enum,omitempty"`
 }
 
 type EventLinksElem struct {

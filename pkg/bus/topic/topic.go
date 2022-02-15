@@ -47,6 +47,14 @@ type DevicePropertyChangedMessage struct {
 	properties.PropertyDescription
 }
 
+type ThingAddedMessage struct {
+	ThingId string
+}
+
+type ThingRemovedMessage struct {
+	ThingId string
+}
+
 type ThingPropertyChangedMessage struct {
 	ThingId      string
 	PropertyName string
@@ -56,6 +64,14 @@ type ThingPropertyChangedMessage struct {
 type ThingConnectedMessage struct {
 	ThingId   string
 	Connected bool
+}
+
+type ThingModifyMessage struct {
+	ThingId string
+}
+
+type ThingEventMessage struct {
+	ThingId string
 }
 
 func (t Topic) ToString() string {

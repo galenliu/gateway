@@ -95,14 +95,14 @@ func (c *wsClint) close() {
 
 func (c *wsClint) addThing(t *things.Thing) {
 
-	onConnected := func(deviceId string, connected bool) {
-		if deviceId != t.GetId() {
+	onConnected := func(message topic.ThingConnectedMessage) {
+		if message.ThingId != t.GetId() {
 			return
 		}
 		err := c.ws.WriteJSON(map[string]any{
 			"id":          t.GetId(),
 			"messageType": constant.Connected,
-			"data":        connected,
+			"data":        message.Connected,
 		})
 		if err != nil {
 			c.logger.Error("websocket send %s message err : %s", constant.Connected, err.Error())
@@ -110,8 +110,8 @@ func (c *wsClint) addThing(t *things.Thing) {
 	}
 	removeConnectedFunc := c.bus.Subscribe(topic.ThingConnected, onConnected)
 
-	onThingRemoved := func(thingId string) {
-		if thingId != t.GetId() {
+	onThingRemoved := func(message topic.ThingRemovedMessage) {
+		if message.ThingId != t.GetId() {
 			return
 		}
 		f, ok := c.thingCleanups[t.GetId()]
@@ -129,8 +129,8 @@ func (c *wsClint) addThing(t *things.Thing) {
 	}
 	removeRemovedFunc := c.bus.Subscribe(topic.ThingRemoved, onThingRemoved)
 
-	onThingModified := func(thingId string) {
-		if thingId != t.GetId() {
+	onThingModified := func(message topic.ThingModifyMessage) {
+		if message.ThingId != t.GetId() {
 			return
 		}
 		err := c.ws.WriteJSON(map[string]any{

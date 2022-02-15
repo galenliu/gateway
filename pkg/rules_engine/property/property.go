@@ -49,8 +49,8 @@ func (p *Property) onPropertyChanged(msg topic.ThingPropertyChangedMessage) {
 	}
 }
 
-func (p *Property) onThingAdded(thingId string) {
-	if p.thing == thingId {
+func (p *Property) onThingAdded(message topic.ThingAddedMessage) {
+	if p.thing == message.ThingId {
 		err := p.getInitialValue()
 		if err != nil {
 			fmt.Println(err.Error())

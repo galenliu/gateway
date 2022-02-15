@@ -19,10 +19,12 @@ func main() {
 	}
 	yeeAdapter := yeelight.NewVirtualAdapter("yeelight-adapter")
 	virtualAdapter := virtual.NewVirtualAdapter("virtual-adapter")
+
 	manager.RegisteredAdapter(yeeAdapter, virtualAdapter)
 
 	yeeAdapter.StartPairing(time.After(3 * time.Second))
 	virtualAdapter.StartPairing(time.After(3 * time.Second))
+
 	interruptChannel := make(chan os.Signal, 1)
 	signal.Notify(interruptChannel, syscall.SIGINT, syscall.SIGTERM)
 

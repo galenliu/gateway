@@ -85,7 +85,7 @@ func (t *Thing) SetSelectedCapability(selectedCapability string) bool {
 			if err != nil {
 				return false
 			}
-			t.container.Publish(topic.ThingModify, t.GetId())
+			t.container.Publish(topic.ThingModify, topic.ThingModifyMessage{ThingId: t.GetId()})
 			return true
 		}
 	}
@@ -101,7 +101,7 @@ func (t *Thing) SetTitle(title string) bool {
 	if err != nil {
 		return false
 	}
-	t.container.Publish(topic.ThingModify, t.GetId())
+	t.container.Publish(topic.ThingModify, topic.ThingModifyMessage{ThingId: t.GetId()})
 	return true
 }
 
@@ -121,7 +121,7 @@ func (t *Thing) removed() {
 	if err != nil {
 		fmt.Printf("delete thing err:%s", err.Error())
 	}
-	t.container.Publish(topic.ThingRemoved, t.GetId())
+	t.container.Publish(topic.ThingRemoved, topic.ThingRemovedMessage{ThingId: t.GetId()})
 }
 
 func (t *Thing) update() {
@@ -129,7 +129,7 @@ func (t *Thing) update() {
 	if err != nil {
 		return
 	}
-	t.container.Publish(topic.ThingModify, t.GetId())
+	t.container.Publish(topic.ThingModify, topic.ThingModifyMessage{ThingId: t.GetId()})
 }
 
 func (t *Thing) added() {
@@ -137,7 +137,7 @@ func (t *Thing) added() {
 	if err != nil {
 		return
 	}
-	t.container.Publish(topic.ThingAdded, t.GetId())
+	t.container.Publish(topic.ThingAdded, topic.ThingAddedMessage{ThingId: t.GetId()})
 }
 
 func (t *Thing) onPropertyChanged(prop properties.PropertyDescription) {
@@ -164,4 +164,8 @@ func (t *Thing) AddAction(name string) bool {
 func (t *Thing) RemoveAction(name string) bool {
 	_, ok := t.Actions[name]
 	return ok
+}
+
+func (t *Thing) AddEventSubscription(f func(message topic.ThingEventMessage)) {
+	t.container.Subscribe(topic.ThingEvent+topic.Topic(t.GetId()), f)
 }

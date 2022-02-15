@@ -5,15 +5,7 @@ const (
 	Support = "liuguilin361@gmai.com"
 
 	UnloadPluginKillDelay = 3000
-	GatewayStop           = "gatewayStop"
 
-	// DeviceAdded Addon Manager Event
-	DeviceAdded   = "deviceAdded"
-	DeviceRemoved = "deviceRemoved"
-)
-
-// path
-const (
 	UsersPath        = "/users"
 	ThingsPath       = "/things"
 	PropertiesPath   = "/properties"
@@ -40,7 +32,6 @@ const (
 	PingPath         = "/ping"
 	ProxyPath        = "/proxy"
 	ExtensionsPath   = "/extensions"
-	ThingIdParam     = "/:thingId"
 )
 
 const (

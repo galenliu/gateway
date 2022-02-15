@@ -2,6 +2,7 @@ package triggers
 
 import (
 	things "github.com/galenliu/gateway/api/models/container"
+	"github.com/galenliu/gateway/pkg/bus/topic"
 	json "github.com/json-iterator/go"
 )
 
@@ -24,7 +25,7 @@ func NewEventTrigger(desc EventTriggerDescription, container things.Container) *
 		Trigger:   NewTrigger(desc.TriggerDescription),
 		thing:     desc.Thing,
 		event:     desc.Event,
-		stopped:   false,
+		stopped:   true,
 		container: container,
 	}
 }
@@ -42,10 +43,15 @@ func (t *EventTrigger) MarshalJSON() ([]byte, error) {
 }
 
 func (t *EventTrigger) Start() {
+	t.stopped = false
 	thing := t.container.GetThing(t.thing)
 	if thing != nil && !t.stopped {
-
+		thing.AddEventSubscription(t.onEvent)
 	}
+}
+
+func (t *EventTrigger) onEvent(message topic.ThingEventMessage) {
+
 }
 
 func (t *EventTrigger) Stop() {

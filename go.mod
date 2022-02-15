@@ -6,7 +6,7 @@ require (
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/brutella/hc v1.2.4
 	github.com/fasthttp/websocket v1.4.6
-	github.com/gofiber/fiber/v2 v2.26.0
+	github.com/gofiber/fiber/v2 v2.27.0
 	github.com/gofiber/websocket/v2 v2.0.14
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/json-iterator/go v1.1.12
