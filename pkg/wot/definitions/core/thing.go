@@ -11,7 +11,7 @@ import (
 type ThingInterface any
 
 type ThingProperties map[string]PropertyAffordance
-type ThingActions map[string]ActionAffordance
+type ThingActions map[string]*ActionAffordance
 type ThingEvents map[string]EventAffordance
 type ThingSecurityDefinitions map[string]securityScheme.SecurityScheme
 type ThingSchemaDefinitions map[string]dataSchema.DataSchema
@@ -117,4 +117,20 @@ func (t *Thing) GetURI() string {
 
 func (t *Thing) GetHref() string {
 	return t.Id.GetURI()
+}
+
+func (t *Thing) GetProperty(propNane string) PropertyAffordance {
+	property, ok := t.Properties[propNane]
+	if ok {
+		return property
+	}
+	return nil
+}
+
+func (t *Thing) GetAction(name string) *ActionAffordance {
+	action, ok := t.Actions[name]
+	if ok {
+		return action
+	}
+	return nil
 }

@@ -30,6 +30,24 @@ type ActionDescription struct {
 	Idempotent bool                    `json:"idempotent,omitempty" wot:"withDefault"`
 }
 
+func FromDescription(desc ActionDescription) ActionAffordance {
+	return ActionAffordance{
+		InteractionAffordance: &ia.InteractionAffordance{
+			AtType:       desc.AtType,
+			Title:        desc.Title,
+			Titles:       desc.Titles,
+			Description:  desc.Description,
+			Descriptions: desc.Descriptions,
+			Forms:        desc.Forms,
+			UriVariables: desc.UriVariables,
+		},
+		Input:      desc.Input,
+		Output:     desc.Output,
+		Safe:       desc.Safe,
+		Idempotent: desc.Idempotent,
+	}
+}
+
 func (a *ActionAffordance) MarshalJSON() ([]byte, error) {
 	action := ActionDescription{
 		AtType:       a.AtType,
