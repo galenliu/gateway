@@ -3,7 +3,6 @@ package container
 import (
 	"context"
 	"fmt"
-	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/events"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
@@ -201,9 +200,9 @@ func (c *ThingsContainer) handleDevicePropertyChanged(message topic.DeviceProper
 	t.onPropertyChanged(message.PropertyDescription)
 }
 
-func (c *ThingsContainer) handleDeviceActionStatus(deviceId string, action *actions.ActionDescription) {
-	t := c.GetThing(deviceId)
-	t.onActionStatus(action)
+func (c *ThingsContainer) handleDeviceActionStatus(msg topic.DeviceActionStatusMessage) {
+	t := c.GetThing(msg.DeviceId)
+	t.onActionStatus(msg.Action)
 }
 
 func (c *ThingsContainer) handleDeviceEvent(deviceId string, event *events.EventDescription) {

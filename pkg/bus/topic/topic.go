@@ -1,6 +1,7 @@
 package topic
 
 import (
+	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 )
@@ -47,12 +48,30 @@ type DevicePropertyChangedMessage struct {
 	properties.PropertyDescription
 }
 
+type DeviceActionStatusMessage struct {
+	DeviceId string
+	Action   actions.ActionDescription
+}
+
 type ThingAddedMessage struct {
 	ThingId string
 }
 
 type ThingRemovedMessage struct {
 	ThingId string
+}
+
+type ThingActionDescription struct {
+	Id            string         `json:"id,omitempty"`
+	Name          string         `json:"name,omitempty"`
+	Input         map[string]any `json:"input,omitempty"`
+	Status        string         `json:"status,omitempty"`
+	TimeRequested string         `json:"timeRequested,omitempty"`
+	TimeCompleted string         `json:"timeCompleted,omitempty"`
+}
+type ThingActionStatusMessage struct {
+	ThingId string
+	Action  ThingActionDescription
 }
 
 type ThingPropertyChangedMessage struct {

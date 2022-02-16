@@ -7,6 +7,15 @@ import (
 
 type ActionInput map[string]any
 
+type ActionDescription struct {
+	Id            string         `json:"id,omitempty"`
+	Name          string         `json:"name,omitempty"`
+	Input         map[string]any `json:"input,omitempty"`
+	Status        string         `json:"status,omitempty"`
+	TimeRequested string         `json:"timeRequested,omitempty"`
+	TimeCompleted string         `json:"timeCompleted,omitempty"`
+}
+
 type Action struct {
 	Type        string            `json:"type,omitempty"`
 	AtType      string            `json:"@type,omitempty"`
@@ -49,15 +58,6 @@ func (a Action) ToMessage() messages.Action {
 		Input:       nil,
 		Title:       nil,
 	}
-}
-
-type ActionDescription struct {
-	Id            string         `json:"id,omitempty"`
-	Name          string         `json:"name,omitempty"`
-	Input         map[string]any `json:"input,omitempty"`
-	Status        string         `json:"status,omitempty"`
-	TimeRequested string         `json:"timeRequested,omitempty"`
-	TimeCompleted string         `json:"timeCompleted,omitempty"`
 }
 
 type ActionLinksElem struct {

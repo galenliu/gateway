@@ -24,6 +24,7 @@ type device struct {
 	*devices.Device
 	logger               logging.Logger
 	requestActionTask    sync.Map
+	removeActionTask     sync.Map
 	setPropertyValueTask sync.Map
 }
 
@@ -219,11 +220,14 @@ func (device *device) NotifyPropertyChanged(property properties.PropertyDescript
 }
 
 func (device *device) notifyDeviceConnected(connected bool) {
-	device.adapter.plugin.manager.Publish(topic.DeviceConnected, device.GetId(), connected)
+	device.getManager().Publish(topic.DeviceConnected, device.GetId(), connected)
 }
 
-func (device *device) notifyAction(actionDescription *actions.ActionDescription) {
-	device.adapter.plugin.manager.Publish(topic.DeviceActionStatus, device.GetId(), actionDescription)
+func (device *device) actionNotify(actionDescription actions.ActionDescription) {
+	device.getManager().Publish(topic.DeviceActionStatus, topic.DeviceActionStatusMessage{
+		DeviceId: device.GetId(),
+		Action:   actionDescription,
+	})
 }
 
 func (device *device) requestAction(ctx context.Context, id, name string, input map[string]any) error {
@@ -306,6 +310,10 @@ func (device *device) setPropertyValue(ctx context.Context, name string, value a
 
 func (device *device) getAdapter() *Adapter {
 	return device.adapter
+}
+
+func (device *device) getManager() *Manager {
+	return device.adapter.plugin.manager
 }
 
 func (device *device) GetAdapter() proxy.AdapterProxy {

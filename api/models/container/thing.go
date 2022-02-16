@@ -148,12 +148,22 @@ func (t *Thing) onPropertyChanged(prop properties.PropertyDescription) {
 	})
 }
 
-func (t *Thing) onActionStatus(action *actions.ActionDescription) {
-	t.container.Publish(topic.ThingActionStatus, t.GetId(), action)
+func (t *Thing) onActionStatus(a actions.ActionDescription) {
+	t.container.Publish(topic.ThingActionStatus, topic.ThingActionStatusMessage{
+		ThingId: "",
+		Action: topic.ThingActionDescription{
+			Id:            a.Id,
+			Name:          a.Name,
+			Input:         a.Input,
+			Status:        a.Status,
+			TimeRequested: a.TimeRequested,
+			TimeCompleted: a.TimeCompleted,
+		},
+	})
 }
 
 func (t *Thing) OnEvent(event *events.EventDescription) {
-	t.container.Publish(topic.ThingActionStatus, t.GetId(), event)
+	t.container.Publish(topic.ThingEvent, t.GetId(), event)
 }
 
 func (t *Thing) AddAction(name string) bool {

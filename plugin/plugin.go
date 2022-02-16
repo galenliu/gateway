@@ -246,7 +246,7 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			plugin.logger.Errorf("Bad message : %s", err.Error())
 			return
 		}
-		dev.notifyAction(&actions.ActionDescription{
+		dev.actionNotify(actions.ActionDescription{
 			Id:            message.Action.Id,
 			Name:          message.Action.Name,
 			Input:         message.Action.Input,
@@ -273,10 +273,13 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			if !ok {
 				return
 			}
-			task := t.(chan bool)
-			select {
-			case task <- message.Success:
+			task, ok := t.(chan bool)
+			if ok {
+				select {
+				case task <- message.Success:
+				}
 			}
+			dev.requestActionTask.Delete(message.ActionId)
 		}()
 		return
 
@@ -287,6 +290,19 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			plugin.logger.Errorf("Bad message : %s", err.Error())
 			return
 		}
+		go func() {
+			t, ok := dev.removeActionTask.Load(message.ActionId)
+			if !ok {
+				return
+			}
+			task, ok := t.(chan bool)
+			if ok {
+				select {
+				case task <- message.Success:
+				}
+			}
+			dev.removeActionTask.Delete(message.ActionId)
+		}()
 		return
 
 	case messages.MessageType_DeviceSetCredentialsResponse:
