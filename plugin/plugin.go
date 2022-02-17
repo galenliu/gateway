@@ -216,7 +216,7 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			plugin.logger.Errorf("Bad message : %s", util.JsonIndent(dt))
 			return
 		}
-		device := newDevice(adapter, message.Device)
+		device := newDeviceFromMessage(adapter, message.Device)
 		go adapter.handleDeviceAdded(device)
 		return
 	}
@@ -320,7 +320,7 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 				return
 			}
 			if message.Device != nil && message.Success {
-				newDev := newDevice(adapter, *message.Device)
+				newDev := newDeviceFromMessage(adapter, *message.Device)
 				adapter.AddDevice(newDev)
 				plugin.manager.AddDevice(newDev)
 				select {
@@ -341,7 +341,7 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			plugin.logger.Errorf("Bad message")
 			return
 		}
-		go dev.NotifyPropertyChanged(properties.PropertyDescription{
+		go dev.onPropertyChanged(properties.PropertyDescription{
 			Name:        *message.Property.Name,
 			AtType:      *message.Property.AtType,
 			Title:       *message.Property.Title,

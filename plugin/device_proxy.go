@@ -28,7 +28,7 @@ type device struct {
 	setPropertyValueTask sync.Map
 }
 
-func newDevice(adapter *Adapter, msg messages.Device) *device {
+func newDeviceFromMessage(adapter *Adapter, msg messages.Device) *device {
 
 	getString := func(s *string) string {
 		if s == nil {
@@ -80,13 +80,13 @@ func newDevice(adapter *Adapter, msg messages.Device) *device {
 					return nil
 				}
 				return *p.Minimum
-			},
+			}(),
 			Maximum: func() any {
 				if p.Maximum != nil {
 					return *p.Maximum
 				}
 				return nil
-			},
+			}(),
 			Enum: p.Enum,
 			ReadOnly: func(b *bool) bool {
 				if b == nil {
@@ -94,9 +94,14 @@ func newDevice(adapter *Adapter, msg messages.Device) *device {
 				}
 				return *b
 			}(p.ReadOnly),
-			MultipleOf: p.MultipleOf,
-			Links:      nil,
-			Value:      p.Value,
+			MultipleOf: func() any {
+				if p.MultipleOf != nil {
+					return *p.MultipleOf
+				}
+				return nil
+			}(),
+			Links: nil,
+			Value: p.Value,
 		}
 	}
 
@@ -183,7 +188,7 @@ func newDevice(adapter *Adapter, msg messages.Device) *device {
 	return &device
 }
 
-func (device *device) NotifyPropertyChanged(property properties.PropertyDescription) {
+func (device *device) onPropertyChanged(property properties.PropertyDescription) {
 	t, ok := device.setPropertyValueTask.Load(property.Name)
 	if ok {
 		task := t.(chan any)
@@ -230,7 +235,10 @@ func (device *device) NotifyPropertyChanged(property properties.PropertyDescript
 }
 
 func (device *device) notifyDeviceConnected(connected bool) {
-	device.getManager().Publish(topic.DeviceConnected, device.GetId(), connected)
+	device.getManager().Publish(topic.DeviceConnected, topic.DeviceConnectedMessage{
+		DeviceId:  device.GetId(),
+		Connected: connected,
+	})
 }
 
 func (device *device) actionNotify(actionDescription actions.ActionDescription) {

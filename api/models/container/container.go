@@ -36,7 +36,7 @@ type ThingsStorage interface {
 	RemoveThing(id string) error
 	CreateThing(id string, thing *Thing) error
 	UpdateThing(id string, thing *Thing) error
-	GetThings() map[string]Thing
+	GetThings() map[string]*Thing
 }
 
 type ThingsContainer struct {
@@ -179,7 +179,7 @@ func (c *ThingsContainer) updateThings() {
 	if len(c.things) < 1 {
 		for id, thing := range c.store.GetThings() {
 			thing.container = c
-			c.things[id] = &thing
+			c.things[id] = thing
 		}
 	}
 }
@@ -198,10 +198,10 @@ func (c *ThingsContainer) handleDeviceAdded(msg topic.DeviceAddedMessage) {
 	}
 }
 
-func (c *ThingsContainer) handleDeviceConnected(deviceId string, connected bool) {
-	t := c.GetThing(deviceId)
+func (c *ThingsContainer) handleDeviceConnected(msg topic.DeviceConnectedMessage) {
+	t := c.GetThing(msg.DeviceId)
 	if t != nil {
-		t.setConnected(connected)
+		t.setConnected(msg.Connected)
 	}
 }
 

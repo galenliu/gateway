@@ -53,6 +53,11 @@ type DeviceActionStatusMessage struct {
 	Action   actions.ActionDescription
 }
 
+type DeviceConnectedMessage struct {
+	DeviceId  string
+	Connected bool
+}
+
 type ThingAddedMessage struct {
 	ThingId string
 }

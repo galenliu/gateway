@@ -171,18 +171,18 @@ func mapOfWotProperties(deviceId string, props devices.DeviceProperties) (mapOfP
 				StringSchema: &schema.StringSchema{
 					DataSchema: dataSchema,
 					MinLength: func() *controls.UnsignedInt {
-						if p.GetMinimum() == nil {
-							return nil
+						if v := p.GetMinimum(); v != nil {
+							i := controls.ToUnsignedInt(v)
+							return &i
 						}
-						var min = controls.ToUnsignedInt(p.GetMinimum())
-						return &min
+						return nil
 					}(),
 					MaxLength: func() *controls.UnsignedInt {
-						if p.GetMinimum() == nil {
-							return nil
+						if v := p.GetMaximum(); v != nil {
+							i := controls.ToUnsignedInt(v)
+							return &i
 						}
-						var max = controls.ToUnsignedInt(p.GetMaximum())
-						return &max
+						return nil
 					}(),
 					Pattern:          "",
 					ContentEncoding:  "",
