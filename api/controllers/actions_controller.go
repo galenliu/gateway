@@ -17,7 +17,7 @@ type ActionsController struct {
 	thingContainer *container.ThingsContainer
 	actions        *models.ActionsModel
 	manager        models.ActionsManager
-	bus            *bus.Bus
+	bus            *bus.ThingsBus
 }
 
 func NewActionsController(model *models.ActionsModel, thing *container.ThingsContainer, manager models.ActionsManager, log logging.Logger) *ActionsController {

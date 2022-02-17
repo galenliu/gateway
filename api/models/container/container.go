@@ -10,6 +10,7 @@ import (
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	"github.com/gofiber/fiber/v2"
 	json "github.com/json-iterator/go"
+	"sync"
 	"time"
 )
 
@@ -19,6 +20,7 @@ type Container interface {
 	Publish(topic2 topic.Topic, args ...any)
 	Subscribe(topic2 topic.Topic, f any) func()
 	GetThing(thing string) *Thing
+	GetThings() []*Thing
 }
 
 type Manager interface {
@@ -32,24 +34,26 @@ type Manager interface {
 // ThingsStorage CRUD
 type ThingsStorage interface {
 	RemoveThing(id string) error
-	CreateThing(id string, thing Thing) error
-	UpdateThing(id string, thing Thing) error
+	CreateThing(id string, thing *Thing) error
+	UpdateThing(id string, thing *Thing) error
 	GetThings() map[string]Thing
 }
 
 type ThingsContainer struct {
+	sync.Mutex
 	things  map[string]*Thing
 	manager Manager
 	store   ThingsStorage
 	logger  logging.Logger
-	*bus.Controller
+	bus.ThingsBus
 }
 
 func NewThingsContainerModel(manager Manager, store ThingsStorage, log logging.Logger) *ThingsContainer {
 	t := &ThingsContainer{}
+	t.Mutex = sync.Mutex{}
 	t.store = store
 	t.manager = manager
-	t.Controller = bus.NewBusController()
+	t.ThingsBus = bus.NewBus()
 	t.logger = log
 	t.things = make(map[string]*Thing, 20)
 	t.updateThings()
@@ -118,7 +122,8 @@ func (c *ThingsContainer) GetMapOfThings() map[string]*Thing {
 }
 
 func (c *ThingsContainer) CreateThing(data []byte) (*Thing, error) {
-
+	c.Lock()
+	defer c.Unlock()
 	var thing Thing
 	err := json.Unmarshal(data, &thing)
 	if err != nil {
@@ -128,13 +133,14 @@ func (c *ThingsContainer) CreateThing(data []byte) (*Thing, error) {
 	thing.Created = &controls.DataTime{Time: time.Now()}
 	thing.Modified = &controls.DataTime{Time: time.Now()}
 	th := &thing
-	th.added()
+	th.onCreate()
 	c.things[thing.GetId()] = th
 	return th, nil
 }
 
 func (c *ThingsContainer) RemoveThing(thingId string) {
-
+	c.Lock()
+	defer c.Unlock()
 	t, _ := c.things[thingId]
 	if t == nil {
 		c.logger.Errorf("thing with id %s not found", thingId)
@@ -146,6 +152,8 @@ func (c *ThingsContainer) RemoveThing(thingId string) {
 }
 
 func (c *ThingsContainer) UpdateThing(data []byte) error {
+	c.Lock()
+	defer c.Unlock()
 	id := json.Get(data, "id")
 	if id.ValueType() != json.StringValue {
 		return fmt.Errorf("thing id invaild")
@@ -166,6 +174,8 @@ func (c *ThingsContainer) UpdateThing(data []byte) error {
 }
 
 func (c *ThingsContainer) updateThings() {
+	c.Lock()
+	defer c.Unlock()
 	if len(c.things) < 1 {
 		for id, thing := range c.store.GetThings() {
 			thing.container = c
@@ -197,15 +207,24 @@ func (c *ThingsContainer) handleDeviceConnected(deviceId string, connected bool)
 
 func (c *ThingsContainer) handleDevicePropertyChanged(message topic.DevicePropertyChangedMessage) {
 	t := c.GetThing(message.DeviceId)
-	t.onPropertyChanged(message.PropertyDescription)
+	if t == nil {
+		return
+	}
+	t.onPropertyChanged(message)
 }
 
 func (c *ThingsContainer) handleDeviceActionStatus(msg topic.DeviceActionStatusMessage) {
 	t := c.GetThing(msg.DeviceId)
+	if t == nil {
+		return
+	}
 	t.onActionStatus(msg.Action)
 }
 
 func (c *ThingsContainer) handleDeviceEvent(deviceId string, event *events.EventDescription) {
 	t := c.GetThing(deviceId)
+	if t == nil {
+		return
+	}
 	t.OnEvent(event)
 }

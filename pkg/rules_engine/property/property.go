@@ -9,7 +9,7 @@ import (
 
 type Property struct {
 	container things.Container
-	*bus.Controller
+	*bus.EventBus
 	id          string
 	typ         string
 	thing       string
@@ -31,7 +31,7 @@ type Description struct {
 func NewProperty(description Description, container things.Container) *Property {
 	p := &Property{
 		container:   container,
-		Controller:  bus.NewBusController(),
+		EventBus:    bus.NewBus(),
 		id:          description.Id,
 		typ:         description.Type,
 		thing:       description.Thing,

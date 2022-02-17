@@ -34,18 +34,8 @@ type Config struct {
 	AddonUrls []string
 }
 
-// Container  Things
-type Container interface {
-	GetThing(id string) *things.Thing
-	GetThings() []*things.Thing
-	GetMapOfThings() map[string]*things.Thing
-	CreateThing(data []byte) (*things.Thing, error)
-	RemoveThing(id string)
-	UpdateThing(data []byte) error
-}
-
 type Models struct {
-	ThingsModel  *Container
+	ThingsModel  *things.Container
 	UsersModel   *models.Users
 	SettingModel *models.Settings
 }
@@ -146,7 +136,7 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		app.Post(constant.LoginPath, loginController.handleLogin)
 	}
 
-	// Users Controller
+	// Users EventBus
 	{
 		usersController := NewUsersController(usersModel, jsonwebtokenModel, log)
 		usersGroup := app.Group(constant.UsersPath)
@@ -155,7 +145,7 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 	}
 
 	actionsController := NewActionsController(actionsModel, containerModel, manager, log)
-	//actions Controller
+	//actions EventBus
 	{
 		actionsGroup := app.Group(constant.ActionsPath)
 		actionsGroup.Post("/", actionsController.handleCreateAction)
@@ -164,7 +154,7 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		actionsGroup.Delete("/:thingId/:actionName/:actionId", actionsController.handleDeleteAction)
 	}
 
-	//Things Controller
+	//Things EventBus
 	{
 		thingsController := NewThingsControllerFunc(manager, containerModel, log)
 		thingsGroup := app.Group(constant.ThingsPath)
@@ -180,8 +170,8 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		thingsGroup.Patch("/:thingId", thingsController.handleUpdateThing)
 		thingsGroup.Get("/", thingsController.handleGetThings)
 
-		thingsGroup.Get("/:thingId", websocket.New(handleWebsocket(containerModel, manager, log)))
-		thingsGroup.Get("/", websocket.New(handleWebsocket(containerModel, manager, log)))
+		thingsGroup.Get("/:thingId", websocket.New(handleWebsocket(containerModel, log)))
+		thingsGroup.Get("/", websocket.New(handleWebsocket(containerModel, log)))
 
 		//Get the properties of a thing
 		thingsGroup.Get("/:thingId"+constant.PropertiesPath, thingsController.handleGetProperties)
@@ -196,7 +186,7 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		thingsGroup.Post("/:thingId"+"/"+constant.ActionsPath, actionsController.handleCreateAction)
 	}
 
-	//NewThing Controller
+	//NewThing EventBus
 	{
 		newThingsController := NewNewThingsController(log)
 		newThingsGroup := app.Group(constant.NewThingsPath)
@@ -210,7 +200,7 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		newThingsGroup.Get("/", websocket.New(newThingsController.handleNewThingsWebsocket(manager, containerModel)))
 	}
 
-	//Addons Controller
+	//Addons EventBus
 	{
 		addonController := NewAddonController(manager, addonModel, log)
 		addonGroup := app.Group(constant.AddonsPath)
@@ -224,14 +214,14 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		addonGroup.Put("/:addonId/config", addonController.handlerSetAddonConfig)
 	}
 
-	//Settings Controller
+	//Settings EventBus
 	{
 		settingsGroup := app.Group(constant.SettingsPath)
 		settingsController := NewSettingController(settingModel, log)
 		settingsGroup.Get("/addonsInfo", settingsController.handleGetAddonsInfo)
 	}
 
-	//rules Controller
+	//rules EventBus
 	{
 		rulesGroup := app.Group(constant.RulesPath)
 		rulesController := NewRulesController(store, containerModel)

@@ -17,7 +17,7 @@ const TypeTimeTrigger = "TimeTrigger"
 const TypeTrigger = "Trigger"
 
 type Entity interface {
-	bus.Bus
+	bus.ThingsBus
 	GetType() string
 	Start()
 	Stop()
@@ -29,16 +29,16 @@ type TriggerDescription struct {
 }
 
 type Trigger struct {
-	*bus.Controller
+	*bus.EventBus
 	t     string
 	label string
 }
 
 func NewTrigger(des TriggerDescription) *Trigger {
 	return &Trigger{
-		Controller: bus.NewBusController(),
-		t:          des.Type,
-		label:      des.Label,
+		EventBus: bus.NewBus(),
+		t:        des.Type,
+		label:    des.Label,
 	}
 }
 

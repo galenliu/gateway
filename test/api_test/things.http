@@ -4,13 +4,13 @@ Content-Type: application/x-www-form-urlencoded
 
 true
 
-### trune off
+### trun off
 PUT http://localhost:9090/things/192.168.1.101:55443/properties/on
 Content-Type: application/x-www-form-urlencoded
 
 false
 
-### trune level
+### trun bright
 PUT http://localhost:9090/things/192.168.1.101:55443/properties/bright
 Content-Type: application/x-www-form-urlencoded
 
@@ -39,7 +39,6 @@ Content-Type: application/json
   "title": "192.168.1.101:55443",
   "id": "192.168.1.101:55443",
   "@type": [
-    "",
     "Light",
     "OnOffSwitch"
   ],

@@ -119,12 +119,12 @@ func (t *Thing) GetHref() string {
 	return t.Id.GetURI()
 }
 
-func (t *Thing) GetProperty(propNane string) PropertyAffordance {
-	property, ok := t.Properties[propNane]
-	if ok {
-		return property
+func (t *Thing) GetProperty(name string) PropertyAffordance {
+	p, ok := t.Properties[name]
+	if !ok {
+		return nil
 	}
-	return nil
+	return p
 }
 
 func (t *Thing) GetAction(name string) *ActionAffordance {

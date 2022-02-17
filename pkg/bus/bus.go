@@ -2,11 +2,10 @@ package bus
 
 import (
 	"fmt"
-	"github.com/asaskevich/EventBus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 )
 
-type Bus interface {
+type ThingsBus interface {
 	Publisher
 	Subscriber
 }
@@ -20,22 +19,23 @@ type Subscriber interface {
 	Unsubscribe(topic2 topic.Topic, f any)
 }
 
-type Controller struct {
-	bus EventBus.Bus
+type EventBus struct {
+	bus Bus
 }
 
-func NewBusController() *Controller {
-	return &Controller{bus: EventBus.New()}
+func NewBus() *EventBus {
+	return &EventBus{bus: New()}
 }
 
-func (t *Controller) Subscribe(topic topic.Topic, fn any) func() {
-	err := t.bus.Subscribe(string(topic), fn)
+func (t *EventBus) Subscribe(topic topic.Topic, fn any) func() {
+	top := string(topic)
+	err := t.bus.Subscribe(top, fn)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil
 	}
 	return func() {
-		err := t.bus.Unsubscribe(string(topic), fn)
+		err := t.bus.Unsubscribe(top, fn)
 		if err != nil {
 			fmt.Println(err.Error())
 			return
@@ -43,12 +43,14 @@ func (t *Controller) Subscribe(topic topic.Topic, fn any) func() {
 	}
 }
 
-func (t *Controller) Publish(topic2 topic.Topic, args ...any) {
-	t.bus.Publish(string(topic2), args...)
+func (t *EventBus) Publish(topic topic.Topic, args ...any) {
+	top := string(topic)
+	t.bus.Publish(top, args...)
 }
 
-func (t *Controller) Unsubscribe(topic2 topic.Topic, f any) {
-	err := t.bus.Unsubscribe(string(topic2), f)
+func (t *EventBus) Unsubscribe(topic topic.Topic, f any) {
+	top := string(topic)
+	err := t.bus.Unsubscribe(top, f)
 	if err != nil {
 		fmt.Println(err.Error())
 		return

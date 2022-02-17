@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/events"
-	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
+	"sync"
 )
 
 type ThingPin struct {
@@ -31,6 +31,7 @@ type Thing struct {
 	//LayoutIndex         uint `json:"layoutIndex"`
 	GroupId   string `json:"groupId,omitempty"`
 	container *ThingsContainer
+	sync.Mutex
 }
 
 func (t *Thing) UnmarshalJSON(data []byte) error {
@@ -39,6 +40,7 @@ func (t *Thing) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
+	t.Mutex = sync.Mutex{}
 	if thing.Title == "" {
 		return fmt.Errorf("thing title cannot be empty")
 	}
@@ -81,7 +83,7 @@ func (t *Thing) SetSelectedCapability(selectedCapability string) bool {
 	for _, s := range t.AtType {
 		if s == selectedCapability {
 			t.SelectedCapability = selectedCapability
-			err := t.container.store.UpdateThing(t.GetId(), *t)
+			err := t.container.store.UpdateThing(t.GetId(), t)
 			if err != nil {
 				return false
 			}
@@ -97,7 +99,7 @@ func (t *Thing) SetTitle(title string) bool {
 		return false
 	}
 	t.Title = title
-	err := t.container.store.UpdateThing(t.GetId(), *t)
+	err := t.container.store.UpdateThing(t.GetId(), t)
 	if err != nil {
 		return false
 	}
@@ -125,32 +127,35 @@ func (t *Thing) removed() {
 }
 
 func (t *Thing) update() {
-	err := t.container.store.UpdateThing(t.GetId(), *t)
+	err := t.container.store.UpdateThing(t.GetId(), t)
 	if err != nil {
 		return
 	}
 	t.container.Publish(topic.ThingModify, topic.ThingModifyMessage{ThingId: t.GetId()})
 }
 
-func (t *Thing) added() {
-	err := t.container.store.CreateThing(t.GetId(), *t)
+func (t *Thing) onCreate() {
+	err := t.container.store.CreateThing(t.GetId(), t)
 	if err != nil {
 		return
 	}
 	t.container.Publish(topic.ThingAdded, topic.ThingAddedMessage{ThingId: t.GetId()})
 }
 
-func (t *Thing) onPropertyChanged(prop properties.PropertyDescription) {
+func (t *Thing) onPropertyChanged(msg topic.DevicePropertyChangedMessage) {
+	if p := t.GetProperty(msg.PropertyName); p == nil {
+		return
+	}
 	t.container.Publish(topic.ThingPropertyChanged, topic.ThingPropertyChangedMessage{
 		ThingId:      t.GetId(),
-		PropertyName: prop.Name,
-		Value:        prop.Value,
+		PropertyName: msg.Name,
+		Value:        msg.Value,
 	})
 }
 
 func (t *Thing) onActionStatus(a actions.ActionDescription) {
 	t.container.Publish(topic.ThingActionStatus, topic.ThingActionStatusMessage{
-		ThingId: "",
+		ThingId: t.GetId(),
 		Action: topic.ThingActionDescription{
 			Id:            a.Id,
 			Name:          a.Name,

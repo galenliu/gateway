@@ -3,6 +3,7 @@ package properties
 import (
 	"encoding/json"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
+	"github.com/xiam/to"
 )
 
 type PropertyLinkElem struct {
@@ -62,7 +63,7 @@ type Property struct {
 	AtType      string `json:"@type,omitempty"`
 	Unit        string `json:"unit,omitempty"`
 	Description string `json:"description,omitempty"`
-	Minimum     any    `json:"minimum,omitempty"`
+	Minimum     any    `json:"minimum"`
 	Maximum     any    `json:"maximum,omitempty"`
 	Enum        []any  `json:"enum,omitempty"`
 	ReadOnly    bool   `json:"readOnly"`
@@ -93,7 +94,7 @@ func NewProperty(description PropertyDescription) *Property {
 	}
 }
 
-func (p *Property) MarshalJSON() ([]byte, error) {
+func (p Property) MarshalJSON() ([]byte, error) {
 	propertyDescription := PropertyDescription{
 		Name:        p.Name,
 		AtType:      p.AtType,
@@ -216,28 +217,22 @@ func (p *Property) ToMessage() messages.Property {
 		Enum:        p.Enum,
 		Maximum: func() *float64 {
 			if v := p.GetMaximum(); v != nil {
-				f, ok := v.(float64)
-				if ok {
-					return &f
-				}
+				f := to.Float64(v)
+				return &f
 			}
 			return nil
 		}(),
 		Minimum: func() *float64 {
 			if v := p.GetMinimum(); v != nil {
-				f, ok := v.(float64)
-				if ok {
-					return &f
-				}
+				f := to.Float64(v)
+				return &f
 			}
 			return nil
 		}(),
 		MultipleOf: func() *float64 {
 			if v := p.GetMultipleOf(); v != nil {
-				f, ok := v.(float64)
-				if ok {
-					return &f
-				}
+				f := to.Float64(v)
+				return &f
 			}
 			return nil
 		}(),

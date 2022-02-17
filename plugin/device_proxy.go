@@ -75,9 +75,19 @@ func newDevice(adapter *Adapter, msg messages.Device) *device {
 			Type:        p.Type,
 			Unit:        getString(p.Unit),
 			Description: getString(p.Description),
-			Minimum:     p.Minimum,
-			Maximum:     p.Maximum,
-			Enum:        p.Enum,
+			Minimum: func() any {
+				if p.Minimum == nil {
+					return nil
+				}
+				return *p.Minimum
+			},
+			Maximum: func() any {
+				if p.Maximum != nil {
+					return *p.Maximum
+				}
+				return nil
+			},
+			Enum: p.Enum,
 			ReadOnly: func(b *bool) bool {
 				if b == nil {
 					return false

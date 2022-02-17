@@ -7,7 +7,7 @@ import (
 	"github.com/galenliu/gateway/api/models/container"
 )
 
-func (s *Storage) CreateThing(id string, thing container.Thing) error {
+func (s *Storage) CreateThing(id string, thing *container.Thing) error {
 	bytes, err := json.Marshal(thing)
 	if err != nil {
 		return err
@@ -81,7 +81,7 @@ func (s *Storage) RemoveThing(id string) error {
 	return nil
 }
 
-func (s *Storage) UpdateThing(id string, thing container.Thing) (err error) {
+func (s *Storage) UpdateThing(id string, thing *container.Thing) (err error) {
 	bytes, err := json.Marshal(thing)
 	if err != nil {
 		return fmt.Errorf("thing marshal error: %s", err.Error())

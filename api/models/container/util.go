@@ -14,7 +14,7 @@ import (
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 )
 
-func AsWebOfThing(device devices.Device) Thing {
+func AsWebOfThing(device devices.Device) *Thing {
 	thing := Thing{
 		Thing: &wot.Thing{
 			AtContext:    controls.URI(device.GetAtContext()),
@@ -53,7 +53,7 @@ func AsWebOfThing(device devices.Device) Thing {
 			Pattern:  device.Pin.Pattern,
 		}
 	}
-	return thing
+	return &thing
 }
 
 func mapOfWotProperties(deviceId string, props devices.DeviceProperties) (mapOfProperty map[string]wot.PropertyAffordance) {
@@ -103,36 +103,31 @@ func mapOfWotProperties(deviceId string, props devices.DeviceProperties) (mapOfP
 					DataSchema: dataSchema,
 					Minimum: func() *controls.Integer {
 						if v := p.GetMinimum(); v != nil {
-							integer, ok := v.(controls.Integer)
-							if ok {
-								return &integer
-							}
+							i := controls.ToInteger(v)
+							return &i
 						}
 						return nil
 					}(),
 					ExclusiveMinimum: nil,
 					Maximum: func() *controls.Integer {
 						if v := p.GetMaximum(); v != nil {
-							integer, ok := v.(controls.Integer)
-							if ok {
-								return &integer
-							}
+							i := controls.ToInteger(v)
+							return &i
 						}
 						return nil
 					}(),
 					ExclusiveMaximum: nil,
 					MultipleOf: func() *controls.Integer {
-						if v := p.GetMaximum(); v != nil {
-							integer, ok := v.(controls.Integer)
-							if ok {
-								return &integer
-							}
+						if v := p.GetMultipleOf(); v != nil {
+							i := controls.ToInteger(v)
+							return &i
 						}
 						return nil
 					}(),
 				},
 				Observable: false,
 			}
+			fmt.Printf("")
 		case controls.TypeNumber:
 			wp = &pa.NumberPropertyAffordance{
 				InteractionAffordance: i,
@@ -183,7 +178,11 @@ func mapOfWotProperties(deviceId string, props devices.DeviceProperties) (mapOfP
 						return &min
 					}(),
 					MaxLength: func() *controls.UnsignedInt {
-						return nil
+						if p.GetMinimum() == nil {
+							return nil
+						}
+						var max = controls.ToUnsignedInt(p.GetMaximum())
+						return &max
 					}(),
 					Pattern:          "",
 					ContentEncoding:  "",
@@ -238,7 +237,7 @@ func mapOfWotActions(deviceId string, as devices.DeviceActions) (mapOfProperty w
 	mapOfProperty = make(wot.ThingActions)
 	for name, a := range as {
 		if actionAffordance := asWotAction(deviceId, name, a); &actionAffordance != nil {
-			mapOfProperty[name] = actionAffordance
+			mapOfProperty[name] = &actionAffordance
 		}
 	}
 	return

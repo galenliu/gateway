@@ -12,7 +12,7 @@ import (
 
 type deviceManager interface {
 	GetMapOfDevices() map[string]*devices.Device
-	bus.Bus
+	bus.ThingsBus
 }
 type thingContainer interface {
 	GetMapOfThings() map[string]*things.Thing

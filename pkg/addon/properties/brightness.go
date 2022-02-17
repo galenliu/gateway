@@ -8,12 +8,10 @@ func NewBrightnessProperty(description PropertyDescription) *BrightnessProperty 
 	p := &BrightnessProperty{}
 	description.AtType = "BrightnessProperty"
 	if description.Maximum == nil {
-		var v float64 = 100
-		description.Maximum = &v
+		description.Maximum = 100
 	}
 	if description.Minimum == nil {
-		var v float64 = 0
-		description.Minimum = &v
+		description.Minimum = 0
 	}
 	if description.Unit == "" {
 		description.Unit = "percentage"

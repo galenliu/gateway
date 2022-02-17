@@ -13,8 +13,11 @@ type Brightness struct {
 
 func NewBrightness(bulb *yeelight.Yeelight) *Brightness {
 	return &Brightness{
-		bulb:               bulb,
-		BrightnessProperty: properties.NewBrightnessProperty(properties.PropertyDescription{}),
+		bulb: bulb,
+		BrightnessProperty: properties.NewBrightnessProperty(properties.PropertyDescription{
+			Minimum: 0,
+			Maximum: 100,
+		}),
 	}
 }
 

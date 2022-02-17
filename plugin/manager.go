@@ -38,7 +38,7 @@ type Config struct {
 
 type Manager struct {
 	*manager.Manager
-	*bus.Controller
+	*bus.EventBus
 	config         Config
 	configPath     string
 	pluginServer   *PluginsServer
@@ -67,7 +67,7 @@ func NewAddonsManager(ctx context.Context, conf Config, s managerStore, log logg
 	am.addonsLoaded = false
 	am.isPairing = false
 	am.running = false
-	am.Controller = bus.NewBusController()
+	am.EventBus = bus.NewBus()
 	am.storage = s
 	am.locker = new(sync.Mutex)
 	am.UpdatePreferences()

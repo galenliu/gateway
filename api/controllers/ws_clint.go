@@ -2,8 +2,8 @@ package controllers
 
 import (
 	things "github.com/galenliu/gateway/api/models/container"
+	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/events"
-	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
@@ -12,20 +12,18 @@ import (
 
 type wsClint struct {
 	ws                   *websocket.Conn
-	container            Container
+	container            things.Container
 	thingId              string
 	thingCleanups        map[string]func()
 	logger               logging.Logger
 	subscribedEventNames map[string]bool
-	bus                  bus.Bus
 }
 
-func NewWsClint(ws *websocket.Conn, thingId string, bus bus.Bus, container Container, log logging.Logger) *wsClint {
+func NewWsClint(ws *websocket.Conn, thingId string, container things.Container, log logging.Logger) *wsClint {
 	c := &wsClint{}
 	c.subscribedEventNames = make(map[string]bool)
 	c.thingCleanups = make(map[string]func())
 	c.ws = ws
-	c.bus = bus
 	c.container = container
 	c.logger = log
 	c.thingId = thingId
@@ -36,7 +34,7 @@ func (c *wsClint) handle() {
 	var unsubscribe func()
 	if c.thingId == "" {
 		ts := c.container.GetThings()
-		unsubscribe = c.bus.Subscribe(topic.ThingAdded, func(msg topic.ThingAddedMessage) {
+		unsubscribe = c.container.Subscribe(topic.ThingAdded, func(msg topic.ThingAddedMessage) {
 			thing := c.container.GetThing(msg.ThingId)
 			c.addThing(thing)
 		})
@@ -107,7 +105,7 @@ func (c *wsClint) addThing(t *things.Thing) {
 			c.logger.Error("websocket send %s message err : %s", constant.Connected, err.Error())
 		}
 	}
-	removeConnectedFunc := c.bus.Subscribe(topic.ThingConnected, onConnected)
+	removeConnectedFunc := c.container.Subscribe(topic.ThingConnected, onConnected)
 
 	onThingRemoved := func(message topic.ThingRemovedMessage) {
 		if message.ThingId != t.GetId() {
@@ -126,7 +124,7 @@ func (c *wsClint) addThing(t *things.Thing) {
 		}
 		c.logger.Error("websocket send %s message err : %s", constant.ThingRemoved, err.Error())
 	}
-	removeRemovedFunc := c.bus.Subscribe(topic.ThingRemoved, onThingRemoved)
+	removeRemovedFunc := c.container.Subscribe(topic.ThingRemoved, onThingRemoved)
 
 	onThingModified := func(message topic.ThingModifyMessage) {
 		if message.ThingId != t.GetId() {
@@ -141,7 +139,7 @@ func (c *wsClint) addThing(t *things.Thing) {
 		}
 		c.logger.Error("websocket send %s message err : %s", constant.ThingRemoved, err.Error())
 	}
-	removeModifiedFunc := c.bus.Subscribe(topic.ThingModify, onThingModified)
+	removeModifiedFunc := c.container.Subscribe(topic.ThingModify, onThingModified)
 
 	onEvent := func(e *events.Event) {
 		err := c.ws.WriteJSON(map[string]any{
@@ -156,7 +154,7 @@ func (c *wsClint) addThing(t *things.Thing) {
 		}
 		c.logger.Error("websocket send %s message err : %s", constant.Event, err.Error())
 	}
-	removeThingEventStatusFunc := c.bus.Subscribe(topic.ThingEvent, onEvent)
+	removeThingEventStatusFunc := c.container.Subscribe(topic.ThingEvent, onEvent)
 
 	onPropertyChanged := func(message topic.ThingPropertyChangedMessage) {
 		if message.ThingId != t.GetId() {
@@ -171,22 +169,22 @@ func (c *wsClint) addThing(t *things.Thing) {
 		}
 		c.logger.Error("websocket send %s message err : %s", constant.Event, err.Error())
 	}
-	removePropertyChangedFunc := c.bus.Subscribe(topic.ThingPropertyChanged, onPropertyChanged)
+	removePropertyChangedFunc := c.container.Subscribe(topic.ThingPropertyChanged, onPropertyChanged)
 
-	onActionStatus := func(msg topic.ThingActionStatusMessage) {
-		if t.GetId() != msg.ThingId {
+	onActionStatus := func(thingId string, action *actions.ActionDescription) {
+		if t.GetId() != thingId {
 			return
 		}
 		err := c.ws.WriteJSON(map[string]any{
 			"id":          t.GetId(),
 			"messageType": constant.ActionStatus,
-			"data":        map[string]any{msg.Action.Name: msg.Action},
+			"data":        map[string]any{action.GetName(): action.GetDescription()},
 		})
 		if err != nil {
 		}
 		c.logger.Error("websocket send %s message err : %s", constant.Event, err.Error())
 	}
-	removeActionStatusFunc := c.bus.Subscribe(topic.ThingActionStatus, onActionStatus)
+	removeActionStatusFunc := c.container.Subscribe(topic.ThingActionStatus, onActionStatus)
 
 	thingCleanup := func() {
 		removeConnectedFunc()

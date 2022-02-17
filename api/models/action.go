@@ -29,11 +29,11 @@ type Action struct {
 	TimeCompleted *time.Time     `json:"timeCompleted,omitempty"`
 	Status        string         `json:"status,omitempty"`
 	Error         error          `json:"error,omitempty"`
-	bus           *bus.Bus
+	bus           *bus.ThingsBus
 	logger        logging.Logger
 }
 
-func NewActionModel(name string, input map[string]any, bus *bus.Bus, log logging.Logger, things ...*container.Thing) *Action {
+func NewActionModel(name string, input map[string]any, bus *bus.ThingsBus, log logging.Logger, things ...*container.Thing) *Action {
 	t := time.Now()
 	a := &Action{
 		logger:        log,
