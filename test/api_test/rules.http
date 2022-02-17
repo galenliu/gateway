@@ -18,7 +18,7 @@ Content-Type: application/json
     "type": "MultiTrigger",
     "triggers": [
       {
-        "time": "22:18",
+        "time": "18:06",
         "type": "TimeTrigger",
         "onValue": true
       },
@@ -29,7 +29,7 @@ Content-Type: application/json
           "thing": "192.168.1.101:55443"
         },
         "type": "BooleanTrigger",
-        "onValue": true
+        "onValue": false
       }
     ]
   },
@@ -46,12 +46,21 @@ Content-Type: application/json
       },
       {
         "property": {
+          "type": "integer",
+          "thing": "192.168.1.101:55443",
+          "id": "bright"
+        },
+        "type": "SetEffect",
+        "value": 90
+      },
+      {
+        "property": {
           "type": "boolean",
           "thing": "192.168.1.101:55443",
           "id": "on"
         },
         "type": "SetEffect",
-        "value": false
+        "value": true
       }
     ],
     "type": "MultiEffect",

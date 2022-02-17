@@ -14,13 +14,13 @@ false
 PUT http://localhost:9090/things/192.168.1.101:55443/properties/bright
 Content-Type: application/x-www-form-urlencoded
 
-9
+22
 
 ### set hue
 PUT http://localhost:9090/things/192.168.1.101:55443/properties/color
 Content-Type: application/x-www-form-urlencoded
 
-"098765"
+"f000ff"
 
 ###GET Things
 GET http://localhost:9090/things
@@ -55,79 +55,6 @@ Content-Type: application/json
 }
 
 
-
-###create thing
-POST http://localhost:9090/things
-Content-Type: application/json
-
-
-{
-  "@context": "https://webthings.io/schemas",
-  "title": "0x0000000010e2fa00",
-  "id": "0x0000000010e2fa00",
-  "@type": [
-    "Light"
-  ],
-  "support": "liuguilin361@gmai.com",
-  "version": {
-    "instance": "1.1",
-    "model": ""
-  },
-  "properties": {
-    "level": {
-      "title": "Brightness",
-      "forms": [
-        {
-          "href": "/things/0x0000000010e2fa00/properties/level"
-        }
-      ],
-      "unit": "percent",
-      "type": "integer",
-      "minimum": 0,
-      "maximum": 0,
-      "multipleOf": 0
-    },
-    "hue": {
-      "title": "Hue",
-      "forms": [
-        {
-          "href": "/things/0x0000000010e2fa00/properties/hue"
-        }
-      ],
-      "type": "string",
-      "minLength": 0
-    },
-    "on": {
-      "title": "On/Off",
-      "forms": [
-        {
-          "href": "/things/0x0000000010e2fa00/properties/on"
-        }
-      ],
-      "type": "boolean"
-    }
-  },
-  "actions": {
-    "effect": {
-      "forms": [
-        {
-          "href": "things/0x0000000010e2fa00/actions/effect",
-          "op": [
-            "observeallproperties"
-          ]
-        }
-      ]
-    }
-  },
-  "pin": {
-    "required": false,
-    "pattern": ""
-  }
-}
-
-
-
-
 ###create thing action
 POST http://localhost:9090/things/0x0000000010e2fa00/actions
 Content-Type: application/json
@@ -141,8 +68,6 @@ Content-Type: application/json
   }
 }
 
-
-<> 2021-12-11T003053.400.txt
 
 ### Get addonsInfo
 GET http://localhost:9090/settings/addonsInfo
