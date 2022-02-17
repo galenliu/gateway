@@ -22,8 +22,12 @@ func main() {
 
 	manager.RegisteredAdapter(yeeAdapter, virtualAdapter)
 
-	yeeAdapter.StartPairing(time.After(3 * time.Second))
-	virtualAdapter.StartPairing(time.After(3 * time.Second))
+	go func() {
+		for {
+			yeeAdapter.StartPairing(nil)
+			time.Sleep(60 * time.Second)
+		}
+	}()
 
 	interruptChannel := make(chan os.Signal, 1)
 	signal.Notify(interruptChannel, syscall.SIGINT, syscall.SIGTERM)

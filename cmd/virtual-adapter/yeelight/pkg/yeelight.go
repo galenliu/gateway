@@ -211,7 +211,6 @@ func (y *Yeelight) Listen() (<-chan *Notification, chan<- struct{}, error) {
 		return nil, nil, fmt.Errorf("cannot connect to %s. %s", y.addr, err)
 	}
 
-	fmt.Println("Connection established")
 	go func(c net.Conn) {
 		//make sure connection is closed when method returns
 		defer closeConnection(conn)
