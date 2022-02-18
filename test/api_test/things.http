@@ -1,11 +1,11 @@
 ### trune on
-PUT http://192.168.1.106:9090/things/192.168.1.101:55443/properties/on
+PUT http://localhost:9090/things/192.168.1.101:55443/properties/on
 Content-Type: application/x-www-form-urlencoded
 
 true
 
 ### trun off
-PUT http://192.168.1.106:9090/things/192.168.1.101:55443/properties/on
+PUT http://localhost:9090/things/192.168.1.101:55443/properties/on
 Content-Type: application/x-www-form-urlencoded
 
 false
@@ -23,7 +23,7 @@ Content-Type: application/x-www-form-urlencoded
 "ff0000"
 
 ###GET Things
-GET http://192.168.1.106:9090/things
+GET http://localhost:9090/things
 Accept: application/json
 
 
@@ -43,9 +43,27 @@ Content-Type: application/json
     "OnOffSwitch"
   ],
   "version": {
+    "instance": "",
     "model": "1.0.0"
   },
   "properties": {
+    "bright": {
+      "@type": "BrightnessProperty",
+      "forms": [
+        {
+          "href": "/properties/bright",
+          "contentType": "application/json",
+          "op": [
+            "readproperty",
+            "writeproperty"
+          ]
+        }
+      ],
+      "unit": "percentage",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
     "color": {
       "@type": "ColorProperty",
       "forms": [
@@ -73,23 +91,6 @@ Content-Type: application/json
         }
       ],
       "type": "boolean"
-    },
-    "bright": {
-      "@type": "BrightnessProperty",
-      "forms": [
-        {
-          "href": "/properties/bright",
-          "contentType": "application/json",
-          "op": [
-            "readproperty",
-            "writeproperty"
-          ]
-        }
-      ],
-      "unit": "percentage",
-      "type": "integer",
-      "minimum": 0,
-      "maximum": 100
     }
   },
   "forms": [
@@ -102,6 +103,7 @@ Content-Type: application/json
     }
   ]
 }
+
 
 
 

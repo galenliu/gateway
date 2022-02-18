@@ -12,7 +12,7 @@ type ThingInterface any
 
 type ThingProperties map[string]PropertyAffordance
 type ThingActions map[string]*ActionAffordance
-type ThingEvents map[string]EventAffordance
+type ThingEvents map[string]*EventAffordance
 type ThingSecurityDefinitions map[string]securityScheme.SecurityScheme
 type ThingSchemaDefinitions map[string]dataSchema.DataSchema
 

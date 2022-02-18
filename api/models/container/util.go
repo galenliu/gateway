@@ -42,9 +42,9 @@ func AsWebOfThing(device devices.Device) *Thing {
 		GroupId:             "",
 	}
 
-	thing.Properties = mapOfWotProperties(thing.Thing, device.Properties)
-	thing.Actions = mapOfWotActions(thing.Thing, device.Actions)
-	thing.Events = mapOfWotEvent(thing.Thing, device.Events)
+	thing.Properties = mapOfWotProperties(device.Properties)
+	thing.Actions = mapOfWotActions(device.Actions)
+	thing.Events = mapOfWotEvent(device.Events)
 	thing.Forms = arrayOfThingFrom(thing.Thing)
 
 	if device.Pin != nil {
@@ -56,8 +56,8 @@ func AsWebOfThing(device devices.Device) *Thing {
 	return &thing
 }
 
-func mapOfWotProperties(thing *wot.Thing, props devices.DeviceProperties) (mapOfProperty map[string]wot.PropertyAffordance) {
-	asWotProperty := func(thing *wot.Thing, p properties.Entity) wot.PropertyAffordance {
+func mapOfWotProperties(props devices.DeviceProperties) (mapOfProperty map[string]wot.PropertyAffordance) {
+	asWotProperty := func(p properties.Entity) wot.PropertyAffordance {
 		var wp wot.PropertyAffordance
 		var i = &ia.InteractionAffordance{
 			AtType:       p.GetAtType(),
@@ -84,22 +84,14 @@ func mapOfWotProperties(thing *wot.Thing, props devices.DeviceProperties) (mapOf
 			Type:         p.GetType(),
 		}
 		form := controls.Form{
-			Href:                controls.URI(fmt.Sprintf("%s/properties/%s", thing.Base, p.GetName())),
-			ContentType:         controls.JSON,
-			ContentCoding:       "",
-			Security:            nil,
-			Scopes:              nil,
-			Response:            nil,
-			AdditionalResponses: nil,
-			Subprotocol:         "",
+			Href:        controls.URI(fmt.Sprintf("/properties/%s", p.GetName())),
+			ContentType: controls.JSON,
 		}
 		if !dataSchema.ReadOnly && !dataSchema.WriteOnly {
 			form.Op = controls.NewOpArray(controls.Readproperty, controls.Writeproperty)
-		}
-		if dataSchema.ReadOnly {
+		} else if dataSchema.ReadOnly {
 			form.Op = controls.NewOpArray(controls.Readproperty)
-		}
-		if dataSchema.WriteOnly {
+		} else if dataSchema.WriteOnly {
 			form.Op = controls.NewOpArray(controls.Writeproperty)
 		}
 		i.Forms = make([]controls.Form, 0)
@@ -210,16 +202,15 @@ func mapOfWotProperties(thing *wot.Thing, props devices.DeviceProperties) (mapOf
 	}
 	mapOfProperty = make(map[string]wot.PropertyAffordance)
 	for name, p := range props {
-		if propertyAffordance := asWotProperty(thing, p); propertyAffordance != nil {
+		if propertyAffordance := asWotProperty(p); propertyAffordance != nil {
 			mapOfProperty[name] = propertyAffordance
 		}
 	}
 	return
 }
 
-func mapOfWotActions(thing *wot.Thing, as devices.DeviceActions) (mapOfProperty wot.ThingActions) {
-
-	asWotAction := func(thing *wot.Thing, actionName string, a actions.Action) wot.ActionAffordance {
+func mapOfWotActions(as devices.DeviceActions) (mapOfProperty wot.ThingActions) {
+	asWotAction := func(actionName string, a actions.Action) wot.ActionAffordance {
 		var aa = wot.ActionAffordance{}
 		var i = &ia.InteractionAffordance{
 			AtType:       a.AtType,
@@ -228,35 +219,28 @@ func mapOfWotActions(thing *wot.Thing, as devices.DeviceActions) (mapOfProperty 
 			Description:  a.Description,
 			Descriptions: map[string]string{},
 			Forms: []controls.Form{{
-				Href:                controls.URI(fmt.Sprintf("%s/actions/%s", thing.Base, actionName)),
-				ContentType:         "",
-				ContentCoding:       "",
-				Security:            nil,
-				Scopes:              nil,
-				Response:            nil,
-				AdditionalResponses: nil,
-				Subprotocol:         "",
-				Op:                  controls.NewOpArray(controls.Invokeaction),
+				Href:        controls.URI(fmt.Sprintf("/actions/%s", actionName)),
+				ContentType: controls.JSON,
+				Op:          controls.NewOpArray(controls.Invokeaction),
 			}},
 			UriVariables: nil,
 		}
 		aa.InteractionAffordance = i
 		return aa
 	}
-
 	mapOfProperty = make(wot.ThingActions)
 	for name, a := range as {
-		if actionAffordance := asWotAction(thing, name, a); &actionAffordance != nil {
+		if actionAffordance := asWotAction(name, a); &actionAffordance != nil {
 			mapOfProperty[name] = &actionAffordance
 		}
 	}
 	return
 }
 
-func mapOfWotEvent(thing *wot.Thing, des devices.DeviceEvents) (es wot.ThingEvents) {
+func mapOfWotEvent(des devices.DeviceEvents) (es wot.ThingEvents) {
 
-	asWotEvent := func(thing *wot.Thing, a events.Event) wot.EventAffordance {
-		ea := wot.EventAffordance{
+	asWotEvent := func(a events.Event) *wot.EventAffordance {
+		ea := &wot.EventAffordance{
 			InteractionAffordance: ia.InteractionAffordance{
 				AtType:       a.Type,
 				Title:        a.Title,
@@ -265,15 +249,9 @@ func mapOfWotEvent(thing *wot.Thing, des devices.DeviceEvents) (es wot.ThingEven
 				Descriptions: map[string]string{},
 				Forms: []controls.Form{
 					{
-						Href:                controls.NewURI(fmt.Sprintf(thing.Id.ToString()+"/things/%s/events/%s", thing.GetId(), a.Name)),
-						ContentType:         controls.JSON,
-						ContentCoding:       "",
-						Security:            nil,
-						Scopes:              nil,
-						Response:            nil,
-						AdditionalResponses: nil,
-						Subprotocol:         "",
-						Op:                  controls.NewOpArray(controls.SubscribeEvent),
+						Href:        controls.NewURI(fmt.Sprintf("/events/%s", a.Name)),
+						ContentType: controls.JSON,
+						Op:          controls.NewOpArray(controls.SubscribeEvent),
 					},
 				},
 				UriVariables: nil,
@@ -284,42 +262,44 @@ func mapOfWotEvent(thing *wot.Thing, des devices.DeviceEvents) (es wot.ThingEven
 		}
 		return ea
 	}
-
 	es = make(wot.ThingEvents)
 	for n, e := range des {
-		es[n] = asWotEvent(thing, e)
+		e := asWotEvent(e)
+		if e != nil {
+			es[n] = e
+		}
 	}
-	return nil
+	if len(es) == 0 {
+		return nil
+	}
+	return es
 }
 
 func arrayOfThingFrom(t *wot.Thing) []controls.Form {
 	var fs = make([]controls.Form, 0)
 	if t.Properties != nil && len(t.Properties) > 0 {
 		fs = append(fs, controls.Form{
-			Href:                "/properties",
-			ContentType:         controls.JSON,
-			ContentCoding:       "",
-			Security:            nil,
-			Scopes:              nil,
-			Response:            nil,
-			AdditionalResponses: nil,
-			Subprotocol:         "",
-			Op:                  controls.NewArrayOrString(controls.Readallproperties),
+			Href:        "/properties",
+			ContentType: controls.JSON,
+			Op:          controls.NewArrayOrString(controls.Readallproperties),
 		})
 	}
 	if t.Events != nil && len(t.Events) > 0 {
 		fs = append(fs, controls.Form{
-			Href:                "/events",
-			ContentType:         controls.JSON,
-			ContentCoding:       "",
-			Security:            nil,
-			Scopes:              nil,
-			Response:            nil,
-			AdditionalResponses: nil,
-			Subprotocol:         "",
-			Op:                  controls.NewArrayOrString(controls.Subscribeallevents),
+			Href:        "/events",
+			ContentType: controls.JSON,
+			Op:          controls.NewArrayOrString(controls.Subscribeallevents),
 		})
 	}
+
+	if t.Actions != nil && len(t.Actions) > 0 {
+		fs = append(fs, controls.Form{
+			Href:        "/actions",
+			ContentType: controls.JSON,
+			Op:          controls.NewArrayOrString(controls.Queryallactions),
+		})
+	}
+
 	if len(fs) == 0 {
 		return nil
 	}
