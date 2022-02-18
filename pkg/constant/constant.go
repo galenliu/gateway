@@ -2,7 +2,7 @@ package constant
 
 // events
 const (
-	Support = "liuguilin361@gmai.com"
+	Support = ""
 
 	UnloadPluginKillDelay = 3000
 
@@ -25,6 +25,7 @@ const (
 	DebugPath        = "/debug"
 	RulesPath        = "/rules"
 	OauthPath        = "/oauth"
+	GroupsPath       = "/groups"
 	OauthclientsPath = "/authorizations"
 	InternalLogsPath = "/internal-logs"
 	LogsPath         = "/logs"

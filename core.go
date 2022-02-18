@@ -87,7 +87,6 @@ func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gat
 		UploadDir:   path.Join(g.config.BaseDir, "upload"),
 		LogDir:      path.Join(g.config.BaseDir, "log"),
 	}, g.addonManager, storage, logger)
-	logger.Infof("web api running.")
 	return g, nil
 }
 

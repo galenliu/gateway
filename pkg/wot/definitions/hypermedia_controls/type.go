@@ -26,6 +26,22 @@ const (
 	TypeBoolean = "boolean"
 )
 
+func (u URI) ToString() string {
+	return string(u)
+}
+
+func NewURI(s string) URI {
+	return URI(s)
+}
+
+func NewArrayOrString(args ...string) ArrayOrString {
+	arr := make([]string, 0)
+	for _, s := range args {
+		arr = append(arr, s)
+	}
+	return arr
+}
+
 func ToInteger(v any) Integer {
 	return Integer(to.Uint64(v))
 }

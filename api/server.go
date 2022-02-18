@@ -27,10 +27,44 @@ func NewServe(ctx context.Context, config Config, addonManager *plugin.Manager, 
 	sev := &WebServe{}
 	sev.options = config
 	sev.logger = log
-	sev.Router = controllers.NewRouter(ctx, controllers.Config{
-		HttpAddr:  sev.options.HttpAddr,
-		HttpsAddr: sev.options.HttpsAddr,
-		AddonUrls: config.AddonUrls,
-	}, addonManager, store, log)
+	sev.Router = controllers.NewRouter(config.AddonUrls, addonManager, store, log)
+	sev.Start(ctx)
 	return sev
+}
+
+func (app *WebServe) Start(ctx context.Context) {
+	go func() {
+		c, cancelFunc := context.WithCancel(ctx)
+		select {
+		case <-c.Done():
+			cancelFunc()
+			_ = app.Shutdown()
+		default:
+			err := app.Listen(app.options.HttpAddr)
+			if err != nil {
+				app.logger.Errorf("http api err:%s", err.Error())
+				cancelFunc()
+				return
+			}
+		}
+		cancelFunc()
+	}()
+
+	go func() {
+		c, cancelFunc := context.WithCancel(ctx)
+		select {
+		case <-c.Done():
+			cancelFunc()
+			_ = app.Shutdown()
+		default:
+			err := app.Listen(app.options.HttpsAddr)
+			if err != nil {
+				app.logger.Errorf("https api err:%s", err.Error())
+				cancelFunc()
+				return
+			}
+		}
+		cancelFunc()
+	}()
+	app.logger.Infof("api running at adders: %v, %v \n", app.options.HttpAddr, app.options.HttpsAddr)
 }

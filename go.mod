@@ -3,7 +3,6 @@ module github.com/galenliu/gateway
 go 1.18
 
 require (
-	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/brutella/hc v1.2.4
 	github.com/fasthttp/websocket v1.4.6
 	github.com/gofiber/fiber/v2 v2.27.0
@@ -20,6 +19,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.9.0
+	github.com/statusmachine/urlidentification v0.0.0-20151022172627-7e9a5439cbf3
 	github.com/xiam/to v0.0.0-20200126224905-d60d31e03561
 	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c

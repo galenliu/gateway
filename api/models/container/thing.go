@@ -123,7 +123,7 @@ func (t *Thing) removed() {
 	if err != nil {
 		fmt.Printf("delete thing err:%s", err.Error())
 	}
-	t.container.Publish(topic.ThingRemoved, topic.ThingRemovedMessage{ThingId: t.GetId()})
+	go t.container.Publish(topic.ThingRemoved, topic.ThingRemovedMessage{ThingId: t.GetId()})
 }
 
 func (t *Thing) update() {
@@ -139,7 +139,7 @@ func (t *Thing) onCreate() {
 	if err != nil {
 		return
 	}
-	t.container.Publish(topic.ThingAdded, topic.ThingAddedMessage{ThingId: t.GetId()})
+	go t.container.Publish(topic.ThingAdded, topic.ThingAddedMessage{ThingId: t.GetId()})
 }
 
 func (t *Thing) onPropertyChanged(msg topic.DevicePropertyChangedMessage) {

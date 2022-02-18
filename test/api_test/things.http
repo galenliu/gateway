@@ -14,13 +14,13 @@ false
 PUT http://localhost:9090/things/192.168.1.101:55443/properties/bright
 Content-Type: application/x-www-form-urlencoded
 
-100
+21
 
 ### set hue
 PUT http://localhost:9090/things/192.168.1.101:55443/properties/color
 Content-Type: application/x-www-form-urlencoded
 
-"f000ff"
+"ff0000"
 
 ###GET Things
 GET http://192.168.1.106:9090/things
@@ -42,31 +42,68 @@ Content-Type: application/json
     "Light",
     "OnOffSwitch"
   ],
-  "support": "liuguilin361@gmai.com",
   "version": {
-    "instance": "1.1",
-    "model": ""
+    "model": "1.0.0"
   },
   "properties": {
-    "color": {"@type":"ColorProperty","forms":[{"href":"/things/192.168.1.101:55443/properties/color"}],"type":"string"},
-    "on": {"@type":"OnOffProperty","forms":[{"href":"/things/192.168.1.101:55443/properties/on"}],"type":"boolean"},
-    "bright": {"@type":"BrightnessProperty","forms":[{"href":"/things/192.168.1.101:55443/properties/bright"}],"unit":"percentage","type":"integer","minimum":0,"maximum":100}
-  }
-}
-
-
-###create thing action
-POST http://localhost:9090/things/0x0000000010e2fa00/actions
-Content-Type: application/json
-
-{
-  "effect": {
-    "input": {
-      "type": "smooth",
-      "duration": 100
+    "color": {
+      "@type": "ColorProperty",
+      "forms": [
+        {
+          "href": "/properties/color",
+          "contentType": "application/json",
+          "op": [
+            "readproperty",
+            "writeproperty"
+          ]
+        }
+      ],
+      "type": "string"
+    },
+    "on": {
+      "@type": "OnOffProperty",
+      "forms": [
+        {
+          "href": "/properties/on",
+          "contentType": "application/json",
+          "op": [
+            "readproperty",
+            "writeproperty"
+          ]
+        }
+      ],
+      "type": "boolean"
+    },
+    "bright": {
+      "@type": "BrightnessProperty",
+      "forms": [
+        {
+          "href": "/properties/bright",
+          "contentType": "application/json",
+          "op": [
+            "readproperty",
+            "writeproperty"
+          ]
+        }
+      ],
+      "unit": "percentage",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
     }
-  }
+  },
+  "forms": [
+    {
+      "href": "/properties",
+      "contentType": "application/json",
+      "op": [
+        "readallproperties"
+      ]
+    }
+  ]
 }
+
+
 
 
 ### Get addonsInfo

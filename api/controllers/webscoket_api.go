@@ -10,6 +10,7 @@ type MessageType = string
 
 func handleWebsocket(model things.Container, log logging.Logger) func(conn *websocket.Conn) {
 	handler := func(c *websocket.Conn) {
+		log.Infof("websocket : %s", c.RemoteAddr())
 		thingId, _ := c.Locals("thingId").(string)
 		clint := NewWsClint(c, thingId, model, log)
 		defer clint.close()

@@ -1,15 +1,18 @@
 package hypermedia_controls
 
+type OP = string
+type ContentType = string
+
 type Form struct {
 	Href                URI                          `json:"href" wot:"mandatory"`
-	ContentType         string                       `json:"contentType,omitempty" wot:"withDefault"`
+	ContentType         ContentType                  `json:"contentType,omitempty" wot:"withDefault"`
 	ContentCoding       string                       `json:"contentCoding,omitempty" wot:"optional"`
 	Security            ArrayOrString                `json:"security,omitempty" wot:"optional"`
 	Scopes              ArrayOrString                `json:"scopes,omitempty" wot:"optional"`
 	Response            *ExpectedResponse            `json:"response,omitempty" wot:"optional"`
 	AdditionalResponses []AdditionalExpectedResponse `json:"additionalResponses,omitempty" wot:"optional"`
 	Subprotocol         string                       `json:"subprotocol,omitempty" wot:"optional"`
-	Op                  ArrayOrString                `json:"op,omitempty" wot:"withDefault"`
+	Op                  []OP                         `json:"op,omitempty" wot:"withDefault"`
 }
 
 /*
@@ -22,23 +25,35 @@ form for the operation required. op can be assigned one or
 more interaction verb(s) each representing a semantic intention of an operation.
 */
 
+func NewOpArray(args ...OP) []OP {
+	var arr = make([]OP, 0)
+	for _, a := range args {
+		arr = append(arr, a)
+	}
+	return arr
+}
+
 const (
-	Op_readproperty            = "readproperty"
-	Op_writeproperty           = "writeproperty"
-	Op_observeproperty         = "observeproperty"
-	Op_unobserveproperty       = "unobserveproperty"
-	Op_invokeaction            = "invokeaction"
-	Op_queryaction             = "queryaction"
-	Op_cancelaction            = "cancelaction"
-	Op_subscribeEvent          = "subscribeevent"
-	Op_unsubscribeevent        = "unsubscribeevent"
-	Op_readallproperties       = "readallproperties"
-	Op_writeallproperties      = "writeallproperties"
-	Op_readmultipleproperties  = "readmultipleproperties"
-	Op_writemultipleproperties = "writemultipleproperties"
-	Op_observeallProperties    = "observeallproperties"
-	Op_unobserveallproperties  = "unobserveallproperties"
-	Op_subscribeallevents      = "subscribeallevents"
-	Op_unsubscribeallevents    = "unsubscribeallevents"
-	Op_queryallactions         = "queryallactions"
+	Readproperty            OP = "readproperty"
+	Writeproperty           OP = "writeproperty"
+	Observeproperty         OP = "observeproperty"
+	Unobserveproperty       OP = "unobserveproperty"
+	Invokeaction            OP = "invokeaction"
+	Queryaction             OP = "queryaction"
+	Cancelaction            OP = "cancelaction"
+	SubscribeEvent          OP = "subscribeevent"
+	Unsubscribeevent        OP = "unsubscribeevent"
+	Readallproperties       OP = "readallproperties"
+	Writeallproperties      OP = "writeallproperties"
+	Readmultipleproperties  OP = "readmultipleproperties"
+	Writemultipleproperties OP = "writemultipleproperties"
+	ObserveallProperties    OP = "observeallproperties"
+	Unobserveallproperties  OP = "unobserveallproperties"
+	Subscribeallevents      OP = "subscribeallevents"
+	Unsubscribeallevents    OP = "unsubscribeallevents"
+	Queryallactions         OP = "queryallactions"
+
+	JSON   ContentType = "application/json"
+	LdJSON ContentType = "application/ld+json"
+	xml    ContentType = "application/xml"
 )

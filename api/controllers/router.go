@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"context"
 	"fmt"
 	"github.com/galenliu/gateway/api/middleware"
 	"github.com/galenliu/gateway/api/models"
@@ -28,12 +27,6 @@ type Storage interface {
 	rules_engine.RuleDB
 }
 
-type Config struct {
-	HttpAddr  string
-	HttpsAddr string
-	AddonUrls []string
-}
-
 type Models struct {
 	ThingsModel  *things.Container
 	UsersModel   *models.Users
@@ -42,25 +35,24 @@ type Models struct {
 
 type Router struct {
 	*fiber.App
-	ctx    context.Context
-	logger logging.Logger
-	config Config
+	addonUrls []string
+	logger    logging.Logger
 }
 
-func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, store Storage, log logging.Logger) *Router {
+func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log logging.Logger) *Router {
 
 	//router init
 	app := Router{}
+	app.addonUrls = addonUrls
 	app.logger = log
-	app.config = config
-	app.ctx = ctx
+
 	app.App = fiber.New()
 	app.Use(recover.New())
 	app.Use(cors.New(cors.ConfigDefault))
 	app.Use(compress.New())
 
 	//models init
-	settingModel := models.NewSettingsModel(config.AddonUrls, store, log)
+	settingModel := models.NewSettingsModel(app.addonUrls, store, log)
 	containerModel := things.NewThingsContainerModel(manager, store, log)
 	jwtMiddleware := middleware.NewJWTMiddleware(store, log)
 	auth := jwtMiddleware.Auth
@@ -125,7 +117,7 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		return c.SendStatus(http.StatusNoContent)
 	})
 
-	//root actions
+	//root
 	app.Use(rootHandler)
 
 	//app.Get("/", controllers.RootHandle())
@@ -136,7 +128,7 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		app.Post(constant.LoginPath, loginController.handleLogin)
 	}
 
-	// Users EventBus
+	// Users
 	{
 		usersController := NewUsersController(usersModel, jsonwebtokenModel, log)
 		usersGroup := app.Group(constant.UsersPath)
@@ -144,8 +136,8 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		usersGroup.Post("/", usersController.createUser)
 	}
 
-	actionsController := NewActionsController(actionsModel, containerModel, manager, log)
 	//actions EventBus
+	actionsController := NewActionsController(actionsModel, containerModel, manager, log)
 	{
 		actionsGroup := app.Group(constant.ActionsPath)
 		actionsGroup.Post("/", actionsController.handleCreateAction)
@@ -154,12 +146,11 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		actionsGroup.Delete("/:thingId/:actionName/:actionId", actionsController.handleDeleteAction)
 	}
 
-	//Things EventBus
+	//Things
 	{
 		thingsController := NewThingsControllerFunc(manager, containerModel, log)
 		thingsGroup := app.Group(constant.ThingsPath)
 
-		//set a properties of a thing.
 		thingsGroup.Put("/:thingId/properties/*", thingsController.handleSetProperty)
 		thingsGroup.Get("/:thingId/properties/*", thingsController.handleGetPropertyValue)
 
@@ -186,7 +177,7 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		thingsGroup.Post("/:thingId"+"/"+constant.ActionsPath, actionsController.handleCreateAction)
 	}
 
-	//NewThing EventBus
+	//Things
 	{
 		newThingsController := NewNewThingsController(log)
 		newThingsGroup := app.Group(constant.NewThingsPath)
@@ -200,7 +191,7 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		newThingsGroup.Get("/", websocket.New(newThingsController.handleNewThingsWebsocket(manager, containerModel)))
 	}
 
-	//Addons EventBus
+	//Addons
 	{
 		addonController := NewAddonController(manager, addonModel, log)
 		addonGroup := app.Group(constant.AddonsPath)
@@ -214,14 +205,21 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		addonGroup.Put("/:addonId/config", addonController.handlerSetAddonConfig)
 	}
 
-	//Settings EventBus
+	{
+		eventsController := NewEventsController()
+		eventsGroup := app.Group(constant.EventsPath)
+		eventsGroup.Get("/", eventsController.handleGetEvents)
+		eventsGroup.Get("/:eventName", eventsController.handlerGetEvent)
+	}
+
+	//Settings
 	{
 		settingsGroup := app.Group(constant.SettingsPath)
 		settingsController := NewSettingController(settingModel, log)
 		settingsGroup.Get("/addonsInfo", settingsController.handleGetAddonsInfo)
 	}
 
-	//rules EventBus
+	//rules
 	{
 		rulesGroup := app.Group(constant.RulesPath)
 		rulesController := NewRulesController(store, containerModel)
@@ -232,43 +230,16 @@ func NewRouter(ctx context.Context, config Config, manager *plugin.Manager, stor
 		rulesGroup.Post("/", rulesController.handleCreateRule)
 	}
 
-	app.Start()
+	//groups
+	{
+		group := app.Group(constant.GroupsPath)
+		groupsController := NewGroupsController()
+		group.Get("/", groupsController.handleGetGroups)
+		group.Get("/:id", groupsController.handleGetGroup)
+		group.Post("/", groupsController.handlerCreateGroup)
+		group.Delete("/:id", groupsController.handlerDeleteGroup)
+		group.Put("/:id", groupsController.handlerUpdateGroup)
+	}
+
 	return &app
-}
-
-func (app *Router) Start() {
-	go func() {
-		c, cancelFunc := context.WithCancel(app.ctx)
-		select {
-		case <-c.Done():
-			cancelFunc()
-			_ = app.Shutdown()
-		default:
-			err := app.Listen(app.config.HttpAddr)
-			if err != nil {
-				app.logger.Errorf("http api err:%s", err.Error())
-				cancelFunc()
-				return
-			}
-		}
-		cancelFunc()
-	}()
-
-	go func() {
-		c, cancelFunc := context.WithCancel(app.ctx)
-		select {
-		case <-c.Done():
-			cancelFunc()
-			_ = app.Shutdown()
-		default:
-			err := app.Listen(app.config.HttpsAddr)
-			if err != nil {
-				app.logger.Errorf("https api err:%s", err.Error())
-				cancelFunc()
-				return
-			}
-		}
-		cancelFunc()
-	}()
-
 }
