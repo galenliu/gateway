@@ -8,8 +8,6 @@ import (
 	json "github.com/json-iterator/go"
 )
 
-type ThingInterface any
-
 type ThingProperties map[string]PropertyAffordance
 type ThingActions map[string]*ActionAffordance
 type ThingEvents map[string]*EventAffordance
