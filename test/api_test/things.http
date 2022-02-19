@@ -36,7 +36,7 @@ Content-Type: application/json
 
 {
   "@context": "https://webthings.io/schemas",
-  "title": "192.168.1.101:55443",
+  "title": "192.168.1.111:55443",
   "id": "192.168.1.101:55443",
   "@type": [
     "Light",

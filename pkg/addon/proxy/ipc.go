@@ -3,6 +3,7 @@ package proxy
 import (
 	"fmt"
 	"github.com/fasthttp/websocket"
+	json "github.com/json-iterator/go"
 	"net/url"
 	"sync"
 )
@@ -18,6 +19,7 @@ type IpcClient struct {
 	sendLock sync.Mutex
 	origin   string
 	verbose  bool
+	done     chan struct{}
 }
 
 // NewClient 新建一个Client，注册消息Handler
@@ -25,6 +27,7 @@ func NewClient(handler handler, path string) *IpcClient {
 	u := url.URL{Scheme: "ws", Host: "localhost:" + path, Path: "/"}
 	client := &IpcClient{}
 	client.handler = handler
+	client.done = make(chan struct{})
 	client.url = u.String()
 	var err error = nil
 	client.ws, _, err = websocket.DefaultDialer.Dial(client.url, nil)
@@ -39,7 +42,8 @@ func NewClient(handler handler, path string) *IpcClient {
 func (client *IpcClient) Send(message any) {
 	client.sendLock.Lock()
 	defer client.sendLock.Unlock()
-	err := client.ws.WriteJSON(message)
+	data, _ := json.Marshal(message)
+	err := client.ws.WriteMessage(websocket.TextMessage, data)
 	if err != nil {
 		fmt.Printf("client.Send err: %s \r\n", err.Error())
 		return
@@ -47,17 +51,26 @@ func (client *IpcClient) Send(message any) {
 }
 
 func (client *IpcClient) readLoop() {
+
 	for {
-		_, message, err := client.ws.ReadMessage()
-		if err != nil {
-			fmt.Printf("read messages error: %s", err.Error())
+		select {
+		case <-client.done:
 			return
+		default:
+			_, message, err := client.ws.ReadMessage()
+			if err != nil {
+				fmt.Printf("read messages error: %s", err.Error())
+				return
+			}
+			client.handler.OnMessage(message)
 		}
-		client.handler.OnMessage(message)
 	}
 }
 
 func (client *IpcClient) close() {
+	select {
+	case client.done <- struct{}{}:
+	}
 	if client.ws != nil {
 		_ = client.ws.Close()
 	}

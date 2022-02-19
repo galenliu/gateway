@@ -1,14 +1,16 @@
 package properties
 
-import "math"
+import (
+	"github.com/xiam/to"
+	"math"
+)
 
 type Integer int64
 
 type IntegerEntity interface {
 	Entity
-	GetMinValue() Integer
-	GetMaxValue() Integer
 	GetValue() Integer
+	CheckValue(any) Integer
 }
 
 type IntegerProperty struct {
@@ -34,7 +36,12 @@ func (prop *IntegerProperty) OnValueRemoteUpdate(fn func(int)) {
 	//})
 }
 
-func (prop *IntegerProperty) GetMinValue() Integer {
+func (prop *IntegerProperty) CheckValue(v any) Integer {
+	to.Int64(v)
+	return prop.clamp(v.(Integer))
+}
+
+func (prop *IntegerProperty) getMinValue() Integer {
 	if v := prop.GetMinimum(); v != nil {
 		f, ok := v.(Integer)
 		if ok {
@@ -44,7 +51,7 @@ func (prop *IntegerProperty) GetMinValue() Integer {
 	return math.MinInt64
 }
 
-func (prop *IntegerProperty) GetMaxValue() Integer {
+func (prop *IntegerProperty) getMaxValue() Integer {
 	if v := prop.GetMaximum(); v != nil {
 		f, ok := v.(Integer)
 		if ok {
@@ -57,4 +64,25 @@ func (prop *IntegerProperty) GetMaxValue() Integer {
 func (prop *IntegerProperty) GetValue() Integer {
 	v := prop.Value.(Integer)
 	return v
+}
+
+func (prop *IntegerProperty) clamp(v Integer) Integer {
+	value := v
+	if min := prop.GetMinimum(); min != nil {
+		minValue, ok := min.(Integer)
+		if ok {
+			if minValue < value {
+				value = minValue
+			}
+		}
+	}
+	if max := prop.GetMaximum(); max != nil {
+		maxValue, ok := max.(Integer)
+		if ok {
+			if maxValue < value {
+				value = maxValue
+			}
+		}
+	}
+	return value
 }

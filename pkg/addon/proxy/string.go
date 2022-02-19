@@ -6,8 +6,8 @@ import (
 )
 
 type StringInstance interface {
-	properties.Entity
-	SetValue(v string)
+	properties.StringEntity
+	SetValue(v string) error
 }
 
 type StringProxy struct {
@@ -19,12 +19,9 @@ func NewStringProxy(p StringInstance) *StringProxy {
 }
 
 func (p *StringProxy) SetValue(v any) {
-	value, ok := v.(string)
-	if !ok {
-		fmt.Printf("value error:%s", v)
-		return
-	}
-	if ok {
-		p.StringInstance.SetValue(value)
+	value := p.CheckValue(v)
+	err := p.StringInstance.SetValue(value)
+	if err != nil {
+		fmt.Printf("device:%s set property:%s value error: %v", p.GetDevice().GetId(), p.GetName(), err)
 	}
 }

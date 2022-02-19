@@ -30,7 +30,7 @@ func (on *On) TurnOff() error {
 func (on *On) TurnOn() error {
 	_, err := on.bulb.TurnOn()
 	if err != nil {
-		return nil
+		return err
 	}
 	on.SetCachedValue(true)
 	on.NotifyChanged()

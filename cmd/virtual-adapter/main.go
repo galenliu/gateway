@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/galenliu/gateway/cmd/virtual-adapter/virtual"
 	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight"
@@ -12,6 +13,7 @@ import (
 )
 
 func main() {
+	ctx, cancelFunc := context.WithCancel(context.Background())
 	manager, err := proxy.NewAddonManager("virtual-adapter-go")
 	if err != nil {
 		fmt.Printf("err: %s", err.Error())
@@ -22,13 +24,6 @@ func main() {
 
 	manager.RegisteredAdapter(yeeAdapter, virtualAdapter)
 
-	go func() {
-		for {
-			yeeAdapter.StartPairing(nil)
-			time.Sleep(60 * time.Second)
-		}
-	}()
-
 	interruptChannel := make(chan os.Signal, 1)
 	signal.Notify(interruptChannel, syscall.SIGINT, syscall.SIGTERM)
 
@@ -36,15 +31,31 @@ func main() {
 		for {
 			select {
 			case _ = <-interruptChannel:
+				cancelFunc()
 				manager.Close()
+			}
+		}
+	}()
+
+	go func() {
+		c, f := context.WithCancel(ctx)
+		for {
+			yeeAdapter.StartPairing(nil)
+			select {
+			case <-c.Done():
+				f()
+				return
+			default:
+				time.Sleep(120 * time.Second)
 			}
 		}
 	}()
 
 	for {
 		if manager.IsRunning() {
-			time.Sleep(2 * time.Second)
+			time.Sleep(5 * time.Second)
 		} else {
+			cancelFunc()
 			return
 		}
 	}

@@ -1,7 +1,6 @@
 package yeelight
 
 import (
-	"fmt"
 	yeelight "github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 )
@@ -21,12 +20,12 @@ func NewBrightness(bulb *yeelight.Yeelight) *Brightness {
 	}
 }
 
-func (b Brightness) SetValue(v properties.Integer) {
+func (b Brightness) SetValue(v properties.Integer) error {
 	_, err := b.bulb.SetBrightness(int(v))
 	if err != nil {
-		fmt.Printf("Error setting brightness:%s\n", err.Error())
-		return
+		return err
 	}
 	b.SetCachedValue(v)
 	b.NotifyChanged()
+	return nil
 }

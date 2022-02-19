@@ -2,7 +2,13 @@ package properties
 
 import (
 	"fmt"
+	"github.com/xiam/to"
 )
+
+type BooleanEntity interface {
+	Entity
+	CheckValue(v any) bool
+}
 
 type BooleanProperty struct {
 	*Property
@@ -36,4 +42,8 @@ func (prop *BooleanProperty) OnValueRemoteUpdate(fn func(bool)) {
 func (prop *BooleanProperty) GetValue() bool {
 	v := prop.Value.(bool)
 	return v
+}
+
+func (prop *BooleanProperty) CheckValue(v any) bool {
+	return to.Bool(v)
 }

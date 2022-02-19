@@ -1,13 +1,15 @@
 package properties
 
-import "math"
+import (
+	"github.com/xiam/to"
+	"math"
+)
 
 type Number float64
 
 type NumberEntity interface {
 	Entity
-	GetMaxValue() Number
-	GetMinValue() Number
+	CheckValue(v any) Number
 }
 
 type NumberProperty struct {
@@ -44,7 +46,23 @@ func (prop *NumberProperty) GetValue() Number {
 	return v
 }
 
-func (prop *NumberProperty) GetMaxValue() Number {
+func (prop *NumberProperty) CheckValue(v any) Number {
+	f := to.Float64(v)
+	return prop.clamp(Number(f))
+}
+
+func (prop *NumberProperty) clamp(v Number) Number {
+	value := v
+	if max := prop.getMaxValue(); max < value {
+		value = max
+	}
+	if min := prop.getMinValue(); min > value {
+		value = min
+	}
+	return value
+}
+
+func (prop *NumberProperty) getMaxValue() Number {
 	if v := prop.GetMaximum(); v != nil {
 		f, ok := v.(Number)
 		if ok {
@@ -54,7 +72,7 @@ func (prop *NumberProperty) GetMaxValue() Number {
 	return math.MaxFloat64
 }
 
-func (prop *NumberProperty) GetMinValue() Number {
+func (prop *NumberProperty) getMinValue() Number {
 	if v := prop.GetMinimum(); v != nil {
 		n, ok := v.(Number)
 		if ok {

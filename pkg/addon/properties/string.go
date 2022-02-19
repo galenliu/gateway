@@ -1,5 +1,12 @@
 package properties
 
+import "github.com/xiam/to"
+
+type StringEntity interface {
+	Entity
+	CheckValue(v any) string
+}
+
 type StringProperty struct {
 	*Property
 }
@@ -28,6 +35,11 @@ func (prop *StringProperty) OnValueRemoteUpdate(fn func(string)) {
 	//prop.OnValueUpdate(func(Property *addon.PropertyProxy, newValue, oldValue interface{}) {
 	//	fn(newValue.(string))
 	//)
+}
+
+func (prop *StringProperty) CheckValue(v any) string {
+	s := to.String(v)
+	return s
 }
 
 func (prop *StringProperty) GetValue() string {

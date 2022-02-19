@@ -6,7 +6,7 @@ import (
 )
 
 type BooleanInstance interface {
-	properties.Entity
+	properties.BooleanEntity
 	TurnOff() error
 	TurnOn() error
 }
@@ -28,11 +28,13 @@ func (p *BooleanProxy) SetValue(v any) {
 	if value {
 		err := p.BooleanInstance.TurnOn()
 		if err != nil {
+			fmt.Printf("device %s turn on error: %s", p.GetDevice().GetId(), err.Error())
 			return
 		}
 	} else {
 		err := p.BooleanInstance.TurnOff()
 		if err != nil {
+			fmt.Printf("device %s turn off error: %s", p.GetDevice().GetId(), err.Error())
 			return
 		}
 	}

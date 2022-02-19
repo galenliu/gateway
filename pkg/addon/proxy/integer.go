@@ -1,12 +1,13 @@
 package proxy
 
 import (
+	"fmt"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 )
 
 type IntegerInstance interface {
 	properties.IntegerEntity
-	SetValue(v properties.Integer)
+	SetValue(v properties.Integer) error
 }
 
 type IntegerProxy struct {
@@ -18,15 +19,9 @@ func NewIntegerProxy(p IntegerInstance) *IntegerProxy {
 }
 
 func (p *IntegerProxy) SetValue(v any) {
-	f, ok := v.(float64)
-	value := properties.Integer(f)
-	if ok {
-		if min := p.GetMinValue(); min > value {
-			value = min
-		}
-		if max := p.GetMaxValue(); max < value {
-			value = max
-		}
+	value := p.CheckValue(v)
+	err := p.IntegerInstance.SetValue(value)
+	if err != nil {
+		fmt.Printf("device:%s set property:%s value error: %v", p.GetDevice().GetId(), p.GetName(), err)
 	}
-	p.IntegerInstance.SetValue(value)
 }

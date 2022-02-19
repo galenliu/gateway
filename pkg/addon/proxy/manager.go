@@ -16,7 +16,6 @@ type Manager struct {
 	verbose     bool
 	running     bool
 	registered  bool
-	components  sync.Map
 	userProfile *messages.PluginRegisterResponseJsonDataUserProfile
 	preferences *messages.PluginRegisterResponseJsonDataPreferences
 }
