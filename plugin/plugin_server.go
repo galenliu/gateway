@@ -27,15 +27,14 @@ func NewPluginServer(manager *Manager) *PluginsServer {
 }
 
 func (s *PluginsServer) RegisterPlugin(connection ipc.Connection) (ipc.PluginHandler, error) {
-	mt, d, err := connection.ReadMessage()
+	m, err := connection.ReadMessage()
 	if err != nil {
 		return nil, err
 	}
-	data, err := json.Marshal(d)
-	if mt != messages.MessageType_PluginRegisterRequest {
+	data, err := json.Marshal(m.Data)
+	if m.MessageType != messages.MessageType_PluginRegisterRequest {
 		return nil, fmt.Errorf("MessageType need PluginRegisterRequest")
 	}
-
 	var registerMessage messages.PluginRegisterRequestJsonData
 	err = json.Unmarshal(data, &registerMessage)
 	if err != nil {

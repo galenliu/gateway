@@ -86,16 +86,12 @@ func (s *WebSocketServer) readLoop(conn *websocket.Conn) {
 		}
 	}()
 	for {
-		mt, data, err := con.ReadMessage()
+		m, err := con.ReadMessage()
 		if err != nil {
-			if mt == messages.MessageType_MashalERROR {
-				s.logger.Infof(err.Error())
-				continue
-			}
 			s.logger.Errorf("plugin read err : %s", err.Error())
 			return
 		}
-		pluginHandler.OnMsg(mt, data)
+		pluginHandler.OnMsg(m.MessageType, m.Data)
 	}
 }
 
