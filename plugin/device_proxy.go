@@ -164,10 +164,15 @@ func newDeviceFromMessage(adapter *Adapter, msg messages.Device) *device {
 			}(),
 			Description: "",
 			Links:       linksFunc(msg.Links),
-			BaseHref:    *msg.BaseHref,
-			Pin:         pinFunc(msg.Pin),
-			Actions:     actionsFunc(msg.Actions),
-			Events:      eventsFunc(msg.Events),
+			BaseHref: func() string {
+				if msg.BaseHref == nil {
+					return ""
+				}
+				return *msg.BaseHref
+			}(),
+			Pin:     pinFunc(msg.Pin),
+			Actions: actionsFunc(msg.Actions),
+			Events:  eventsFunc(msg.Events),
 			CredentialsRequired: func() bool {
 				if msg.CredentialsRequired == nil {
 					return false
@@ -196,7 +201,7 @@ func (device *device) onPropertyChanged(property properties.PropertyDescription)
 		case task <- property.Value:
 		}
 	}
-	p := device.GetPropertyEntity(property.Name)
+	p := device.GetProperty(property.Name)
 	if p == nil {
 		return
 	}
@@ -281,7 +286,7 @@ func (device *device) requestAction(ctx context.Context, id, name string, input 
 
 func (device *device) setPropertyValue(ctx context.Context, name string, value any) (any, error) {
 
-	p := device.GetPropertyEntity(name)
+	p := device.GetProperty(name)
 	if p == nil {
 		return nil, errors.New("property not found")
 	}

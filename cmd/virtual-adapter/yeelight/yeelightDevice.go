@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg"
 	"github.com/galenliu/gateway/pkg/addon/devices"
-	"github.com/galenliu/gateway/pkg/addon/proxy"
 	"github.com/xiam/to"
 	"strconv"
 )
@@ -37,7 +36,7 @@ func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
 					}
 				}
 			}
-			yeeDevice.AddProperty(proxy.NewBooleanProxy(prop))
+			yeeDevice.AddProperty(prop)
 		case "set_bright":
 			prop := NewBrightness(bulb)
 			propValue := bulb.GetPropertyValue("bright")
@@ -50,7 +49,7 @@ func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
 					}
 				}
 			}
-			yeeDevice.AddProperty(proxy.NewIntegerProxy(prop))
+			yeeDevice.AddProperty(prop)
 		case "set_rgb":
 			prop := NewColor(bulb)
 			propValue := bulb.GetPropertyValue("rgb")
@@ -61,7 +60,7 @@ func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
 					prop.SetCachedValue(color)
 				}
 			}
-			yeeDevice.AddProperty(proxy.NewStringProxy(prop))
+			yeeDevice.AddProperty(prop)
 		default:
 			continue
 		}
@@ -87,19 +86,18 @@ func (d *YeelightDevice) Listen() error {
 	for {
 		select {
 		case msg := <-notify:
-			fmt.Printf("notify: %s", msg)
 			for n, v := range msg.Params {
 				if n == "power" {
 					b := v == "on"
-					d.GetPropertyEntity("on").SetCachedValueAndNotify(b)
+					d.GetProperty("on").SetCachedValueAndNotify(b)
 				}
 				if n == "bright" {
-					d.GetPropertyEntity("bright").SetCachedValueAndNotify(v)
+					d.GetProperty("bright").SetCachedValueAndNotify(v)
 				}
 				if n == "rgb" {
 					i := to.Int64(v)
 					v := "#" + fmt.Sprintf("%X", i)
-					d.GetPropertyEntity("color").SetCachedValueAndNotify(v)
+					d.GetProperty("color").SetCachedValueAndNotify(v)
 				}
 			}
 		}

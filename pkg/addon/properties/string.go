@@ -1,10 +1,14 @@
 package properties
 
-import "github.com/xiam/to"
+import (
+	"fmt"
+	"github.com/xiam/to"
+)
 
 type StringEntity interface {
 	Entity
 	CheckValue(v any) string
+	SetValue(v string) error
 }
 
 type StringProperty struct {
@@ -19,8 +23,8 @@ func NewStringProperty(description PropertyDescription) *StringProperty {
 }
 
 // SetValue sets a value
-func (prop *StringProperty) SetValue(value string) {
-	//	prop.UpdateValue(value)
+func (prop *StringProperty) SetValue(v string) error {
+	return fmt.Errorf("device:%s property:%s set value:%v not implemented ", prop.GetDevice().GetId(), prop.GetName(), v)
 }
 
 // OnValueRemoteGet calls fn when the value was read by a client.

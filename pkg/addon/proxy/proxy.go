@@ -8,19 +8,6 @@ import (
 	"time"
 )
 
-type PropertyProxy interface {
-	properties.Entity
-	SetValue(a any)
-}
-
-type DeviceProxy interface {
-	devices.Entity
-	GetProperty(id string) PropertyProxy
-	properties.DeviceHandler
-	SetCredentials(username, password string) error
-	SetPin(pin string) error
-}
-
 type ManagerProxy interface {
 	HandleDeviceAdded(device DeviceProxy)
 	HandleDeviceRemoved(device DeviceProxy)
@@ -45,10 +32,4 @@ type AdapterProxy interface {
 	HandleDeviceSaved(DeviceProxy)
 	HandleDeviceRemoved(DeviceProxy)
 	CancelRemoveThing(id string)
-}
-
-type IntegrationProxy interface {
-	GetName() string
-	GetId() string
-	GetPackageName() string
 }

@@ -8,6 +8,8 @@ import (
 type BooleanEntity interface {
 	Entity
 	CheckValue(v any) bool
+	TurnOn() error
+	TurnOff() error
 }
 
 type BooleanProperty struct {
@@ -46,4 +48,12 @@ func (prop *BooleanProperty) GetValue() bool {
 
 func (prop *BooleanProperty) CheckValue(v any) bool {
 	return to.Bool(v)
+}
+
+func (prop *BooleanProperty) TurnOn() error {
+	return fmt.Errorf("device:%s property:%s turn on not implemented ", prop.GetDevice().GetId(), prop.GetName())
+}
+
+func (prop *BooleanProperty) TurnOff() error {
+	return fmt.Errorf("device:%s property:%s turn off not implemented ", prop.GetDevice().GetId(), prop.GetName())
 }

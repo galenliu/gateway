@@ -40,13 +40,14 @@ func main() {
 	go func() {
 		c, f := context.WithCancel(ctx)
 		for {
+			fmt.Printf("automatically discover deivces every 30 minute\n")
 			yeeAdapter.StartPairing(nil)
 			select {
 			case <-c.Done():
 				f()
 				return
 			default:
-				time.Sleep(120 * time.Second)
+				time.Sleep(30 * time.Minute)
 			}
 		}
 	}()

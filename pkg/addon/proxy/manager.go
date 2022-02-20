@@ -3,6 +3,7 @@ package proxy
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon/manager"
+	"github.com/galenliu/gateway/pkg/addon/properties"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	json "github.com/json-iterator/go"
 	"sync"
@@ -52,19 +53,6 @@ func (m *Manager) RegisteredAdapter(adapters ...AdapterProxy) {
 			AdapterId:   adapter.GetId(),
 			Name:        adapter.GetName(),
 			PackageName: adapter.GetPackageName(),
-			PluginId:    m.pluginId,
-		})
-	}
-}
-
-func (m *Manager) RegisteredIntegration(integrations ...IntegrationProxy) {
-	for _, ig := range integrations {
-
-		m.AddIntegration(ig)
-		m.Send(messages.MessageType_AdapterAddedNotification, messages.AdapterAddedNotificationJsonData{
-			AdapterId:   ig.GetId(),
-			Name:        ig.GetName(),
-			PackageName: ig.GetPackageName(),
 			PluginId:    m.pluginId,
 		})
 	}
@@ -244,7 +232,53 @@ func (m *Manager) OnMessage(data []byte) {
 			fmt.Printf("can not found propertyName(%s)", msg.PropertyName)
 			return
 		}
-		go prop.SetValue(msg.PropertyValue)
+		go func() {
+			switch prop.GetType() {
+			case properties.TypeBoolean:
+				p, ok := prop.(properties.BooleanEntity)
+				if ok {
+					b := p.CheckValue(msg.PropertyValue)
+					if b {
+						err := p.TurnOn()
+						if err != nil {
+							fmt.Printf(err.Error())
+						}
+					} else {
+						err := p.TurnOff()
+						if err != nil {
+							fmt.Printf(err.Error())
+						}
+					}
+				}
+			case properties.TypeInteger:
+				p, ok := prop.(properties.IntegerEntity)
+				if ok {
+					value := p.CheckValue(msg.PropertyValue)
+					err := p.SetValue(value)
+					if err != nil {
+						fmt.Printf(err.Error())
+					}
+				}
+			case properties.TypeNumber:
+				p, ok := prop.(properties.NumberEntity)
+				if ok {
+					value := p.CheckValue(msg.PropertyValue)
+					err := p.SetValue(value)
+					if err != nil {
+						fmt.Printf(err.Error())
+					}
+				}
+			case properties.TypeString:
+				p, ok := prop.(properties.StringEntity)
+				if ok {
+					value := p.CheckValue(msg.PropertyValue)
+					err := p.SetValue(value)
+					if err != nil {
+						fmt.Printf(err.Error())
+					}
+				}
+			}
+		}()
 		return
 
 	case messages.MessageType_DeviceSetPinRequest:

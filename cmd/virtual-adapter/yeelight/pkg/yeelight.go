@@ -17,7 +17,7 @@ const (
 	discoverMSG = "M-SEARCH * HTTP/1.1\r\n HOST:239.255.255.250:1982\r\n MAN:\"ssdp:discover\"\r\n ST:wifi_bulb\r\n"
 
 	// timeout value for TCP and UDP commands
-	timeout = time.Second * 3
+	timeout = time.Second * 2
 	//SSDP discover address
 	ssdpAddr = "239.255.255.250:1982"
 	//CR-LF delimiter

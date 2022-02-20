@@ -14,13 +14,13 @@ false
 PUT http://localhost:9090/things/192.168.1.101:55443/properties/bright
 Content-Type: application/x-www-form-urlencoded
 
-79
+11
 
 ### set hue
 PUT http://localhost:9090/things/192.168.1.101:55443/properties/color
 Content-Type: application/x-www-form-urlencoded
 
-"00f000"
+"0000ff"
 
 ###GET Things
 GET http://localhost:9090/things

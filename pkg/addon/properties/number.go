@@ -1,6 +1,7 @@
 package properties
 
 import (
+	"fmt"
 	"github.com/xiam/to"
 	"math"
 )
@@ -10,6 +11,7 @@ type Number float64
 type NumberEntity interface {
 	Entity
 	CheckValue(v any) Number
+	SetValue(Number) error
 }
 
 type NumberProperty struct {
@@ -20,11 +22,6 @@ func NewNumberProperty() *NumberProperty {
 	p := &NumberProperty{}
 	p.Type = TypeNumber
 	return p
-}
-
-// SetValue sets a value
-func (prop *NumberProperty) SetValue(value float64) {
-	//prop.UpdateValue(value)
 }
 
 // OnValueRemoteGet calls fn when the value was read by a client.
@@ -80,4 +77,8 @@ func (prop *NumberProperty) getMinValue() Number {
 		}
 	}
 	return math.MinInt64
+}
+
+func (prop *NumberProperty) SetValue(v Number) error {
+	return fmt.Errorf("device:%s property:%s set value:%v not implemented ", prop.GetDevice().GetId(), prop.GetName(), v)
 }

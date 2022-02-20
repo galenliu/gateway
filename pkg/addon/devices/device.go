@@ -1,6 +1,7 @@
 package devices
 
 import (
+	"fmt"
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/events"
 	"github.com/galenliu/gateway/pkg/addon/properties"
@@ -22,10 +23,13 @@ type Entity interface {
 	GetAdapter() AdapterHandler
 	GetId() string
 	GetAtContext() string
-	GetPropertyEntity(id string) properties.Entity
+	GetProperty(id string) properties.Entity
 	GetAtType() []string
 	ToMessage() *messages.Device
 	NotifyPropertyChanged(p properties.PropertyDescription)
+
+	SetCredentials(username, password string) error
+	SetPin(pin string) error
 }
 
 type DeviceDescription struct {
@@ -125,7 +129,7 @@ func (d *Device) GetProperties() map[string]properties.Entity {
 	return d.Properties
 }
 
-func (d *Device) GetPropertyEntity(id string) properties.Entity {
+func (d *Device) GetProperty(id string) properties.Entity {
 	p, ok := d.Properties[id]
 	if ok {
 		return p
@@ -170,11 +174,16 @@ func (d *Device) NotifyPropertyChanged(p properties.PropertyDescription) {
 }
 
 func (d *Device) ToMessage() *messages.Device {
-	baseHref := "/things/" + d.GetId()
 	return &messages.Device{
-		Context:             &d.Context,
-		Type:                d.AtType,
-		BaseHref:            &baseHref,
+		Context: &d.Context,
+		Type:    d.AtType,
+		BaseHref: func() *string {
+			if d.BaseHref == "" {
+				return nil
+			}
+			s := d.BaseHref
+			return &s
+		}(),
 		CredentialsRequired: nil,
 		Description:         nil,
 		Id:                  d.GetId(),
@@ -203,4 +212,12 @@ func (d *Device) ToMessage() *messages.Device {
 		}(d.Actions),
 		Title: nil,
 	}
+}
+
+func (d *Device) SetCredentials(username, password string) error {
+	return fmt.Errorf("device:%s SetCredentials not implemented", d.GetId())
+}
+
+func (d *Device) SetPin(pin string) error {
+	return fmt.Errorf("device:%s SetPin not implemented", d.GetId())
 }

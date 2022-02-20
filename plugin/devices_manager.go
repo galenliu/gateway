@@ -12,7 +12,7 @@ func (m *Manager) SetPropertyValue(ctx context.Context, deviceId, propName strin
 	if device == nil {
 		return nil, fmt.Errorf("device:%s not found", deviceId)
 	}
-	p := device.GetPropertyEntity(propName)
+	p := device.GetProperty(propName)
 	if p == nil {
 		return nil, fmt.Errorf("property:%s not found", propName)
 	}
@@ -24,7 +24,7 @@ func (m *Manager) GetPropertyValue(thingId, propName string) (any, error) {
 	if device == nil {
 		return nil, fmt.Errorf("device:%s not found", thingId)
 	}
-	p := device.GetPropertyEntity(propName)
+	p := device.GetProperty(propName)
 	if p == nil {
 		return nil, fmt.Errorf("property:%s not found", propName)
 	}

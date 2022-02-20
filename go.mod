@@ -19,7 +19,6 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.9.0
-	github.com/statusmachine/urlidentification v0.0.0-20151022172627-7e9a5439cbf3
 	github.com/xiam/to v0.0.0-20200126224905-d60d31e03561
 	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c

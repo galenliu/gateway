@@ -1,6 +1,7 @@
 package properties
 
 import (
+	"fmt"
 	"github.com/xiam/to"
 	"math"
 )
@@ -11,6 +12,7 @@ type IntegerEntity interface {
 	Entity
 	GetValue() Integer
 	CheckValue(any) Integer
+	SetValue(v Integer) error
 }
 
 type IntegerProperty struct {
@@ -37,8 +39,8 @@ func (prop *IntegerProperty) OnValueRemoteUpdate(fn func(int)) {
 }
 
 func (prop *IntegerProperty) CheckValue(v any) Integer {
-	to.Int64(v)
-	return prop.clamp(v.(Integer))
+	value := to.Int64(v)
+	return prop.clamp(Integer(value))
 }
 
 func (prop *IntegerProperty) getMinValue() Integer {
@@ -85,4 +87,8 @@ func (prop *IntegerProperty) clamp(v Integer) Integer {
 		}
 	}
 	return value
+}
+
+func (prop *IntegerProperty) SetValue(v Integer) error {
+	return fmt.Errorf("device:%s property:%s set value:%v not implemented ", prop.GetDevice().GetId(), prop.GetName(), v)
 }
