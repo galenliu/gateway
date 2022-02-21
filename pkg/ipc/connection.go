@@ -42,24 +42,24 @@ func (c *connection) WriteMessage(mt messages.MessageType, data any) error {
 	return nil
 }
 
-func (c *connection) ReadMessage() (messages.MessageType, any, error) {
+func (c *connection) ReadMessage() (*BaseMessage, error) {
 	_, data, err := c.Conn.ReadMessage()
 	if err != nil {
-		return 0, nil, fmt.Errorf("read message error: %v", err.Error())
+		return nil, fmt.Errorf("read message error: %v", err.Error())
 	}
 	if data == nil {
-		return 0, nil, fmt.Errorf("invalid data")
+		return nil, fmt.Errorf("invalid data")
 	}
 	//var msg rpc.BaseMessage
 	var m BaseMessage
 	err = json.Unmarshal(data, &m)
 	if err != nil {
-		return messages.MessageType_MashalERROR, nil, fmt.Errorf("marshal err: %s", err.Error())
+		return nil, fmt.Errorf("marshal err: %s", err.Error())
 	}
 	if c.registered {
 		c.logger.Debugf("rev %s message :%s \t\n", c.getPluginId(), util.JsonIndent(m))
 	}
-	return m.MessageType, m.Data, nil
+	return &m, nil
 }
 
 func (c *connection) getPluginId() string {

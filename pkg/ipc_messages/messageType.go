@@ -54,7 +54,6 @@ const (
 	MessageType_OutletNotifyRequest                MessageType = 16386
 	MessageType_OutletNotifyResponse               MessageType = 16387
 	MessageType_OutletRemovedNotification          MessageType = 16385
-	MessageType_MashalERROR                        MessageType = 81000
 )
 
 // Enum value maps for MessageType.
