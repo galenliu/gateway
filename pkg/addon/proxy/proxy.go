@@ -24,7 +24,7 @@ type AdapterProxy interface {
 	GetDevice(deviceId string) DeviceProxy
 	GetName() string
 	GetPackageName() string
-	Registered(m ManagerProxy)
+	Registered(m *Manager)
 	SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription)
 	Unload()
 	CancelPairing()

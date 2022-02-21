@@ -12,7 +12,7 @@ import (
 type Adapter struct {
 	*adapter.Adapter
 	name      string
-	manager   ManagerProxy
+	manager   *Manager
 	IsPairing bool
 	verbose   bool
 	pluginId  string
@@ -191,7 +191,7 @@ func (a *Adapter) CancelRemoveThing(id string) {
 	fmt.Printf("Adapter:%s CancelRemoveThing func not implemented\t\n", a.GetId())
 }
 
-func (a *Adapter) Registered(manager ManagerProxy) {
+func (a *Adapter) Registered(manager *Manager) {
 	a.manager = manager
 	a.pluginId = manager.GetPluginId()
 }
