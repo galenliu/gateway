@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	things "github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/events"
@@ -30,21 +31,38 @@ func NewWsClint(ws *websocket.Conn, thingId string, container things.Container, 
 	return c
 }
 
-func (c *wsClint) handle() {
-	var unsubscribe func()
+func (c *wsClint) handle() error {
+	var unsubscribeFuncs = make([]func(), 0)
+	c.logger.Debug("handle websocket:", c.ws.LocalAddr())
+
+	onThingAdded := func(message topic.ThingAddedMessage) {
+		c.logger.Infof("OnThingsAdded message: %s", message)
+		err := c.ws.WriteJSON(map[string]any{
+			"id":          message.ThingId,
+			"messageType": constant.ThingAdded,
+			"data":        struct{}{},
+		})
+		if err != nil {
+			c.logger.Error("websocket send %s message err : %s", constant.ThingAdded, err.Error())
+		}
+		thing := c.container.GetThing(message.ThingId)
+		if thing == nil {
+			return
+		}
+		c.addThing(thing)
+	}
+
 	if c.thingId == "" {
 		ts := c.container.GetThings()
-		unsubscribe = c.container.Subscribe(topic.ThingAdded, func(msg topic.ThingAddedMessage) {
-			thing := c.container.GetThing(msg.ThingId)
-			c.addThing(thing)
-		})
+		f := c.container.Subscribe(topic.ThingAdded, onThingAdded)
+		unsubscribeFuncs = append(unsubscribeFuncs, f)
 		for _, t := range ts {
 			c.addThing(t)
 		}
 	} else {
 		t := c.container.GetThing(c.thingId)
 		if t == nil {
-			return
+			return fmt.Errorf("thing:%s not found in container", c.thingId)
 		}
 		c.addThing(t)
 	}
@@ -52,14 +70,16 @@ func (c *wsClint) handle() {
 	for {
 		mt, data, err := c.ws.ReadMessage()
 		if mt == websocket.CloseMessage {
-			c.logger.Info("websocket %s close message from ws :", c.ws.LocalAddr())
-			return
+			return fmt.Errorf("websocket %s close message", c.ws.LocalAddr())
 		}
 		if err != nil {
-			if unsubscribe != nil {
-				unsubscribe()
+			if unsubscribeFuncs != nil && len(unsubscribeFuncs) > 0 {
+				for _, f := range unsubscribeFuncs {
+					f()
+				}
 			}
-			return
+			fmt.Printf("websocket close: %s", c.ws.LocalAddr())
+			return err
 		}
 		go c.handleMessage(data)
 	}
@@ -67,19 +87,6 @@ func (c *wsClint) handle() {
 
 func (c *wsClint) handleMessage(data []byte) {
 	c.logger.Infof("websocket read message: %s", data)
-}
-
-func (c *wsClint) sendMessage(messageType string, data map[string]any) {
-	err := c.ws.WriteJSON(struct {
-		MessageType string         `json:"messageType"`
-		Data        map[string]any `json:"data"`
-	}{
-		MessageType: messageType,
-		Data:        data,
-	})
-	if err != nil {
-		c.logger.Error("send message err: %s", err)
-	}
 }
 
 func (c *wsClint) close() {
@@ -92,7 +99,8 @@ func (c *wsClint) close() {
 
 func (c *wsClint) addThing(t *things.Thing) {
 
-	onConnected := func(message topic.ThingConnectedMessage) {
+	onThingConnected := func(message topic.ThingConnectedMessage) {
+		c.logger.Infof("onThingConnected message: %s", message)
 		if message.ThingId != t.GetId() {
 			return
 		}
@@ -105,9 +113,10 @@ func (c *wsClint) addThing(t *things.Thing) {
 			c.logger.Error("websocket send %s message err : %s", constant.Connected, err.Error())
 		}
 	}
-	removeConnectedFunc := c.container.Subscribe(topic.ThingConnected, onConnected)
+	removeConnectedFunc := c.container.Subscribe(topic.ThingConnected, onThingConnected)
 
 	onThingRemoved := func(message topic.ThingRemovedMessage) {
+		c.logger.Infof("onThingRemoved message: %s", message)
 		if message.ThingId != t.GetId() {
 			return
 		}
@@ -130,14 +139,15 @@ func (c *wsClint) addThing(t *things.Thing) {
 		if message.ThingId != t.GetId() {
 			return
 		}
+		c.logger.Infof("onThingModified message: %s", message)
 		err := c.ws.WriteJSON(map[string]any{
 			"id":          t.GetId(),
 			"messageType": constant.ThingModified,
 			"data":        struct{}{},
 		})
 		if err != nil {
+			c.logger.Error("websocket send %s message err : %s", constant.ThingRemoved, err.Error())
 		}
-		c.logger.Error("websocket send %s message err : %s", constant.ThingRemoved, err.Error())
 	}
 	removeModifiedFunc := c.container.Subscribe(topic.ThingModify, onThingModified)
 
@@ -160,6 +170,7 @@ func (c *wsClint) addThing(t *things.Thing) {
 		if message.ThingId != t.GetId() {
 			return
 		}
+		c.logger.Infof("onPropertyChanged message: %s", message)
 		err := c.ws.WriteJSON(map[string]any{
 			"id":          t.GetId(),
 			"messageType": constant.PropertyChanged,
@@ -181,8 +192,9 @@ func (c *wsClint) addThing(t *things.Thing) {
 			"data":        map[string]any{action.GetName(): action.GetDescription()},
 		})
 		if err != nil {
+			c.logger.Error("websocket send %s message err : %s", constant.Event, err.Error())
+
 		}
-		c.logger.Error("websocket send %s message err : %s", constant.Event, err.Error())
 	}
 	removeActionStatusFunc := c.container.Subscribe(topic.ThingActionStatus, onActionStatus)
 

@@ -87,7 +87,7 @@ func (t *Thing) SetSelectedCapability(selectedCapability string) bool {
 			if err != nil {
 				return false
 			}
-			t.container.Publish(topic.ThingModify, topic.ThingModifyMessage{ThingId: t.GetId()})
+			go t.container.Publish(topic.ThingModify, topic.ThingModifyMessage{ThingId: t.GetId()})
 			return true
 		}
 	}
@@ -103,7 +103,7 @@ func (t *Thing) SetTitle(title string) bool {
 	if err != nil {
 		return false
 	}
-	t.container.Publish(topic.ThingModify, topic.ThingModifyMessage{ThingId: t.GetId()})
+	go t.container.Publish(topic.ThingModify, topic.ThingModifyMessage{ThingId: t.GetId()})
 	return true
 }
 
@@ -131,7 +131,7 @@ func (t *Thing) update() {
 	if err != nil {
 		return
 	}
-	t.container.Publish(topic.ThingModify, topic.ThingModifyMessage{ThingId: t.GetId()})
+	go t.container.Publish(topic.ThingModify, topic.ThingModifyMessage{ThingId: t.GetId()})
 }
 
 func (t *Thing) onCreate() {
@@ -139,6 +139,7 @@ func (t *Thing) onCreate() {
 	if err != nil {
 		return
 	}
+	t.container.logger.Infof("thing:%s created", t.GetId())
 	go t.container.Publish(topic.ThingAdded, topic.ThingAddedMessage{ThingId: t.GetId()})
 }
 
@@ -146,7 +147,7 @@ func (t *Thing) onPropertyChanged(msg topic.DevicePropertyChangedMessage) {
 	if p := t.GetProperty(msg.PropertyName); p == nil {
 		return
 	}
-	t.container.Publish(topic.ThingPropertyChanged, topic.ThingPropertyChangedMessage{
+	go t.container.Publish(topic.ThingPropertyChanged, topic.ThingPropertyChangedMessage{
 		ThingId:      t.GetId(),
 		PropertyName: msg.Name,
 		Value:        msg.Value,
@@ -154,7 +155,7 @@ func (t *Thing) onPropertyChanged(msg topic.DevicePropertyChangedMessage) {
 }
 
 func (t *Thing) onActionStatus(a actions.ActionDescription) {
-	t.container.Publish(topic.ThingActionStatus, topic.ThingActionStatusMessage{
+	go t.container.Publish(topic.ThingActionStatus, topic.ThingActionStatusMessage{
 		ThingId: t.GetId(),
 		Action: topic.ThingActionDescription{
 			Id:            a.Id,
@@ -168,7 +169,7 @@ func (t *Thing) onActionStatus(a actions.ActionDescription) {
 }
 
 func (t *Thing) OnEvent(event *events.EventDescription) {
-	t.container.Publish(topic.ThingEvent, t.GetId(), event)
+	go t.container.Publish(topic.ThingEvent, t.GetId(), event)
 }
 
 func (t *Thing) AddAction(name string) bool {
@@ -182,5 +183,5 @@ func (t *Thing) RemoveAction(name string) bool {
 }
 
 func (t *Thing) AddEventSubscription(f func(message topic.ThingEventMessage)) {
-	t.container.Subscribe(topic.ThingEvent+topic.Topic(t.GetId()), f)
+	go t.container.Subscribe(topic.ThingEvent+topic.Topic(t.GetId()), f)
 }

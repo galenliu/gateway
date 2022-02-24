@@ -14,7 +14,10 @@ func handleWebsocket(model things.Container, log logging.Logger) func(conn *webs
 		thingId, _ := c.Locals("thingId").(string)
 		clint := NewWsClint(c, thingId, model, log)
 		defer clint.close()
-		clint.handle()
+		err := clint.handle()
+		if err != nil {
+			log.Errorf(err.Error())
+		}
 	}
 	return handler
 }
