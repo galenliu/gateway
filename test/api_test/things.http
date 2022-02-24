@@ -36,28 +36,21 @@ Content-Type: application/json
 
 {
   "@context": "https://webthings.io/schemas",
-  "title": "10101111101",
-  "id": "1122100--2q332=======33=0001322003",
-  "@type": [
-    "Light",
-    "OnOffSwitch"
-  ],
+  "title": "Yeelight1",
+  "id": "1234567",
+  "@type": ["Light", "OnOffSwitch"],
   "version": {
+    "instance": "",
     "model": "1.0.0"
   },
   "properties": {
     "bright": {
       "@type": "BrightnessProperty",
-      "forms": [
-        {
-          "href": "/properties/bright",
-          "contentType": "application/json",
-          "op": [
-            "readproperty",
-            "writeproperty"
-          ]
-        }
-      ],
+      "forms": [{
+        "href": "/properties/bright",
+        "contentType": "application/json",
+        "op": ["readproperty", "writeproperty"]
+      }],
       "unit": "percentage",
       "type": "integer",
       "minimum": 0,
@@ -65,42 +58,29 @@ Content-Type: application/json
     },
     "color": {
       "@type": "ColorProperty",
-      "forms": [
-        {
-          "href": "/properties/color",
-          "contentType": "application/json",
-          "op": [
-            "readproperty",
-            "writeproperty"
-          ]
-        }
-      ],
+      "forms": [{
+        "href": "/properties/color",
+        "contentType": "application/json",
+        "op": ["readproperty", "writeproperty"]
+      }],
       "type": "string"
     },
     "on": {
       "@type": "OnOffProperty",
-      "forms": [
-        {
-          "href": "/properties/on",
-          "contentType": "application/json",
-          "op": [
-            "readproperty",
-            "writeproperty"
-          ]
-        }
-      ],
+      "forms": [{
+        "href": "/properties/on",
+        "contentType": "application/json",
+        "op": ["readproperty", "writeproperty"]
+      }],
       "type": "boolean"
     }
   },
-  "forms": [
-    {
-      "href": "/properties",
-      "contentType": "application/json",
-      "op": [
-        "readallproperties"
-      ]
-    }
-  ]
+  "forms": [{
+    "href": "/properties",
+    "contentType": "application/json",
+    "op": ["readallproperties"]
+  }],
+  "selectedCapability": "Light"
 }
 
 
