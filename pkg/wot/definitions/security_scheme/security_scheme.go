@@ -2,7 +2,7 @@ package security_scheme
 
 import "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 
-type SecurityScheme any
+type SecurityScheme interface{}
 
 type securityScheme struct {
 	AtType       string            `json:"@type"`

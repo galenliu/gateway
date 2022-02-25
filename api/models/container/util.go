@@ -18,17 +18,14 @@ func AsWebOfThing(device devices.Device) *Thing {
 
 	thing := Thing{
 		Thing: &wot.Thing{
-			AtContext:    controls.URI(device.GetAtContext()),
-			Title:        device.GetTitle(),
-			Titles:       map[string]string{},
-			Id:           controls.NewURI(device.GetId()),
-			AtType:       device.GetAtType(),
-			Description:  device.GetDescription(),
-			Descriptions: map[string]string{},
-			Support:      constant.Support,
-			Version: &wot.VersionInfo{
-				Model: "1.0.0",
-			},
+			AtContext:         controls.URI(device.GetAtContext()),
+			Title:             device.GetTitle(),
+			Titles:            map[string]string{},
+			Id:                controls.NewURI(device.GetId()),
+			AtType:            device.GetAtType(),
+			Description:       device.GetDescription(),
+			Descriptions:      map[string]string{},
+			Support:           constant.Support,
 			Created:           nil,
 			Modified:          nil,
 			Links:             nil,
@@ -38,14 +35,13 @@ func AsWebOfThing(device devices.Device) *Thing {
 		},
 		CredentialsRequired: device.CredentialsRequired,
 		SelectedCapability:  "",
-		Connected:           true,
 		GroupId:             "",
 	}
 
 	thing.Properties = mapOfWotProperties(device.Properties)
-	thing.Actions = mapOfWotActions(device.Actions)
-	thing.Events = mapOfWotEvent(device.Events)
-	thing.Forms = arrayOfThingFrom(thing.Thing)
+	thing.Actions = mapOfWotActions(device, device.Actions)
+	thing.Events = mapOfWotEvent(device, device.Events)
+	thing.Forms = arrayOfThingForms(thing.Thing)
 
 	if device.Pin != nil {
 		thing.Pin = &ThingPin{
@@ -84,7 +80,7 @@ func mapOfWotProperties(props devices.DeviceProperties) (mapOfProperty map[strin
 			Type:         p.GetType(),
 		}
 		form := controls.Form{
-			Href:        controls.URI(fmt.Sprintf("/properties/%s", p.GetName())),
+			Href:        controls.URI(fmt.Sprintf("things/%s/properties/%s", p.GetDevice().GetId(), p.GetName())),
 			ContentType: controls.JSON,
 		}
 		if !dataSchema.ReadOnly && !dataSchema.WriteOnly {
@@ -209,7 +205,7 @@ func mapOfWotProperties(props devices.DeviceProperties) (mapOfProperty map[strin
 	return
 }
 
-func mapOfWotActions(as devices.DeviceActions) (mapOfProperty wot.ThingActions) {
+func mapOfWotActions(device devices.Device, as devices.DeviceActions) (mapOfProperty wot.ThingActions) {
 	asWotAction := func(actionName string, a actions.Action) wot.ActionAffordance {
 		var aa = wot.ActionAffordance{}
 		var i = &ia.InteractionAffordance{
@@ -219,7 +215,7 @@ func mapOfWotActions(as devices.DeviceActions) (mapOfProperty wot.ThingActions) 
 			Description:  a.Description,
 			Descriptions: map[string]string{},
 			Forms: []controls.Form{{
-				Href:        controls.URI(fmt.Sprintf("/actions/%s", actionName)),
+				Href:        controls.URI(fmt.Sprintf("things/%s/actions/%s", device.GetId(), actionName)),
 				ContentType: controls.JSON,
 				Op:          controls.NewOpArray(controls.Invokeaction),
 			}},
@@ -237,7 +233,7 @@ func mapOfWotActions(as devices.DeviceActions) (mapOfProperty wot.ThingActions) 
 	return
 }
 
-func mapOfWotEvent(des devices.DeviceEvents) (es wot.ThingEvents) {
+func mapOfWotEvent(device devices.Device, des devices.DeviceEvents) (es wot.ThingEvents) {
 
 	asWotEvent := func(a events.Event) *wot.EventAffordance {
 		ea := &wot.EventAffordance{
@@ -249,7 +245,7 @@ func mapOfWotEvent(des devices.DeviceEvents) (es wot.ThingEvents) {
 				Descriptions: map[string]string{},
 				Forms: []controls.Form{
 					{
-						Href:        controls.NewURI(fmt.Sprintf("/events/%s", a.Name)),
+						Href:        controls.NewURI(fmt.Sprintf("things/%s/events/%s", device.GetId(), a.Name)),
 						ContentType: controls.JSON,
 						Op:          controls.NewOpArray(controls.SubscribeEvent),
 					},
@@ -275,18 +271,18 @@ func mapOfWotEvent(des devices.DeviceEvents) (es wot.ThingEvents) {
 	return es
 }
 
-func arrayOfThingFrom(t *wot.Thing) []controls.Form {
+func arrayOfThingForms(t *wot.Thing) []controls.Form {
 	var fs = make([]controls.Form, 0)
 	if t.Properties != nil && len(t.Properties) > 0 {
 		fs = append(fs, controls.Form{
-			Href:        "/properties",
+			Href:        controls.NewURI(fmt.Sprintf("/things/%s/properties", t.GetId())),
 			ContentType: controls.JSON,
 			Op:          controls.NewArrayOrString(controls.Readallproperties),
 		})
 	}
 	if t.Events != nil && len(t.Events) > 0 {
 		fs = append(fs, controls.Form{
-			Href:        "/events",
+			Href:        controls.NewURI(fmt.Sprintf("/things/%s/events", t.GetId())),
 			ContentType: controls.JSON,
 			Op:          controls.NewArrayOrString(controls.Subscribeallevents),
 		})
@@ -294,12 +290,11 @@ func arrayOfThingFrom(t *wot.Thing) []controls.Form {
 
 	if t.Actions != nil && len(t.Actions) > 0 {
 		fs = append(fs, controls.Form{
-			Href:        "/actions",
+			Href:        controls.NewURI(fmt.Sprintf("/things/%s/actions", t.GetId())),
 			ContentType: controls.JSON,
 			Op:          controls.NewArrayOrString(controls.Queryallactions),
 		})
 	}
-
 	if len(fs) == 0 {
 		return nil
 	}

@@ -36,52 +36,70 @@ Content-Type: application/json
 
 {
   "@context": "https://webthings.io/schemas",
-  "title": "Yeelight1",
-  "id": "1234567",
-  "@type": ["Light", "OnOffSwitch"],
-  "version": {
-    "instance": "",
-    "model": "1.0.0"
-  },
+  "title": "Yeelight",
+  "id": "192.168.1.12：55443",
+  "@type": [
+    "Light",
+    "OnOffSwitch"
+  ],
   "properties": {
-    "bright": {
-      "@type": "BrightnessProperty",
-      "forms": [{
-        "href": "/properties/bright",
-        "contentType": "application/json",
-        "op": ["readproperty", "writeproperty"]
-      }],
-      "unit": "percentage",
-      "type": "integer",
-      "minimum": 0,
-      "maximum": 100
-    },
     "color": {
       "@type": "ColorProperty",
-      "forms": [{
-        "href": "/properties/color",
-        "contentType": "application/json",
-        "op": ["readproperty", "writeproperty"]
-      }],
+      "forms": [
+        {
+          "href": "things/192.168.1.101:55443/properties/color",
+          "contentType": "application/json",
+          "op": [
+            "readproperty",
+            "writeproperty"
+          ]
+        }
+      ],
       "type": "string"
     },
     "on": {
       "@type": "OnOffProperty",
-      "forms": [{
-        "href": "/properties/on",
-        "contentType": "application/json",
-        "op": ["readproperty", "writeproperty"]
-      }],
+      "forms": [
+        {
+          "href": "things/192.168.1.101:55443/properties/on",
+          "contentType": "application/json",
+          "op": [
+            "readproperty",
+            "writeproperty"
+          ]
+        }
+      ],
       "type": "boolean"
+    },
+    "bright": {
+      "@type": "BrightnessProperty",
+      "forms": [
+        {
+          "href": "things/192.168.1.101:55443/properties/bright",
+          "contentType": "application/json",
+          "op": [
+            "readproperty",
+            "writeproperty"
+          ]
+        }
+      ],
+      "unit": "percentage",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
     }
   },
-  "forms": [{
-    "href": "/properties",
-    "contentType": "application/json",
-    "op": ["readallproperties"]
-  }],
-  "selectedCapability": "Light"
+  "forms": [
+    {
+      "href": "things/192.168.1.101:55443/properties",
+      "contentType": "application/json",
+      "op": [
+        "readallproperties"
+      ]
+    }
+  ]
 }
+
 
 
 

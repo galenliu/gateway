@@ -15,11 +15,12 @@ type ThingSecurityDefinitions map[string]securityScheme.SecurityScheme
 type ThingSchemaDefinitions map[string]dataSchema.DataSchema
 
 type Thing struct {
-	AtContext    controls.URI           `json:"@context,omitempty" wot:"mandatory"`
-	Title        string                 `json:"title,omitempty" wot:"mandatory"`
-	Titles       controls.MultiLanguage `json:"titles,omitempty" wot:"optional"`
-	Id           controls.URI           `json:"id" wot:"optional"`
-	AtType       controls.ArrayOrString `json:"@type"`
+	AtContext controls.URI           `json:"@context,omitempty" wot:"mandatory"`
+	AtType    controls.ArrayOrString `json:"@type" wot:"optional"`
+	Id        controls.URI           `json:"id" wot:"optional"`
+	Title     string                 `json:"title,omitempty" wot:"mandatory"`
+	Titles    controls.MultiLanguage `json:"titles,omitempty" wot:"optional"`
+
 	Description  string                 `json:"description,omitempty" wot:"optional"`
 	Descriptions controls.MultiLanguage `json:"descriptions,omitempty" wot:"optional"`
 
@@ -37,7 +38,8 @@ type Thing struct {
 	Links []controls.Link `json:"links,omitempty"`
 	Forms []controls.Form `json:"forms,omitempty"`
 
-	Security controls.ArrayOrString `json:"security,omitempty" wot:"mandatory"`
+	Security            controls.ArrayOrString   `json:"security,omitempty" wot:"mandatory"`
+	SecurityDefinitions ThingSecurityDefinitions `json:"securityDefinitions" wot:"optional"`
 
 	Profile           []controls.URI         `json:"profile,omitempty" wot:"optional"`
 	SchemaDefinitions ThingSchemaDefinitions `json:"schemaDefinitions,omitempty" wot:"optional"`
