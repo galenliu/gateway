@@ -31,14 +31,18 @@ func (t *EventBus) Subscribe(topic topic.Topic, fn any) func() {
 	top := string(topic)
 	err := t.bus.SubscribeAsync(top, fn, false)
 	if err != nil {
-		fmt.Println(err.Error())
-		return nil
+		fmt.Printf("bus subscription error: %s \t\n", err.Error())
+		return func() {
+			fmt.Printf("bus unsubscribe error: %s \t\n", err.Error())
+		}
 	}
 	return func() {
-		err := t.bus.Unsubscribe(top, fn)
-		if err != nil {
-			fmt.Println(err.Error())
-			return
+		if t.bus.HasCallback(string(topic)) {
+			err := t.bus.Unsubscribe(top, fn)
+			if err != nil {
+				fmt.Printf("bus unsubscribe error: %s \t\n", err.Error())
+				return
+			}
 		}
 	}
 }

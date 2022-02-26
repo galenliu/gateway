@@ -55,7 +55,7 @@ func NewThingsContainerModel(manager Manager, store ThingsStorage, log logging.L
 	t.manager = manager
 	t.ThingsBus = bus.NewBus()
 	t.logger = log
-	t.things = make(map[string]*Thing, 20)
+	t.things = make(map[string]*Thing, 1)
 	t.updateThings()
 	_ = manager.Subscribe(topic.DeviceAdded, t.handleDeviceAdded)
 	_ = manager.Subscribe(topic.DeviceRemoved, t.handleDeviceRemoved)

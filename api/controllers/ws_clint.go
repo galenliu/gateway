@@ -32,11 +32,10 @@ func NewWsClint(ws *websocket.Conn, thingId string, container things.Container, 
 }
 
 func (c *wsClint) handle() error {
-	var unsubscribeFuncs = make([]func(), 0)
-	c.logger.Debug("handle websocket:", c.ws.LocalAddr())
 
+	c.logger.Debug("handle websocket:", c.ws.LocalAddr())
 	onThingAdded := func(message topic.ThingAddedMessage) {
-		c.logger.Infof("OnThingsAdded message: %s", message)
+		c.logger.Infof("OnThingsAdded message: %v", message)
 		err := c.ws.WriteJSON(map[string]any{
 			"id":          message.ThingId,
 			"messageType": constant.ThingAdded,
@@ -46,16 +45,15 @@ func (c *wsClint) handle() error {
 			c.logger.Error("websocket send %s message err : %s", constant.ThingAdded, err.Error())
 		}
 		thing := c.container.GetThing(message.ThingId)
-		if thing == nil {
-			return
+		if thing != nil {
+			c.addThing(thing)
 		}
-		c.addThing(thing)
 	}
 
 	if c.thingId == "" {
 		ts := c.container.GetThings()
 		f := c.container.Subscribe(topic.ThingAdded, onThingAdded)
-		unsubscribeFuncs = append(unsubscribeFuncs, f)
+		c.thingCleanups[""] = f
 		for _, t := range ts {
 			c.addThing(t)
 		}
@@ -69,17 +67,9 @@ func (c *wsClint) handle() error {
 
 	for {
 		mt, data, err := c.ws.ReadMessage()
-		if mt == websocket.CloseMessage {
-			return fmt.Errorf("websocket %s close message", c.ws.LocalAddr())
-		}
-		if err != nil {
-			if unsubscribeFuncs != nil && len(unsubscribeFuncs) > 0 {
-				for _, f := range unsubscribeFuncs {
-					f()
-				}
-			}
-			fmt.Printf("websocket close: %s", c.ws.LocalAddr())
-			return err
+		if mt == websocket.CloseMessage || err != nil {
+			c.close()
+			return fmt.Errorf("websocket  close message")
 		}
 		go c.handleMessage(data)
 	}
@@ -90,11 +80,18 @@ func (c *wsClint) handleMessage(data []byte) {
 }
 
 func (c *wsClint) close() {
-	err := c.ws.Close()
-	if err != nil {
-		c.logger.Infof("%s close", c.ws.LocalAddr().String())
-		return
+	if c.thingCleanups != nil && len(c.thingCleanups) > 0 {
+		for _, f := range c.thingCleanups {
+			f()
+		}
 	}
+	if c.ws != nil {
+		err := c.ws.Close()
+		if err != nil {
+			c.logger.Infof("%s close", c.ws.LocalAddr().String())
+		}
+	}
+	c.ws = nil
 }
 
 func (c *wsClint) addThing(t *things.Thing) {
@@ -130,8 +127,8 @@ func (c *wsClint) addThing(t *things.Thing) {
 			"data":        struct{}{},
 		})
 		if err != nil {
+			c.logger.Error("websocket send %s message err : %s", constant.ThingRemoved, err.Error())
 		}
-		c.logger.Error("websocket send %s message err : %s", constant.ThingRemoved, err.Error())
 	}
 	removeRemovedFunc := c.container.Subscribe(topic.ThingRemoved, onThingRemoved)
 
@@ -177,8 +174,8 @@ func (c *wsClint) addThing(t *things.Thing) {
 			"data":        map[string]any{message.PropertyName: message.Value},
 		})
 		if err != nil {
+			c.logger.Error("websocket send %s message err : %s", constant.Event, err.Error())
 		}
-		c.logger.Error("websocket send %s message err : %s", constant.Event, err.Error())
 	}
 	removePropertyChangedFunc := c.container.Subscribe(topic.ThingPropertyChanged, onPropertyChanged)
 
@@ -193,7 +190,6 @@ func (c *wsClint) addThing(t *things.Thing) {
 		})
 		if err != nil {
 			c.logger.Error("websocket send %s message err : %s", constant.Event, err.Error())
-
 		}
 	}
 	removeActionStatusFunc := c.container.Subscribe(topic.ThingActionStatus, onActionStatus)
