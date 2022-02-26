@@ -29,7 +29,7 @@ type Thing struct {
 
 	Version  *VersionInfo       `json:"version,omitempty" wot:"optional"`
 	Created  *controls.DataTime `json:"created,omitempty" wot:"optional"`
-	Modified *controls.DataTime `json:"modified,omitempty" wot:"optional"`
+	Modified *controls.DataTime `json:"-" wot:"optional"`
 
 	Properties ThingProperties `json:"properties,omitempty" wot:"optional"`
 	Actions    ThingActions    `json:"actions,omitempty" wot:"optional"`
@@ -39,7 +39,7 @@ type Thing struct {
 	Forms []controls.Form `json:"forms,omitempty"`
 
 	Security            controls.ArrayOrString   `json:"security,omitempty" wot:"mandatory"`
-	SecurityDefinitions ThingSecurityDefinitions `json:"securityDefinitions" wot:"optional"`
+	SecurityDefinitions ThingSecurityDefinitions `json:"securityDefinitions,omitempty" wot:"optional"`
 
 	Profile           []controls.URI         `json:"profile,omitempty" wot:"optional"`
 	SchemaDefinitions ThingSchemaDefinitions `json:"schemaDefinitions,omitempty" wot:"optional"`

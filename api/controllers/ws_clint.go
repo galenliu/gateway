@@ -161,8 +161,8 @@ func (c *wsClint) addThing(t *things.Thing) {
 			}{Name: e.GetName(), Event: e},
 		})
 		if err != nil {
+			c.logger.Error("websocket send %s message err : %s", constant.Event, err.Error())
 		}
-		c.logger.Error("websocket send %s message err : %s", constant.Event, err.Error())
 	}
 	removeThingEventStatusFunc := c.container.Subscribe(topic.ThingEvent, onEvent)
 
