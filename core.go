@@ -31,7 +31,6 @@ type Config struct {
 type Gateway struct {
 	*bus.EventBus
 	config       Config
-	bus          *bus.ThingsBus
 	addonManager *plugin.Manager
 	sever        *api.WebServe
 	logger       logging.Logger
@@ -40,7 +39,6 @@ type Gateway struct {
 func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gateway, error) {
 
 	g := &Gateway{}
-	g.EventBus = bus.NewBus()
 	g.logger = logger
 	g.config = config
 	u := &messages.PluginRegisterResponseJsonDataUserProfile{
