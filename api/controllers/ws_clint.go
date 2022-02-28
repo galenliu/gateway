@@ -92,23 +92,35 @@ func (c *wsClint) close() {
 		}
 	}
 	c.ws = nil
+	c.thingCleanups = nil
 }
 
 func (c *wsClint) addThing(t *things.Thing) {
+
+	write := func(id string, messageType string, data any) {
+		if c.ws != nil {
+			err := c.ws.WriteJSON(struct {
+				Id          string `json:"id"`
+				MessageType string `json:"message_type"`
+				Data        any    `json:"data,omitempty"`
+			}{
+				id,
+				messageType,
+				data,
+			})
+			if err != nil {
+				c.logger.Error("websocket error: messageType:%s  err : %s", messageType, err.Error())
+				return
+			}
+		}
+	}
 
 	onThingConnected := func(message topic.ThingConnectedMessage) {
 		c.logger.Infof("onThingConnected message: %s", message)
 		if message.ThingId != t.GetId() {
 			return
 		}
-		err := c.ws.WriteJSON(map[string]any{
-			"id":          t.GetId(),
-			"messageType": constant.Connected,
-			"data":        message.Connected,
-		})
-		if err != nil {
-			c.logger.Error("websocket send %s message err : %s", constant.Connected, err.Error())
-		}
+		write(t.GetId(), constant.Connected, message.Connected)
 	}
 	removeConnectedFunc := c.container.Subscribe(topic.ThingConnected, onThingConnected)
 
@@ -121,14 +133,7 @@ func (c *wsClint) addThing(t *things.Thing) {
 		if ok {
 			f()
 		}
-		err := c.ws.WriteJSON(map[string]any{
-			"id":          t.GetId(),
-			"messageType": constant.ThingRemoved,
-			"data":        struct{}{},
-		})
-		if err != nil {
-			c.logger.Error("websocket send %s message err : %s", constant.ThingRemoved, err.Error())
-		}
+		write(t.GetId(), constant.ThingRemoved, nil)
 	}
 	removeRemovedFunc := c.container.Subscribe(topic.ThingRemoved, onThingRemoved)
 
@@ -136,30 +141,15 @@ func (c *wsClint) addThing(t *things.Thing) {
 		if message.ThingId != t.GetId() {
 			return
 		}
-		c.logger.Infof("onThingModified message: %s", message)
-		err := c.ws.WriteJSON(map[string]any{
-			"id":          t.GetId(),
-			"messageType": constant.ThingModified,
-			"data":        struct{}{},
-		})
-		if err != nil {
-			c.logger.Error("websocket send %s message err : %s", constant.ThingRemoved, err.Error())
-		}
+		write(t.GetId(), constant.ThingModified, nil)
 	}
 	removeModifiedFunc := c.container.Subscribe(topic.ThingModify, onThingModified)
 
 	onEvent := func(e *events.Event) {
-		err := c.ws.WriteJSON(map[string]any{
-			"id":          t.GetId(),
-			"messageType": constant.Event,
-			"data": struct {
-				Name  string        `json:"name"`
-				Event *events.Event `json:"events"`
-			}{Name: e.GetName(), Event: e},
-		})
-		if err != nil {
-			c.logger.Error("websocket send %s message err : %s", constant.Event, err.Error())
-		}
+		write(t.GetId(), constant.Event, struct {
+			Name  string        `json:"name"`
+			Event *events.Event `json:"events"`
+		}{Name: e.GetName(), Event: e})
 	}
 	removeThingEventStatusFunc := c.container.Subscribe(topic.ThingEvent, onEvent)
 
@@ -167,15 +157,8 @@ func (c *wsClint) addThing(t *things.Thing) {
 		if message.ThingId != t.GetId() {
 			return
 		}
+		write(t.GetId(), constant.PropertyChanged, map[string]any{message.PropertyName: message.Value})
 		c.logger.Infof("onPropertyChanged message: %s", message)
-		err := c.ws.WriteJSON(map[string]any{
-			"id":          t.GetId(),
-			"messageType": constant.PropertyChanged,
-			"data":        map[string]any{message.PropertyName: message.Value},
-		})
-		if err != nil {
-			c.logger.Error("websocket send %s message err : %s", constant.Event, err.Error())
-		}
 	}
 	removePropertyChangedFunc := c.container.Subscribe(topic.ThingPropertyChanged, onPropertyChanged)
 
@@ -183,14 +166,7 @@ func (c *wsClint) addThing(t *things.Thing) {
 		if t.GetId() != thingId {
 			return
 		}
-		err := c.ws.WriteJSON(map[string]any{
-			"id":          t.GetId(),
-			"messageType": constant.ActionStatus,
-			"data":        map[string]any{action.GetName(): action.GetDescription()},
-		})
-		if err != nil {
-			c.logger.Error("websocket send %s message err : %s", constant.Event, err.Error())
-		}
+		write(t.GetId(), constant.ActionStatus, map[string]any{action.GetName(): action.GetDescription()})
 	}
 	removeActionStatusFunc := c.container.Subscribe(topic.ThingActionStatus, onActionStatus)
 
