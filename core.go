@@ -3,13 +3,11 @@ package gateway
 import (
 	"context"
 	"github.com/galenliu/gateway/api"
-	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/db"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin"
-	json "github.com/json-iterator/go"
 	"path"
 	"time"
 )
@@ -29,7 +27,6 @@ type Config struct {
 }
 
 type Gateway struct {
-	*bus.EventBus
 	config       Config
 	addonManager *plugin.Manager
 	sever        *api.WebServe
@@ -50,8 +47,7 @@ func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gat
 		LogDir:     path.Join(g.config.BaseDir, "log"),
 		GatewayDir: g.config.BaseDir,
 	}
-	s, _ := json.MarshalIndent(u, "", "   ")
-	logger.Infof("userprofile: %v ", string(s))
+	logger.Infof("userprofile: %v ", util.JsonIndent(u))
 
 	//检查Gateway运行需要的文件目录
 	util.EnsureDir(logger, u.BaseDir, u.DataDir, u.ConfigDir, u.AddonsDir, u.ConfigDir, u.MediaDir, u.LogDir)

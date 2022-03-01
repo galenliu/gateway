@@ -14,6 +14,10 @@ Content-Type: application/json
 GET http://localhost:9090/things
 Accept: application/json
 
+###GET Addons
+GET http://localhost:9090/addons
+Accept: application/json
+
 ### Get addonsInfo
 GET http://localhost:9090/settings/addonsInfo
 Accept: application/json

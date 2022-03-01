@@ -46,7 +46,6 @@ type Manager struct {
 	outlets        sync.Map
 	installAddons  sync.Map
 	extensions     sync.Map
-	container      *things.ThingsContainer
 	addonsLoaded   bool
 	isPairing      bool
 	running        bool

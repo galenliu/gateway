@@ -23,7 +23,7 @@ type Addon struct {
 	Name                    string `json:"name"`
 	ShortName               string `json:"short_name"`
 	Author                  string `json:"author"`
-	Description             string `json:"description，omitempty"`
+	Description             string `json:"description,omitempty"`
 	License                 string `json:"license,omitempty"`
 	HomepageUrl             string `json:"homepage_url"`
 	Version                 string `json:"version"`
