@@ -142,7 +142,7 @@ func (adapter *Adapter) getDevice(deviceId string) *device {
 }
 
 func (adapter *Adapter) getDevices() (devices []*device) {
-	devices = make([]*device, 1)
+	devices = make([]*device, 0)
 	for _, dev := range adapter.GetDevices() {
 		d, ok := dev.(*device)
 		if ok {

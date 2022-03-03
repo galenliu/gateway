@@ -17,7 +17,7 @@ type AddonManager interface {
 	UninstallAddon(id string, disabled bool) error
 	GetAddonLicense(addonId string) (string, error)
 	AddonEnabled(addonId string) bool
-	UnloadAddon(id string)
+	UnloadAddon(addonId string) error
 }
 
 type AddonController struct {
@@ -98,11 +98,16 @@ func (addon *AddonController) handlerSetAddonConfig(c *fiber.Ctx) error {
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to set config for add-on: "+addonId)
 	}
-	addon.manager.UnloadAddon(addonId)
+	err = addon.manager.UnloadAddon(addonId)
+	if err != nil {
+		addon.logger.Errorf(err.Error())
+		return fiber.NewError(200, err.Error())
+	}
 	if addon.manager.AddonEnabled(addonId) {
 		err := addon.manager.LoadAddon(addonId)
 		if err != nil {
-			return fiber.NewError(fiber.StatusInternalServerError, "Failed to restart add-on: "+addonId)
+			addon.logger.Errorf(err.Error())
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 	}
 	err = addon.manager.LoadAddon(addonId)

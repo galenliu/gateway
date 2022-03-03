@@ -16,6 +16,8 @@ type AddonsStore interface {
 	StoreAddonSetting(key, value string) error
 	LoadAddonConfig(key string) (string, error)
 	StoreAddonsConfig(key string, value any) error
+	RemoveAddonSettingAndConfig(key string) error
+	UpdateAddonSetting(id, value string) error
 }
 
 type Addon struct {
@@ -72,19 +74,31 @@ func (a *Addon) SetEnabled(disabled bool) error {
 		return nil
 	}
 	a.Enabled = disabled
-	err := a.save()
+	err := a.update()
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
+func (a *Addon) DeleteSettingAndConfig() error {
+	return a.store.RemoveAddonSettingAndConfig(a.ID)
+}
+
 func (a *Addon) save() error {
-	str, err := json.MarshalToString(a)
+	byt, err := json.Marshal(a)
 	if err != nil {
 		return err
 	}
-	return a.store.StoreAddonSetting(a.ID, str)
+	return a.store.StoreAddonSetting(a.ID, string(byt))
+}
+
+func (a *Addon) update() error {
+	byt, err := json.Marshal(a)
+	if err != nil {
+		return err
+	}
+	return a.store.UpdateAddonSetting(a.ID, string(byt))
 }
 
 // LoadManifest

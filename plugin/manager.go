@@ -199,8 +199,8 @@ func (m *Manager) handleDeviceAdded(device *device) {
 func (m *Manager) handleDeviceRemoved(device *device) {
 	m.RemoveDevice(device.GetId())
 	task, ok := m.deferredRemove.Load(device.GetId())
-	taskChan := task.(chan struct{})
 	if ok {
+		taskChan := task.(chan struct{})
 		select {
 		case taskChan <- struct{}{}:
 			m.logger.Infof("handle device removed")
@@ -329,7 +329,10 @@ func (m *Manager) installAddon(packageId, packageDir string) error {
 		_ = os.Chmod(fi.Name(), 777)
 		_ = fw.Close()
 	}
-	m.loadAddon(packageId)
+	err = m.LoadAddon(packageId)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -350,7 +353,10 @@ func (m *Manager) loadAddons() {
 		}
 		for _, fi := range fs {
 			if fi.IsDir() {
-				m.loadAddon(fi.Name())
+				err := m.LoadAddon(fi.Name())
+				if err != nil {
+					return
+				}
 			}
 		}
 	}
@@ -366,58 +372,6 @@ func (m *Manager) loadAddons() {
 	})
 	c.Start()
 	return
-}
-
-func (m *Manager) loadAddon(packageId string) {
-	m.logger.Infof("starting loading addon %s.", packageId)
-	var addonInfo *Addon
-	var obj any
-	var err error
-	packageDir := m.getAddonPath(packageId)
-	addonInfo, obj, err = LoadManifest(packageDir, packageId, m.storage)
-	if err != nil {
-		m.logger.Errorf("load file %s%s"+"manifest.json  err:", os.PathSeparator, packageId)
-		return
-	}
-	saved, err := m.storage.LoadAddonSetting(packageId)
-	if err == nil && saved != "" {
-		addonInfo = NewAddonSettingFromString(saved, m.storage)
-	} else {
-		err = addonInfo.save()
-		if err != nil {
-			m.logger.Errorf("addon save err: %s", err.Error())
-		}
-	}
-	addonConf, err := m.storage.LoadAddonConfig(packageId)
-	if err != nil && addonConf == "" {
-		if obj != nil {
-			err := m.storage.StoreAddonsConfig(packageId, obj)
-			if err != nil {
-				m.logger.Errorf("store addon config err: %s", err.Error())
-			}
-		}
-	}
-
-	m.installAddons.Store(packageId, addonInfo)
-
-	if addonInfo.ContentScripts != "" && addonInfo.WSebAccessibleResources != "" {
-		var ext = Extension{
-			Extensions: addonInfo.ContentScripts,
-			Resources:  addonInfo.WSebAccessibleResources,
-		}
-		m.extensions.Store(addonInfo.ID, ext)
-	}
-	util.EnsureDir(m.logger, path.Join(m.config.UserProfile.DataDir, packageId))
-	if addonInfo.Exec == "" {
-		m.logger.Errorf("addon %s has not exec", addonInfo.ID)
-		return
-	}
-
-	if !addonInfo.Enabled {
-		m.logger.Errorf("addon %s disabled", packageId)
-		return
-	}
-	m.pluginServer.loadPlugin(addonInfo.ID, packageDir, addonInfo.Exec)
 }
 
 func (m *Manager) removeAdapter(adapter *Adapter) {

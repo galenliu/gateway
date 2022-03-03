@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/galenliu/gateway/pkg/logging"
 	_ "github.com/mattn/go-sqlite3"
 	"os"
@@ -126,18 +127,20 @@ func (s *Storage) createTable() error {
 	return nil
 }
 
-func (s *Storage) updateValue(k, v string) (err error) {
-	_, err = s.db.Exec(`update data set value=@value where key=@key`, sql.Named("value", v), sql.Named("key", k))
+func (s *Storage) updateValue(k, v, table string) (err error) {
+	query := fmt.Sprintf(`update %s set value=@value where key=@key`, table)
+	_, err = s.db.Exec(query, sql.Named("value", v), sql.Named("key", k))
 	return
 }
 
-func (s *Storage) queryValue(k string) (value string, err error) {
-	err = s.db.QueryRow("SELECT value FROM data where key = @key", sql.Named("key", k)).Scan(&value)
+func (s *Storage) queryValue(k string, table string) (value string, err error) {
+	query := fmt.Sprintf("SELECT value FROM %s where key = @key", table)
+	err = s.db.QueryRow(query, sql.Named("key", k)).Scan(&value)
 	return value, err
 }
 
-func (s *Storage) deleteValue(key string) error {
-	stmt, err := s.db.Prepare(`delete from data where key = ?`)
+func (s *Storage) deleteValue(key string, table string) error {
+	stmt, err := s.db.Prepare(fmt.Sprintf(`delete from %s where key = ?`, table))
 	if err != nil {
 		return err
 	}
@@ -145,5 +148,31 @@ func (s *Storage) deleteValue(key string) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (s *Storage) setValue(key string, value, table string) error {
+	query := fmt.Sprintf("INSERT INTO %s(key, value) values(?,?)", table)
+	stmt, err := s.db.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer func(stmt *sql.Stmt) {
+		err := stmt.Close()
+		if err != nil {
+			s.logger.Error(err.Error())
+		}
+	}(stmt)
+	res, ee := stmt.Exec(key, value)
+	if ee != nil {
+		s.logger.Errorf("insert %s: key:%s err:", table, key, err.Error())
+		return ee
+	}
+	id, eee := res.LastInsertId()
+	if eee != nil {
+		s.logger.Errorf("insert %s: key:%s err:", table, key, err.Error())
+		return eee
+	}
+	s.logger.Debugf("insert %s,id: %s , value: %s \t\n", table, id, value)
 	return nil
 }

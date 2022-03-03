@@ -73,6 +73,7 @@ func (plugin *Plugin) getAdapter(adapterId string) *Adapter {
 }
 
 func (plugin *Plugin) getAdapters() (adapters []*Adapter) {
+	adapters = make([]*Adapter, 0)
 	plugin.adapters.Range(func(key, value any) bool {
 		adapter, ok := value.(*Adapter)
 		if ok {
@@ -84,6 +85,7 @@ func (plugin *Plugin) getAdapters() (adapters []*Adapter) {
 }
 
 func (plugin *Plugin) getNotifiers() (notifiers []*Notifier) {
+	notifiers = make([]*Notifier, 0)
 	plugin.notifiers.Range(func(key, value any) bool {
 		notifier, ok := value.(*Notifier)
 		if ok {
@@ -95,6 +97,7 @@ func (plugin *Plugin) getNotifiers() (notifiers []*Notifier) {
 }
 
 func (plugin *Plugin) getApiHandlers() (apiHandlers []*ApiHandler) {
+	apiHandlers = make([]*ApiHandler, 0)
 	plugin.apiHandlers.Range(func(key, value any) bool {
 		apiHandler, ok := value.(*ApiHandler)
 		if ok {
@@ -342,19 +345,39 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			return
 		}
 		go dev.onPropertyChanged(properties.PropertyDescription{
-			Name:        *message.Property.Name,
-			AtType:      *message.Property.AtType,
-			Title:       *message.Property.Title,
-			Type:        message.Property.Type,
-			Unit:        *message.Property.Unit,
-			Description: *message.Property.Description,
-			Minimum:     message.Property.Minimum,
-			Maximum:     message.Property.Maximum,
-			Enum:        message.Property.Enum,
-			ReadOnly:    *message.Property.ReadOnly,
-			MultipleOf:  message.Property.MultipleOf,
-			Links:       nil,
-			Value:       message.Property.Value,
+			Name:   *message.Property.Name,
+			AtType: *message.Property.AtType,
+			Title: func() string {
+				if message.Property.Title == nil {
+					return ""
+				}
+				return *message.Property.Title
+			}(),
+			Type: message.Property.Type,
+			Unit: func() string {
+				if message.Property.Unit == nil {
+					return ""
+				}
+				return *message.Property.Unit
+			}(),
+			Description: func() string {
+				if message.Property.Description == nil {
+					return ""
+				}
+				return *message.Property.Description
+			}(),
+			Minimum: message.Property.Minimum,
+			Maximum: message.Property.Maximum,
+			Enum:    message.Property.Enum,
+			ReadOnly: func() bool {
+				if message.Property.ReadOnly == nil {
+					return false
+				}
+				return *message.Property.ReadOnly
+			}(),
+			MultipleOf: message.Property.MultipleOf,
+			Links:      nil,
+			Value:      message.Property.Value,
 		})
 		return
 
@@ -375,10 +398,12 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 }
 
 func (plugin *Plugin) send(mt messages.MessageType, data any) {
-	err := plugin.connection.WriteMessage(mt, data)
-	if err != nil {
-		plugin.logger.Infof("plugin %s send err: %s", plugin.pluginId, err.Error())
-		return
+	if plugin.connection != nil && plugin.registered == true {
+		err := plugin.connection.WriteMessage(mt, data)
+		if err != nil {
+			plugin.logger.Infof("plugin %s send err: %s", plugin.pluginId, err.Error())
+			return
+		}
 	}
 }
 
@@ -443,8 +468,8 @@ func (plugin *Plugin) start() {
 	}
 }
 
-func (plugin *Plugin) unload() {
-	plugin.logger.Info("unloading plugin %s", plugin.pluginId)
+func (plugin *Plugin) notifyUnload() {
+	plugin.logger.Infof("unloading plugin %s", plugin.getId())
 	plugin.send(messages.MessageType_PluginUnloadRequest, messages.PluginUnloadRequestJsonData{PluginId: plugin.getId()})
 }
 
@@ -452,32 +477,41 @@ func (plugin *Plugin) unloadComponents() {
 	adapters := plugin.getAdapters()
 	notifiers := plugin.getNotifiers()
 	apiHandlers := plugin.getApiHandlers()
-	var unloadsFunc []func()
-	for _, adapter := range adapters {
-		plugin.manager.removeAdapter(adapter)
-		for _, device := range adapter.getDevices() {
-			plugin.manager.handleDeviceRemoved(device)
-		}
-		unloadsFunc = append(unloadsFunc, adapter.unload)
-	}
-
-	for _, notifier := range notifiers {
-		plugin.manager.removeNotifier(notifier.ID)
-		unloadsFunc = append(unloadsFunc, notifier.unload)
-		for _, device := range notifier.getOutlets() {
-			plugin.manager.handleOutletRemoved(device)
+	var unloadsFunc = make([]func(), 0)
+	if adapters != nil && len(adapters) > 0 {
+		for _, adapter := range adapters {
+			plugin.manager.removeAdapter(adapter)
+			for _, device := range adapter.getDevices() {
+				plugin.manager.handleDeviceRemoved(device)
+			}
+			unloadsFunc = append(unloadsFunc, adapter.unload)
 		}
 	}
 
-	for id, apiHandler := range apiHandlers {
-		plugin.manager.removeApiHandler(id)
-		unloadsFunc = append(unloadsFunc, apiHandler.unload)
+	if notifiers != nil && len(notifiers) > 0 {
+		for _, notifier := range notifiers {
+			plugin.manager.removeNotifier(notifier.ID)
+			unloadsFunc = append(unloadsFunc, notifier.unload)
+			for _, device := range notifier.getOutlets() {
+				plugin.manager.handleOutletRemoved(device)
+			}
+		}
 	}
-	for _, f := range unloadsFunc {
-		f()
+
+	if apiHandlers != nil && len(apiHandlers) > 0 {
+		for id, apiHandler := range apiHandlers {
+			plugin.manager.removeApiHandler(id)
+			unloadsFunc = append(unloadsFunc, apiHandler.unload)
+		}
+	}
+
+	if unloadsFunc != nil && len(unloadsFunc) > 0 {
+		for _, f := range unloadsFunc {
+			go f()
+		}
 	}
 	if len(adapters) == 0 && len(notifiers) == 0 && len(apiHandlers) == 0 {
-		plugin.unload()
+		go plugin.notifyUnload()
 	}
 }
 

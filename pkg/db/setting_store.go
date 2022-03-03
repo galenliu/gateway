@@ -43,3 +43,7 @@ func (s *Storage) SetSetting(key, value string) error {
 	s.logger.Debugf("insert data,id:%d , value: %s \t\n", id, value)
 	return nil
 }
+
+func (s *Storage) RemoveSetting(key string) error {
+	return s.deleteValue(key, "settings")
+}

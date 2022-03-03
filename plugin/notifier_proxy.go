@@ -23,6 +23,7 @@ func (m *Notifier) getOutlet(outletId string) *Outlet {
 }
 
 func (m *Notifier) getOutlets() (outlets []*Outlet) {
+	outlets = make([]*Outlet, 0)
 	m.outlets.Range(func(key, value any) bool {
 		outlet, ok := value.(*Outlet)
 		if ok {
