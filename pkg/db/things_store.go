@@ -7,30 +7,14 @@ import (
 	"github.com/galenliu/gateway/api/models/container"
 )
 
+const ThingTable = "things"
+
 func (s *Storage) CreateThing(id string, thing *container.Thing) error {
 	bytes, err := json.Marshal(thing)
 	if err != nil {
 		return err
 	}
-	stmt, err := s.db.Prepare("INSERT INTO things(id, description) values(?,?)")
-	if err != nil {
-		return err
-	}
-	defer func(stmt *sql.Stmt) {
-		err := stmt.Close()
-		if err != nil {
-			s.logger.Error("stmt close err: %s", err.Error())
-		}
-	}(stmt)
-	res, ee := stmt.Exec(id, bytes)
-	if ee != nil {
-		return ee
-	}
-	_, eee := res.LastInsertId()
-	if eee != nil {
-		return eee
-	}
-	return nil
+	return s.setValue(id, string(bytes), ThingTable)
 }
 
 func (s *Storage) GetThings() map[string]*container.Thing {

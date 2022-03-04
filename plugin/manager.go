@@ -16,7 +16,6 @@ import (
 	"github.com/robfig/cron"
 	"io"
 	"os"
-	"path"
 	"strings"
 	"sync"
 	"time"
@@ -275,6 +274,7 @@ func (m *Manager) getPlugin(packetId string) *Plugin {
 }
 
 func (m *Manager) getInstallAddons() (addons []*Addon) {
+	addons = make([]*Addon, 0)
 	m.installAddons.Range(func(key, value any) bool {
 		ad, ok := value.(*Addon)
 		if ok {
@@ -341,7 +341,7 @@ func (m *Manager) loadAddons() {
 		return
 	}
 	m.logger.Info("starting loading addons.")
-	m.addonsLoaded = true
+
 	if m.pluginServer == nil {
 		m.pluginServer = NewPluginServer(m)
 	}
@@ -355,15 +355,14 @@ func (m *Manager) loadAddons() {
 			if fi.IsDir() {
 				err := m.LoadAddon(fi.Name())
 				if err != nil {
-					return
+					m.logger.Errorf(err.Error())
+					continue
 				}
 			}
 		}
 	}
 	load(m.config.AddonsDir)
-	if m.config.AttachAddonsDir != "" {
-		load(m.config.AttachAddonsDir)
-	}
+	m.addonsLoaded = true
 	//每天的23：00更新一次Add-on
 	c := cron.New()
 	m.logger.Infof("time task for update addons every day 23:00")
@@ -376,20 +375,6 @@ func (m *Manager) loadAddons() {
 
 func (m *Manager) removeAdapter(adapter *Adapter) {
 	m.RemoveAdapter(adapter.GetId())
-}
-
-func (m *Manager) getAddonPath(packageId string) string {
-	for _, dir := range []string{m.config.AddonsDir, m.config.AttachAddonsDir} {
-		if dir == "" {
-			continue
-		}
-		_, e := os.Stat(path.Join(dir, packageId))
-		if os.IsNotExist(e) {
-			continue
-		}
-		return path.Join(dir, packageId)
-	}
-	return ""
 }
 
 func (m *Manager) removeNotifier(notifierId string) {

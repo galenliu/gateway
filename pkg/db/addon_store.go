@@ -2,22 +2,24 @@ package db
 
 import json "github.com/json-iterator/go"
 
+const AddonTable = "settings"
+
 func (s *Storage) LoadAddonSetting(key string) (value string, err error) {
 	return s.GetSetting("addons." + key)
 }
 
 func (s *Storage) UpdateAddonSetting(id, value string) (err error) {
 	key := "addons." + id
-	return s.updateValue(key, value, "settings")
+	return s.updateValue(key, value, AddonTable)
 }
 
 func (s *Storage) UpdateAddonConfig(id, value string) (err error) {
 	key := "addons.config." + id
-	return s.updateValue(key, value, "settings")
+	return s.updateValue(key, value, AddonTable)
 }
 
 func (s *Storage) StoreAddonSetting(key, value string) error {
-	return s.setValue("addons."+key, value, "settings")
+	return s.setValue("addons."+key, value, AddonTable)
 }
 
 func (s *Storage) LoadAddonConfig(key string) (value string, err error) {
@@ -33,8 +35,8 @@ func (s *Storage) StoreAddonsConfig(key string, v any) error {
 }
 
 func (s *Storage) RemoveAddonSettingAndConfig(key string) error {
-	err := s.deleteValue("addons.config."+key, "settings")
-	err1 := s.deleteValue("addons."+key, "settings")
+	err := s.deleteValue("addons.config."+key, AddonTable)
+	err1 := s.deleteValue("addons."+key, AddonTable)
 	if err != nil {
 		return err
 	}

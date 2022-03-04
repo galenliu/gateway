@@ -46,18 +46,18 @@ func (m *Manager) GetPropertiesValue(deviceId string) (map[string]any, error) {
 
 func (m *Manager) GetMapOfDevices() map[string]*devices.Device {
 	devs := m.GetDevices()
-	var devicesMap = make(map[string]*devices.Device)
+	var devicesMap = make(map[string]*devices.Device, 0)
 	if devs != nil {
 		for _, dev := range devs {
 			devicesMap[dev.GetId()] = dev.Device
 		}
 		return devicesMap
 	}
-	return nil
+	return devicesMap
 }
 
 func (m *Manager) GetDevices() (devices []*device) {
-	devices = make([]*device, 1)
+	devices = make([]*device, 0)
 	for _, s := range m.Manager.GetDevices() {
 		device, ok := s.(*device)
 		if ok {

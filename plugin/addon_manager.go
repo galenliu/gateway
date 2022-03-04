@@ -100,7 +100,7 @@ func (m *Manager) UninstallAddon(packetId string, disable bool) error {
 	if err != nil {
 		fmt.Printf(err.Error())
 	}
-	err = util.RemoveDir(m.getAddonPath(packetId))
+	err = util.RemoveDir(path.Join(m.config.AddonsDir, packetId))
 	if err != nil {
 		m.logger.Errorf("delete plugin addon dir failed err: %s", err.Error())
 	}
@@ -116,10 +116,10 @@ func (m *Manager) LoadAddon(packageId string) error {
 	var addonInfo *Addon
 	var obj any
 	var err error
-	packageDir := m.getAddonPath(packageId)
+	packageDir := path.Join(m.config.AddonsDir, packageId)
 	addonInfo, obj, err = LoadManifest(packageDir, packageId, m.storage)
 	if err != nil {
-		return fmt.Errorf("load file %s%s"+"manifest.json  err:", os.PathSeparator, packageId)
+		return fmt.Errorf("load file %s  manifest.json  err:", packageId)
 	}
 	saved, err := m.storage.LoadAddonSetting(packageId)
 	if err == nil && saved != "" {
@@ -141,7 +141,7 @@ func (m *Manager) LoadAddon(packageId string) error {
 	}
 	m.installAddons.Store(packageId, addonInfo)
 
-	if addonInfo.ContentScripts != "" && addonInfo.WSebAccessibleResources != "" {
+	if addonInfo.ContentScripts != nil && addonInfo.WSebAccessibleResources != "" {
 		var ext = Extension{
 			Extensions: addonInfo.ContentScripts,
 			Resources:  addonInfo.WSebAccessibleResources,
@@ -177,7 +177,7 @@ func (m *Manager) UnloadAddon(packageId string) error {
 }
 
 func (m *Manager) GetAddonLicense(addonId string) (string, error) {
-	addonDir := m.getAddonPath(addonId)
+	addonDir := path.Join(m.config.AddonsDir, addonId)
 	m.pluginServer.getPlugin(addonId)
 	if addonDir == "" {
 		return "", fmt.Errorf("addon not installed")

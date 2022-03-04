@@ -3,8 +3,8 @@ POST http://localhost:9090/actions
 Content-Type: application/json
 
 {
-  "pair":{
-    "input":{
+  "pair": {
+    "input": {
       "timeout": 10000
     }
   }

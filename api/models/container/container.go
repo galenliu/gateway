@@ -81,10 +81,10 @@ func (c *ThingsContainer) SetThingPropertyValue(thingId, propName string, value 
 	}
 	prop, ok := thing.Properties[propName]
 	if !ok {
-		return nil, fiber.NewError(fiber.StatusNotFound, "property:%s not found", propName)
+		return nil, fmt.Errorf("property:%s not found", propName)
 	}
 	if prop.IsReadOnly() {
-		return nil, fiber.NewError(fiber.StatusNotFound, "property read only")
+		return nil, fmt.Errorf("property read only")
 	}
 	ctx, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)
 	defer func() {
@@ -92,7 +92,7 @@ func (c *ThingsContainer) SetThingPropertyValue(thingId, propName string, value 
 	}()
 	v, err := c.manager.SetPropertyValue(ctx, thingId, propName, value)
 	if err != nil {
-		return nil, fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		return nil, err
 	}
 	return v, nil
 }

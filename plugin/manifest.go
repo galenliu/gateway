@@ -21,8 +21,8 @@ type ManifestJson struct {
 	HomepageUrl             string `json:"homepage_url,omitempty"`
 	ManifestVersion         int    `json:"manifest_version"`
 	Version                 string `json:"version"`
-	ContentScripts          string `json:"content_Scripts"`
-	WSebAccessibleResources string `json:"web_accessible_resources"`
+	ContentScripts          any    `json:"content_Scripts"`
+	WSebAccessibleResources any    `json:"web_accessible_resources"`
 	Options                 struct {
 		Default any    `json:"default"`
 		Schema  Schema `json:"schema"`
@@ -33,7 +33,7 @@ type ManifestJson struct {
 			PrimaryType      string `json:"primary_type"`
 			StrictMaxVersion string `json:"strict_max_version"`
 			StrictMinVersion string `json:"strict_min_version"`
-			Enable           bool   `json:"setEnabled"`
+			Enable           bool   `json:"enable,omitempty"`
 		} `json:"webthings"`
 	} `json:"gateway_specific_settings"`
 	Enable bool `json:"setEnabled"`

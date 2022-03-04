@@ -8,7 +8,6 @@ import (
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/events"
 	"github.com/galenliu/gateway/pkg/addon/properties"
-	"github.com/galenliu/gateway/pkg/addon/proxy"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
@@ -337,8 +336,4 @@ func (device *device) getAdapter() *Adapter {
 
 func (device *device) getManager() *Manager {
 	return device.adapter.plugin.manager
-}
-
-func (device *device) GetAdapter() proxy.AdapterProxy {
-	return nil
 }

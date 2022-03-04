@@ -1,8 +1,8 @@
 package plugin
 
 type Extension struct {
-	Extensions string
-	Resources  string
+	Extensions any
+	Resources  any
 }
 
 func (e Extension) unload() {

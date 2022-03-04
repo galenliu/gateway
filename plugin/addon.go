@@ -33,8 +33,8 @@ type Addon struct {
 	Exec                    string `json:"exec"`
 	Enabled                 bool   `json:"enabled"`
 	PrimaryType             string `json:"primary_type"`
-	ContentScripts          string `json:"content_scripts,omitempty"`
-	WSebAccessibleResources string `json:"web_accessible_resources,omitempty"`
+	ContentScripts          any    `json:"content_scripts,omitempty"`
+	WSebAccessibleResources any    `json:"web_accessible_resources,omitempty"`
 	store                   AddonsStore
 }
 
