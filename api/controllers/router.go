@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/galenliu/gateway/api/middleware"
 	"github.com/galenliu/gateway/api/models"
 	things "github.com/galenliu/gateway/api/models/container"
@@ -14,9 +13,13 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/fiber/v2/middleware/timeout"
 	"github.com/gofiber/websocket/v2"
 	"net/http"
+	"time"
 )
+
+const InstallAddonTimeOut = 60 * time.Second
 
 type Storage interface {
 	models.UsersStore
@@ -45,7 +48,6 @@ func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log l
 	app := Router{}
 	app.addonUrls = addonUrls
 	app.logger = log
-
 	app.App = fiber.New()
 	app.Use(recover.New())
 	app.Use(cors.New(cors.ConfigDefault))
@@ -65,64 +67,30 @@ func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log l
 	//newThingsModel := models.NewNewThingsModel(deviceManager, log)
 
 	// Color values
-	const (
-		cBlack   = "\u001b[90m"
-		cRed     = "\u001b[91m"
-		cGreen   = "\u001b[92m"
-		cYellow  = "\u001b[93m"
-		cBlue    = "\u001b[94m"
-		cMagenta = "\u001b[95m"
-		cCyan    = "\u001b[96m"
-		cWhite   = "\u001b[97m"
-		cReset   = "\u001b[0m"
-	)
+	//const (
+	//	cBlack   = "\u001b[90m"
+	//	cRed     = "\u001b[91m"
+	//	cGreen   = "\u001b[92m"
+	//	cYellow  = "\u001b[93m"
+	//	cBlue    = "\u001b[94m"
+	//	cMagenta = "\u001b[95m"
+	//	cCyan    = "\u001b[96m"
+	//	cWhite   = "\u001b[97m"
+	//	cReset   = "\u001b[0m"
+	//)
+	//
 	//logger
-	app.Use(func(c *fiber.Ctx) error {
-		return logger.New(logger.Config{
-			Format: fmt.Sprintf("%s| %s  %s|${status} %s| -${latency} %s| ${method} %s| ${path}\n",
-				cBlue, c.IP(), cRed, cMagenta, cCyan, cGreen),
-			Output: log,
-		})(c)
-	})
+	app.Use(logger.New())
 
-	app.Use(func(c *fiber.Ctx) error {
-		if c.Protocol() == "https" {
-			c.Response().Header.Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
-		}
-		c.Response().Header.Set("Content-Security-Policy", "")
-		return c.Next()
-	})
-
-	staticHandler := func(c *fiber.Ctx) error {
-		return nil
-	}
-	app.Use(func(c *fiber.Ctx) error {
-		if c.Path() != "/" || c.Accepts("html") == "" {
-			return c.Next()
-		}
-		return staticHandler(c)
-	})
-
-	app.Use(func(c *fiber.Ctx) error {
-		c.Response().Header.Set("Vary", "Accept")
-		c.Response().Header.Set("Access-Control-Allow-Origin", "*")
-		c.Response().Header.Set("Access-Control-Allow-Headers",
-			"Origin, X-Requested-With, Content-Type, Accept, Authorization")
-		c.Response().Header.Set("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE")
-		return c.Next()
-	})
+	//root handler
+	app.Use(rootHandler)
 
 	//ping controller
 	app.Get("/ping", func(c *fiber.Ctx) error {
 		return c.SendStatus(http.StatusNoContent)
 	})
 
-	//root
-	app.Use(rootHandler)
-
-	//app.Get("/", controllers.RootHandle())
-	app.Static("/index.htm", "")
-
+	// login
 	{
 		loginController := NewLoginController(usersModel, jsonwebtokenModel, log)
 		app.Post(constant.LoginPath, loginController.handleLogin)
@@ -198,7 +166,7 @@ func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log l
 		addonGroup.Get("/", addonController.handlerGetInstalledAddons)
 		addonGroup.Delete("/:addonId", addonController.handlerDeleteAddon)
 		addonGroup.Get("/:addonId/license", addonController.handlerGetLicense)
-		addonGroup.Post("/", addonController.handlerInstallAddon)
+		addonGroup.Post("/", timeout.New(addonController.handlerInstallAddon, InstallAddonTimeOut))
 		addonGroup.Put("/:addonId", addonController.handlerSetAddon)
 		addonGroup.Patch("/:addonId", addonController.handlerUpdateAddon)
 		addonGroup.Get("/:addonId/config", addonController.handlerGetAddonConfig)

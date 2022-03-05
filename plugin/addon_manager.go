@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/util"
-	"io/ioutil"
-	"net/http"
+	"github.com/melbahja/got"
 	"os"
 	"path"
+	"strings"
 	"time"
 )
 
@@ -55,27 +55,36 @@ func (m *Manager) AddonEnabled(addonId string) bool {
 
 func (m *Manager) InstallAddonFromUrl(id, url, checksum string) error {
 
-	destPath := path.Join(os.TempDir(), id+".tar.gz")
-	m.logger.Infof("fetching add-on %s as %s", url, destPath)
-	resp, err := http.Get(url)
+	list := strings.SplitAfter(url, "/")
+	fileName := list[len(list)-1]
+
+	file := path.Join(os.TempDir(), fileName)
+	m.logger.Infof("fetching add-on %s as %s", url, file)
+	g := got.New()
+	err := g.Download(url, file)
 	if err != nil {
-		return fmt.Errorf("http get err: %s", err.Error())
+		return fmt.Errorf("download %s error: %s", file, err.Error())
 	}
 	defer func() {
-		_ = resp.Body.Close()
-		err := os.Remove(destPath)
+		err := os.Remove(file)
 		if err != nil {
 			m.logger.Infof("remove temp file failed ,err:%s", err.Error())
 		}
 	}()
-	data, _ := ioutil.ReadAll(resp.Body)
-	_ = ioutil.WriteFile(destPath, data, 777)
-	if !util.CheckSum(destPath, checksum) {
-		return fmt.Errorf("checksum err,pakage id:%s", id)
+
+	err = os.Chmod(file, 777)
+	if err != nil {
+		m.logger.Infof("chmod err,package id:%s,err:%v", id, err.Error())
+		return err
+	}
+	if !util.CheckSum(file, checksum) {
+		m.logger.Infof("checksum err,package id:%s", id)
+		return fmt.Errorf("checksum err,package id:%s", id)
 	}
 	m.logger.Infof("download %s successful", id)
-	err = m.installAddon(id, destPath)
+	err = m.installAddon(id, file)
 	if err != nil {
+		m.logger.Infof("install %s failed error: %s", id, err.Error())
 		return err
 	}
 	return nil

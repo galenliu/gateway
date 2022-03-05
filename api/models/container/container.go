@@ -33,7 +33,7 @@ type Manager interface {
 
 // ThingsStorage CRUD
 type ThingsStorage interface {
-	RemoveThing(id string) error
+	DeleteThing(id string) error
 	CreateThing(id string, thing *Thing) error
 	UpdateThing(id string, thing *Thing) error
 	GetThings() map[string]*Thing

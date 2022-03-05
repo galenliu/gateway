@@ -148,11 +148,11 @@ func (addon *AddonController) handlerUpdateAddon(c *fiber.Ctx) error {
 	}
 	e := addon.manager.InstallAddonFromUrl(id, url, checksum)
 	if e != nil {
+		addon.logger.Errorf("install addon % err: %s", id, e.Error())
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": e.Error()})
 	}
 	setting, ee := addon.model.Store.LoadAddonSetting(id)
 	if ee != nil {
-
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": ee.Error()})
 	}
 	return c.Status(fiber.StatusOK).SendString(setting)

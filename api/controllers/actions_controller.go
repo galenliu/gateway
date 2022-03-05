@@ -7,7 +7,6 @@ import (
 	"github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/util"
 	"github.com/gofiber/fiber/v2"
 	"time"
 )
@@ -34,6 +33,7 @@ func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 	type action struct {
 		Input map[string]any `json:"input,omitempty"`
 	}
+
 	thingId := c.Params("thingId")
 	var actionBody map[string]action
 	err := c.BodyParser(&actionBody)
@@ -75,9 +75,13 @@ func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 	}
 	err = a.actions.Add(actionModel)
 	if err != nil {
-		return fiber.NewError(fiber.StatusNotFound, fmt.Sprintf("create actions: %s failed，err:%s", actionName, err.Error()))
+		return fiber.NewError(fiber.StatusProcessing, fmt.Sprintf("create actions: %s failed，err:%s", actionName, err.Error()))
 	}
-	return c.Status(fiber.StatusCreated).SendString(util.JsonIndent(map[string]any{"actionName": actionModel.GetDescription()}))
+	//return c.Status(fiber.StatusCreated).JSON(map[string]any{actionName: actionModel.GetDescription()})
+	m := make(map[string]models.ActionDescription)
+	actionDescription := actionModel.GetDescription()
+	m[actionName] = actionDescription
+	return c.Status(fiber.StatusCreated).JSON(m)
 }
 
 func (a *ActionsController) handleGetActions(c *fiber.Ctx) error {
@@ -110,7 +114,8 @@ func (a *ActionsController) handleDeleteAction(c *fiber.Ctx) error {
 	}
 	err := a.actions.Remove(actionId)
 	if err != nil {
-		return fiber.NewError(fiber.StatusNotFound, err.Error())
+		a.logger.Error(err.Error())
+		return fiber.NewError(fiber.StatusNoContent)
 	}
 	return c.SendStatus(fiber.StatusNoContent)
 }

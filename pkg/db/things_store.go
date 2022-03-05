@@ -46,7 +46,7 @@ func (s *Storage) GetThings() map[string]*container.Thing {
 	return things
 }
 
-func (s *Storage) RemoveThing(id string) error {
+func (s *Storage) DeleteThing(id string) error {
 	stmt, err := s.db.Prepare(`delete from things where id = ?`)
 	if err != nil {
 		return err

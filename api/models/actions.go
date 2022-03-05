@@ -37,7 +37,6 @@ type ActionsModel struct {
 
 func NewActionsModel(m ActionsManager, container *container.ThingsContainer, log logging.Logger) *ActionsModel {
 	return &ActionsModel{
-
 		logger:    log,
 		container: container,
 		manager:   m,

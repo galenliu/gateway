@@ -119,7 +119,7 @@ func (t *Thing) setConnected(connected bool) {
 }
 
 func (t *Thing) removed() {
-	err := t.container.store.RemoveThing(t.GetId())
+	err := t.container.store.DeleteThing(t.GetId())
 	if err != nil {
 		fmt.Printf("delete thing err:%s", err.Error())
 	}

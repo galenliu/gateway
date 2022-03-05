@@ -218,7 +218,7 @@ func (m *Manager) getAdapter(adapterId string) *Adapter {
 }
 
 func (m *Manager) getAdapters() (adapters []*Adapter) {
-	adapters = make([]*Adapter, 1)
+	adapters = make([]*Adapter, 0)
 	for _, a := range m.GetAdapters() {
 		adp, ok := a.(*Adapter)
 		if ok {
@@ -291,10 +291,8 @@ func (m *Manager) installAddon(packageId, packageDir string) error {
 		return fmt.Errorf("cannot install add-on before other add-ons have been loaded")
 	}
 	m.logger.Infof("start install %s", packageId)
+
 	f, err := os.Open(packageDir)
-	if err != nil {
-		return err
-	}
 	defer func() {
 		e := f.Close()
 		if e != nil {
