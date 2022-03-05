@@ -5,6 +5,15 @@ import (
 	"github.com/xiam/to"
 )
 
+type BooleanPropertyDescription struct {
+	Name        string `json:"name,omitempty"`
+	AtType      string `json:"@type,omitempty"`
+	Title       string `json:"title,omitempty"`
+	Description string `json:"description,omitempty"`
+	ReadOnly    bool   `json:"readOnly,omitempty"`
+	Value       bool   `json:"value,omitempty"`
+}
+
 type BooleanEntity interface {
 	Entity
 	CheckValue(v any) bool
@@ -16,10 +25,17 @@ type BooleanProperty struct {
 	*Property
 }
 
-func NewBooleanProperty(description PropertyDescription) *BooleanProperty {
+func NewBooleanProperty(description BooleanPropertyDescription) *BooleanProperty {
 	p := &BooleanProperty{}
-	description.Type = TypeBoolean
-	p.Property = NewProperty(description)
+	p.Property = NewProperty(PropertyDescription{
+		Name:        description.Name,
+		AtType:      description.AtType,
+		Title:       description.Title,
+		Type:        TypeNumber,
+		Description: description.Description,
+		ReadOnly:    description.ReadOnly,
+		Value:       description.Value,
+	})
 	return p
 }
 

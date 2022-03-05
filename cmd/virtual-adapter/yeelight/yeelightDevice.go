@@ -4,63 +4,63 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg"
 	"github.com/galenliu/gateway/pkg/addon/devices"
+	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/xiam/to"
 	"strconv"
 )
 
 type YeelightDevice struct {
-	*devices.LightBulb
+	*devices.Light
 	*yeelight.Yeelight
 }
 
 func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
 	yeeDevice := &YeelightDevice{
-		LightBulb: devices.NewLightBulb(devices.DeviceDescription{
-			Id: bulb.GetAddr(),
-		}), //proxy.NewDevice([]string{schemas.Light, schemas.OnOffSwitch}, bulb.GetAddr(), "yeelight"+bulb.GetAddr()),
+		Light:    devices.NewLightBulb(bulb.GetAddr()), //proxy.NewDevice([]string{schemas.CapabilityLight, schemas.CapabilityOnOffSwitch}, bulb.GetAddr(), "yeelight"+bulb.GetAddr()),
 		Yeelight: bulb,
 	}
 	for _, method := range bulb.GetSupports() {
 		switch method {
 		case "set_power":
-			prop := NewOn(bulb)
 			propValue := bulb.GetPropertyValue("power")
+			var value = false
 			if propValue != nil {
 				v, ok := propValue.(string)
 				if ok {
-					if v == "off" {
-						prop.SetCachedValue(false)
-					}
 					if v == "on" {
-						prop.SetCachedValue(true)
+						value = true
 					}
 				}
 			}
-			yeeDevice.AddProperty(prop)
+			prop := NewOn(bulb, value)
+			yeeDevice.AddProperties(prop)
 		case "set_bright":
-			prop := NewBrightness(bulb)
 			propValue := bulb.GetPropertyValue("bright")
+			var value properties.Integer = 0
 			if propValue != nil {
 				s, ok := propValue.(string)
 				if ok {
 					v, err := strconv.Atoi(s)
 					if err == nil {
-						prop.SetCachedValue(v)
+						value = properties.Integer(v)
 					}
 				}
 			}
-			yeeDevice.AddProperty(prop)
+			prop := NewBrightness(bulb, value)
+			yeeDevice.AddProperties(prop)
 		case "set_rgb":
-			prop := NewColor(bulb)
+
 			propValue := bulb.GetPropertyValue("rgb")
+			value := "#ffffff"
 			if propValue != nil {
 				_, ok := propValue.(string)
 				if ok {
 					color := "#" + fmt.Sprintf("%X", to.Int64(propValue))
-					prop.SetCachedValue(color)
+					value = color
 				}
 			}
-			yeeDevice.AddProperty(prop)
+			prop := NewColor(bulb, value)
+			yeeDevice.AddProperties(prop)
 		default:
 			continue
 		}

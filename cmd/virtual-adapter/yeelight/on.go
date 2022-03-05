@@ -10,10 +10,10 @@ type On struct {
 	*properties.OnOffProperty
 }
 
-func NewOn(bulb *yeelight.Yeelight) *On {
+func NewOn(bulb *yeelight.Yeelight, value bool) *On {
 	return &On{
 		bulb,
-		properties.NewOnOffProperty(properties.PropertyDescription{}),
+		properties.NewOnOffProperty(value),
 	}
 }
 

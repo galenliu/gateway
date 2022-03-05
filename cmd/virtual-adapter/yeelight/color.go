@@ -10,10 +10,10 @@ type Color struct {
 	*properties.ColorProperty
 }
 
-func NewColor(bulb *yeelight.Yeelight) *Color {
+func NewColor(bulb *yeelight.Yeelight, value string) *Color {
 	return &Color{
 		bulb,
-		properties.NewColorProperty(properties.PropertyDescription{}),
+		properties.NewColorProperty(value),
 	}
 }
 

@@ -27,14 +27,16 @@ type Entity interface {
 	GetAtType() []string
 	ToMessage() *messages.Device
 	NotifyPropertyChanged(p properties.PropertyDescription)
-
 	SetCredentials(username, password string) error
 	SetPin(pin string) error
+	GetDevice() *Device
 }
+
+type withOptions = func()
 
 type DeviceDescription struct {
 	Id          string
-	AtType      []string
+	AtType      []Capability
 	Title       string
 	Description string
 }
@@ -42,7 +44,7 @@ type DeviceDescription struct {
 type Device struct {
 	handler             AdapterHandler
 	Context             string           `json:"@context,omitempty"`
-	AtType              []string         `json:"@type,omitempty"`
+	AtType              []Capability     `json:"@type,omitempty"`
 	Id                  string           `json:"id,omitempty"`
 	Title               string           `json:"title,omitempty"`
 	Description         string           `json:"description,omitempty"`
@@ -89,16 +91,22 @@ type DevicePin struct {
 	Pattern  string `json:"pattern,omitempty"`
 }
 
-func (d *Device) AddProperty(p properties.Entity) {
+func (d *Device) AddProperties(props ...properties.Entity) {
 	if d.Properties == nil {
 		d.Properties = make(DeviceProperties, 1)
 	}
-	p.SetHandler(d)
-	d.Properties[p.GetName()] = p
+	for _, p := range props {
+		p.SetHandler(d)
+		d.Properties[p.GetName()] = p
+	}
 }
 
 func (d *Device) GetId() string {
 	return d.Id
+}
+
+func (d *Device) GetDevice() *Device {
+	return d
 }
 
 func (d *Device) GetAtContext() string {

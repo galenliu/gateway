@@ -10,13 +10,10 @@ type Brightness struct {
 	*properties.BrightnessProperty
 }
 
-func NewBrightness(bulb *yeelight.Yeelight) *Brightness {
+func NewBrightness(bulb *yeelight.Yeelight, value properties.Integer) *Brightness {
 	return &Brightness{
-		bulb: bulb,
-		BrightnessProperty: properties.NewBrightnessProperty(properties.PropertyDescription{
-			Minimum: 0,
-			Maximum: 100,
-		}),
+		bulb:               bulb,
+		BrightnessProperty: properties.NewBrightnessProperty(value),
 	}
 }
 

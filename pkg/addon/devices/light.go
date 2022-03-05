@@ -1,7 +1,6 @@
 package devices
 
 import (
-	"github.com/galenliu/gateway/pkg/addon/schemas"
 	"strconv"
 	"strings"
 )
@@ -12,37 +11,41 @@ type LightHandler interface {
 	SetBrightness(brightness int)
 }
 
-type LightBulb struct {
+type Light struct {
 	*Device
 }
 
-func NewLightBulb(description DeviceDescription) *LightBulb {
-	if description.Id == "" {
+func NewLightBulb(id string, args ...string) *Light {
+	if id == "" {
 		return nil
 	}
-	if description.Title == "" {
-		description.Title = description.Id
+	title := "light" + id
+	desc := ""
+	if len(args) > 0 {
+		title = args[0]
 	}
-	if description.AtType == nil {
-		description.AtType = make([]string, 0)
-		description.AtType = append(description.AtType, schemas.Light, schemas.OnOffSwitch)
-	} else {
-		description.AtType = append(description.AtType, schemas.Light, schemas.OnOffSwitch)
+	if len(args) > 1 {
+		desc = args[1]
 	}
-	return &LightBulb{
-		NewDevice(description),
+	return &Light{
+		NewDevice(DeviceDescription{
+			Id:          id,
+			AtType:      []Capability{CapabilityLight, CapabilityOnOffSwitch},
+			Title:       title,
+			Description: desc,
+		}),
 	}
 }
 
-func (light *LightBulb) TurnOn() {
+func (light *Light) TurnOn() {
 	//light.On.SetValue(true)
 }
 
-func (light *LightBulb) TurnOff() {
+func (light *Light) TurnOff() {
 	//light.On.SetValue(false)
 }
 
-func (light *LightBulb) Toggle() {
+func (light *Light) Toggle() {
 	//if light.On.Value == true {
 	//	light.TurnOff()
 	//} else {
@@ -50,7 +53,7 @@ func (light *LightBulb) Toggle() {
 	//}
 }
 
-func (light *LightBulb) SetBrightness(brightness int) {
+func (light *Light) SetBrightness(brightness int) {
 	//if light.Bright == nil {
 	//	return
 	//}
@@ -62,7 +65,7 @@ func (light *LightBulb) SetBrightness(brightness int) {
 	//light.Bright.SetValue(brightness)
 }
 
-func (light *LightBulb) propertyValueUpdate(propName string, newValue any) {
+func (light *Light) propertyValueUpdate(propName string, newValue any) {
 
 }
 

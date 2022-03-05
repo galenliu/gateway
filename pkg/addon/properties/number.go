@@ -6,6 +6,20 @@ import (
 	"math"
 )
 
+type NumberPropertyDescription struct {
+	Name        string       `json:"name,omitempty"`
+	AtType      PropertyType `json:"@type,omitempty"`
+	Title       string       `json:"title,omitempty"`
+	Unit        Unit         `json:"unit,omitempty"`
+	Description string       `json:"description,omitempty"`
+	Minimum     Number       `json:"minimum,omitempty"`
+	Maximum     Number       `json:"maximum,omitempty"`
+	Enum        []Number     `json:"enum,omitempty"`
+	ReadOnly    bool         `json:"readOnly,omitempty"`
+	MultipleOf  Number       `json:"multipleOf,omitempty"`
+	Value       Number       `json:"value,omitempty"`
+}
+
 type Number float64
 
 type NumberEntity interface {
@@ -18,10 +32,29 @@ type NumberProperty struct {
 	*Property
 }
 
-func NewNumberProperty() *NumberProperty {
-	p := &NumberProperty{}
-	p.Type = TypeNumber
-	return p
+func NewNumberProperty(desc NumberPropertyDescription) *NumberProperty {
+	n := &NumberProperty{}
+	n.Property = NewProperty(PropertyDescription{
+		Name:        desc.Name,
+		AtType:      desc.AtType,
+		Title:       desc.Title,
+		Type:        TypeNumber,
+		Unit:        desc.Unit,
+		Description: desc.Description,
+		Minimum:     desc.Minimum,
+		Maximum:     desc.Maximum,
+		Enum: func() []any {
+			enum := make([]any, 0)
+			for _, e := range desc.Enum {
+				enum = append(enum, e)
+			}
+			return enum
+		}(),
+		ReadOnly:   desc.ReadOnly,
+		MultipleOf: desc.MultipleOf,
+		Value:      desc.Value,
+	})
+	return n
 }
 
 // OnValueRemoteGet calls fn when the value was read by a client.

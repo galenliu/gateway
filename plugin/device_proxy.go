@@ -185,7 +185,7 @@ func newDeviceFromMessage(adapter *Adapter, msg messages.Device) *device {
 		if prop == nil {
 			continue
 		}
-		device.AddProperty(prop)
+		device.AddProperties(prop)
 	}
 
 	device.logger = adapter.logger

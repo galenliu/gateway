@@ -32,12 +32,13 @@ type DeviceHandler interface {
 
 type Entity interface {
 	MarshalJSON() ([]byte, error)
+	GetProperty() *Property
 	GetType() string
 	GetTitle() string
 	GetName() string
 	GetUnit() string
 	GetEnum() []any
-	GetAtType() string
+	GetAtType() PropertyType
 	GetDescription() string
 	GetMinimum() any
 	GetMaximum() any
@@ -57,18 +58,18 @@ type Entity interface {
 
 type Property struct {
 	handler     DeviceHandler
-	Name        string `json:"name"`
-	Title       string `json:"title,omitempty"`
-	Type        string `json:"type"`
-	AtType      string `json:"@type,omitempty"`
-	Unit        string `json:"unit,omitempty"`
-	Description string `json:"description,omitempty"`
-	Minimum     any    `json:"minimum"`
-	Maximum     any    `json:"maximum,omitempty"`
-	Enum        []any  `json:"enum,omitempty"`
-	ReadOnly    bool   `json:"readOnly"`
-	MultipleOf  any    `json:"multipleOf,omitempty"`
-	Value       any    `json:"value"`
+	Name        string       `json:"name"`
+	Title       string       `json:"title,omitempty"`
+	Type        Type         `json:"type"`
+	AtType      PropertyType `json:"@type,omitempty"`
+	Unit        string       `json:"unit,omitempty"`
+	Description string       `json:"description,omitempty"`
+	Minimum     any          `json:"minimum"`
+	Maximum     any          `json:"maximum,omitempty"`
+	Enum        []any        `json:"enum,omitempty"`
+	ReadOnly    bool         `json:"readOnly"`
+	MultipleOf  any          `json:"multipleOf,omitempty"`
+	Value       any          `json:"value"`
 }
 
 func NewProperty(description PropertyDescription) *Property {
@@ -145,7 +146,7 @@ func (p *Property) GetType() string {
 	return p.Type
 }
 
-func (p *Property) GetAtType() string {
+func (p *Property) GetAtType() PropertyType {
 	return p.AtType
 }
 
@@ -201,6 +202,10 @@ func (p *Property) ToDescription() PropertyDescription {
 		Links:       nil,
 		Value:       p.Value,
 	}
+}
+
+func (p *Property) GetProperty() *Property {
+	return p
 }
 
 func (p *Property) ToMessage() messages.Property {
