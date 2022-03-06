@@ -39,11 +39,6 @@ func NewBooleanProperty(description BooleanPropertyDescription, opts ...Option) 
 	return p
 }
 
-func (prop *BooleanProperty) Turn(b bool) {
-	prop.Property.SetValue(b)
-	fmt.Printf("property: %s Turn func not implemented", prop.GetName())
-}
-
 // OnValueRemoteGet calls fn when the value was read by a client.
 func (prop *BooleanProperty) OnValueRemoteGet(fn func() bool) {
 	//prop.OnValueGet(func() interface{} {
@@ -65,6 +60,10 @@ func (prop *BooleanProperty) GetValue() bool {
 
 func (prop *BooleanProperty) CheckValue(v any) bool {
 	return to.Bool(v)
+}
+
+func (prop *BooleanProperty) Toggle() {
+	fmt.Printf("property: %s Toggle func not implemented", prop.GetName())
 }
 
 func (prop *BooleanProperty) TurnOn() error {

@@ -9,6 +9,7 @@ import (
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
 	"sync"
+	"time"
 )
 
 type ThingPin struct {
@@ -32,6 +33,19 @@ type Thing struct {
 	GroupId   string `json:"groupId,omitempty"`
 	container *ThingsContainer
 	sync.Mutex
+}
+
+func NewThing(data []byte, container *ThingsContainer) (*Thing, error) {
+	var thing Thing
+	err := json.Unmarshal(data, &thing)
+	if err != nil {
+		return nil, err
+	}
+	thing.Created = &controls.DataTime{Time: time.Now()}
+	thing.container = container
+	thing.create()
+	container.things[thing.GetId()] = &thing
+	return &thing, nil
 }
 
 func (t *Thing) UnmarshalJSON(data []byte) error {
@@ -134,20 +148,19 @@ func (t *Thing) update() {
 	go t.container.Publish(topic.ThingModify, topic.ThingModifyMessage{ThingId: t.GetId()})
 }
 
-func (t *Thing) onCreate() {
+func (t *Thing) create() {
 	err := t.container.store.CreateThing(t.GetId(), t)
 	if err != nil {
-		return
+		t.container.logger.Errorf(err.Error())
 	}
-	t.container.logger.Infof("thing:%s created", t.GetId())
-	go t.container.Publish(topic.ThingAdded, topic.ThingAddedMessage{ThingId: t.GetId()})
+	t.container.Publish(topic.ThingAdded, topic.ThingAddedMessage{ThingId: t.GetId()})
 }
 
 func (t *Thing) onPropertyChanged(msg topic.DevicePropertyChangedMessage) {
 	if p := t.GetProperty(msg.PropertyName); p == nil {
 		return
 	}
-	go t.container.Publish(topic.ThingPropertyChanged, topic.ThingPropertyChangedMessage{
+	t.container.Publish(topic.ThingPropertyChanged, topic.ThingPropertyChangedMessage{
 		ThingId:      t.GetId(),
 		PropertyName: msg.Name,
 		Value:        msg.Value,

@@ -89,15 +89,15 @@ func (d *YeelightDevice) Listen() error {
 			for n, v := range msg.Params {
 				if n == "power" {
 					b := v == "on"
-					d.GetProperty("on").SetCachedValueAndNotify(b)
+					d.OnOff.SetCachedValueAndNotify(b)
 				}
 				if n == "bright" {
-					d.GetProperty("bright").SetCachedValueAndNotify(v)
+					d.Brightness.SetCachedValueAndNotify(v)
 				}
 				if n == "rgb" {
 					i := to.Int64(v)
 					v := "#" + fmt.Sprintf("%X", i)
-					d.GetProperty("color").SetCachedValueAndNotify(v)
+					d.Color.SetCachedValueAndNotify(v)
 				}
 			}
 		}

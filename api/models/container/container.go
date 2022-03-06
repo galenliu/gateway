@@ -7,7 +7,6 @@ import (
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/logging"
-	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	"github.com/gofiber/fiber/v2"
 	json "github.com/json-iterator/go"
 	"sync"
@@ -124,18 +123,11 @@ func (c *ThingsContainer) GetMapOfThings() map[string]*Thing {
 func (c *ThingsContainer) CreateThing(data []byte) (*Thing, error) {
 	c.Lock()
 	defer c.Unlock()
-	var thing Thing
-	err := json.Unmarshal(data, &thing)
+	thing, err := NewThing(data, c)
 	if err != nil {
 		return nil, err
 	}
-	thing.container = c
-	thing.Created = &controls.DataTime{Time: time.Now()}
-	thing.Modified = &controls.DataTime{Time: time.Now()}
-	th := &thing
-	th.onCreate()
-	c.things[thing.GetId()] = th
-	return th, nil
+	return thing, nil
 }
 
 func (c *ThingsContainer) RemoveThing(thingId string) {

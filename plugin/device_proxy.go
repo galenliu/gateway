@@ -181,11 +181,14 @@ func newDeviceFromMessage(adapter *Adapter, msg messages.Device) *device {
 		},
 	}
 	for _, p := range msg.Properties {
+		if device.Properties == nil {
+			device.Properties = make(map[string]properties.Entity, 0)
+		}
 		prop := properties.NewProperty(getPropertyDescription(p))
 		if prop == nil {
 			continue
 		}
-		device.AddProperties(prop)
+		device.AddProperty(prop)
 	}
 
 	device.logger = adapter.logger

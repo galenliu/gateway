@@ -32,8 +32,6 @@ type Entity interface {
 	GetDevice() *Device
 }
 
-type withOptions = func()
-
 type DeviceDescription struct {
 	Id          string
 	AtType      []Capability
@@ -70,9 +68,9 @@ func NewDevice(description DeviceDescription, opts ...Option) *Device {
 		Forms:               nil,
 		BaseHref:            "",
 		Pin:                 nil,
-		Properties:          nil,
-		Actions:             nil,
-		Events:              nil,
+		Properties:          make(map[string]properties.Entity, 0),
+		Actions:             make(map[string]actions.Action, 0),
+		Events:              make(map[string]events.Event, 0),
 		CredentialsRequired: false,
 	}
 	for _, o := range opts {
@@ -98,14 +96,12 @@ type DevicePin struct {
 	Pattern  string `json:"pattern,omitempty"`
 }
 
-func (d *Device) AddProperties(props ...properties.Entity) {
+func (d *Device) AddProperty(p properties.Entity) {
 	if d.Properties == nil {
 		d.Properties = make(DeviceProperties, 1)
 	}
-	for _, p := range props {
-		p.SetHandler(d)
-		d.Properties[p.GetName()] = p
-	}
+	p.SetHandler(d)
+	d.Properties[p.GetName()] = p
 }
 
 func (d *Device) GetId() string {
@@ -225,7 +221,13 @@ func (d *Device) ToMessage() *messages.Device {
 			}
 			return mma
 		}(d.Actions),
-		Title: nil,
+		Title: func() *string {
+			t := ""
+			if d.Title != "" {
+				t = d.Title
+			}
+			return &t
+		}(),
 	}
 }
 

@@ -14,7 +14,26 @@ func (s *Storage) CreateThing(id string, thing *container.Thing) error {
 	if err != nil {
 		return err
 	}
-	return s.setValue(id, string(bytes), ThingTable)
+	query := `INSERT INTO things(id, description) values(?,?)`
+	stmt, err := s.db.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer func(stmt *sql.Stmt) {
+		err := stmt.Close()
+		if err != nil {
+			s.logger.Error(err.Error())
+		}
+	}(stmt)
+	res, ee := stmt.Exec(id, bytes)
+	if ee != nil {
+		return ee
+	}
+	_, eee := res.LastInsertId()
+	if eee != nil {
+		return eee
+	}
+	return nil
 }
 
 func (s *Storage) GetThings() map[string]*container.Thing {

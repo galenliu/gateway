@@ -26,6 +26,6 @@ func (d *Device) SetCredentials(username string, password string) error {
 
 func (d *Device) addProperties(props ...properties.Entity) {
 	for _, p := range props {
-		d.AddProperties(NewProperty(p))
+		d.AddProperty(NewProperty(p))
 	}
 }

@@ -34,7 +34,7 @@ type DeviceHandler interface {
 type Entity interface {
 	MarshalJSON() ([]byte, error)
 	GetProperty() *Property
-	GetType() string
+	GetType() Type
 	GetTitle() string
 	GetName() string
 	GetUnit() string
@@ -234,15 +234,27 @@ func (p *Property) ToMessage() messages.Property {
 		Enum:        p.Enum,
 		Maximum: func() *float64 {
 			if v := p.GetMaximum(); v != nil {
-				f := to.Float64(v)
-				return &f
+				if nb, ok := v.(Number); ok {
+					f := float64(nb)
+					return &f
+				}
+				if i, ok := v.(Integer); ok {
+					f := float64(i)
+					return &f
+				}
 			}
 			return nil
 		}(),
 		Minimum: func() *float64 {
 			if v := p.GetMinimum(); v != nil {
-				f := to.Float64(v)
-				return &f
+				if nb, ok := v.(Number); ok {
+					f := float64(nb)
+					return &f
+				}
+				if i, ok := v.(Integer); ok {
+					f := float64(i)
+					return &f
+				}
 			}
 			return nil
 		}(),

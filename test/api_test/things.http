@@ -11,7 +11,7 @@ Content-Type: application/x-www-form-urlencoded
 false
 
 ### trun bright
-PUT http://localhost:9090/things/192.168.1.101:55443/properties/bright
+PUT http://localhost:9090/things/192.168.1.101:55443/properties/level
 Content-Type: application/x-www-form-urlencoded
 
 55
@@ -41,7 +41,7 @@ Content-Type: application/json
     "OnOffSwitch"
   ],
   "id": "192.168.1.101:55443",
-  "title": "192.168.1.101:55443",
+  "title": "Light192.168.1.101:55443",
   "properties": {
     "on": {
       "@type": "OnOffProperty",
@@ -57,11 +57,11 @@ Content-Type: application/json
       ],
       "type": "boolean"
     },
-    "bright": {
+    "level": {
       "@type": "BrightnessProperty",
       "forms": [
         {
-          "href": "things/192.168.1.101:55443/properties/bright",
+          "href": "things/192.168.1.101:55443/properties/level",
           "contentType": "application/json",
           "op": [
             "readproperty",
@@ -69,7 +69,6 @@ Content-Type: application/json
           ]
         }
       ],
-      "unit": "percentage",
       "type": "integer",
       "minimum": 0,
       "maximum": 100

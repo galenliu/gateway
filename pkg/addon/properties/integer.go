@@ -101,7 +101,7 @@ func (prop *IntegerProperty) clamp(v Integer) Integer {
 	if min := prop.GetMinimum(); min != nil {
 		minValue, ok := min.(Integer)
 		if ok {
-			if minValue < value {
+			if minValue > value {
 				value = minValue
 			}
 		}

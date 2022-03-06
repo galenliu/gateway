@@ -1,6 +1,7 @@
 package devices
 
 import (
+	"github.com/galenliu/gateway/pkg/addon/properties"
 	"strconv"
 	"strings"
 )
@@ -13,19 +14,39 @@ type LightHandler interface {
 
 type Light struct {
 	*Device
+	OnOff            properties.Entity
+	Brightness       properties.Entity
+	ColorMode        properties.Entity
+	Color            properties.Entity
+	ColorTemperature properties.Entity
 }
 
 func NewLightBulb(id string, opts ...Option) *Light {
-	if id == "" {
+	device := NewDevice(DeviceDescription{
+		Id:     id,
+		AtType: []Capability{CapabilityLight, CapabilityOnOffSwitch},
+	}, opts...)
+	if device == nil {
 		return nil
 	}
-	desc := ""
-	return &Light{
-		NewDevice(DeviceDescription{
-			Id:          id,
-			AtType:      []Capability{CapabilityLight, CapabilityOnOffSwitch},
-			Description: desc,
-		}, opts...),
+	return &Light{Device: device}
+}
+
+func (light *Light) AddProperties(props ...properties.Entity) {
+	for _, p := range props {
+		switch p.GetAtType() {
+		case properties.TypeOnOffProperty:
+			light.OnOff = p
+		case properties.TypeBrightnessProperty:
+			light.Brightness = p
+		case properties.TypeColorModeProperty:
+			light.ColorMode = p
+		case properties.TypeColorProperty:
+			light.Color = p
+		case properties.TypeColorTemperatureProperty:
+			light.ColorTemperature = p
+		}
+		light.Device.AddProperty(p)
 	}
 }
 
@@ -46,15 +67,7 @@ func (light *Light) Toggle() {
 }
 
 func (light *Light) SetBrightness(brightness int) {
-	//if light.Bright == nil {
-	//	return
-	//}
-	//if brightness == 0 && light.On.Value == true {
-	//	light.TurnOff()
-	//} else if brightness > 0 && light.On.Value == false {
-	//	light.TurnOn()
-	//}
-	//light.Bright.SetValue(brightness)
+	//light.Device.get
 }
 
 func (light *Light) propertyValueUpdate(propName string, newValue any) {

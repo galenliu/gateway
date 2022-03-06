@@ -5,10 +5,12 @@ type MultiLevelSwitch struct {
 }
 
 func NewMultiLevelSwitch(id string, opts ...Option) *MultiLevelSwitch {
-	return &MultiLevelSwitch{
-		NewDevice(DeviceDescription{
-			Id:     id,
-			AtType: []Capability{CapabilityMultiLevelSwitch, CapabilityOnOffSwitch, CapabilityMultiLevelSwitch},
-		}),
+	device := NewDevice(DeviceDescription{
+		Id:     id,
+		AtType: []Capability{CapabilityMultiLevelSwitch, CapabilityOnOffSwitch, CapabilityMultiLevelSwitch},
+	}, opts...)
+	if device == nil {
+		return nil
 	}
+	return &MultiLevelSwitch{device}
 }

@@ -53,6 +53,7 @@ func AsWebOfThing(device devices.Device) *Thing {
 }
 
 func mapOfWotProperties(props devices.DeviceProperties) (mapOfProperty map[string]wot.PropertyAffordance) {
+
 	asWotProperty := func(p properties.Entity) wot.PropertyAffordance {
 		var wp wot.PropertyAffordance
 		var i = &ia.InteractionAffordance{
@@ -66,9 +67,9 @@ func mapOfWotProperties(props devices.DeviceProperties) (mapOfProperty map[strin
 		var dataSchema = &schema.DataSchema{
 			AtType:       p.GetAtType(),
 			Title:        p.GetTitle(),
-			Titles:       nil,
+			Titles:       map[string]string{},
 			Description:  p.GetDescription(),
-			Descriptions: nil,
+			Descriptions: map[string]string{},
 			Const:        nil,
 			Default:      nil,
 			Unit:         p.GetUnit(),
@@ -196,6 +197,7 @@ func mapOfWotProperties(props devices.DeviceProperties) (mapOfProperty map[strin
 		}
 		return wp
 	}
+
 	mapOfProperty = make(map[string]wot.PropertyAffordance)
 	for name, p := range props {
 		if propertyAffordance := asWotProperty(p); propertyAffordance != nil {
