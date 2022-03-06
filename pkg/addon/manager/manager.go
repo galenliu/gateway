@@ -67,29 +67,6 @@ func (m *Manager) GetAdapters() []Adapter {
 	return adapters
 }
 
-func (m *Manager) GetIntegration(id string) Integration {
-	v, ok := m.integrations.Load(id)
-	if ok {
-		v, ok := v.(Integration)
-		if ok {
-			return v
-		}
-	}
-	return nil
-}
-
-func (m *Manager) GetIntegrations() []Integration {
-	integrations := make([]Integration, 1)
-	m.integrations.Range(func(key, value any) bool {
-		com, ok := value.(Integration)
-		if ok {
-			integrations = append(integrations, com)
-		}
-		return true
-	})
-	return integrations
-}
-
 func (m *Manager) GetDevice(id string) Device {
 	v, ok := m.devices.Load(id)
 	if ok {

@@ -9,23 +9,20 @@ import (
 type Integer int64
 
 type IntegerPropertyDescription struct {
-	Name        string             `json:"name,omitempty"`
-	AtType      string             `json:"@type,omitempty"`
-	Title       string             `json:"title,omitempty"`
-	Unit        string             `json:"unit,omitempty"`
-	Description string             `json:"description,omitempty"`
-	Minimum     Integer            `json:"minimum,omitempty"`
-	Maximum     Integer            `json:"maximum,omitempty"`
-	Enum        []Integer          `json:"enum,omitempty"`
-	ReadOnly    bool               `json:"readOnly,omitempty"`
-	MultipleOf  any                `json:"multipleOf,omitempty"`
-	Links       []PropertyLinkElem `json:"links,omitempty"`
-	Value       Integer            `json:"value,omitempty"`
+	Name       string             `json:"name,omitempty"`
+	AtType     string             `json:"@type,omitempty"`
+	Minimum    Integer            `json:"minimum,omitempty"`
+	Maximum    Integer            `json:"maximum,omitempty"`
+	Unit       Unit               `json:"unit"`
+	Enum       []Integer          `json:"enum,omitempty"`
+	ReadOnly   bool               `json:"readOnly,omitempty"`
+	MultipleOf any                `json:"multipleOf,omitempty"`
+	Links      []PropertyLinkElem `json:"links,omitempty"`
+	Value      Integer            `json:"value,omitempty"`
 }
 
 type IntegerEntity interface {
 	Entity
-	GetValue() Integer
 	CheckValue(any) Integer
 	SetValue(v Integer) error
 }
@@ -34,17 +31,14 @@ type IntegerProperty struct {
 	*Property
 }
 
-func NewIntegerProperty(desc IntegerPropertyDescription) *IntegerProperty {
+func NewIntegerProperty(desc IntegerPropertyDescription, opts ...Option) *IntegerProperty {
 	i := &IntegerProperty{}
 	i.Property = NewProperty(PropertyDescription{
-		Name:        desc.Name,
-		AtType:      desc.AtType,
-		Title:       desc.Title,
-		Type:        TypeInteger,
-		Unit:        desc.Unit,
-		Description: desc.Description,
-		Minimum:     desc.Minimum,
-		Maximum:     desc.Maximum,
+		Name:    desc.Name,
+		AtType:  desc.AtType,
+		Type:    TypeInteger,
+		Minimum: desc.Minimum,
+		Maximum: desc.Maximum,
 		Enum: func() []any {
 			enum := make([]any, 0)
 			for _, e := range desc.Enum {
@@ -56,7 +50,7 @@ func NewIntegerProperty(desc IntegerPropertyDescription) *IntegerProperty {
 		MultipleOf: desc.MultipleOf,
 		Links:      desc.Links,
 		Value:      desc.Value,
-	})
+	}, opts...)
 	return i
 }
 

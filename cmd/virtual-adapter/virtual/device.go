@@ -19,6 +19,11 @@ func (d *Device) SetPin(pin string) error {
 	return nil
 }
 
+func (d *Device) SetCredentials(username string, password string) error {
+	fmt.Printf("device: %s set credentials: user:%s  password: %s  \t\n", d.GetId(), username, password)
+	return nil
+}
+
 func (d *Device) addProperties(props ...properties.Entity) {
 	for _, p := range props {
 		d.AddProperties(NewProperty(p))

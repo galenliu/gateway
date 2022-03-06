@@ -9,3 +9,8 @@ type Property struct {
 func NewProperty(p properties.Entity) *Property {
 	return &Property{p.GetProperty()}
 }
+
+func (p *Property) SetValue(v properties.Number) error {
+	return nil
+
+}

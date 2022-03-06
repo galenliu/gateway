@@ -58,8 +58,8 @@ type Device struct {
 	CredentialsRequired bool             `json:"credentialsRequired,omitempty"`
 }
 
-func NewDevice(description DeviceDescription) *Device {
-	return &Device{
+func NewDevice(description DeviceDescription, opts ...Option) *Device {
+	device := &Device{
 		handler:             nil,
 		Context:             schemas.Context,
 		AtType:              description.AtType,
@@ -75,6 +75,13 @@ func NewDevice(description DeviceDescription) *Device {
 		Events:              nil,
 		CredentialsRequired: false,
 	}
+	for _, o := range opts {
+		o(device)
+	}
+	if device.Title == "" {
+		device.Title = device.AtType[0] + device.Id
+	}
+	return device
 }
 
 type DeviceLink struct {
@@ -228,4 +235,32 @@ func (d *Device) SetCredentials(username, password string) error {
 
 func (d *Device) SetPin(pin string) error {
 	return fmt.Errorf("device:%s SetPin not implemented", d.GetId())
+}
+
+type Option func(device *Device)
+
+func WithTitle(title string) Option {
+	return func(d *Device) {
+		d.Title = title
+	}
+}
+func WithDescription(des string) Option {
+	return func(d *Device) {
+		d.Description = des
+	}
+}
+
+func WithCredentialsRequired() Option {
+	return func(d *Device) {
+		d.CredentialsRequired = true
+	}
+}
+
+func WithPin(pin string) Option {
+	return func(d *Device) {
+		d.Pin = &DevicePin{
+			Required: true,
+			Pattern:  pin,
+		}
+	}
 }

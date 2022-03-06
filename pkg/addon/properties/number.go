@@ -7,17 +7,14 @@ import (
 )
 
 type NumberPropertyDescription struct {
-	Name        string       `json:"name,omitempty"`
-	AtType      PropertyType `json:"@type,omitempty"`
-	Title       string       `json:"title,omitempty"`
-	Unit        Unit         `json:"unit,omitempty"`
-	Description string       `json:"description,omitempty"`
-	Minimum     Number       `json:"minimum,omitempty"`
-	Maximum     Number       `json:"maximum,omitempty"`
-	Enum        []Number     `json:"enum,omitempty"`
-	ReadOnly    bool         `json:"readOnly,omitempty"`
-	MultipleOf  Number       `json:"multipleOf,omitempty"`
-	Value       Number       `json:"value,omitempty"`
+	Name       string       `json:"name,omitempty"`
+	AtType     PropertyType `json:"@type,omitempty"`
+	Minimum    Number       `json:"minimum,omitempty"`
+	Maximum    Number       `json:"maximum,omitempty"`
+	Enum       []Number     `json:"enum,omitempty"`
+	ReadOnly   bool         `json:"readOnly,omitempty"`
+	MultipleOf Number       `json:"multipleOf,omitempty"`
+	Value      Number       `json:"value,omitempty"`
 }
 
 type Number float64
@@ -32,17 +29,14 @@ type NumberProperty struct {
 	*Property
 }
 
-func NewNumberProperty(desc NumberPropertyDescription) *NumberProperty {
+func NewNumberProperty(desc NumberPropertyDescription, opts ...Option) *NumberProperty {
 	n := &NumberProperty{}
 	n.Property = NewProperty(PropertyDescription{
-		Name:        desc.Name,
-		AtType:      desc.AtType,
-		Title:       desc.Title,
-		Type:        TypeNumber,
-		Unit:        desc.Unit,
-		Description: desc.Description,
-		Minimum:     desc.Minimum,
-		Maximum:     desc.Maximum,
+		Name:    desc.Name,
+		AtType:  desc.AtType,
+		Type:    TypeNumber,
+		Minimum: desc.Minimum,
+		Maximum: desc.Maximum,
 		Enum: func() []any {
 			enum := make([]any, 0)
 			for _, e := range desc.Enum {
@@ -53,7 +47,7 @@ func NewNumberProperty(desc NumberPropertyDescription) *NumberProperty {
 		ReadOnly:   desc.ReadOnly,
 		MultipleOf: desc.MultipleOf,
 		Value:      desc.Value,
-	})
+	}, opts...)
 	return n
 }
 

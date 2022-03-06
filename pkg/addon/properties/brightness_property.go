@@ -9,26 +9,17 @@ type BrightnessProperty struct {
 	*IntegerProperty
 }
 
-func NewBrightnessProperty(value Integer, args ...string) *BrightnessProperty {
-	desc := ""
-	title := "brightness"
-	if len(args) > 0 {
-		desc = args[0]
-	}
-	if len(args) > 1 {
-		title = args[1]
-	}
+func NewBrightnessProperty(value Integer, opts ...Option) *BrightnessProperty {
+
 	b := &BrightnessProperty{}
 	b.IntegerProperty = NewIntegerProperty(IntegerPropertyDescription{
-		Name:        "level",
-		AtType:      TypeBrightnessProperty,
-		Title:       title,
-		Unit:        UnitPercent,
-		Description: desc,
-		Minimum:     0,
-		Maximum:     100,
-		ReadOnly:    false,
-		Value:       value,
-	})
+		Name:     "level",
+		AtType:   TypeBrightnessProperty,
+		Unit:     UnitPercent,
+		Minimum:  0,
+		Maximum:  100,
+		ReadOnly: false,
+		Value:    value,
+	}, opts...)
 	return b
 }

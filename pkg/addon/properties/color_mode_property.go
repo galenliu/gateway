@@ -18,14 +18,12 @@ type ColorModeProperty struct {
 func NewColorModeProperty(desc ColorModePropertyDescription) *ColorModeProperty {
 	p := &ColorModeProperty{}
 	p.StringProperty = NewStringProperty(StringPropertyDescription{
-		Name:        "color_mode",
-		AtType:      TypeColorModeProperty,
-		Title:       desc.Title,
-		Type:        TypeString,
-		Description: desc.Description,
-		Enum:        []string{ColorModePropertyEnumColor, ColorModePropertyEnumTemperature},
-		ReadOnly:    false,
-		Value:       desc.Value,
+		Name:     "color_mode",
+		AtType:   TypeColorModeProperty,
+		Type:     TypeString,
+		Enum:     []string{ColorModePropertyEnumColor, ColorModePropertyEnumTemperature},
+		ReadOnly: false,
+		Value:    desc.Value,
 	})
 	return p
 }

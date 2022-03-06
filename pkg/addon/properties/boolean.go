@@ -25,21 +25,22 @@ type BooleanProperty struct {
 	*Property
 }
 
-func NewBooleanProperty(description BooleanPropertyDescription) *BooleanProperty {
+func NewBooleanProperty(description BooleanPropertyDescription, opts ...Option) *BooleanProperty {
 	p := &BooleanProperty{}
 	p.Property = NewProperty(PropertyDescription{
 		Name:        description.Name,
 		AtType:      description.AtType,
 		Title:       description.Title,
-		Type:        TypeNumber,
+		Type:        TypeBoolean,
 		Description: description.Description,
 		ReadOnly:    description.ReadOnly,
 		Value:       description.Value,
-	})
+	}, opts...)
 	return p
 }
 
 func (prop *BooleanProperty) Turn(b bool) {
+	prop.Property.SetValue(b)
 	fmt.Printf("property: %s Turn func not implemented", prop.GetName())
 }
 

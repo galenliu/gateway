@@ -27,7 +27,7 @@ func (a *YeelightAdapter) StartPairing(timeout <-chan time.Time) {
 	discover := func() *yeelight.Yeelight {
 		bulb, err := yeelight.Discover()
 		if err != nil {
-			fmt.Printf("adapter:%s StartPairing err:%s \t\n", a.GetId(), err.Error())
+			fmt.Printf("adapter:%s  err:%s \t\n", a.GetId(), err.Error())
 			return nil
 		}
 		return bulb

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/xiam/to"
+	"strings"
 )
 
 type PropertyLinkElem struct {
@@ -62,7 +63,7 @@ type Property struct {
 	Title       string       `json:"title,omitempty"`
 	Type        Type         `json:"type"`
 	AtType      PropertyType `json:"@type,omitempty"`
-	Unit        string       `json:"unit,omitempty"`
+	Unit        Unit         `json:"unit,omitempty"`
 	Description string       `json:"description,omitempty"`
 	Minimum     any          `json:"minimum"`
 	Maximum     any          `json:"maximum,omitempty"`
@@ -72,27 +73,38 @@ type Property struct {
 	Value       any          `json:"value"`
 }
 
-func NewProperty(description PropertyDescription) *Property {
+func NewProperty(des PropertyDescription, opts ...Option) *Property {
 
-	if description.Type != TypeString && description.Type != TypeInteger && description.Type != TypeNumber &&
-		description.Type != TypeBoolean {
+	if des.Type != TypeString && des.Type != TypeInteger && des.Type != TypeNumber &&
+		des.Type != TypeBoolean {
 		return nil
 	}
-	return &Property{
+	p := &Property{
 		handler:     nil,
-		Name:        description.Name,
-		Title:       description.Title,
-		Type:        description.Type,
-		AtType:      description.AtType,
-		Unit:        description.Unit,
-		Description: description.Description,
-		Minimum:     description.Minimum,
-		Maximum:     description.Maximum,
-		Enum:        description.Enum,
-		ReadOnly:    description.ReadOnly,
-		MultipleOf:  description.MultipleOf,
-		Value:       description.Value,
+		Name:        des.Name,
+		Title:       des.Title,
+		Type:        des.Type,
+		AtType:      des.AtType,
+		Unit:        des.Unit,
+		Description: des.Description,
+		Minimum:     des.Minimum,
+		Maximum:     des.Maximum,
+		Enum:        des.Enum,
+		ReadOnly:    des.ReadOnly,
+		MultipleOf:  des.MultipleOf,
+		Value:       des.Value,
 	}
+	for _, o := range opts {
+		o(p)
+	}
+	if p.Name == "" {
+		if p.AtType != "" {
+			p.Name = strings.ToLower(p.AtType)
+		} else {
+			p.Name = strings.ToLower(p.Type)
+		}
+	}
+	return p
 }
 
 func (p Property) MarshalJSON() ([]byte, error) {
@@ -277,4 +289,24 @@ func (p *Property) SetCachedValue(value any) bool {
 	}
 	p.Value = value
 	return true
+}
+
+type Option func(p *Property)
+
+func WithTitle(title string) Option {
+	return func(p *Property) {
+		p.Title = title
+	}
+}
+
+func WithDescription(description string) Option {
+	return func(p *Property) {
+		p.Description = description
+	}
+}
+
+func WithUnit(unit Unit) Option {
+	return func(p *Property) {
+		p.Unit = unit
+	}
 }

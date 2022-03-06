@@ -10,24 +10,15 @@ type ColorProperty struct {
 	*StringProperty
 }
 
-func NewColorProperty(value string, args ...string) *ColorProperty {
-	desc := ""
-	title := "hue"
-	if len(args) > 0 {
-		desc = args[0]
-	}
-	if len(args) > 1 {
-		title = args[1]
-	}
+func NewColorProperty(value string, opts ...Option) *ColorProperty {
+
 	c := &ColorProperty{}
 	c.StringProperty = NewStringProperty(StringPropertyDescription{
-		Name:        "color",
-		AtType:      TypeColorProperty,
-		Title:       title,
-		Type:        TypeString,
-		Description: desc,
-		ReadOnly:    false,
-		Value:       value,
+		Name:     "color",
+		AtType:   TypeColorProperty,
+		Type:     TypeString,
+		ReadOnly: false,
+		Value:    value,
 	})
 	return c
 }

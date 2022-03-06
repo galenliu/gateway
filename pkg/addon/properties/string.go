@@ -6,17 +6,12 @@ import (
 )
 
 type StringPropertyDescription struct {
-	Name        string             `json:"name,omitempty"`
-	AtType      PropertyType       `json:"@type,omitempty"`
-	Title       string             `json:"title,omitempty"`
-	Type        string             `json:"type,omitempty"`
-	Unit        string             `json:"unit,omitempty"`
-	Description string             `json:"description,omitempty"`
-	Enum        []string           `json:"enum,omitempty"`
-	ReadOnly    bool               `json:"readOnly,omitempty"`
-	MultipleOf  string             `json:"multipleOf,omitempty"`
-	Links       []PropertyLinkElem `json:"links,omitempty"`
-	Value       string             `json:"value,omitempty"`
+	Name     string       `json:"name,omitempty"`
+	AtType   PropertyType `json:"@type,omitempty"`
+	Type     string       `json:"type,omitempty"`
+	Enum     []string     `json:"enum,omitempty"`
+	ReadOnly bool         `json:"readOnly,omitempty"`
+	Value    string       `json:"value,omitempty"`
 }
 
 type StringEntity interface {
@@ -29,15 +24,12 @@ type StringProperty struct {
 	*Property
 }
 
-func NewStringProperty(desc StringPropertyDescription) *StringProperty {
+func NewStringProperty(desc StringPropertyDescription, opts ...Option) *StringProperty {
 	s := &StringProperty{}
 	s.Property = NewProperty(PropertyDescription{
-		Name:        desc.Name,
-		AtType:      desc.AtType,
-		Title:       desc.Title,
-		Type:        TypeString,
-		Unit:        desc.Unit,
-		Description: desc.Description,
+		Name:   desc.Name,
+		AtType: desc.AtType,
+		Type:   TypeString,
 		Enum: func() []any {
 			enum := make([]any, 0)
 			for _, e := range desc.Enum {
@@ -45,10 +37,9 @@ func NewStringProperty(desc StringPropertyDescription) *StringProperty {
 			}
 			return enum
 		}(),
-		ReadOnly:   desc.ReadOnly,
-		MultipleOf: desc.MultipleOf,
-		Value:      desc.Value,
-	})
+		ReadOnly: desc.ReadOnly,
+		Value:    desc.Value,
+	}, opts...)
 	return s
 }
 

@@ -15,25 +15,17 @@ type Light struct {
 	*Device
 }
 
-func NewLightBulb(id string, args ...string) *Light {
+func NewLightBulb(id string, opts ...Option) *Light {
 	if id == "" {
 		return nil
 	}
-	title := "light" + id
 	desc := ""
-	if len(args) > 0 {
-		title = args[0]
-	}
-	if len(args) > 1 {
-		desc = args[1]
-	}
 	return &Light{
 		NewDevice(DeviceDescription{
 			Id:          id,
 			AtType:      []Capability{CapabilityLight, CapabilityOnOffSwitch},
-			Title:       title,
 			Description: desc,
-		}),
+		}, opts...),
 	}
 }
 
