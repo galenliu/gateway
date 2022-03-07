@@ -10,7 +10,7 @@ type Device struct {
 	*devices.Device
 }
 
-func NewDevice(device devices.Entity) *Device {
+func NewVirtualDevice(device devices.Entity) *Device {
 	return &Device{device.GetDevice()}
 }
 
@@ -24,8 +24,8 @@ func (d *Device) SetCredentials(username string, password string) error {
 	return nil
 }
 
-func (d *Device) addProperties(props ...properties.Entity) {
+func (d *Device) addProperties(props ...*properties.Property) {
 	for _, p := range props {
-		d.AddProperty(NewProperty(p))
+		d.AddProperty(NewVirtualProperty(p))
 	}
 }

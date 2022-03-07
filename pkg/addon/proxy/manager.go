@@ -234,51 +234,62 @@ func (m *Manager) OnMessage(data []byte) {
 		}
 		go func() {
 			{
-				switch prop.GetType() {
-				case properties.TypeBoolean:
-					p, ok := prop.(properties.BooleanEntity)
-					if ok {
-						b := p.CheckValue(msg.PropertyValue)
-						if b {
-							err := p.TurnOn()
+				{
+					switch prop.GetType() {
+					case properties.TypeBoolean:
+						p, ok := prop.(properties.BooleanEntity)
+						if ok {
+							b := p.CheckValue(msg.PropertyValue)
+							if b {
+								err := p.TurnOn()
+								if err != nil {
+									fmt.Printf(err.Error())
+								}
+							} else {
+								err := p.TurnOff()
+								if err != nil {
+									fmt.Printf(err.Error())
+								}
+							}
+						}
+					case properties.TypeInteger:
+						p, ok := prop.(properties.IntegerEntity)
+						if ok {
+							value := p.CheckValue(msg.PropertyValue)
+							err := p.SetValue(value)
 							if err != nil {
 								fmt.Printf(err.Error())
 							}
-						} else {
-							err := p.TurnOff()
+						}
+					case properties.TypeNumber:
+						p, ok := prop.(properties.NumberEntity)
+						if ok {
+							value := p.CheckValue(msg.PropertyValue)
+							err := p.SetValue(value)
 							if err != nil {
 								fmt.Printf(err.Error())
 							}
 						}
-					}
-				case properties.TypeInteger:
-					p, ok := prop.(properties.IntegerEntity)
-					if ok {
-						value := p.CheckValue(msg.PropertyValue)
-						err := p.SetValue(value)
-						if err != nil {
-							fmt.Printf(err.Error())
+					case properties.TypeString:
+						p, ok := prop.(properties.StringEntity)
+						if ok {
+							value := p.CheckValue(msg.PropertyValue)
+							err := p.SetValue(value)
+							if err != nil {
+								fmt.Printf(err.Error())
+							}
 						}
-					}
-				case properties.TypeNumber:
-					p, ok := prop.(properties.NumberEntity)
-					if ok {
-						value := p.CheckValue(msg.PropertyValue)
-						err := p.SetValue(value)
-						if err != nil {
-							fmt.Printf(err.Error())
-						}
-					}
-				case properties.TypeString:
-					p, ok := prop.(properties.StringEntity)
-					if ok {
-						value := p.CheckValue(msg.PropertyValue)
-						err := p.SetValue(value)
-						if err != nil {
-							fmt.Printf(err.Error())
+					default:
+						p, ok := prop.(properties.Entity)
+						if ok {
+							err := p.SetPropertyValue(msg.PropertyValue)
+							if err != nil {
+								fmt.Printf(err.Error())
+							}
 						}
 					}
 				}
+
 			}
 		}()
 		return

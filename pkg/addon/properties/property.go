@@ -2,6 +2,7 @@ package properties
 
 import (
 	"encoding/json"
+	"fmt"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/xiam/to"
 	"strings"
@@ -55,6 +56,7 @@ type Entity interface {
 	GetDevice() DeviceHandler
 	NotifyChanged()
 	GetCachedValue() any
+	SetPropertyValue(value any) error
 }
 
 type Property struct {
@@ -218,6 +220,10 @@ func (p *Property) ToDescription() PropertyDescription {
 
 func (p *Property) GetProperty() *Property {
 	return p
+}
+
+func (p *Property) SetPropertyValue(value any) error {
+	return fmt.Errorf("set property value not yet implemented")
 }
 
 func (p *Property) ToMessage() messages.Property {

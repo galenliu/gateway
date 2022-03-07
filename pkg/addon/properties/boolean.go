@@ -22,12 +22,12 @@ type BooleanEntity interface {
 	IsOn() bool
 }
 
-type BooleanProperty struct {
+type Boolean struct {
 	*Property
 }
 
-func NewBooleanProperty(description BooleanPropertyDescription, opts ...Option) *BooleanProperty {
-	p := &BooleanProperty{}
+func NewBoolean(description BooleanPropertyDescription, opts ...Option) *Boolean {
+	p := &Boolean{}
 	p.Property = NewProperty(PropertyDescription{
 		Name:        description.Name,
 		AtType:      description.AtType,
@@ -41,36 +41,36 @@ func NewBooleanProperty(description BooleanPropertyDescription, opts ...Option) 
 }
 
 // OnValueRemoteGet calls fn when the value was read by a client.
-func (prop *BooleanProperty) OnValueRemoteGet(fn func() bool) {
+func (prop *Boolean) OnValueRemoteGet(fn func() bool) {
 	//prop.OnValueGet(func() interface{} {
 	//	return fn()
 	//})
 }
 
 // OnValueRemoteUpdate calls fn when the value was updated by a client.
-func (prop *BooleanProperty) OnValueRemoteUpdate(fn func(bool)) {
+func (prop *Boolean) OnValueRemoteUpdate(fn func(bool)) {
 	//prop.OnValueUpdate(func(Property *addon.PropertyProxy, newValue, oldValue interface{}) {
 	//	fn(newValue.(bool))
 	//})
 }
 
-func (prop *BooleanProperty) IsOn() bool {
+func (prop *Boolean) IsOn() bool {
 	v := prop.Value.(bool)
 	return v
 }
 
-func (prop *BooleanProperty) CheckValue(v any) bool {
+func (prop *Boolean) CheckValue(v any) bool {
 	return to.Bool(v)
 }
 
-func (prop *BooleanProperty) Toggle() {
+func (prop *Boolean) Toggle() {
 	fmt.Printf("property: %s Toggle func not implemented", prop.GetName())
 }
 
-func (prop *BooleanProperty) TurnOn() error {
+func (prop *Boolean) TurnOn() error {
 	return fmt.Errorf("device:%s property:%s turn on not implemented ", prop.GetDevice().GetId(), prop.GetName())
 }
 
-func (prop *BooleanProperty) TurnOff() error {
+func (prop *Boolean) TurnOff() error {
 	return fmt.Errorf("device:%s property:%s turn off not implemented ", prop.GetDevice().GetId(), prop.GetName())
 }

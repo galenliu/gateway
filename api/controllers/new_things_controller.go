@@ -10,7 +10,7 @@ import (
 	"sync"
 )
 
-type deviceManager interface {
+type manager interface {
 	GetMapOfDevices() map[string]*devices.Device
 	bus.ThingsBus
 }
@@ -19,38 +19,49 @@ type thingContainer interface {
 }
 
 type NewThingsController struct {
-	locker     *sync.Mutex
-	ws         *websocket.Conn
-	foundThing chan string
-	closeChan  chan struct{}
-	logger     logging.Logger
+	locker         *sync.Mutex
+	ws             *websocket.Conn
+	foundThing     chan string
+	closeChan      chan struct{}
+	logger         logging.Logger
+	manager        manager
+	thingContainer thingContainer
 }
 
-func NewNewThingsController(log logging.Logger) *NewThingsController {
+func NewNewThingsController(manager manager, thingContainer thingContainer, log logging.Logger) *NewThingsController {
 	c := &NewThingsController{}
 	c.logger = log
+	c.manager = manager
+	c.thingContainer = thingContainer
 	c.locker = new(sync.Mutex)
 	c.closeChan = make(chan struct{})
 	c.foundThing = make(chan string)
 	return c
 }
 
-func (c *NewThingsController) handleNewThingsWebsocket(m deviceManager, t thingContainer) func(conn *websocket.Conn) {
+func (c *NewThingsController) handleNewThingsWebsocket() func(conn *websocket.Conn) {
 	return func(conn *websocket.Conn) {
+		locker := new(sync.Mutex)
 		addThing := func(msg topic.DeviceAddedMessage) {
-			err := conn.WriteJSON(things.AsWebOfThing(msg.Device))
-			if err != nil {
-				return
+			if conn != nil && locker != nil {
+				locker.Lock()
+				defer locker.Unlock()
+				err := conn.WriteJSON(things.AsWebOfThing(msg.Device))
+				if err != nil {
+					return
+				}
 			}
+
 		}
-		addonDevices := m.GetMapOfDevices()
-		unSub := m.Subscribe(topic.DeviceAdded, addThing)
+		addonDevices := c.manager.GetMapOfDevices()
+		unSub := c.manager.Subscribe(topic.DeviceAdded, addThing)
 		defer func() {
 			//removeFunc()
+			locker = nil
 			unSub()
 			_ = conn.Close()
 		}()
-		savedThings := t.GetMapOfThings()
+		savedThings := c.thingContainer.GetMapOfThings()
 		for id, dev := range addonDevices {
 			_, ok := savedThings[id]
 			if !ok {

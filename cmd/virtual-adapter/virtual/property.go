@@ -1,16 +1,20 @@
 package virtual
 
-import "github.com/galenliu/gateway/pkg/addon/properties"
+import (
+	"fmt"
+	"github.com/galenliu/gateway/pkg/addon/properties"
+)
 
 type Property struct {
 	*properties.Property
 }
 
-func NewProperty(p properties.Entity) *Property {
-	return &Property{p.GetProperty()}
+func NewVirtualProperty(p *properties.Property) *Property {
+	return &Property{p}
 }
 
-func (p *Property) SetValue(v properties.Number) error {
+func (p *Property) SetPropertyValue(v any) error {
+	p.SetCachedValueAndNotify(v)
+	fmt.Printf("adapter:virtual device: %s set property: %s value: %s", p.GetDevice().GetId(), p.GetName(), v)
 	return nil
-
 }

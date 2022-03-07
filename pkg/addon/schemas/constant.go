@@ -17,7 +17,7 @@ const (
 
 	AlarmProperty                    = "AlarmProperty"
 	BarometricPressureProperty       = "BarometricPressureProperty"
-	BooleanProperty                  = "BooleanProperty"
+	BooleanProperty                  = "Boolean"
 	BrightnessProperty               = "BrightnessProperty"
 	ColorModeProperty                = "ColorModeProperty"
 	ColorProperty                    = "ColorProperty"

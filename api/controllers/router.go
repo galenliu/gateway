@@ -63,22 +63,7 @@ func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log l
 	jsonwebtokenModel := models.NewJsonwebtokenModel(settingModel, store, log)
 
 	actionsModel := models.NewActionsModel(manager, containerModel, log)
-	//serviceModel := models.NewServicesModel(deviceManager)
-	//newThingsModel := models.NewNewThingsModel(deviceManager, log)
 
-	// Color values
-	//const (
-	//	cBlack   = "\u001b[90m"
-	//	cRed     = "\u001b[91m"
-	//	cGreen   = "\u001b[92m"
-	//	cYellow  = "\u001b[93m"
-	//	cBlue    = "\u001b[94m"
-	//	cMagenta = "\u001b[95m"
-	//	cCyan    = "\u001b[96m"
-	//	cWhite   = "\u001b[97m"
-	//	cReset   = "\u001b[0m"
-	//)
-	//
 	//logger
 	app.Use(logger.New())
 
@@ -145,9 +130,9 @@ func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log l
 		thingsGroup.Post("/:thingId"+"/"+constant.ActionsPath, actionsController.handleCreateAction)
 	}
 
-	//Things
+	//New Things
 	{
-		newThingsController := NewNewThingsController(log)
+		newThingsController := NewNewThingsController(manager, containerModel, log)
 		newThingsGroup := app.Group(constant.NewThingsPath)
 		newThingsGroup.Use("/", func(c *fiber.Ctx) error {
 			if websocket.IsWebSocketUpgrade(c) {
@@ -156,7 +141,7 @@ func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log l
 			}
 			return fiber.ErrUpgradeRequired
 		})
-		newThingsGroup.Get("/", websocket.New(newThingsController.handleNewThingsWebsocket(manager, containerModel)))
+		newThingsGroup.Get("/", websocket.New(newThingsController.handleNewThingsWebsocket()))
 	}
 
 	//Addons

@@ -149,7 +149,7 @@ func (bus *eventBus) Publish(topic string, args ...interface{}) {
 					handler.Lock()
 					bus.lock.Lock()
 				}
-				go bus.doPublishAsync(handler, topic, args...)
+				bus.doPublishAsync(handler, topic, args...)
 			}
 		}
 	}

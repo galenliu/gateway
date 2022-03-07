@@ -19,7 +19,7 @@ type Property struct {
 
 //AlarmProperty                    = "AlarmProperty"
 //BarometricPressureProperty       = "BarometricPressureProperty"
-//BooleanProperty                  = "BooleanProperty"
+//Boolean                  = "Boolean"
 //BrightnessProperty               = "BrightnessProperty"
 //ColorModeProperty                = "ColorModeProperty"
 //ColorProperty                    = "ColorProperty"

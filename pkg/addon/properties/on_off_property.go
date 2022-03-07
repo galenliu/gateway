@@ -10,13 +10,13 @@ type OnOff interface {
 }
 
 type OnOffProperty struct {
-	*BooleanProperty
+	*Boolean
 }
 
 func NewOnOffProperty(value bool, args ...string) *OnOffProperty {
 
 	p := &OnOffProperty{}
-	p.BooleanProperty = NewBooleanProperty(BooleanPropertyDescription{
+	p.Boolean = NewBoolean(BooleanPropertyDescription{
 		Name:   "on",
 		AtType: TypeOnOffProperty,
 		Value:  value,

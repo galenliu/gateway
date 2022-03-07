@@ -189,7 +189,7 @@ func (m *Manager) handleAdapterUnload(adapterId string) {
 func (m *Manager) handleDeviceAdded(device *device) {
 	m.AddDevice(device)
 	m.logger.Debugf("Thing added:\t\n %s ", util.JsonIndent(things.AsWebOfThing(*device.Device)))
-	go m.Publish(topic.DeviceAdded, topic.DeviceAddedMessage{
+	m.Publish(topic.DeviceAdded, topic.DeviceAddedMessage{
 		DeviceId: device.GetId(),
 		Device:   *device.Device,
 	})

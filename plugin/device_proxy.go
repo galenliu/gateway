@@ -131,7 +131,7 @@ func newDeviceFromMessage(adapter *Adapter, msg messages.Device) *device {
 			AtType:              msg.Type,
 			Id:                  msg.Id,
 			Title:               util.GetFromPointer(msg.Title),
-			Description:         "",
+			Description:         util.GetFromPointer(msg.Description),
 			Links:               linksFunc(msg.Links),
 			BaseHref:            util.GetFromPointer[string](msg.BaseHref),
 			Pin:                 pinFunc(msg.Pin),
@@ -140,7 +140,7 @@ func newDeviceFromMessage(adapter *Adapter, msg messages.Device) *device {
 			CredentialsRequired: util.GetFromPointer[bool](msg.CredentialsRequired),
 		},
 	}
-	device.Properties = asPropertiesMap(device, msg.Properties)
+	asPropertiesMap(device, msg.Properties)
 	device.logger = adapter.logger
 	return device
 }

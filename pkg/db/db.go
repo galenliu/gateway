@@ -168,11 +168,11 @@ func (s *Storage) setValue(key string, value, table string) error {
 		s.logger.Errorf("insert %s: key:%s err:", table, key, err.Error())
 		return ee
 	}
-	id, eee := res.LastInsertId()
+	_, eee := res.LastInsertId()
 	if eee != nil {
 		s.logger.Errorf("insert %s: key:%s err:", table, key, err.Error())
 		return eee
 	}
-	s.logger.Debugf("insert %s,id: %s , value: %s \t\n", table, id, value)
+	s.logger.Debugf("insert %s,id: %s \t\n", table)
 	return nil
 }
