@@ -11,6 +11,7 @@ import (
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/util"
 	"github.com/xiam/to"
 	"golang.org/x/sync/singleflight"
 	"sync"
@@ -29,13 +30,6 @@ type device struct {
 
 func newDeviceFromMessage(adapter *Adapter, msg messages.Device) *device {
 
-	getString := func(s *string) string {
-		if s == nil {
-			return ""
-		}
-		return *s
-	}
-
 	linksFunc := func(links []messages.Link) (ls []devices.DeviceLink) {
 		if len(links) == 0 {
 			return nil
@@ -43,8 +37,8 @@ func newDeviceFromMessage(adapter *Adapter, msg messages.Device) *device {
 		for _, l := range links {
 			ls = append(ls, devices.DeviceLink{
 				Href:      l.Href,
-				Rel:       getString(l.Rel),
-				MediaType: getString(l.MediaType),
+				Rel:       util.GetFromPointer(l.Rel),
+				MediaType: util.GetFromPointer(l.MediaType),
 			})
 		}
 		return ls
@@ -56,61 +50,17 @@ func newDeviceFromMessage(adapter *Adapter, msg messages.Device) *device {
 		}
 		return &devices.DevicePin{
 			Required: pin.Required,
-			Pattern:  getString(pin.Pattern),
-		}
-	}
-	getString = func(s *string) string {
-		if s == nil {
-			return ""
-		}
-		return *s
-	}
-
-	getPropertyDescription := func(p messages.Property) properties.PropertyDescription {
-		return properties.PropertyDescription{
-			Name:        getString(p.Name),
-			AtType:      getString(p.AtType),
-			Title:       getString(p.Title),
-			Type:        p.Type,
-			Unit:        getString(p.Unit),
-			Description: getString(p.Description),
-			Minimum: func() any {
-				if p.Minimum == nil {
-					return nil
-				}
-				return *p.Minimum
-			}(),
-			Maximum: func() any {
-				if p.Maximum != nil {
-					return *p.Maximum
-				}
-				return nil
-			}(),
-			Enum: p.Enum,
-			ReadOnly: func(b *bool) bool {
-				if b == nil {
-					return false
-				}
-				return *b
-			}(p.ReadOnly),
-			MultipleOf: func() any {
-				if p.MultipleOf != nil {
-					return *p.MultipleOf
-				}
-				return nil
-			}(),
-			Links: nil,
-			Value: p.Value,
+			Pattern:  util.GetFromPointer(pin.Pattern),
 		}
 	}
 
-	actionsFunc := func(as messages.DeviceActions) (oActions map[string]actions.Action) {
+	asActionMap := func(as messages.DeviceActions) (oActions map[string]actions.Action) {
 		oActions = make(map[string]actions.Action)
 		for n, a := range as {
 			oActions[n] = actions.Action{
-				Type:        getString(a.Type),
-				Title:       getString(a.Title),
-				Description: getString(a.Description),
+				Type:        util.GetFromPointer(a.Type),
+				Title:       util.GetFromPointer(a.Title),
+				Description: util.GetFromPointer(a.Description),
 				Forms: func(s []messages.ActionFormsElem) (forms []actions.ActionFormsElem) {
 					if len(s) == 0 {
 						return nil
@@ -128,17 +78,17 @@ func newDeviceFromMessage(adapter *Adapter, msg messages.Device) *device {
 		return
 	}
 
-	eventsFunc := func(es messages.DeviceEvents) (events1 map[string]events.Event) {
+	asEventMap := func(es messages.DeviceEvents) (events1 map[string]events.Event) {
 		events1 = make(map[string]events.Event)
 		for n, e := range es {
 			events1[n] = events.Event{
 				AtType:      "",
-				Name:        getString(e.Name),
-				Title:       getString(e.Name),
-				Description: getString(e.Description),
+				Name:        util.GetFromPointer(e.Name),
+				Title:       util.GetFromPointer(e.Name),
+				Description: util.GetFromPointer(e.Description),
 				Links:       nil,
-				Type:        getString(e.Type),
-				Unit:        getString(e.Unit),
+				Type:        util.GetFromPointer(e.Type),
+				Unit:        util.GetFromPointer(e.Unit),
 				Minimum:     0,
 				Maximum:     0,
 				MultipleOf:  0,
@@ -148,51 +98,51 @@ func newDeviceFromMessage(adapter *Adapter, msg messages.Device) *device {
 		return
 	}
 
-	device := device{
-		adapter: adapter,
-		Device: &devices.Device{
-			Context: getString(msg.Context),
-			AtType:  msg.Type,
-			Id:      msg.Id,
-			Title: func() string {
-				t := getString(msg.Title)
-				if t != "" {
-					return t
-				}
-				return msg.Id
-			}(),
-			Description: "",
-			Links:       linksFunc(msg.Links),
-			BaseHref: func() string {
-				if msg.BaseHref == nil {
-					return ""
-				}
-				return *msg.BaseHref
-			}(),
-			Pin:     pinFunc(msg.Pin),
-			Actions: actionsFunc(msg.Actions),
-			Events:  eventsFunc(msg.Events),
-			CredentialsRequired: func() bool {
-				if msg.CredentialsRequired == nil {
-					return false
-				}
-				return *msg.CredentialsRequired
-			}(),
-		},
-	}
-	for _, p := range msg.Properties {
-		if device.Properties == nil {
-			device.Properties = make(map[string]properties.Entity, 0)
+	asPropertiesMap := func(device *device, deviceProperties messages.DeviceProperties) devices.DeviceProperties {
+		props := make(devices.DeviceProperties, 0)
+		for _, p := range msg.Properties {
+			prop := properties.NewProperty(properties.PropertyDescription{
+				Name:        util.GetFromPointer(p.Name),
+				AtType:      util.GetFromPointer(p.AtType),
+				Title:       util.GetFromPointer(p.Title),
+				Type:        p.Type,
+				Unit:        util.GetFromPointer(p.Unit),
+				Description: util.GetFromPointer(p.Description),
+				Minimum:     util.GetFromPointer(p.Minimum),
+				Maximum:     util.GetFromPointer(p.Maximum),
+				Enum:        p.Enum,
+				ReadOnly:    util.GetFromPointer(p.ReadOnly),
+				MultipleOf:  util.GetFromPointer(p.MultipleOf),
+				Links:       nil,
+				Value:       p.Value,
+			})
+			if prop == nil {
+				continue
+			}
+			device.AddProperty(prop)
 		}
-		prop := properties.NewProperty(getPropertyDescription(p))
-		if prop == nil {
-			continue
-		}
-		device.AddProperty(prop)
+		return props
 	}
 
+	device := &device{
+		adapter: adapter,
+		Device: &devices.Device{
+			Context:             util.GetFromPointer(msg.Context),
+			AtType:              msg.Type,
+			Id:                  msg.Id,
+			Title:               util.GetFromPointer(msg.Title),
+			Description:         "",
+			Links:               linksFunc(msg.Links),
+			BaseHref:            util.GetFromPointer[string](msg.BaseHref),
+			Pin:                 pinFunc(msg.Pin),
+			Actions:             asActionMap(msg.Actions),
+			Events:              asEventMap(msg.Events),
+			CredentialsRequired: util.GetFromPointer[bool](msg.CredentialsRequired),
+		},
+	}
+	device.Properties = asPropertiesMap(device, msg.Properties)
 	device.logger = adapter.logger
-	return &device
+	return device
 }
 
 func (device *device) onPropertyChanged(property properties.PropertyDescription) {

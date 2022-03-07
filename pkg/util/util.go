@@ -137,3 +137,16 @@ func JsonIndent(in any) string {
 	}
 	return string(d)
 }
+
+type Valuer interface {
+	string | float64 | bool
+}
+
+func GetFromPointer[T Valuer](value *T) T {
+	var v T
+	if value != nil {
+		tem := value
+		return *tem
+	}
+	return v
+}

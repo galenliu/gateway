@@ -221,13 +221,7 @@ func (d *Device) ToMessage() *messages.Device {
 			}
 			return mma
 		}(d.Actions),
-		Title: func() *string {
-			t := ""
-			if d.Title != "" {
-				t = d.Title
-			}
-			return &t
-		}(),
+		Title: &d.Title,
 	}
 }
 

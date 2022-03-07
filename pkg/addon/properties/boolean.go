@@ -19,6 +19,7 @@ type BooleanEntity interface {
 	CheckValue(v any) bool
 	TurnOn() error
 	TurnOff() error
+	IsOn() bool
 }
 
 type BooleanProperty struct {
@@ -53,7 +54,7 @@ func (prop *BooleanProperty) OnValueRemoteUpdate(fn func(bool)) {
 	//})
 }
 
-func (prop *BooleanProperty) GetValue() bool {
+func (prop *BooleanProperty) IsOn() bool {
 	v := prop.Value.(bool)
 	return v
 }
