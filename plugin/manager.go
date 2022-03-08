@@ -27,6 +27,11 @@ type managerStore interface {
 	SetSetting(key, value string) error
 }
 
+type ThingsContainer interface {
+	Subscribe(topic topic.Topic, fn any) func()
+	GetThings() []*things.Thing
+}
+
 type Config struct {
 	AddonsDir       string
 	AttachAddonsDir string
@@ -53,6 +58,7 @@ type Manager struct {
 	logger         logging.Logger
 	storage        managerStore
 	ctx            context.Context
+	thingContainer ThingsContainer
 	deferredRemove sync.Map
 }
 
@@ -71,6 +77,10 @@ func NewAddonsManager(ctx context.Context, conf Config, s managerStore, log logg
 	am.UpdatePreferences()
 	am.loadAddons()
 	return am
+}
+
+func (m *Manager) SetThingsContainer(thingContainer ThingsContainer) {
+	m.thingContainer = thingContainer
 }
 
 func (m *Manager) RequestAction(ctx context.Context, thingId, actionName string, input map[string]any) error {

@@ -29,7 +29,7 @@ type AdapterProxy interface {
 	Unload()
 	CancelPairing()
 	StartPairing(timeout <-chan time.Time)
-	HandleDeviceSaved(DeviceProxy)
+	HandleDeviceSaved(data messages.DeviceSavedNotificationJsonData)
 	HandleDeviceRemoved(DeviceProxy)
 	CancelRemoveThing(id string)
 }

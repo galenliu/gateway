@@ -16,6 +16,7 @@ type manager interface {
 }
 type thingContainer interface {
 	GetMapOfThings() map[string]*things.Thing
+	GetThing(id string) *things.Thing
 }
 
 type NewThingsController struct {
@@ -46,6 +47,9 @@ func (c *NewThingsController) handleNewThingsWebsocket() func(conn *websocket.Co
 			if conn != nil && locker != nil {
 				locker.Lock()
 				defer locker.Unlock()
+				if t := c.thingContainer.GetThing(msg.DeviceId); t != nil {
+					return
+				}
 				err := conn.WriteJSON(things.AsWebOfThing(msg.Device))
 				if err != nil {
 					return

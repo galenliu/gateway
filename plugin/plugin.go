@@ -2,8 +2,10 @@ package plugin
 
 import (
 	"context"
+	"fmt"
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/properties"
+	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/ipc"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
@@ -17,17 +19,18 @@ import (
 )
 
 type Plugin struct {
-	manager     *Manager
-	pluginId    string
-	exec        string
-	execPath    string
-	closeChan   chan struct{}
-	connection  ipc.Connection
-	registered  bool
-	logger      logging.Logger
-	adapters    sync.Map
-	notifiers   sync.Map
-	apiHandlers sync.Map
+	manager      *Manager
+	pluginId     string
+	exec         string
+	execPath     string
+	closeChan    chan struct{}
+	connection   ipc.Connection
+	registered   bool
+	logger       logging.Logger
+	eventHandler map[string]func()
+	adapters     sync.Map
+	notifiers    sync.Map
+	apiHandlers  sync.Map
 }
 
 func NewPlugin(pluginId string, manager *Manager, log logging.Logger) (plugin *Plugin) {
@@ -36,6 +39,7 @@ func NewPlugin(pluginId string, manager *Manager, log logging.Logger) (plugin *P
 	plugin.registered = false
 	plugin.manager = manager
 	plugin.pluginId = pluginId
+	plugin.eventHandler = make(map[string]func(), 0)
 	return
 }
 
@@ -124,6 +128,32 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			return
 		}
 		adapter := NewAdapter(plugin, message.AdapterId, plugin.logger)
+
+		send := func(msg topic.ThingAddedMessage) {
+			var device messages.DeviceWithoutId
+			err := json.Unmarshal(msg.Data, &device)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
+			adapter.send(messages.MessageType_DeviceSavedNotification, messages.DeviceSavedNotificationJsonData{
+				AdapterId: adapter.GetId(),
+				Device:    device,
+				DeviceId:  msg.ThingId,
+				PluginId:  plugin.getId(),
+			})
+		}
+
+		if plugin.manager.thingContainer != nil {
+			for _, t := range plugin.manager.thingContainer.GetThings() {
+				send(topic.ThingAddedMessage{
+					ThingId: t.GetId(),
+					Data:    []byte(util.JsonIndent(t)),
+				})
+			}
+		}
+		adapter.eventHandler[string(topic.ThingAdded)] = plugin.manager.thingContainer.Subscribe(topic.ThingAdded, send)
+
 		go plugin.handleAdapterAdded(adapter)
 		return
 

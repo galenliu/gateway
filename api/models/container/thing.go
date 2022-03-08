@@ -5,6 +5,7 @@ import (
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/events"
 	"github.com/galenliu/gateway/pkg/bus/topic"
+	"github.com/galenliu/gateway/pkg/util"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 	json "github.com/json-iterator/go"
@@ -153,7 +154,7 @@ func (t *Thing) create() {
 	if err != nil {
 		t.container.logger.Errorf(err.Error())
 	}
-	t.container.Publish(topic.ThingAdded, topic.ThingAddedMessage{ThingId: t.GetId()})
+	t.container.Publish(topic.ThingAdded, topic.ThingAddedMessage{ThingId: t.GetId(), Data: []byte(util.JsonIndent(t))})
 }
 
 func (t *Thing) onPropertyChanged(msg topic.DevicePropertyChangedMessage) {

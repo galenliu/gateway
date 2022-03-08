@@ -15,7 +15,9 @@ import (
 )
 
 func AsWebOfThing(device devices.Device) *Thing {
-
+	if len(device.AtType) == 0 {
+		return nil
+	}
 	thing := Thing{
 		Thing: &wot.Thing{
 			AtContext:         controls.URI(device.GetAtContext()),
@@ -34,7 +36,7 @@ func AsWebOfThing(device devices.Device) *Thing {
 			SchemaDefinitions: nil,
 		},
 		CredentialsRequired: device.CredentialsRequired,
-		SelectedCapability:  "",
+		SelectedCapability:  device.GetAtType()[0],
 		GroupId:             "",
 	}
 

@@ -274,7 +274,7 @@ func (device *device) setPropertyValue(ctx context.Context, name string, value a
 		for {
 			select {
 			case <-ctx.Done():
-				return nil, fmt.Errorf("timeout for setPropertyValue")
+				return nil, fmt.Errorf("timeout")
 			case v := <-task:
 				return v, nil
 			}

@@ -141,7 +141,7 @@ func (m *Manager) OnMessage(data []byte) {
 	adapterId := dataNode.Get("adapterId").ToString()
 	adapter := m.getAdapter(adapterId)
 	if adapter == nil {
-		fmt.Printf("can not found adapter(%s)", adapterId)
+		fmt.Printf("can not found adapter(%s) \t\n", adapterId)
 		return
 	}
 	switch messageType {
@@ -182,11 +182,22 @@ func (m *Manager) OnMessage(data []byte) {
 		}
 		go unloadFunc()
 		break
+
+	case messages.MessageType_DeviceSavedNotification:
+		var msg messages.DeviceSavedNotificationJsonData
+		dataNode.ToVal(&msg)
+		if dataNode.LastError() != nil {
+			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
+			return
+		}
+		go adapter.HandleDeviceSaved(msg)
+		return
 	}
+
 	deviceId := dataNode.Get("deviceId").ToString()
 	device := adapter.GetDevice(deviceId)
 	if device == nil {
-		fmt.Printf("device %s not found", deviceId)
+		fmt.Printf("manager Onmessage: device %s not found \t\n", deviceId)
 		return
 	}
 	switch messageType {
@@ -198,16 +209,6 @@ func (m *Manager) OnMessage(data []byte) {
 			return
 		}
 		go adapter.CancelRemoveThing(msg.DeviceId)
-		return
-
-	case messages.MessageType_DeviceSavedNotification:
-		var msg messages.DeviceSavedNotificationJsonData
-		dataNode.ToVal(&msg)
-		if dataNode.LastError() != nil {
-			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
-			return
-		}
-		go adapter.HandleDeviceSaved(device)
 		return
 
 	case messages.MessageType_AdapterRemoveDeviceRequest:
@@ -251,6 +252,14 @@ func (m *Manager) OnMessage(data []byte) {
 									fmt.Printf(err.Error())
 								}
 							}
+						} else {
+							p, ok := prop.(properties.Entity)
+							if ok {
+								err := p.SetPropertyValue(msg.PropertyValue)
+								if err != nil {
+									fmt.Printf(err.Error())
+								}
+							}
 						}
 					case properties.TypeInteger:
 						p, ok := prop.(properties.IntegerEntity)
@@ -259,6 +268,14 @@ func (m *Manager) OnMessage(data []byte) {
 							err := p.SetValue(value)
 							if err != nil {
 								fmt.Printf(err.Error())
+							}
+						} else {
+							p, ok := prop.(properties.Entity)
+							if ok {
+								err := p.SetPropertyValue(msg.PropertyValue)
+								if err != nil {
+									fmt.Printf(err.Error())
+								}
 							}
 						}
 					case properties.TypeNumber:
@@ -269,6 +286,14 @@ func (m *Manager) OnMessage(data []byte) {
 							if err != nil {
 								fmt.Printf(err.Error())
 							}
+						} else {
+							p, ok := prop.(properties.Entity)
+							if ok {
+								err := p.SetPropertyValue(msg.PropertyValue)
+								if err != nil {
+									fmt.Printf(err.Error())
+								}
+							}
 						}
 					case properties.TypeString:
 						p, ok := prop.(properties.StringEntity)
@@ -277,6 +302,14 @@ func (m *Manager) OnMessage(data []byte) {
 							err := p.SetValue(value)
 							if err != nil {
 								fmt.Printf(err.Error())
+							}
+						} else {
+							p, ok := prop.(properties.Entity)
+							if ok {
+								err := p.SetPropertyValue(msg.PropertyValue)
+								if err != nil {
+									fmt.Printf(err.Error())
+								}
 							}
 						}
 					default:

@@ -56,6 +56,7 @@ func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log l
 	//models init
 	settingModel := models.NewSettingsModel(app.addonUrls, store, log)
 	containerModel := things.NewThingsContainerModel(manager, store, log)
+	manager.SetThingsContainer(containerModel)
 	jwtMiddleware := middleware.NewJWTMiddleware(store, log)
 	auth := jwtMiddleware.Auth
 	usersModel := models.NewUsersModel(store, log)

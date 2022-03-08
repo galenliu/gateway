@@ -109,9 +109,9 @@ func (a *Adapter) Unload() {
 	}
 }
 
-func (a *Adapter) HandleDeviceSaved(device DeviceProxy) {
+func (a *Adapter) HandleDeviceSaved(msg messages.DeviceSavedNotificationJsonData) {
 	if a.verbose {
-		log.Printf("adapter:(%s)- HandleDeviceSaved() not implemented", device.GetId())
+		log.Printf("adapter: %s HandleDeviceSaved not implemented", msg.AdapterId)
 	}
 }
 

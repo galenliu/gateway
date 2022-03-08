@@ -60,6 +60,7 @@ type DeviceConnectedMessage struct {
 
 type ThingAddedMessage struct {
 	ThingId string
+	Data    []byte
 }
 
 type ThingRemovedMessage struct {

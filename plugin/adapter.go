@@ -17,6 +17,7 @@ type Adapter struct {
 	plugin             *Plugin
 	setCredentialsTask sync.Map
 	setPinTask         sync.Map
+	eventHandler       map[string]func()
 	nextId             int
 }
 
@@ -25,6 +26,7 @@ func NewAdapter(plugin *Plugin, adapterId string, log logging.Logger) *Adapter {
 	a.Adapter = adapter.NewAdapter(adapterId)
 	a.plugin = plugin
 	a.logger = log
+	a.eventHandler = make(map[string]func(), 0)
 	a.packageName = plugin.pluginId
 	a.nextId = 0
 	return a
@@ -159,6 +161,9 @@ func (adapter *Adapter) getPlugin() *Plugin {
 func (adapter *Adapter) unload() {
 	for _, device := range adapter.getDevices() {
 		adapter.handleDeviceRemoved(device)
+	}
+	for _, f := range adapter.eventHandler {
+		f()
 	}
 }
 
