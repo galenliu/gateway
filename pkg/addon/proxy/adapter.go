@@ -82,7 +82,7 @@ func (a *Adapter) SendUnpairingPrompt(prompt, url string, did string) {
 	})
 }
 
-func (a *Adapter) send(mt messages.MessageType, data map[string]any) {
+func (a *Adapter) Send(mt messages.MessageType, data any) {
 	a.manager.Send(mt, data)
 }
 

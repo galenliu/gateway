@@ -119,61 +119,65 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 		plugin.logger.Info("Bad message type")
 		return
 	}
-	switch mt {
-	case messages.MessageType_AdapterAddedNotification:
-		var message messages.AdapterAddedNotificationJsonData
-		err := json.Unmarshal(data, &message)
-		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", util.JsonIndent(dt))
-			return
-		}
-		adapter := NewAdapter(plugin, message.AdapterId, plugin.logger)
 
-		send := func(msg topic.ThingAddedMessage) {
-			var device messages.DeviceWithoutId
-			err := json.Unmarshal(msg.Data, &device)
+	//首先处理Adapter注册
+	{
+		switch mt {
+		case messages.MessageType_AdapterAddedNotification:
+			var message messages.AdapterAddedNotificationJsonData
+			err := json.Unmarshal(data, &message)
 			if err != nil {
-				fmt.Println(err.Error())
+				plugin.logger.Errorf("Bad message : %s", util.JsonIndent(dt))
 				return
 			}
-			adapter.send(messages.MessageType_DeviceSavedNotification, messages.DeviceSavedNotificationJsonData{
-				AdapterId: adapter.GetId(),
-				Device:    device,
-				DeviceId:  msg.ThingId,
-				PluginId:  plugin.getId(),
-			})
-		}
+			adapter := NewAdapter(plugin, message.AdapterId, plugin.logger)
 
-		if plugin.manager.thingContainer != nil {
-			for _, t := range plugin.manager.thingContainer.GetThings() {
-				send(topic.ThingAddedMessage{
-					ThingId: t.GetId(),
-					Data:    []byte(util.JsonIndent(t)),
+			send := func(msg topic.ThingAddedMessage) {
+				var device messages.DeviceWithoutId
+				err := json.Unmarshal(msg.Data, &device)
+				if err != nil {
+					fmt.Println(err.Error())
+					return
+				}
+				adapter.Send(messages.MessageType_DeviceSavedNotification, messages.DeviceSavedNotificationJsonData{
+					AdapterId: adapter.GetId(),
+					Device:    device,
+					DeviceId:  msg.ThingId,
+					PluginId:  plugin.getId(),
 				})
 			}
-		}
-		adapter.eventHandler[string(topic.ThingAdded)] = plugin.manager.thingContainer.Subscribe(topic.ThingAdded, send)
 
-		go plugin.handleAdapterAdded(adapter)
-		return
+			if plugin.manager.thingContainer != nil {
+				for _, t := range plugin.manager.thingContainer.GetThings() {
+					send(topic.ThingAddedMessage{
+						ThingId: t.GetId(),
+						Data:    []byte(util.JsonIndent(t)),
+					})
+				}
+			}
+			adapter.eventHandler[string(topic.ThingAdded)] = plugin.manager.thingContainer.Subscribe(topic.ThingAdded, send)
 
-	case messages.MessageType_NotifierAddedNotification:
-		var message messages.NotifierAddedNotificationJsonData
-		err := json.Unmarshal(data, &message)
-		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", util.JsonIndent(dt))
+			go plugin.handleAdapterAdded(adapter)
+			return
+
+		case messages.MessageType_NotifierAddedNotification:
+			var message messages.NotifierAddedNotificationJsonData
+			err := json.Unmarshal(data, &message)
+			if err != nil {
+				plugin.logger.Errorf("Bad message : %s", util.JsonIndent(dt))
+				return
+			}
 			return
 		}
-		return
 	}
 
+	//处理adapter消息，如果adapter未注册，则丢弃消息
 	adapterId := json.Get(data, "adapterId").ToString()
 	adapter := plugin.getAdapter(adapterId)
 	if adapter == nil {
-		plugin.logger.Errorf("plugin message err: %s not found, messageType: %v data: %s", adapterId, mt, util.JsonIndent(dt))
+		plugin.logger.Errorf("plugin message err: adapter: %s not found, messageType: %v data: %s", adapterId, mt, util.JsonIndent(dt))
 		return
 	}
-	// adapter handler
 	switch mt {
 	case messages.MessageType_OutletNotifyResponse:
 		var message messages.OutletNotifyRequestJsonData
@@ -217,7 +221,6 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 		err := json.Unmarshal(data, &message)
 		if err != nil {
 			plugin.logger.Errorf("Bad message : %s", util.JsonIndent(dt))
-
 			return
 		}
 		return
@@ -249,12 +252,12 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			plugin.logger.Errorf("Bad message : %s", util.JsonIndent(dt))
 			return
 		}
-		device := newDeviceFromMessage(adapter, message.Device)
+		device := newDeviceFromMessage(message.Device)
 		go adapter.handleDeviceAdded(device)
 		return
 	}
 
-	//device handler
+	//处理device消息，如果device没有注册，则丢弃消息
 	deviceId := json.Get(data, "deviceId").ToString()
 	dev := plugin.manager.getDevice(deviceId)
 	if dev == nil {
@@ -353,9 +356,8 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 				return
 			}
 			if message.Device != nil && message.Success {
-				newDev := newDeviceFromMessage(adapter, *message.Device)
-				adapter.AddDevice(newDev)
-				plugin.manager.AddDevice(newDev)
+				newDev := newDeviceFromMessage(*message.Device)
+				adapter.handleDeviceAdded(newDev)
 				select {
 				case task <- newDev:
 				}
@@ -375,39 +377,19 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			return
 		}
 		go dev.onPropertyChanged(properties.PropertyDescription{
-			Name:   *message.Property.Name,
-			AtType: *message.Property.AtType,
-			Title: func() string {
-				if message.Property.Title == nil {
-					return ""
-				}
-				return *message.Property.Title
-			}(),
-			Type: message.Property.Type,
-			Unit: func() string {
-				if message.Property.Unit == nil {
-					return ""
-				}
-				return *message.Property.Unit
-			}(),
-			Description: func() string {
-				if message.Property.Description == nil {
-					return ""
-				}
-				return *message.Property.Description
-			}(),
-			Minimum: message.Property.Minimum,
-			Maximum: message.Property.Maximum,
-			Enum:    message.Property.Enum,
-			ReadOnly: func() bool {
-				if message.Property.ReadOnly == nil {
-					return false
-				}
-				return *message.Property.ReadOnly
-			}(),
-			MultipleOf: message.Property.MultipleOf,
-			Links:      nil,
-			Value:      message.Property.Value,
+			Name:        util.GetFromPointer(message.Property.Name),
+			AtType:      *message.Property.AtType,
+			Title:       util.GetFromPointer(message.Property.Title),
+			Type:        message.Property.Type,
+			Unit:        util.GetFromPointer(message.Property.Unit),
+			Description: util.GetFromPointer(message.Property.Description),
+			Minimum:     util.GetFromPointer(message.Property.Minimum),
+			Maximum:     util.GetFromPointer(message.Property.Maximum),
+			Enum:        message.Property.Enum,
+			ReadOnly:    util.GetFromPointer(message.Property.ReadOnly),
+			MultipleOf:  util.GetFromPointer(message.Property.MultipleOf),
+			Links:       nil,
+			Value:       message.Property.Value,
 		})
 		return
 

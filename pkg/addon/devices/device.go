@@ -16,6 +16,7 @@ type DeviceEvents map[string]events.Event
 type AdapterHandler interface {
 	GetId() string
 	SendPropertyChangedNotification(deviceId string, p properties.PropertyDescription)
+	Send(messageType messages.MessageType, data any)
 }
 
 type Entity interface {
@@ -174,6 +175,10 @@ func (d *Device) GetCredentialsRequired() bool {
 
 func (d *Device) SetHandler(h AdapterHandler) {
 	d.handler = h
+}
+
+func (d *Device) GetHandler() AdapterHandler {
+	return d.handler
 }
 
 func (d *Device) GetAdapter() AdapterHandler {

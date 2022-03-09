@@ -18,6 +18,7 @@ type ManagerProxy interface {
 	IsRunning() bool
 }
 
+// AdapterProxy Adapter 的抽象接口，
 type AdapterProxy interface {
 	adapter.Entity
 	devices.AdapterHandler
@@ -32,4 +33,14 @@ type AdapterProxy interface {
 	HandleDeviceSaved(data messages.DeviceSavedNotificationJsonData)
 	HandleDeviceRemoved(DeviceProxy)
 	CancelRemoveThing(id string)
+}
+
+// DeviceProxy 所有Addon所有Device的抽象接口，
+//   addons/devices下所有Device均实现了此接口
+type DeviceProxy interface {
+	devices.Entity
+	properties.DeviceHandler
+	GetProperty(id string) properties.Entity
+	SetCredentials(username, password string) error
+	SetPin(pin string) error
 }

@@ -20,7 +20,6 @@ import (
 var gsf singleflight.Group
 
 type device struct {
-	adapter *Adapter
 	*devices.Device
 	logger               logging.Logger
 	requestActionTask    sync.Map
@@ -28,7 +27,7 @@ type device struct {
 	setPropertyValueTask sync.Map
 }
 
-func newDeviceFromMessage(adapter *Adapter, msg messages.Device) *device {
+func newDeviceFromMessage(msg messages.Device) *device {
 
 	linksFunc := func(links []messages.Link) (ls []devices.DeviceLink) {
 		if len(links) == 0 {
@@ -125,7 +124,6 @@ func newDeviceFromMessage(adapter *Adapter, msg messages.Device) *device {
 	}
 
 	device := &device{
-		adapter: adapter,
 		Device: &devices.Device{
 			Context:             util.GetFromPointer(msg.Context),
 			AtType:              msg.Type,
@@ -141,7 +139,6 @@ func newDeviceFromMessage(adapter *Adapter, msg messages.Device) *device {
 		},
 	}
 	asPropertiesMap(device, msg.Properties)
-	device.logger = adapter.logger
 	return device
 }
 
@@ -160,35 +157,7 @@ func (device *device) onPropertyChanged(property properties.PropertyDescription)
 	if p.IsReadOnly() {
 		return
 	}
-	valueChanged := p.SetCachedValue(property.Value)
-	titleChanged := false
-	if property.Title != "" {
-		titleChanged = p.SetTitle(property.Title)
-	}
-	descriptionChanged := false
-	if property.Description != "" {
-		descriptionChanged = p.SetDescription(property.Description)
-	}
-	if valueChanged || descriptionChanged || titleChanged {
-		device.adapter.plugin.manager.Publish(topic.DevicePropertyChanged, topic.DevicePropertyChangedMessage{
-			DeviceId: device.GetId(),
-			PropertyDescription: properties.PropertyDescription{
-				Name:        p.GetName(),
-				AtType:      p.GetType(),
-				Title:       p.GetTitle(),
-				Type:        p.GetType(),
-				Unit:        p.GetUnit(),
-				Description: p.GetDescription(),
-				Minimum:     p.GetMinimum(),
-				Maximum:     p.GetMaximum(),
-				Enum:        p.GetEnum(),
-				ReadOnly:    p.IsReadOnly(),
-				MultipleOf:  p.GetMultipleOf(),
-				Links:       nil,
-				Value:       p.GetCachedValue(),
-			},
-		})
-	}
+	p.SetCachedValueAndNotify(property.Value)
 }
 
 func (device *device) notifyDeviceConnected(connected bool) {
@@ -206,7 +175,6 @@ func (device *device) actionNotify(actionDescription actions.ActionDescription) 
 }
 
 func (device *device) requestAction(ctx context.Context, id, name string, input map[string]any) error {
-
 	t, ok := device.requestActionTask.LoadOrStore(id, make(chan bool))
 	if !ok {
 		var message = messages.DeviceRequestActionRequestJsonData{
@@ -215,9 +183,9 @@ func (device *device) requestAction(ctx context.Context, id, name string, input 
 			AdapterId:  device.getAdapter().GetId(),
 			DeviceId:   device.GetId(),
 			Input:      input,
-			PluginId:   device.adapter.plugin.pluginId,
+			PluginId:   device.getAdapter().plugin.pluginId,
 		}
-		device.adapter.send(messages.MessageType_DeviceRequestActionRequest, message)
+		device.getAdapter().Send(messages.MessageType_DeviceRequestActionRequest, message)
 	}
 	task := t.(chan bool)
 	defer func() {
@@ -264,11 +232,11 @@ func (device *device) setPropertyValue(ctx context.Context, name string, value a
 		data := messages.DeviceSetPropertyCommandJsonData{
 			AdapterId:     device.getAdapter().GetId(),
 			DeviceId:      device.GetId(),
-			PluginId:      device.adapter.plugin.pluginId,
+			PluginId:      device.getAdapter().plugin.pluginId,
 			PropertyName:  name,
 			PropertyValue: value,
 		}
-		device.adapter.send(messages.MessageType_DeviceSetPropertyCommand, data)
+		device.getAdapter().Send(messages.MessageType_DeviceSetPropertyCommand, data)
 	}
 	v, err, _ := gsf.Do(name, func() (any, error) {
 		for {
@@ -284,9 +252,14 @@ func (device *device) setPropertyValue(ctx context.Context, name string, value a
 }
 
 func (device *device) getAdapter() *Adapter {
-	return device.adapter
+	a := device.Device.GetHandler()
+	adapter, ok := a.(*Adapter)
+	if ok {
+		return adapter
+	}
+	return nil
 }
 
 func (device *device) getManager() *Manager {
-	return device.adapter.plugin.manager
+	return device.getAdapter().plugin.manager
 }

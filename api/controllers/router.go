@@ -65,7 +65,12 @@ func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log l
 
 	actionsModel := models.NewActionsModel(manager, containerModel, log)
 
-	//logger
+	// recover middleware
+	app.Use(recover.New(recover.Config{
+		EnableStackTrace: true,
+	}))
+
+	//logger middleware
 	app.Use(logger.New())
 
 	//root handler
