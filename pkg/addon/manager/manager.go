@@ -10,18 +10,13 @@ type Adapter interface {
 	GetId() string
 }
 
-type Integration interface {
-	GetId() string
-}
-
 func NewManager() *Manager {
 	return &Manager{}
 }
 
 type Manager struct {
-	devices      sync.Map
-	adapters     sync.Map
-	integrations sync.Map
+	devices  sync.Map
+	adapters sync.Map
 }
 
 func (m *Manager) AddDevice(d Device) {
@@ -34,10 +29,6 @@ func (m *Manager) RemoveDevice(id string) {
 
 func (m *Manager) AddAdapter(a Adapter) {
 	m.adapters.Store(a.GetId(), a)
-}
-
-func (m *Manager) AddIntegration(ig Integration) {
-	m.integrations.Store(ig.GetId(), ig)
 }
 
 func (m *Manager) RemoveAdapter(id string) {

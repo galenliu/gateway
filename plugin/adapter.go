@@ -23,13 +23,6 @@ type Adapter struct {
 	nextId             int
 }
 
-func (adapter *Adapter) SendPropertyChangedNotification(deviceId string, p properties.PropertyDescription) {
-	adapter.plugin.manager.Publish(topic.DevicePropertyChanged, topic.DevicePropertyChangedMessage{
-		DeviceId:            deviceId,
-		PropertyDescription: p,
-	})
-}
-
 func NewAdapter(plugin *Plugin, adapterId string, log logging.Logger) *Adapter {
 	a := &Adapter{}
 	a.Adapter = adapter.NewAdapter(adapterId)
@@ -39,6 +32,13 @@ func NewAdapter(plugin *Plugin, adapterId string, log logging.Logger) *Adapter {
 	a.packageName = plugin.pluginId
 	a.nextId = 0
 	return a
+}
+
+func (adapter *Adapter) SendPropertyChangedNotification(deviceId string, p properties.PropertyDescription) {
+	adapter.plugin.manager.Publish(topic.DevicePropertyChanged, topic.DevicePropertyChangedMessage{
+		DeviceId:            deviceId,
+		PropertyDescription: p,
+	})
 }
 
 func (adapter *Adapter) setDeviceCredentials(ctx context.Context, thingId, username, password string) (*messages.Device, error) {
@@ -145,7 +145,7 @@ func (adapter *Adapter) handleDeviceAdded(device *device) {
 }
 
 func (adapter *Adapter) getDevice(deviceId string) *device {
-	d := adapter.GetDeviceById(deviceId)
+	d := adapter.GetDevice(deviceId)
 	device, ok := d.(device)
 	if !ok {
 		return nil

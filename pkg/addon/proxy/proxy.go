@@ -9,8 +9,11 @@ import (
 )
 
 type ManagerProxy interface {
-	HandleDeviceAdded(device DeviceProxy)
-	HandleDeviceRemoved(device DeviceProxy)
+	getAdapter(adapterId string) AdapterProxy
+	getDevice(deviceId string) DeviceProxy
+
+	handleDeviceAdded(device DeviceProxy)
+	handleDeviceRemoved(device DeviceProxy)
 	Send(messageType messages.MessageType, v any)
 	GetUserProfile() *messages.PluginRegisterResponseJsonDataUserProfile
 	Close()
@@ -22,12 +25,12 @@ type ManagerProxy interface {
 type AdapterProxy interface {
 	adapter.Entity
 	devices.AdapterHandler
-	GetDevice(deviceId string) DeviceProxy
+
+	getDevice(id string) DeviceProxy
 	GetName() string
 	GetPackageName() string
-	Registered(m *Manager)
-	SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription)
-	Unload()
+	registered(m *Manager)
+	unload()
 	CancelPairing()
 	StartPairing(timeout <-chan time.Time)
 	HandleDeviceSaved(data messages.DeviceSavedNotificationJsonData)
@@ -40,7 +43,6 @@ type AdapterProxy interface {
 type DeviceProxy interface {
 	devices.Entity
 	properties.DeviceHandler
-	GetProperty(id string) properties.Entity
 	SetCredentials(username, password string) error
 	SetPin(pin string) error
 }

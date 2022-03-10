@@ -12,7 +12,7 @@ import (
 type Adapter struct {
 	*adapter.Adapter
 	name      string
-	manager   *Manager
+	manager   ManagerProxy
 	IsPairing bool
 	verbose   bool
 	pluginId  string
@@ -30,9 +30,8 @@ func NewAdapter(adapterId, name string) *Adapter {
 func (a *Adapter) AddDevices(devices ...DeviceProxy) {
 	for _, device := range devices {
 		if device != nil {
-			device.SetHandler(a)
-			a.Adapter.AddDevice(device)
-			a.manager.HandleDeviceAdded(device)
+			a.handleDeviceAdded(device)
+			a.manager.handleDeviceAdded(device)
 		}
 	}
 }
@@ -92,8 +91,8 @@ func (a *Adapter) CancelPairing() {
 	}
 }
 
-func (a *Adapter) GetDevice(id string) DeviceProxy {
-	device := a.Adapter.GetDeviceById(id)
+func (a *Adapter) getDevice(id string) DeviceProxy {
+	device := a.Adapter.GetDevice(id)
 	if device != nil {
 		d, ok := device.(DeviceProxy)
 		if ok {
@@ -103,7 +102,7 @@ func (a *Adapter) GetDevice(id string) DeviceProxy {
 	return nil
 }
 
-func (a *Adapter) Unload() {
+func (a *Adapter) unload() {
 	if a.verbose {
 		log.Printf("adapter:(%s)- unloaded ", a.GetId())
 	}
@@ -210,4 +209,9 @@ func (a *Adapter) GetName() string {
 
 func (a *Adapter) OnMessage(data []byte) {
 
+}
+
+func (a *Adapter) handleDeviceAdded(device DeviceProxy) {
+	device.SetHandler(a)
+	a.AddDevice(device)
 }

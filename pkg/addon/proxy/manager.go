@@ -47,7 +47,7 @@ func NewAddonManager(pluginId string) (*Manager, error) {
 
 func (m *Manager) RegisteredAdapter(adapters ...AdapterProxy) {
 	for _, adapter := range adapters {
-		adapter.Registered(m)
+		adapter.registered(m)
 		m.AddAdapter(adapter)
 		m.Send(messages.MessageType_AdapterAddedNotification, messages.AdapterAddedNotificationJsonData{
 			AdapterId:   adapter.GetId(),
@@ -58,7 +58,7 @@ func (m *Manager) RegisteredAdapter(adapters ...AdapterProxy) {
 	}
 }
 
-func (m *Manager) HandleDeviceAdded(device DeviceProxy) {
+func (m *Manager) handleDeviceAdded(device DeviceProxy) {
 	if m.verbose {
 		fmt.Printf("manager device_added: %s \t\n", device.GetId())
 	}
@@ -69,7 +69,7 @@ func (m *Manager) HandleDeviceAdded(device DeviceProxy) {
 	})
 }
 
-func (m *Manager) HandleDeviceRemoved(device DeviceProxy) {
+func (m *Manager) handleDeviceRemoved(device DeviceProxy) {
 	if m.verbose {
 		fmt.Printf("addon manager handle devices added, deviceId:%v\n", device.GetId())
 	}
@@ -90,6 +90,17 @@ func (m *Manager) getAdapter(adapterId string) AdapterProxy {
 		adp, ok := adapter.(AdapterProxy)
 		if ok {
 			return adp
+		}
+	}
+	return nil
+}
+
+func (m *Manager) getDevice(deviceId string) DeviceProxy {
+	adapter := m.Manager.GetDevice(deviceId)
+	if adapter != nil {
+		dev, ok := adapter.(DeviceProxy)
+		if ok {
+			return dev
 		}
 	}
 	return nil
@@ -172,7 +183,7 @@ func (m *Manager) OnMessage(data []byte) {
 			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
 			return
 		}
-		go adapter.Unload()
+		go adapter.unload()
 		unloadFunc := func() {
 			m.Send(messages.MessageType_AdapterUnloadResponse, messages.AdapterUnloadResponseJsonData{
 				AdapterId: adapter.GetId(),
@@ -195,7 +206,7 @@ func (m *Manager) OnMessage(data []byte) {
 	}
 
 	deviceId := dataNode.Get("deviceId").ToString()
-	device := adapter.GetDevice(deviceId)
+	device := adapter.getDevice(deviceId)
 	if device == nil {
 		fmt.Printf("manager Onmessage: device %s not found \t\n", deviceId)
 		return

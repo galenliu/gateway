@@ -1,6 +1,8 @@
 package adapter
 
-import "sync"
+import (
+	"sync"
+)
 
 type Device interface {
 	GetId() string
@@ -12,14 +14,13 @@ type Thing interface {
 
 type Entity interface {
 	GetId() string
-	GetDeviceById(id string) Device
+	GetDevice(id string) Device
 	GetDevices() []Device
 }
 
 type Adapter struct {
 	id      string
 	devices sync.Map
-	things  sync.Map
 }
 
 func NewAdapter(id string) *Adapter {
@@ -37,7 +38,7 @@ func (a *Adapter) RemoveDevice(id string) {
 	a.devices.Delete(id)
 }
 
-func (a *Adapter) GetDeviceById(id string) Device {
+func (a *Adapter) GetDevice(id string) Device {
 	v, ok := a.devices.Load(id)
 	if ok {
 		v, ok := v.(Device)
@@ -49,7 +50,7 @@ func (a *Adapter) GetDeviceById(id string) Device {
 }
 
 func (a *Adapter) GetDevices() []Device {
-	devices := make([]Device, 1)
+	devices := make([]Device, 0)
 	a.devices.Range(func(key, value any) bool {
 		device, ok := value.(Device)
 		if ok {
@@ -58,29 +59,6 @@ func (a *Adapter) GetDevices() []Device {
 		return true
 	})
 	return devices
-}
-
-func (a *Adapter) GetThings() []Thing {
-	things := make([]Thing, 1)
-	a.things.Range(func(key, value any) bool {
-		device, ok := value.(Device)
-		if ok {
-			things = append(things, device)
-		}
-		return true
-	})
-	return things
-}
-
-func (a *Adapter) GetThingById(id string) Thing {
-	v, ok := a.things.Load(id)
-	if ok {
-		v, ok := v.(Thing)
-		if ok {
-			return v
-		}
-	}
-	return nil
 }
 
 func (a *Adapter) GetId() string {
