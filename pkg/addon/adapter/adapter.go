@@ -16,6 +16,8 @@ type Entity interface {
 	GetId() string
 	GetDevice(id string) Device
 	GetDevices() []Device
+	RemoveDevice(deviceId string)
+	GetAdapter() *Adapter
 }
 
 type Adapter struct {
@@ -28,6 +30,10 @@ func NewAdapter(id string) *Adapter {
 		id:      id,
 		devices: sync.Map{},
 	}
+}
+
+func (a *Adapter) GetAdapter() *Adapter {
+	return a
 }
 
 func (a *Adapter) AddDevice(dev Device) {

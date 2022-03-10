@@ -27,7 +27,6 @@ type Entity interface {
 	GetProperty(id string) properties.Entity
 	GetAtType() []string
 	ToMessage() *messages.Device
-	NotifyPropertyChanged(p properties.PropertyDescription)
 	SetCredentials(username, password string) error
 	SetPin(pin string) error
 	GetDevice() *Device

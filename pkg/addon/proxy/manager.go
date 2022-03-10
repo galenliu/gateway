@@ -229,7 +229,10 @@ func (m *Manager) OnMessage(data []byte) {
 			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
 			return
 		}
-		go adapter.HandleDeviceRemoved(device)
+		go func() {
+			adapter.HandleDeviceRemoved(device)
+			adapter.RemoveDevice(deviceId)
+		}()
 		return
 
 	case messages.MessageType_DeviceSetPropertyCommand:

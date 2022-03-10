@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg"
 	"github.com/galenliu/gateway/pkg/addon/proxy"
+	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"time"
 )
 
@@ -16,6 +17,10 @@ func NewVirtualAdapter(adapterId string) *YeelightAdapter {
 		proxy.NewAdapter(adapterId, "yeelight"),
 	}
 	return v
+}
+
+func (a *YeelightAdapter) HandleDeviceSaved(msg messages.DeviceSavedNotificationJsonData) {
+	fmt.Printf("YeelightAdapter HandleDeviceSaved: %s", msg.DeviceId)
 }
 
 func (a *YeelightAdapter) StartPairing(timeout <-chan time.Time) {

@@ -115,7 +115,9 @@ func (a *Adapter) HandleDeviceSaved(msg messages.DeviceSavedNotificationJsonData
 }
 
 func (a *Adapter) HandleDeviceRemoved(device DeviceProxy) {
-	a.Adapter.RemoveDevice(device.GetId())
+	if a.verbose {
+		log.Printf("adapter: %s HandleDeviceRemoved not implemented", a.GetId())
+	}
 }
 
 func (a *Adapter) Close() {
@@ -190,13 +192,9 @@ func (a *Adapter) CancelRemoveThing(id string) {
 	fmt.Printf("Adapter:%s CancelRemoveThing func not implemented\t\n", a.GetId())
 }
 
-func (a *Adapter) Registered(manager *Manager) {
+func (a *Adapter) registered(manager ManagerProxy) {
 	a.manager = manager
 	a.pluginId = manager.GetPluginId()
-}
-
-func (a *Adapter) GetManager() ManagerProxy {
-	return a.manager
 }
 
 func (a *Adapter) GetPackageName() string {
@@ -205,10 +203,6 @@ func (a *Adapter) GetPackageName() string {
 
 func (a *Adapter) GetName() string {
 	return a.name
-}
-
-func (a *Adapter) OnMessage(data []byte) {
-
 }
 
 func (a *Adapter) handleDeviceAdded(device DeviceProxy) {
