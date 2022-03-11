@@ -33,7 +33,6 @@ func NewWsClint(ws *websocket.Conn, thingId string, container things.Container, 
 
 func (c *wsClint) handle() error {
 
-	c.logger.Debug("handle websocket:", c.ws.LocalAddr())
 	onThingAdded := func(message topic.ThingAddedMessage) {
 		c.logger.Infof("OnThingsAdded message: %v", message)
 		err := c.ws.WriteJSON(map[string]any{
@@ -101,7 +100,7 @@ func (c *wsClint) addThing(t *things.Thing) {
 		if c.ws != nil {
 			err := c.ws.WriteJSON(struct {
 				Id          string `json:"id"`
-				MessageType string `json:"message_type"`
+				MessageType string `json:"messageType"`
 				Data        any    `json:"data,omitempty"`
 			}{
 				id,
@@ -178,5 +177,19 @@ func (c *wsClint) addThing(t *things.Thing) {
 		removeActionStatusFunc()
 		removeThingEventStatusFunc()
 	}
+
+	var data = make(map[string]any)
+	for n, _ := range t.Properties {
+		v, err := t.GetPropertyValue(n)
+		if err == nil {
+			data[n] = v
+			c.logger.Infof("data message: %v", data)
+			continue
+		}
+		c.logger.Errorf(err.Error())
+	}
+
+	write(t.GetId(), constant.PropertyStatus, data)
+
 	c.thingCleanups[t.GetId()] = thingCleanup
 }

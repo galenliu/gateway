@@ -196,6 +196,10 @@ func (t *Thing) RemoveAction(name string) bool {
 	return ok
 }
 
+func (t *Thing) GetPropertyValue(name string) (any, error) {
+	return t.container.manager.GetPropertyValue(t.GetId(), name)
+}
+
 func (t *Thing) AddEventSubscription(f func(message topic.ThingEventMessage)) {
 	go t.container.Subscribe(topic.ThingEvent+topic.Topic(t.GetId()), f)
 }
