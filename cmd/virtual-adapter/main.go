@@ -23,6 +23,7 @@ func main() {
 	virtualAdapter := virtual.NewVirtualAdapter("virtual-adapter")
 
 	manager.RegisteredAdapter(yeeAdapter, virtualAdapter)
+	virtualAdapter.StartPairing(nil)
 
 	interruptChannel := make(chan os.Signal, 1)
 	signal.Notify(interruptChannel, syscall.SIGINT, syscall.SIGTERM)
