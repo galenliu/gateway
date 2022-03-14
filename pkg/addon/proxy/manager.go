@@ -45,11 +45,11 @@ func NewAddonManager(pluginId string) (*Manager, error) {
 	return instance, nil
 }
 
-func (m *Manager) RegisteredAdapter(adapters ...AdapterProxy) {
+func (m *Manager) AddAdapters(adapters ...AdapterProxy) {
 	for _, adapter := range adapters {
 		adapter.registered(m)
-		m.AddAdapter(adapter)
-		m.Send(messages.MessageType_AdapterAddedNotification, messages.AdapterAddedNotificationJsonData{
+		m.Manager.AddAdapter(adapter)
+		m.send(messages.MessageType_AdapterAddedNotification, messages.AdapterAddedNotificationJsonData{
 			AdapterId:   adapter.GetId(),
 			Name:        adapter.GetName(),
 			PackageName: adapter.GetPackageName(),
@@ -62,7 +62,7 @@ func (m *Manager) handleDeviceAdded(device DeviceProxy) {
 	if m.verbose {
 		fmt.Printf("manager device_added: %s \t\n", device.GetId())
 	}
-	m.Send(messages.MessageType_DeviceAddedNotification, messages.DeviceAddedNotificationJsonData{
+	m.send(messages.MessageType_DeviceAddedNotification, messages.DeviceAddedNotificationJsonData{
 		AdapterId: device.GetAdapter().GetId(),
 		Device:    *device.ToMessage(),
 		PluginId:  m.pluginId,
@@ -73,7 +73,7 @@ func (m *Manager) handleDeviceRemoved(device DeviceProxy) {
 	if m.verbose {
 		fmt.Printf("addon manager handle devices added, deviceId:%v\n", device.GetId())
 	}
-	m.Send(messages.MessageType_AdapterRemoveDeviceResponse, messages.AdapterRemoveDeviceResponseJsonData{
+	m.send(messages.MessageType_AdapterRemoveDeviceResponse, messages.AdapterRemoveDeviceResponseJsonData{
 		AdapterId: device.GetAdapter().GetId(),
 		DeviceId:  device.GetId(),
 		PluginId:  m.pluginId,
@@ -82,6 +82,17 @@ func (m *Manager) handleDeviceRemoved(device DeviceProxy) {
 
 func (m *Manager) HandleAdapterRemoved(id string) {
 	m.Manager.RemoveAdapter(id)
+}
+
+func (m *Manager) GetAdapter(adapterId string) AdapterProxy {
+	adapter := m.Manager.GetAdapter(adapterId)
+	if adapter != nil {
+		adp, ok := adapter.(AdapterProxy)
+		if ok {
+			return adp
+		}
+	}
+	return nil
 }
 
 func (m *Manager) getAdapter(adapterId string) AdapterProxy {
@@ -141,7 +152,7 @@ func (m *Manager) OnMessage(data []byte) {
 			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
 			return
 		}
-		m.Send(messages.MessageType_PluginUnloadResponse, messages.PluginUnloadResponseJsonData{PluginId: msg.PluginId})
+		m.send(messages.MessageType_PluginUnloadResponse, messages.PluginUnloadResponseJsonData{PluginId: msg.PluginId})
 		m.running = false
 		go func() {
 			time.AfterFunc(500*time.Millisecond, func() { m.Close() })
@@ -185,7 +196,7 @@ func (m *Manager) OnMessage(data []byte) {
 		}
 		go adapter.unload()
 		unloadFunc := func() {
-			m.Send(messages.MessageType_AdapterUnloadResponse, messages.AdapterUnloadResponseJsonData{
+			m.send(messages.MessageType_AdapterUnloadResponse, messages.AdapterUnloadResponseJsonData{
 				AdapterId: adapter.GetId(),
 				PluginId:  m.pluginId,
 			})
@@ -355,7 +366,7 @@ func (m *Manager) OnMessage(data []byte) {
 				fmt.Printf("device set pin err:%s", err.Error())
 				success = false
 			}
-			m.Send(messages.MessageType_DeviceSetPinResponse, messages.DeviceSetPinResponseJsonData{
+			m.send(messages.MessageType_DeviceSetPinResponse, messages.DeviceSetPinResponseJsonData{
 				AdapterId: device.GetAdapter().GetId(),
 				Device:    device.ToMessage(),
 				DeviceId:  &deviceId,
@@ -380,7 +391,7 @@ func (m *Manager) OnMessage(data []byte) {
 				success = false
 				fmt.Printf(err.Error())
 			}
-			m.Send(messages.MessageType_DeviceSetCredentialsResponse, messages.DeviceSetCredentialsResponseJsonData{
+			m.send(messages.MessageType_DeviceSetCredentialsResponse, messages.DeviceSetCredentialsResponseJsonData{
 				AdapterId: adapterId,
 				Device:    nil,
 				DeviceId:  &deviceId,
@@ -395,15 +406,15 @@ func (m *Manager) OnMessage(data []byte) {
 }
 
 func (m *Manager) sendConnectedStateNotification(device DeviceProxy, connected bool) {
-	m.Send(messages.MessageType_DeviceConnectedStateNotification, messages.DeviceConnectedStateNotificationJsonData{
+	m.send(messages.MessageType_DeviceConnectedStateNotification, messages.DeviceConnectedStateNotificationJsonData{
 		AdapterId: device.GetAdapter().GetId(),
 		Connected: connected,
 		DeviceId:  device.GetId(),
-		PluginId:  m.GetPluginId(),
+		PluginId:  m.getPluginId(),
 	})
 }
 
-func (m *Manager) Send(messageType messages.MessageType, data any) {
+func (m *Manager) send(messageType messages.MessageType, data any) {
 	var message = struct {
 		MessageType messages.MessageType `json:"messageType"`
 		Data        any                  `json:"data"`
@@ -416,8 +427,8 @@ func (m *Manager) register() {
 		fmt.Printf("addon manager not running")
 		return
 	}
-	m.Send(messages.MessageType_PluginRegisterRequest, messages.PluginRegisterRequestJsonData{PluginId: m.pluginId})
-	time.Sleep(time.Duration(10) * time.Millisecond)
+	m.send(messages.MessageType_PluginRegisterRequest, messages.PluginRegisterRequestJsonData{PluginId: m.pluginId})
+	time.Sleep(time.Duration(5) * time.Millisecond)
 }
 
 func (m *Manager) Close() {
@@ -432,10 +443,10 @@ func (m *Manager) IsRunning() bool {
 	return false
 }
 
-func (m *Manager) GetPluginId() string {
+func (m *Manager) getPluginId() string {
 	return m.pluginId
 }
 
-func (m *Manager) GetUserProfile() *messages.PluginRegisterResponseJsonDataUserProfile {
+func (m *Manager) getUserProfile() *messages.PluginRegisterResponseJsonDataUserProfile {
 	return m.userProfile
 }

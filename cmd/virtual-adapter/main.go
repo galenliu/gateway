@@ -22,7 +22,9 @@ func main() {
 	yeeAdapter := yeelight.NewVirtualAdapter("yeelight-adapter")
 	virtualAdapter := virtual.NewVirtualAdapter("virtual-adapter")
 
-	manager.RegisteredAdapter(yeeAdapter, virtualAdapter)
+	manager.AddAdapters(yeeAdapter, virtualAdapter)
+
+	yeeAdapter.StartPairing(nil)
 	virtualAdapter.StartPairing(nil)
 
 	interruptChannel := make(chan os.Signal, 1)

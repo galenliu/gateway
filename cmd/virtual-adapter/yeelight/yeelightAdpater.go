@@ -20,7 +20,7 @@ func NewVirtualAdapter(adapterId string) *YeelightAdapter {
 }
 
 func (a *YeelightAdapter) HandleDeviceSaved(msg messages.DeviceSavedNotificationJsonData) {
-	fmt.Printf("YeelightAdapter HandleDeviceSaved: %s", msg.DeviceId)
+	fmt.Printf("yeelight-adapter handle device saved deviceId: %s \t\n", msg.DeviceId)
 }
 
 func (a *YeelightAdapter) StartPairing(timeout <-chan time.Time) {

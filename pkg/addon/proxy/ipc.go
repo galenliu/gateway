@@ -45,7 +45,7 @@ func (client *IpcClient) Send(message any) {
 	data, _ := json.Marshal(message)
 	err := client.ws.WriteMessage(websocket.TextMessage, data)
 	if err != nil {
-		fmt.Printf("client.Send err: %s \r\n", err.Error())
+		fmt.Printf("client.send err: %s \r\n", err.Error())
 		return
 	}
 }

@@ -16,6 +16,6 @@ func NewVirtualProperty(p *properties.Property) *Property {
 func (p *Property) SetPropertyValue(v any) error {
 	p.SetCachedValue(v)
 	p.NotifyChanged()
-	fmt.Printf("adapter:virtual device: %s set property: %s value: %s", p.GetDevice().GetId(), p.GetName(), v)
+	fmt.Printf("device: %s set property: %s value: %v \t\n", p.GetDevice().GetId(), p.GetName(), v)
 	return nil
 }

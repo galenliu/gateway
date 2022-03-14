@@ -37,7 +37,7 @@ func (a *Adapter) AddDevices(devices ...DeviceProxy) {
 }
 
 func (a *Adapter) SendError(message string) {
-	a.manager.Send(messages.MessageType_PluginErrorNotification, messages.PluginErrorNotificationJsonData{
+	a.manager.send(messages.MessageType_PluginErrorNotification, messages.PluginErrorNotificationJsonData{
 		Message:  message,
 		PluginId: a.GetPackageName(),
 	})
@@ -56,7 +56,7 @@ func (a *Adapter) SendPairingPrompt(prompt, url string, did string) {
 	} else {
 		u = nil
 	}
-	a.manager.Send(messages.MessageType_AdapterPairingPromptNotification, messages.AdapterPairingPromptNotificationJsonData{
+	a.manager.send(messages.MessageType_AdapterPairingPromptNotification, messages.AdapterPairingPromptNotificationJsonData{
 		AdapterId: a.GetId(),
 		DeviceId:  &did,
 		PluginId:  a.GetPackageName(),
@@ -72,7 +72,7 @@ func (a *Adapter) SendUnpairingPrompt(prompt, url string, did string) {
 	} else {
 		u = nil
 	}
-	a.manager.Send(messages.MessageType_AdapterUnpairingPromptNotification, messages.AdapterUnpairingPromptNotificationJsonData{
+	a.manager.send(messages.MessageType_AdapterUnpairingPromptNotification, messages.AdapterUnpairingPromptNotificationJsonData{
 		AdapterId: a.GetId(),
 		DeviceId:  &did,
 		PluginId:  a.GetPackageName(),
@@ -82,7 +82,7 @@ func (a *Adapter) SendUnpairingPrompt(prompt, url string, did string) {
 }
 
 func (a *Adapter) Send(mt messages.MessageType, data any) {
-	a.manager.Send(mt, data)
+	a.manager.send(mt, data)
 }
 
 func (a *Adapter) CancelPairing() {
@@ -134,7 +134,7 @@ func (a *Adapter) SetPin(deviceId string, pin any) {
 }
 
 func (a *Adapter) SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription) {
-	a.manager.Send(messages.MessageType_DevicePropertyChangedNotification, messages.DevicePropertyChangedNotificationJsonData{
+	a.manager.send(messages.MessageType_DevicePropertyChangedNotification, messages.DevicePropertyChangedNotificationJsonData{
 		AdapterId: a.GetId(),
 		DeviceId:  deviceId,
 		PluginId:  a.pluginId,
@@ -194,7 +194,7 @@ func (a *Adapter) CancelRemoveThing(id string) {
 
 func (a *Adapter) registered(manager ManagerProxy) {
 	a.manager = manager
-	a.pluginId = manager.GetPluginId()
+	a.pluginId = manager.getPluginId()
 }
 
 func (a *Adapter) GetPackageName() string {

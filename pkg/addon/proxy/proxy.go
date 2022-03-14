@@ -14,11 +14,17 @@ type ManagerProxy interface {
 
 	handleDeviceAdded(device DeviceProxy)
 	handleDeviceRemoved(device DeviceProxy)
-	Send(messageType messages.MessageType, v any)
-	GetUserProfile() *messages.PluginRegisterResponseJsonDataUserProfile
-	Close()
-	GetPluginId() string
+
+	// AddAdapters 插件调用的方法，向Manager参加AdapterProxy
+	AddAdapters(adapters ...AdapterProxy)
+	// IsRunning  插件调用的方法，检测Manager是否运行
 	IsRunning() bool
+	// Close  插件调用的方法，用于关闭Manager
+	Close()
+
+	send(messageType messages.MessageType, v any)
+	getUserProfile() *messages.PluginRegisterResponseJsonDataUserProfile
+	getPluginId() string
 }
 
 // AdapterProxy Adapter 的抽象接口，

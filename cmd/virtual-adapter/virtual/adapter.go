@@ -1,9 +1,11 @@
 package virtual
 
 import (
+	"fmt"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/addon/proxy"
+	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"time"
 )
 
@@ -56,4 +58,8 @@ func (a *Adapter) StartPairing(t <-chan time.Time) {
 	}
 
 	a.AddDevices(devs...)
+}
+
+func (a *Adapter) HandleDeviceSaved(msg messages.DeviceSavedNotificationJsonData) {
+	fmt.Printf("virtual-adapter handle device saved deviceId: %s \t\n", msg.DeviceId)
 }
