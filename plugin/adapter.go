@@ -37,6 +37,7 @@ func NewAdapter(plugin *Plugin, adapterId string, log logging.Logger) *Adapter {
 func (adapter *Adapter) SendPropertyChangedNotification(deviceId string, p properties.PropertyDescription) {
 	adapter.plugin.manager.Publish(topic.DevicePropertyChanged, topic.DevicePropertyChangedMessage{
 		DeviceId:            deviceId,
+		PropertyName:        p.Name,
 		PropertyDescription: p,
 	})
 }

@@ -25,7 +25,7 @@ func (a *Adapter) StartPairing(t <-chan time.Time) {
 
 	{
 		light := NewVirtualDevice(devices.NewLightBulb("light1"))
-		on := properties.NewColorProperty("#ffffff")
+		on := properties.NewColorProperty("#ff0000")
 		color := properties.NewOnOffProperty(true)
 		level := properties.NewBrightnessProperty(20)
 		light.addProperties(on.Property, color.Property, level.Property)
@@ -42,7 +42,7 @@ func (a *Adapter) StartPairing(t <-chan time.Time) {
 
 	{
 		light := NewVirtualDevice(devices.NewLightBulb("light2", devices.WithPin("12345678")))
-		on := properties.NewColorProperty("#ffffff")
+		on := properties.NewColorProperty("#ff0000")
 		color := properties.NewOnOffProperty(true)
 		level := properties.NewBrightnessProperty(20)
 		light.addProperties(on.Property, color.Property, level.Property)

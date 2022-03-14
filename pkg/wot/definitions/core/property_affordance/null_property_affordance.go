@@ -11,6 +11,7 @@ type NullPropertyAffordance struct {
 	*ia.InteractionAffordance
 	*schema.NullSchema
 	Observable bool `json:"observable"`
+	Value      any  `json:"value,omitempty" wot:"optional"`
 }
 
 type NullPropertyDescription struct {

@@ -11,6 +11,7 @@ type StringPropertyAffordance struct {
 	*ia.InteractionAffordance
 	*schema.StringSchema
 	Observable bool `json:"observable,omitempty"`
+	Value      any  `json:"value,omitempty" wot:"optional"`
 }
 
 type StringPropertyDescription struct {

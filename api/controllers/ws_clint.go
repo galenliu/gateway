@@ -132,6 +132,7 @@ func (c *wsClint) addThing(t *things.Thing) {
 		if ok {
 			f()
 		}
+		delete(c.thingCleanups, t.GetId())
 		write(t.GetId(), constant.ThingRemoved, nil)
 	}
 	removeRemovedFunc := c.container.Subscribe(topic.ThingRemoved, onThingRemoved)
@@ -156,7 +157,7 @@ func (c *wsClint) addThing(t *things.Thing) {
 		if message.ThingId != t.GetId() {
 			return
 		}
-		write(t.GetId(), constant.PropertyChanged, map[string]any{message.PropertyName: message.Value})
+		write(t.GetId(), constant.PropertyStatus, map[string]any{message.PropertyName: message.Value})
 		c.logger.Infof("onPropertyChanged message: %s", message)
 	}
 	removePropertyChangedFunc := c.container.Subscribe(topic.ThingPropertyChanged, onPropertyChanged)

@@ -7,6 +7,7 @@ import (
 	c "github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg/color"
 	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg/utils"
 	"image/color"
+	"io"
 	"math/rand"
 	"net"
 	"sync"
@@ -49,6 +50,12 @@ func (y *Yeelight) executeCommand(name string, params ...interface{}) (*CommandR
 
 func (y *Yeelight) execute(cmd *Command) (*CommandResult, error) {
 
+	if y.sendChan != nil {
+		select {
+		case y.sendChan <- cmd:
+		}
+		return nil, nil
+	}
 	conn, err := net.Dial("tcp", y.addr)
 	if nil != err {
 		conn = nil
@@ -60,7 +67,10 @@ func (y *Yeelight) execute(cmd *Command) (*CommandResult, error) {
 
 	//write request/command
 	b, _ := json.Marshal(cmd)
-	fmt.Fprint(conn, string(b)+crlf)
+	_, err = io.WriteString(conn, string(b)+crlf)
+	if err != nil {
+		fmt.Println(err.Error() + "\t\n")
+	}
 	//wait and read for response
 	res, err := bufio.NewReader(conn).ReadString('\n')
 	if err != nil {
@@ -110,7 +120,6 @@ func (y *Yeelight) IsOn() (bool, error) {
 func (y *Yeelight) SetPower(b bool) {
 	if b {
 		_, _ = y.TurnOn()
-
 	} else {
 		_, _ = y.TurnOff()
 	}
@@ -201,7 +210,7 @@ func (y *Yeelight) SetName(name string) (*CommandResult, error) {
 }
 
 func (y *Yeelight) Listen() (<-chan *Notification, chan<- struct{}, error) {
-
+	y.sendChan = make(chan *Command)
 	var err error
 	notifCh := make(chan *Notification)
 	done := make(chan struct{}, 1)
@@ -215,8 +224,34 @@ func (y *Yeelight) Listen() (<-chan *Notification, chan<- struct{}, error) {
 		//make sure connection is closed when method returns
 		defer closeConnection(conn)
 		connReader := bufio.NewReader(c)
+		go func() {
+			for {
+				select {
+				case cmd := <-y.sendChan:
+					b, _ := json.Marshal(cmd)
+					_, err = io.WriteString(conn, string(b)+crlf)
+					if err != nil {
+						fmt.Println(err.Error() + "\t\n")
+					}
+					//wait and read for response
+					res, err := bufio.NewReader(conn).ReadString('\n')
+					if err != nil {
+						fmt.Println(err.Error())
+					}
+					var rs CommandResult
+					err = json.Unmarshal([]byte(res), &rs)
+					if nil != err {
+						fmt.Println(err.Error())
+					}
+					if nil != rs.Error {
+						fmt.Printf("command execution error. Code: %d, Message: %s \t\n", rs.Error.Code, rs.Error.Message)
+					}
+				}
+			}
+		}()
 		for {
 			select {
+
 			case <-done:
 				return
 			default:

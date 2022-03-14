@@ -11,6 +11,7 @@ type IntegerPropertyAffordance struct {
 	*ia.InteractionAffordance
 	*schema.IntegerSchema
 	Observable bool `json:"observable,omitempty" wot:"withDefault"` //with default
+	Value      any  `json:"value,omitempty" wot:"optional"`
 }
 
 type IntegerPropertyDescription struct {
@@ -37,8 +38,7 @@ type IntegerPropertyDescription struct {
 	Maximum          *controls.Integer `json:"maximum,omitempty"`
 	ExclusiveMaximum *controls.Integer `json:"exclusiveMaximum,omitempty"`
 	MultipleOf       *controls.Integer `json:"multipleOf,omitempty"`
-
-	Observable bool `json:"observable,omitempty"`
+	Observable       bool              `json:"observable,omitempty"`
 }
 
 func (p *IntegerPropertyAffordance) UnmarshalJSON(data []byte) error {

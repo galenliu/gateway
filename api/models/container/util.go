@@ -127,6 +127,7 @@ func mapOfWotProperties(props devices.DeviceProperties) (mapOfProperty map[strin
 					}(),
 				},
 				Observable: false,
+				Value:      p.GetCachedValue(),
 			}
 			fmt.Printf("")
 		case controls.TypeNumber:
@@ -159,12 +160,14 @@ func mapOfWotProperties(props devices.DeviceProperties) (mapOfProperty map[strin
 					}(),
 				},
 				Observable: false,
+				Value:      p.GetCachedValue(),
 			}
 		case controls.TypeBoolean:
 			wp = &pa.BooleanPropertyAffordance{
 				InteractionAffordance: i,
 				BooleanSchema:         &schema.BooleanSchema{DataSchema: dataSchema},
 				Observable:            false,
+				Value:                 p.GetCachedValue(),
 			}
 		case controls.TypeString:
 			wp = &pa.StringPropertyAffordance{
@@ -190,6 +193,7 @@ func mapOfWotProperties(props devices.DeviceProperties) (mapOfProperty map[strin
 					ContentMediaType: "",
 				},
 				Observable: false,
+				Value:      p.GetCachedValue(),
 			}
 		case controls.TypeObject:
 			return nil
