@@ -83,7 +83,7 @@ func mapOfWotProperties(props devices.DeviceProperties) (mapOfProperty map[strin
 			Type:         p.GetType(),
 		}
 		form := controls.Form{
-			Href:        controls.URI(fmt.Sprintf("things/%s/properties/%s", p.GetDevice().GetId(), p.GetName())),
+			Href:        controls.NewURI(fmt.Sprintf("things/%s/properties/%s", p.GetDevice().GetId(), p.GetName())),
 			ContentType: controls.JSON,
 		}
 		if !dataSchema.ReadOnly && !dataSchema.WriteOnly {
@@ -129,7 +129,6 @@ func mapOfWotProperties(props devices.DeviceProperties) (mapOfProperty map[strin
 				Observable: false,
 				Value:      p.GetCachedValue(),
 			}
-			fmt.Printf("")
 		case controls.TypeNumber:
 			wp = &pa.NumberPropertyAffordance{
 				InteractionAffordance: i,
@@ -223,7 +222,7 @@ func mapOfWotActions(device devices.Device, as devices.DeviceActions) (mapOfProp
 			Description:  a.Description,
 			Descriptions: map[string]string{},
 			Forms: []controls.Form{{
-				Href:        controls.URI(fmt.Sprintf("things/%s/actions/%s", device.GetId(), actionName)),
+				Href:        controls.NewURI(fmt.Sprintf("things/%s/actions/%s", device.GetId(), actionName)),
 				ContentType: controls.JSON,
 				Op:          controls.NewOpArray(controls.Invokeaction),
 			}},

@@ -158,7 +158,6 @@ func (c *wsClint) addThing(t *things.Thing) {
 			return
 		}
 		write(t.GetId(), constant.PropertyStatus, map[string]any{message.PropertyName: message.Value})
-		c.logger.Infof("onPropertyChanged message: %s", message)
 	}
 	removePropertyChangedFunc := c.container.Subscribe(topic.ThingPropertyChanged, onPropertyChanged)
 

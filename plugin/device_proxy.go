@@ -107,13 +107,28 @@ func newDeviceFromMessage(msg messages.Device) *device {
 				Type:        p.Type,
 				Unit:        util.GetFromPointer(p.Unit),
 				Description: util.GetFromPointer(p.Description),
-				Minimum:     util.GetFromPointer(p.Minimum),
-				Maximum:     util.GetFromPointer(p.Maximum),
-				Enum:        p.Enum,
-				ReadOnly:    util.GetFromPointer(p.ReadOnly),
-				MultipleOf:  util.GetFromPointer(p.MultipleOf),
-				Links:       nil,
-				Value:       p.Value,
+				Minimum: func() any {
+					if p.Minimum == nil {
+						return nil
+					}
+					return *p.Minimum
+				}(),
+				Maximum: func() any {
+					if p.Maximum == nil {
+						return nil
+					}
+					return *p.Maximum
+				}(),
+				Enum:     p.Enum,
+				ReadOnly: util.GetFromPointer(p.ReadOnly),
+				MultipleOf: func() any {
+					if p.MultipleOf == nil {
+						return nil
+					}
+					return *p.MultipleOf
+				}(),
+				Links: nil,
+				Value: p.Value,
 			})
 			if prop == nil {
 				continue
@@ -238,17 +253,16 @@ func (device *device) setPropertyValue(ctx context.Context, name string, value a
 		}
 		device.getAdapter().Send(messages.MessageType_DeviceSetPropertyCommand, data)
 	}
-	v, err, _ := gsf.Do(name, func() (any, error) {
-		for {
-			select {
-			case <-ctx.Done():
-				return nil, fmt.Errorf("timeout")
-			case v := <-task:
-				return v, nil
-			}
+
+	for {
+		select {
+		case <-ctx.Done():
+			return nil, fmt.Errorf("timeout")
+		case v := <-task:
+			return v, nil
 		}
-	})
-	return v, err
+	}
+
 }
 
 func (device *device) getAdapter() *Adapter {

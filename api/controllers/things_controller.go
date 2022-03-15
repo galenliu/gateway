@@ -11,6 +11,7 @@ import (
 	"github.com/gofiber/websocket/v2"
 	json "github.com/json-iterator/go"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 )
@@ -50,7 +51,10 @@ func (tc *thingsController) handleCreateThing(c *fiber.Ctx) error {
 
 // DELETE /things/:thingId
 func (tc *thingsController) handleDeleteThing(c *fiber.Ctx) error {
-	thingId := c.Params("thingId")
+	thingId, err := url.QueryUnescape(c.Params("thingId"))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest)
+	}
 	if thingId == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "thing id must be provided")
 	}
@@ -60,7 +64,10 @@ func (tc *thingsController) handleDeleteThing(c *fiber.Ctx) error {
 
 //GET /things/:thingId
 func (tc *thingsController) handleGetThing(c *fiber.Ctx) error {
-	thingId := c.Params("thingId")
+	thingId, err := url.QueryUnescape(c.Params("thingId"))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest)
+	}
 	if websocket.IsWebSocketUpgrade(c) {
 		c.Locals("thingId", thingId)
 		return c.Next()
@@ -99,13 +106,16 @@ func (tc *thingsController) handlePatchThing(c *fiber.Ctx) error {
 
 //PUT /:thing/a/:propertyName
 func (tc *thingsController) handleSetProperty(c *fiber.Ctx) error {
-	thingId := c.Params("thingId")
+	thingId, err := url.QueryUnescape(c.Params("thingId"))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest)
+	}
 	propName := c.Params("*")
 	if thingId == "" || propName == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid params")
 	}
 	var value any
-	err := json.Unmarshal(c.Body(), &value)
+	err = json.Unmarshal(c.Body(), &value)
 	if err != nil {
 		return err
 	}
@@ -120,7 +130,10 @@ func (tc *thingsController) handleSetProperty(c *fiber.Ctx) error {
 }
 
 func (tc *thingsController) handleGetPropertyValue(c *fiber.Ctx) error {
-	id := c.Params("thingId")
+	id, err := url.QueryUnescape(c.Params("thingId"))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest)
+	}
 	propName := c.Params("*")
 	v, err := tc.manager.GetPropertyValue(id, propName)
 	if err != nil {
@@ -130,7 +143,10 @@ func (tc *thingsController) handleGetPropertyValue(c *fiber.Ctx) error {
 }
 
 func (tc *thingsController) handleGetProperties(c *fiber.Ctx) error {
-	id := c.Params("thingId")
+	id, err := url.QueryUnescape(c.Params("thingId"))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest)
+	}
 	m, err := tc.manager.GetPropertiesValue(id)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
@@ -139,7 +155,10 @@ func (tc *thingsController) handleGetProperties(c *fiber.Ctx) error {
 }
 
 func (tc *thingsController) handleSetThing(c *fiber.Ctx) error {
-	thingId := c.Params("thingId")
+	thingId, err := url.QueryUnescape(c.Params("thingId"))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest)
+	}
 	thing := tc.model.GetThing(thingId)
 	if thing == nil {
 		return fiber.NewError(http.StatusInternalServerError, "Failed to retrieve thing(%s)", thingId)
@@ -161,11 +180,19 @@ func (tc *thingsController) handleUpdateThing(c *fiber.Ctx) error {
 
 	ctx, cancelFunc := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancelFunc()
-	thingId := c.Params("thingId")
-	username := json.Get(c.Body(), "username").ToString()
-	password := json.Get(c.Body(), "password").ToString()
+	thingId, err := url.QueryUnescape(c.Params("thingId"))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest)
+	}
+	username, err := url.QueryUnescape(json.Get(c.Body(), "username").ToString())
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest)
+	}
+	password, err := url.QueryUnescape(json.Get(c.Body(), "password").ToString())
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest)
+	}
 	pin := json.Get(c.Body(), "pin").ToString()
-
 	if thingId != "" && pin != "" {
 		device, err := tc.manager.SetPIN(ctx, thingId, pin)
 		if err != nil {

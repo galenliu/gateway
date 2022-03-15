@@ -63,7 +63,7 @@ func (t *Thing) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("thing @context cannot be empty")
 	}
 	if thing.Id == "" {
-		thing.Id = controls.URI(thing.Title)
+		thing.Id = controls.NewURI(thing.Title)
 	}
 	t.Thing = &thing
 
