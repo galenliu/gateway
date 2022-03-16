@@ -377,17 +377,17 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 			return
 		}
 		go dev.onPropertyChanged(properties.PropertyDescription{
-			Name:        util.GetFromPointer(message.Property.Name),
+			Name:        util.GetValueFromPointer(message.Property.Name),
 			AtType:      *message.Property.AtType,
-			Title:       util.GetFromPointer(message.Property.Title),
+			Title:       util.GetValueFromPointer(message.Property.Title),
 			Type:        message.Property.Type,
-			Unit:        util.GetFromPointer(message.Property.Unit),
-			Description: util.GetFromPointer(message.Property.Description),
-			Minimum:     util.GetFromPointer(message.Property.Minimum),
-			Maximum:     util.GetFromPointer(message.Property.Maximum),
+			Unit:        util.GetValueFromPointer(message.Property.Unit),
+			Description: util.GetValueFromPointer(message.Property.Description),
+			Minimum:     util.GetValueFromPointer(message.Property.Minimum),
+			Maximum:     util.GetValueFromPointer(message.Property.Maximum),
 			Enum:        message.Property.Enum,
-			ReadOnly:    util.GetFromPointer(message.Property.ReadOnly),
-			MultipleOf:  util.GetFromPointer(message.Property.MultipleOf),
+			ReadOnly:    util.GetValueFromPointer(message.Property.ReadOnly),
+			MultipleOf:  util.GetValueFromPointer(message.Property.MultipleOf),
 			Links:       nil,
 			Value:       message.Property.Value,
 		})
