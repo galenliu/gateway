@@ -40,10 +40,8 @@ func (a *YeelightAdapter) StartPairing(timeout <-chan time.Time) {
 	for {
 		foundDevice := discover()
 		if foundDevice != nil {
-			if d := a.GetDevice(foundDevice.GetAddr()); d == nil {
-				yl := NewYeelightBulb(foundDevice)
-				a.AddDevices(yl)
-			}
+			yl := NewYeelightBulb(foundDevice)
+			a.HandleDeviceAdded(yl)
 		}
 		select {
 		case <-timeout:

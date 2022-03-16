@@ -130,7 +130,7 @@ func (plugin *Plugin) OnMsg(mt messages.MessageType, dt any) {
 				plugin.logger.Errorf("Bad message : %s", util.JsonIndent(dt))
 				return
 			}
-			adapter := NewAdapter(plugin, message.AdapterId, plugin.logger)
+			adapter := NewAdapter(message.AdapterId, message.Name, message.PackageName, plugin)
 
 			send := func(msg topic.ThingAddedMessage) {
 				var device messages.DeviceWithoutId

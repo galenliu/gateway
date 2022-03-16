@@ -57,7 +57,7 @@ func (a *Adapter) StartPairing(t <-chan time.Time) {
 		devs = append(devs, levelSwitch)
 	}
 
-	a.AddDevices(devs...)
+	a.HandleDeviceAdded(devs...)
 }
 
 func (a *Adapter) HandleDeviceSaved(msg messages.DeviceSavedNotificationJsonData) {

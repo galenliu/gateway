@@ -13,7 +13,7 @@ type NumberPropertyDescription struct {
 	Maximum    Number       `json:"maximum,omitempty"`
 	Enum       []Number     `json:"enum,omitempty"`
 	ReadOnly   bool         `json:"readOnly,omitempty"`
-	MultipleOf Number       `json:"multipleOf,omitempty"`
+	MultipleOf any          `json:"multipleOf,omitempty"`
 	Value      Number       `json:"value,omitempty"`
 }
 

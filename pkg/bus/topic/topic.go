@@ -33,6 +33,7 @@ const (
 	DeviceEvent           Topic = "deviceEvent"
 	DeviceRemoved         Topic = "deviceRemoved"
 	DeviceConnected       Topic = "deviceConnected"
+	AdapterAdded          Topic = "adapterAdded"
 
 	PairingTimeout Topic = "pairingTimeout"
 )

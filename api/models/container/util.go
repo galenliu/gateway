@@ -308,16 +308,15 @@ func arrayOfThingForms(t *wot.Thing) []controls.Form {
 	return fs
 }
 
-type Valuer interface {
-	~string | ~float64 | ~bool
-}
-
-func GetPointerFormValue[T Valuer](value T) *T {
-	switch value.(type) {
-	case string:
-		str := value
-		return &str
-
-	}
-	return nil
-}
+//type Valuer interface {
+//	~string | ~float64 | ~bool
+//}
+//
+//func ToPointer[T Valuer](value T) *T {
+//	switch value.(type) {
+//	case Valuer:
+//		str := value
+//		return &str
+//	}
+//	return nil
+//}

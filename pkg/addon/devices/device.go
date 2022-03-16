@@ -77,7 +77,7 @@ func NewDevice(description DeviceDescription, opts ...Option) *Device {
 		o(device)
 	}
 	if device.Title == "" {
-		device.Title = device.AtType[0] + device.Id
+		device.Title = device.Id
 	}
 	return device
 }

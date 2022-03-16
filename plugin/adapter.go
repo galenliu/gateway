@@ -20,14 +20,17 @@ type Adapter struct {
 	setCredentialsTask sync.Map
 	setPinTask         sync.Map
 	eventHandler       map[string]func()
+	name               string
 	nextId             int
 }
 
-func NewAdapter(plugin *Plugin, adapterId string, log logging.Logger) *Adapter {
+func NewAdapter(adapterId string, name string, packageName string, plugin *Plugin) *Adapter {
 	a := &Adapter{}
 	a.Adapter = adapter.NewAdapter(adapterId)
+	a.name = name
+	a.packageName = packageName
 	a.plugin = plugin
-	a.logger = log
+	a.logger = plugin.logger
 	a.eventHandler = make(map[string]func(), 0)
 	a.packageName = plugin.pluginId
 	a.nextId = 0

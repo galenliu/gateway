@@ -190,6 +190,7 @@ func (m *Manager) CancelRemoveThing(deviceId string) {
 
 func (m *Manager) handleAdapterAdded(adapter *Adapter) {
 	m.AddAdapter(adapter)
+	m.Publish(topic.AdapterAdded, adapter)
 }
 
 func (m *Manager) handleAdapterUnload(adapterId string) {

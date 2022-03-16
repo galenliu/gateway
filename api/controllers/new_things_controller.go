@@ -52,6 +52,7 @@ func (c *NewThingsController) handleNewThingsWebsocket() func(conn *websocket.Co
 				}
 				err := conn.WriteJSON(things.AsWebOfThing(msg.Device))
 				if err != nil {
+					c.logger.Error("new thing websocket err:%s", err.Error())
 					return
 				}
 			}

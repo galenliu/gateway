@@ -139,7 +139,7 @@ func JsonIndent(in any) string {
 }
 
 type Valuer interface {
-	~string | ~float64 | ~bool
+	~string | ~float64 | ~bool | ~int64
 }
 
 // GetValueFromPointer 传入一个指针，如果指针为空，返回类型的空值，否则返回指针指向的值

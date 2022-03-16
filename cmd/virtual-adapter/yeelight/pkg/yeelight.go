@@ -210,74 +210,82 @@ func (y *Yeelight) SetName(name string) (*CommandResult, error) {
 }
 
 func (y *Yeelight) Listen() (<-chan *Notification, chan<- struct{}, error) {
-	y.sendChan = make(chan *Command)
-	var err error
-	notifCh := make(chan *Notification)
+
+	y.sendChan = make(chan *Command, 50)
+	notifCh := make(chan *Notification, 50)
 	done := make(chan struct{}, 1)
 
-	conn, err := net.DialTimeout("tcp", y.addr, time.Second*3)
-	if err != nil {
-		return nil, nil, fmt.Errorf("cannot connect to %s. %s", y.addr, err)
+	revTask := func(conn net.Conn) {
+		for {
+			msg, err := bufio.NewReader(conn).ReadString('\n')
+			if err == nil {
+				var rs Notification
+				err = json.Unmarshal([]byte(msg), &rs)
+				if err != nil {
+					fmt.Println(err.Error())
+					break
+				}
+				select {
+				case <-done:
+					return
+				case notifCh <- &rs:
+				default:
+					fmt.Println("Channel is full")
+				}
+			} else {
+				fmt.Printf("rev data err: %v\n", err.Error())
+				break
+			}
+			time.Sleep(1 * time.Second)
+		}
 	}
 
-	go func(c net.Conn) {
-		//make sure connection is closed when method returns
-		defer closeConnection(conn)
-		connReader := bufio.NewReader(c)
-		go func() {
-			for {
-				select {
-				case cmd := <-y.sendChan:
-					b, _ := json.Marshal(cmd)
-					_, err = io.WriteString(conn, string(b)+crlf)
-					if err != nil {
-						fmt.Println(err.Error() + "\t\n")
-					}
-					//wait and read for response
-					res, err := bufio.NewReader(conn).ReadString('\n')
-					if err != nil {
-						fmt.Println(err.Error())
-					}
-					var rs CommandResult
-					err = json.Unmarshal([]byte(res), &rs)
-					if nil != err {
-						fmt.Println(err.Error())
-					}
-					if nil != rs.Error {
-						fmt.Printf("command execution error. Code: %d, Message: %s \t\n", rs.Error.Code, rs.Error.Message)
-					}
-				}
-			}
-		}()
+	sendTask := func(conn net.Conn, done <-chan struct{}) {
 		for {
 			select {
-
 			case <-done:
 				return
-			default:
-				data, err := connReader.ReadString('\n')
-				if nil == err {
-					var rs Notification
-					fmt.Println(data)
-					err := json.Unmarshal([]byte(data), &rs)
-					if err != nil {
-						return
-					}
-					for n, v := range rs.Params {
-						y.lastStatus.Store(n, v)
-					}
-					select {
-					case notifCh <- &rs:
-					default:
-						fmt.Printf("data: %s", data)
-						fmt.Println("Channel is full")
-					}
+			case cmd := <-y.sendChan:
+				b, _ := json.Marshal(cmd)
+				_, err := io.WriteString(conn, string(b)+crlf)
+				if err != nil {
+					fmt.Println(err.Error() + "\t\n")
+				}
+				//wait and read for response
+				res, err := bufio.NewReader(conn).ReadString('\n')
+				if err != nil {
+					fmt.Println(err.Error())
+				}
+				var rs CommandResult
+				err = json.Unmarshal([]byte(res), &rs)
+				if nil != err {
+					fmt.Println(err.Error())
+				}
+				if nil != rs.Error {
+					fmt.Printf("command execution error. Code: %d, Message: %s \t\n", rs.Error.Code, rs.Error.Message)
 				}
 			}
 
 		}
+	}
 
-	}(conn)
+	connection := func() {
+		for {
+			conn, err := net.Dial("tcp", y.addr)
+			done := make(chan struct{})
+			if err != nil {
+				fmt.Println(err.Error())
+			} else {
+				defer conn.Close()
+				go sendTask(conn, done)
+				revTask(conn)
+			}
+			done <- struct{}{}
+			time.Sleep(3 * time.Second)
+		}
+	}
+
+	go connection()
 
 	return notifCh, done, nil
 }

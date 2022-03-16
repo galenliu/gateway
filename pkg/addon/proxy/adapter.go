@@ -27,7 +27,7 @@ func NewAdapter(adapterId, name string) *Adapter {
 	return a
 }
 
-func (a *Adapter) AddDevices(devices ...DeviceProxy) {
+func (a *Adapter) HandleDeviceAdded(devices ...DeviceProxy) {
 	for _, device := range devices {
 		if device != nil {
 			a.handleDeviceAdded(device)
