@@ -94,7 +94,7 @@ func (p *NumberPropertyAffordance) MarshalJSON() ([]byte, error) {
 		Forms:            p.Forms,
 		UriVariables:     p.UriVariables,
 		Minimum:          p.Minimum,
-		ExclusiveMinimum: p.Maximum,
+		ExclusiveMinimum: p.ExclusiveMinimum,
 		Maximum:          p.Maximum,
 		ExclusiveMaximum: p.ExclusiveMaximum,
 		MultipleOf:       p.MultipleOf,

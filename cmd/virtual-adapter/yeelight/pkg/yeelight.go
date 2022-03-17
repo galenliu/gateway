@@ -237,6 +237,7 @@ func (y *Yeelight) Listen() (<-chan *Notification, chan<- struct{}, error) {
 				break
 			}
 			time.Sleep(1 * time.Second)
+			break
 		}
 	}
 
@@ -272,15 +273,15 @@ func (y *Yeelight) Listen() (<-chan *Notification, chan<- struct{}, error) {
 	connection := func() {
 		for {
 			conn, err := net.Dial("tcp", y.addr)
-			done := make(chan struct{})
+			d := make(chan struct{})
 			if err != nil {
 				fmt.Println(err.Error())
 			} else {
 				defer conn.Close()
-				go sendTask(conn, done)
+				go sendTask(conn, d)
 				revTask(conn)
 			}
-			done <- struct{}{}
+			d <- struct{}{}
 			time.Sleep(3 * time.Second)
 		}
 	}

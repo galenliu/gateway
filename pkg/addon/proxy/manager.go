@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"context"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon/manager"
 	"github.com/galenliu/gateway/pkg/addon/properties"
@@ -17,6 +18,7 @@ type Manager struct {
 	verbose     bool
 	running     bool
 	registered  bool
+	ctx         context.Context
 	userProfile *messages.PluginRegisterResponseJsonDataUserProfile
 	preferences *messages.PluginRegisterResponseJsonDataPreferences
 }
@@ -28,11 +30,12 @@ func NewAddonManager(pluginId string) (*Manager, error) {
 	once.Do(
 		func() {
 			instance = &Manager{}
+			instance.ctx = context.Background()
 			instance.Manager = manager.NewManager()
 			instance.pluginId = pluginId
 			instance.verbose = true
 			instance.registered = false
-			instance.ipcClient = NewClient(instance, "9500")
+			instance.ipcClient = NewClient(instance.ctx, instance, "9500")
 			if instance.ipcClient != nil {
 				instance.running = true
 				instance.register()
@@ -428,11 +431,11 @@ func (m *Manager) register() {
 		return
 	}
 	m.send(messages.MessageType_PluginRegisterRequest, messages.PluginRegisterRequestJsonData{PluginId: m.pluginId})
-	time.Sleep(time.Duration(5) * time.Millisecond)
+	time.Sleep(time.Duration(1000) * time.Millisecond)
 }
 
 func (m *Manager) Close() {
-	m.ipcClient.close()
+	m.ctx.Done()
 	m.running = false
 }
 
