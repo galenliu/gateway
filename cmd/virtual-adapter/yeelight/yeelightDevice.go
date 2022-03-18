@@ -1,76 +1,79 @@
 package yeelight
 
 import (
+	"context"
 	"fmt"
-	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg"
+	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/lib"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/properties"
+	json "github.com/json-iterator/go"
 	"github.com/xiam/to"
+	"log"
 	"strconv"
+	"strings"
+	"time"
 )
+
+const timeOut = 1000 * time.Millisecond
+const duration = 100 * time.Millisecond
 
 type YeelightDevice struct {
 	*devices.Light
-	*yeelight.Yeelight
+	ctx context.Context
+	*yeelight.Client
+	id   string
+	name string
+	ip   string
 }
 
-func NewYeelightBulb(bulb *yeelight.Yeelight) *YeelightDevice {
+func NewYeelightBulb(clint *yeelight.Client, id, name, ip string) *YeelightDevice {
 	yeeDevice := &YeelightDevice{
-		Light:    devices.NewLightBulb(bulb.GetAddr()), //proxy.NewDevice([]string{schemas.CapabilityLight, schemas.CapabilityOnOffSwitch}, bulb.GetAddr(), "yeelight"+bulb.GetAddr()),
-		Yeelight: bulb,
+		id:     id,
+		ctx:    context.Background(),
+		name:   name,
+		ip:     ip,
+		Light:  devices.NewLightBulb(id), //proxy.NewDevice([]string{schemas.CapabilityLight, schemas.CapabilityOnOffSwitch}, bulb.GetAddr(), "yeelight"+bulb.GetAddr()),
+		Client: clint,
 	}
-	for _, method := range bulb.GetSupports() {
-		switch method {
-		case "set_power":
-			propValue := bulb.GetPropertyValue("power")
-			var value = false
-			if propValue != nil {
-				v, ok := propValue.(string)
-				if ok {
-					if v == "on" {
-						value = true
-					}
-				}
-			}
-			prop := NewOn(bulb, value)
-			yeeDevice.AddProperties(prop)
-		case "set_bright":
-			propValue := bulb.GetPropertyValue("bright")
-			var value properties.Integer = 0
-			if propValue != nil {
-				s, ok := propValue.(string)
-				if ok {
-					v, err := strconv.Atoi(s)
-					if err == nil {
-						value = properties.Integer(v)
-					}
-				}
-			}
-			prop := NewBrightness(bulb, value)
-			yeeDevice.AddProperties(prop)
-		case "set_rgb":
 
-			propValue := bulb.GetPropertyValue("rgb")
-			value := "#ffffff"
-			if propValue != nil {
-				_, ok := propValue.(string)
-				if ok {
-					color := "#" + fmt.Sprintf("%X", to.Int64(propValue))
-					value = color
-				}
+	props, err := yeeDevice.Client.GetProperties(context.Background(), []string{yeelight.PropertyPower, yeelight.PropertyColorMode, yeelight.PropertyBright, yeelight.PropertyCT, yeelight.PropertyHue, yeelight.PropertyRGB})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	for name, value := range props {
+		fmt.Println("> ", name, ":", value)
+	}
+	for name, value := range props {
+		if value == "" {
+			continue
+		}
+		switch name {
+		case yeelight.PropertyPower:
+			prop := NewOn(yeeDevice, isPowerOn(value))
+			yeeDevice.AddProperties(prop)
+		case yeelight.PropertyBright:
+
+			value, _ := strconv.Atoi(value)
+			prop := NewBrightness(yeeDevice, properties.Integer(value))
+			yeeDevice.AddProperties(prop)
+		case yeelight.PropertyRGB:
+			prop := NewColor(yeeDevice, value)
+			yeeDevice.AddProperties(prop)
+		case yeelight.PropertyColorMode:
+			prop := NewColorMode(yeeDevice, value)
+			yeeDevice.AddProperties(prop)
+		case yeelight.PropertyCT:
+			v, err := strconv.Atoi(value)
+			if err != nil {
+				break
 			}
-			prop := NewColor(bulb, value)
+			prop := NewColorTemperatureProperty(yeeDevice, properties.Integer(v))
 			yeeDevice.AddProperties(prop)
 		default:
 			continue
 		}
 	}
-	go func() {
-		err := yeeDevice.Listen()
-		if err != nil {
-			fmt.Printf("error: %s", err.Error())
-		}
-	}()
+	go yeeDevice.Listen(yeeDevice.ctx)
 	return yeeDevice
 }
 
@@ -78,28 +81,59 @@ func (d *YeelightDevice) SetCredentials(username, password string) error {
 	return nil
 }
 
-func (d *YeelightDevice) Listen() error {
-	notify, _, err := d.Yeelight.Listen()
+type NotifyMessage struct {
+	Method string         `json:"method"`
+	Params map[string]any `json:"params"`
+}
+
+func (d *YeelightDevice) Listen(ctx context.Context) error {
+	channel, err := d.Client.Listen(d.ctx)
 	if err != nil {
-		return err
+		fmt.Println(err.Error())
 	}
+
 	for {
 		select {
-		case msg := <-notify:
-			for n, v := range msg.Params {
-				if n == "power" {
-					b := v == "on"
-					d.OnOff.SetCachedValueAndNotify(b)
-				}
-				if n == "bright" {
-					d.Brightness.SetCachedValueAndNotify(v)
-				}
-				if n == "rgb" {
-					i := to.Int64(v)
-					v := "#" + fmt.Sprintf("%X", i)
-					d.Color.SetCachedValueAndNotify(v)
+		case data := <-channel:
+			var notify NotifyMessage
+			data = strings.Trim(data, "\r\n")
+			err := json.Unmarshal([]byte(data), &notify)
+			fmt.Printf("yeelight device notify:%s \t\n", data)
+			if err == nil {
+				if notify.Method == "props" {
+					for name, value := range notify.Params {
+						switch name {
+						case yeelight.PropertyPower:
+							d.OnOff.SetCachedValueAndNotify(isPowerOn(to.String(value)))
+						case yeelight.PropertyBright:
+							v := to.Float64(value)
+							if err == nil {
+								d.Brightness.SetCachedValueAndNotify(v)
+							}
+						case yeelight.PropertyColorMode:
+							if value == "2" {
+								d.ColorMode.SetCachedValueAndNotify(properties.ColorModePropertyEnumColor)
+							}
+							if value == "3" {
+								d.ColorMode.SetCachedValueAndNotify(properties.ColorModePropertyEnumTemperature)
+							}
+						case yeelight.PropertyRGB:
+							v := to.Float64(value)
+							s := strconv.FormatUint(uint64(v), 16)
+							d.Color.SetCachedValueAndNotify("#" + s)
+						case yeelight.PropertyCT:
+							v := to.Float64(value)
+							if err != nil {
+								d.ColorTemperature.SetCachedValueAndNotify(v)
+							}
+						default:
+							fmt.Printf("Bad Params name: %s,value : %v \t\n", name, value)
+						}
+					}
 				}
 			}
+		case <-ctx.Done():
+			fmt.Printf("exit")
 		}
 	}
 }
@@ -107,4 +141,8 @@ func (d *YeelightDevice) Listen() error {
 func (d *YeelightDevice) SetPin(pin string) error {
 	fmt.Printf("device: %s set pin: %s \n", d.GetId(), pin)
 	return nil
+}
+
+func (d *YeelightDevice) HandleRemoved() {
+	d.ctx.Done()
 }

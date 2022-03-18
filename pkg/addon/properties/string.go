@@ -10,6 +10,7 @@ type StringPropertyDescription struct {
 	AtType   PropertyType `json:"@type,omitempty"`
 	Type     string       `json:"type,omitempty"`
 	Enum     []string     `json:"enum,omitempty"`
+	Title    string       `json:"title,omitempty"`
 	ReadOnly bool         `json:"readOnly,omitempty"`
 	Value    string       `json:"value,omitempty"`
 }
@@ -30,6 +31,7 @@ func NewStringProperty(desc StringPropertyDescription, opts ...Option) *StringPr
 		Name:   desc.Name,
 		AtType: desc.AtType,
 		Type:   TypeString,
+		Title:  desc.Title,
 		Enum: func() []any {
 			enum := make([]any, 0)
 			for _, e := range desc.Enum {

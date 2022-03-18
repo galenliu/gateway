@@ -30,6 +30,7 @@ type Entity interface {
 	SetCredentials(username, password string) error
 	SetPin(pin string) error
 	GetDevice() *Device
+	HandleRemoved()
 }
 
 type DeviceDescription struct {
@@ -235,6 +236,10 @@ func (d *Device) SetCredentials(username, password string) error {
 
 func (d *Device) SetPin(pin string) error {
 	return fmt.Errorf("device:%s SetPin not implemented", d.GetId())
+}
+
+func (d *Device) HandleRemoved() {
+	fmt.Printf("device:%s HandleRemoved not implemented", d.GetId())
 }
 
 type Option func(device *Device)

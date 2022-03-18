@@ -317,6 +317,12 @@ func WithTitle(title string) Option {
 	}
 }
 
+func WithReadOnly() Option {
+	return func(p *Property) {
+		p.ReadOnly = true
+	}
+}
+
 func WithDescription(description string) Option {
 	return func(p *Property) {
 		p.Description = description

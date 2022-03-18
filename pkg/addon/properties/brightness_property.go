@@ -13,13 +13,13 @@ func NewBrightnessProperty(value Integer, opts ...Option) *BrightnessProperty {
 
 	b := &BrightnessProperty{}
 	b.IntegerProperty = NewIntegerProperty(IntegerPropertyDescription{
-		Name:     "level",
-		AtType:   TypeBrightnessProperty,
-		Unit:     UnitPercent,
-		Minimum:  0,
-		Maximum:  100,
-		ReadOnly: false,
-		Value:    value,
+		Name:    "level",
+		AtType:  TypeBrightnessProperty,
+		Title:   "brightness",
+		Unit:    UnitPercent,
+		Minimum: 0,
+		Maximum: 100,
+		Value:   value,
 	}, opts...)
 	return b
 }

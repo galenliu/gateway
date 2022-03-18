@@ -3,6 +3,7 @@ package devices
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon/properties"
+
 	"strconv"
 	"strings"
 )
@@ -23,6 +24,7 @@ type Light struct {
 }
 
 func NewLightBulb(id string, opts ...Option) *Light {
+
 	device := NewDevice(DeviceDescription{
 		Id:     id,
 		AtType: []Capability{CapabilityLight, CapabilityOnOffSwitch},

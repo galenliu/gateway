@@ -1,16 +1,17 @@
 package yeelight
 
 import (
-	yeelight "github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/pkg"
+	"context"
+	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/lib"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 )
 
 type On struct {
-	bulb *yeelight.Yeelight
+	device *YeelightDevice
 	*properties.OnOffProperty
 }
 
-func NewOn(bulb *yeelight.Yeelight, value bool) *On {
+func NewOn(bulb *YeelightDevice, value bool) *On {
 	return &On{
 		bulb,
 		properties.NewOnOffProperty(value),
@@ -18,7 +19,9 @@ func NewOn(bulb *yeelight.Yeelight, value bool) *On {
 }
 
 func (on *On) TurnOff() error {
-	_, err := on.bulb.TurnOff()
+	ctx, cancel := context.WithTimeout(context.Background(), timeOut)
+	defer cancel()
+	err := on.device.Client.Power(ctx, false, yeelight.PowerModeDefault, yeelight.EffectSmooth, duration)
 	if err != nil {
 		return err
 	}
@@ -28,7 +31,9 @@ func (on *On) TurnOff() error {
 }
 
 func (on *On) TurnOn() error {
-	_, err := on.bulb.TurnOn()
+	ctx, cancel := context.WithTimeout(context.Background(), timeOut)
+	defer cancel()
+	err := on.device.Client.Power(ctx, true, yeelight.PowerModeDefault, yeelight.EffectSmooth, duration)
 	if err != nil {
 		return err
 	}

@@ -5,25 +5,20 @@ type ColorModePropertyEnum = string
 const ColorModePropertyEnumColor = "color"
 const ColorModePropertyEnumTemperature = "temperature"
 
-type ColorModePropertyDescription struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Value       ColorModePropertyEnum
-}
-
 type ColorModeProperty struct {
 	*StringProperty
 }
 
-func NewColorModeProperty(desc ColorModePropertyDescription) *ColorModeProperty {
+func NewColorModeProperty(value ColorModePropertyEnum, opts ...Option) *ColorModeProperty {
 	p := &ColorModeProperty{}
 	p.StringProperty = NewStringProperty(StringPropertyDescription{
 		Name:     "color_mode",
 		AtType:   TypeColorModeProperty,
+		Title:    "color mode",
 		Type:     TypeString,
 		Enum:     []string{ColorModePropertyEnumColor, ColorModePropertyEnumTemperature},
 		ReadOnly: false,
-		Value:    desc.Value,
-	})
+		Value:    value,
+	}, opts...)
 	return p
 }

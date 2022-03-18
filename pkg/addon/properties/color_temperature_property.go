@@ -10,15 +10,15 @@ type ColorTemperatureProperty struct {
 	*IntegerProperty
 }
 
-func NewColorTemperatureProperty(desc ColorTemperaturePropertyDescriptor, opts ...Option) *ColorTemperatureProperty {
+func NewColorTemperatureProperty(value Integer, opts ...Option) *ColorTemperatureProperty {
 	colorTemperature := &ColorTemperatureProperty{}
 	colorTemperature.IntegerProperty = NewIntegerProperty(IntegerPropertyDescription{
 		Name:    "ct",
-		AtType:  TypeInteger,
+		AtType:  TypeColorTemperatureProperty,
 		Unit:    UnitKelvin,
 		Minimum: 2000,
 		Maximum: 8000,
-		Value:   desc.Value,
+		Value:   value,
 	}, opts...)
 	return colorTemperature
 }

@@ -14,6 +14,7 @@ type IntegerPropertyDescription struct {
 	Minimum    Integer            `json:"minimum,omitempty"`
 	Maximum    Integer            `json:"maximum,omitempty"`
 	Unit       Unit               `json:"unit"`
+	Title      string             `json:"title,omitempty"`
 	Enum       []Integer          `json:"enum,omitempty"`
 	ReadOnly   bool               `json:"readOnly,omitempty"`
 	MultipleOf any                `json:"multipleOf,omitempty"`
@@ -37,6 +38,8 @@ func NewIntegerProperty(desc IntegerPropertyDescription, opts ...Option) *Intege
 		Name:    desc.Name,
 		AtType:  desc.AtType,
 		Type:    TypeInteger,
+		Unit:    desc.Unit,
+		Title:   desc.Title,
 		Minimum: desc.Minimum,
 		Maximum: desc.Maximum,
 		Enum: func() []any {

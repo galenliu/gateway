@@ -56,9 +56,6 @@ func (c *connection) ReadMessage() (*BaseMessage, error) {
 	if err != nil {
 		return nil, fmt.Errorf("marshal err: %s", err.Error())
 	}
-	if c.registered {
-		c.logger.Debugf("rev %s message :%s \t\n", c.getPluginId(), util.JsonIndent(m))
-	}
 	return &m, nil
 }
 
