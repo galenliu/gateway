@@ -3,45 +3,68 @@ package proxy
 import (
 	"context"
 	"fmt"
+	"github.com/fasthttp/websocket"
 	"github.com/galenliu/gateway/pkg/addon/manager"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	json "github.com/json-iterator/go"
-	"sync"
+	"log"
+	"net/netip"
 	"time"
 )
 
 type Manager struct {
 	*manager.Manager
-	ipcClient   *IpcClient
 	pluginId    string
 	verbose     bool
 	running     bool
 	registered  bool
+	Done        chan struct{}
 	ctx         context.Context
+	sendChan    chan []byte
 	userProfile *messages.PluginRegisterResponseJsonDataUserProfile
 	preferences *messages.PluginRegisterResponseJsonDataPreferences
 }
 
-var once sync.Once
-var instance *Manager
+func NewAddonManager(ctx context.Context, pluginId string) (*Manager, error) {
 
-func NewAddonManager(pluginId string) (*Manager, error) {
-	once.Do(
-		func() {
-			instance = &Manager{}
-			instance.ctx = context.Background()
-			instance.Manager = manager.NewManager()
-			instance.pluginId = pluginId
-			instance.verbose = true
-			instance.registered = false
-			instance.ipcClient = NewClient(instance.ctx, instance, "9500")
-			if instance.ipcClient != nil {
-				instance.running = true
-				instance.register()
+	instance := &Manager{}
+	instance.Manager = manager.NewManager()
+	instance.pluginId = pluginId
+	instance.verbose = true
+	instance.Done = make(chan struct{})
+	//instance.ipcClient = NewClient(instance.ctx, instance, "9500")
+	//if instance.ipcClient != nil {
+	//	instance.running = true
+	//	instance.register()
+	//}
+	addr, err := netip.ParseAddr("127.0.0.1")
+	if err != nil {
+		return nil, err
+	}
+	host := netip.AddrPortFrom(addr, 9500)
+	instance.sendChan = make(chan []byte, 256)
+	client := &Client{
+		send: instance.sendChan,
+		host: &host,
+	}
+	err = instance.register(client)
+	if err != nil {
+		return nil, err
+	}
+	readChan := make(chan []byte, 256)
+	go client.readPump(ctx, readChan)
+	go client.writePump()
+	go func(ctx context.Context) {
+		for {
+			select {
+			case data := <-readChan:
+				instance.OnMessage(data)
+			case <-ctx.Done():
+				log.Printf("client exit")
 			}
-		},
-	)
+		}
+	}(ctx)
 	if !instance.registered {
 		return nil, fmt.Errorf("plugin not registered: %v", pluginId)
 	}
@@ -129,24 +152,6 @@ func (m *Manager) OnMessage(data []byte) {
 		return
 	}
 	messageType := messages.MessageType(mt.ToInt())
-
-	switch messageType {
-	case messages.MessageType_PluginRegisterResponse:
-		var msg messages.PluginRegisterResponseJsonData
-		dataNode.ToVal(&msg)
-		if dataNode.LastError() != nil {
-			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
-			return
-		}
-		m.registered = true
-		m.preferences = &msg.Preferences
-		m.userProfile = &msg.UserProfile
-		return
-	}
-	if !m.registered {
-		fmt.Printf("addon manager not registered")
-		return
-	}
 	switch messageType {
 	case messages.MessageType_PluginUnloadRequest:
 		var msg messages.PluginUnloadRequestJsonData
@@ -158,7 +163,7 @@ func (m *Manager) OnMessage(data []byte) {
 		m.send(messages.MessageType_PluginUnloadResponse, messages.PluginUnloadResponseJsonData{PluginId: msg.PluginId})
 		m.running = false
 		go func() {
-			time.AfterFunc(500*time.Millisecond, func() { m.Close() })
+			time.AfterFunc(500*time.Millisecond, func() { m.close() })
 		}()
 		return
 	}
@@ -422,28 +427,65 @@ func (m *Manager) send(messageType messages.MessageType, data any) {
 		MessageType messages.MessageType `json:"messageType"`
 		Data        any                  `json:"data"`
 	}{MessageType: messageType, Data: data}
-	m.ipcClient.Send(message)
-}
-
-func (m *Manager) register() {
-	if !m.running {
-		fmt.Printf("addon manager not running")
-		return
+	bytes, err := json.Marshal(message)
+	if err != nil {
+		log.Printf(err.Error())
 	}
-	m.send(messages.MessageType_PluginRegisterRequest, messages.PluginRegisterRequestJsonData{PluginId: m.pluginId})
-	time.Sleep(time.Duration(1000) * time.Millisecond)
-}
-
-func (m *Manager) Close() {
-	m.ctx.Done()
-	m.running = false
-}
-
-func (m *Manager) IsRunning() bool {
-	if len(m.GetAdapters()) > 0 && m.running {
-		return true
+	select {
+	case m.sendChan <- bytes:
+	default:
+		log.Printf("send channel is full")
 	}
-	return false
+}
+
+func (m *Manager) register(client *Client) error {
+
+	conn, err := client.Dial()
+	if err != nil {
+		return err
+	}
+	//err = conn.SetWriteDeadline(time.Now().Add(writeWait))
+	//if err != nil {
+	//	return err
+	//}
+	//w, err := client.conn.NextWriter(websocket.TextMessage)
+	//if err != nil {
+	//	return err
+	//}
+	data, err := json.Marshal(messages.PluginRegisterRequestJson{
+		Data:        messages.PluginRegisterRequestJsonData{PluginId: m.pluginId},
+		MessageType: int(messages.MessageType_PluginRegisterRequest),
+	})
+	err = conn.WriteMessage(websocket.TextMessage, data)
+	if err != nil {
+		return err
+	}
+
+	//_, err = w.Write(data)
+	//if err != nil {
+	//	return err
+	//}
+	//err = client.conn.SetReadDeadline(time.Now().Add(pongWait))
+	//if err != nil {
+	//	return err
+	//}
+	var message messages.PluginRegisterResponseJson
+	_, data, err = conn.ReadMessage()
+	err = json.Unmarshal(data, &message)
+	if err != nil {
+		return err
+	}
+	m.registered = true
+	m.preferences = &message.Data.Preferences
+	m.userProfile = &message.Data.UserProfile
+	return nil
+}
+
+func (m *Manager) close() {
+	select {
+	case m.Done <- struct{}{}:
+	}
+	log.Printf("plugin %s unloaded", m.pluginId)
 }
 
 func (m *Manager) getPluginId() string {

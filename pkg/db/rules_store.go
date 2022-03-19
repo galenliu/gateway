@@ -30,7 +30,6 @@ func (s *Storage) CreateRule(description rules_engine.Rule) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	fmt.Printf("insert data,id:%s , value: %s \t\n", id, bytes)
 	return id, nil
 }
 

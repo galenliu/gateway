@@ -17,10 +17,9 @@ type ManagerProxy interface {
 
 	// AddAdapters 插件调用的方法，向Manager参加AdapterProxy
 	AddAdapters(adapters ...AdapterProxy)
-	// IsRunning  插件调用的方法，检测Manager是否运行
-	IsRunning() bool
+
 	// Close  插件调用的方法，用于关闭Manager
-	Close()
+	close()
 
 	send(messageType messages.MessageType, v any)
 	getUserProfile() *messages.PluginRegisterResponseJsonDataUserProfile

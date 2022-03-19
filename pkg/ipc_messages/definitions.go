@@ -207,10 +207,4 @@ type NotificationLevel int
 
 type Scopes any
 
-var enumValues_NotificationLevel = []any{
-	0,
-	1,
-	2,
-}
-
 type ArrayString []string

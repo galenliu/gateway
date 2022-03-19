@@ -47,9 +47,6 @@ func (c *connection) ReadMessage() (*BaseMessage, error) {
 	if err != nil {
 		return nil, fmt.Errorf("read message error: %v", err.Error())
 	}
-	if data == nil {
-		return nil, fmt.Errorf("invalid data")
-	}
 	//var msg rpc.BaseMessage
 	var m BaseMessage
 	err = json.Unmarshal(data, &m)

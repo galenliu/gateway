@@ -13,7 +13,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/gofiber/fiber/v2/middleware/timeout"
 	"github.com/gofiber/websocket/v2"
 	"net/http"
 	"time"
@@ -157,7 +156,7 @@ func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log l
 		addonGroup.Get("/", addonController.handlerGetInstalledAddons)
 		addonGroup.Delete("/:addonId", addonController.handlerDeleteAddon)
 		addonGroup.Get("/:addonId/license", addonController.handlerGetLicense)
-		addonGroup.Post("/", timeout.New(addonController.handlerInstallAddon, InstallAddonTimeOut))
+		addonGroup.Post("/", addonController.handlerInstallAddon)
 		addonGroup.Put("/:addonId", addonController.handlerSetAddon)
 		addonGroup.Patch("/:addonId", addonController.handlerUpdateAddon)
 		addonGroup.Get("/:addonId/config", addonController.handlerGetAddonConfig)

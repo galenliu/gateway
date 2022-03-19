@@ -6,21 +6,26 @@ import (
 	"github.com/galenliu/gateway/cmd/virtual-adapter/virtual"
 	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight"
 	"github.com/galenliu/gateway/pkg/addon/proxy"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 )
+
+var packageId = "virtual-adapter-go"
+var virtualAdapterId = "virtual-adapter"
+var yeelightAdapterId = "yeelight-adapter"
 
 func main() {
 	ctx, cancelFunc := context.WithCancel(context.Background())
-	manager, err := proxy.NewAddonManager("virtual-adapter-go")
+	defer cancelFunc()
+	manager, err := proxy.NewAddonManager(ctx, packageId)
 	if err != nil {
 		fmt.Printf("err: %s", err.Error())
 		return
 	}
-	yeeAdapter := yeelight.NewVirtualAdapter("yeelight-adapter")
-	virtualAdapter := virtual.NewVirtualAdapter("virtual-adapter")
+	yeeAdapter := yeelight.NewVirtualAdapter(yeelightAdapterId)
+	virtualAdapter := virtual.NewVirtualAdapter(virtualAdapterId)
 
 	manager.AddAdapters(yeeAdapter, virtualAdapter)
 
@@ -30,37 +35,14 @@ func main() {
 	interruptChannel := make(chan os.Signal, 1)
 	signal.Notify(interruptChannel, syscall.SIGINT, syscall.SIGTERM)
 
-	go func() {
+	func() {
 		for {
 			select {
-			case _ = <-interruptChannel:
-				cancelFunc()
-				manager.Close()
-			}
-		}
-	}()
-
-	go func() {
-		c, f := context.WithCancel(ctx)
-		for {
-			fmt.Printf("automatically discover deivces every 30 minute\n")
-			yeeAdapter.StartPairing(nil)
-			select {
-			case <-c.Done():
-				f()
+			case s := <-interruptChannel:
+				log.Printf("signal %s exit", s.String())
+			case <-manager.Done:
 				return
-			default:
-				time.Sleep(30 * time.Minute)
 			}
 		}
 	}()
-
-	for {
-		if manager.IsRunning() {
-			time.Sleep(5 * time.Second)
-		} else {
-			cancelFunc()
-			return
-		}
-	}
 }

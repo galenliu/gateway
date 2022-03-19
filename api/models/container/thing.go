@@ -8,7 +8,9 @@ import (
 	"github.com/galenliu/gateway/pkg/util"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
+
 	json "github.com/json-iterator/go"
+	//"github.com/goccy/go-json"
 	"sync"
 	"time"
 )

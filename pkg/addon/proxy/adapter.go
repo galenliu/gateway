@@ -16,7 +16,6 @@ type Adapter struct {
 	IsPairing bool
 	verbose   bool
 	pluginId  string
-	client    *IpcClient
 }
 
 func NewAdapter(adapterId, name string) *Adapter {
@@ -122,15 +121,7 @@ func (a *Adapter) HandleDeviceRemoved(device DeviceProxy) {
 
 func (a *Adapter) Close() {
 	fmt.Print("do some thing while a close")
-	a.manager.Close()
-}
-
-func (a *Adapter) ProxyRunning() bool {
-	return a.manager.IsRunning()
-}
-
-func (a *Adapter) SetPin(deviceId string, pin any) {
-
+	a.manager.close()
 }
 
 func (a *Adapter) SendPropertyChangedNotification(deviceId string, property properties.PropertyDescription) {

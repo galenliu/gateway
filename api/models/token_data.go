@@ -21,7 +21,7 @@ func NewTokenData() *TokenData {
 }
 
 func (t TokenData) privateKey() *ecdsa.PublicKey {
-	block, _ := pem.Decode([]byte(t.PublicKey))
+	block, _ := pem.Decode(t.PublicKey)
 	key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
 	if err != nil {
 		return nil

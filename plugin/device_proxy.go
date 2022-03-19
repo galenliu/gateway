@@ -13,11 +13,8 @@ import (
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/xiam/to"
-	"golang.org/x/sync/singleflight"
 	"sync"
 )
-
-var gsf singleflight.Group
 
 type device struct {
 	*devices.Device

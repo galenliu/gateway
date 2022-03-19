@@ -21,7 +21,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/oherych/yeelight"
 	"log"
 	"time"
 )
