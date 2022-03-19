@@ -113,6 +113,7 @@ func (c *Client) writePump() {
 			for {
 				select {
 				case data := <-c.send:
+					log.Printf("rev: %s", data)
 					err := c.conn.WriteMessage(websocket.TextMessage, data)
 					if websocket.IsCloseError(err) {
 						return
