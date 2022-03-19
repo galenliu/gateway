@@ -245,7 +245,6 @@ func (m *Manager) OnMessage(data []byte) {
 		}
 		go func() {
 			adapter.HandleDeviceRemoved(device)
-			adapter.getDevice(deviceId).HandleRemoved()
 			adapter.RemoveDevice(deviceId)
 		}()
 		return

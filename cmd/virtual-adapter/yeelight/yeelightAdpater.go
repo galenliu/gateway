@@ -11,13 +11,19 @@ import (
 	"time"
 )
 
+type YeeDevice interface {
+	HandleRemoved()
+}
+
 type YeelightAdapter struct {
 	*proxy.Adapter
+	devices map[string]YeeDevice
 }
 
 func NewVirtualAdapter(adapterId string) *YeelightAdapter {
 	v := &YeelightAdapter{
 		proxy.NewAdapter(adapterId, "yeelight"),
+		make(map[string]YeeDevice),
 	}
 	return v
 }
@@ -50,8 +56,8 @@ func (a *YeelightAdapter) StartPairing(timeout <-chan time.Time) {
 			_ = client.SetName(context.Background(), "yeelight"+device.Location)
 		}
 		found := NewYeelightBulb(&client, device.ID, device.Name, device.Location)
+		a.devices[device.ID] = found
 		a.HandleDeviceAdded(found)
-
 	}
 	//fmt.Printf("start pairing...\n")
 	//if timeout == nil {
@@ -81,7 +87,9 @@ func (a *YeelightAdapter) StartPairing(timeout <-chan time.Time) {
 }
 
 func (a *YeelightAdapter) HandleDeviceRemoved(device proxy.DeviceProxy) {
-
+	dev := a.devices[device.GetId()]
+	dev.HandleRemoved()
+	delete(a.devices, device.GetId())
 }
 
 func power(on bool) string {

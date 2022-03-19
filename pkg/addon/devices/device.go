@@ -30,7 +30,6 @@ type Entity interface {
 	SetCredentials(username, password string) error
 	SetPin(pin string) error
 	GetDevice() *Device
-	HandleRemoved()
 }
 
 type DeviceDescription struct {
