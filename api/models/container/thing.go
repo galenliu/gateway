@@ -202,3 +202,11 @@ func (t *Thing) GetPropertyValue(name string) (any, error) {
 func (t *Thing) AddEventSubscription(f func(message topic.ThingEventMessage)) {
 	go t.container.Subscribe(topic.ThingEvent+topic.Topic(t.GetId()), f)
 }
+
+func (t *Thing) AddConnectedSubscription(f func(message topic.ThingConnectedMessage)) func() {
+	f(topic.ThingConnectedMessage{
+		ThingId:   t.GetId(),
+		Connected: t.Connected,
+	})
+	return t.container.Subscribe(topic.ThingConnected, f)
+}

@@ -2,11 +2,11 @@ package container
 
 import (
 	"context"
-	"fmt"
 	"github.com/galenliu/gateway/pkg/addon/events"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/util"
 	"github.com/gofiber/fiber/v2"
 	json "github.com/json-iterator/go"
 	"sync"
@@ -76,11 +76,11 @@ func (c *ThingsContainer) GetThing(id string) *Thing {
 func (c *ThingsContainer) SetThingPropertyValue(thingId, propName string, value any) (any, error) {
 	thing := c.GetThing(thingId)
 	if thing == nil {
-		return nil, fiber.NewError(fiber.StatusNotFound, "thing: %s not found", thing.GetId())
+		return nil, util.NotFoundError("thing: %s not found", thing.GetId())
 	}
 	prop, ok := thing.Properties[propName]
 	if !ok {
-		return nil, fiber.NewError(fiber.StatusNotFound, "thing property:%s not found", propName)
+		return nil, util.NotFoundError("thing property:%s not found", propName)
 	}
 	if prop.IsReadOnly() {
 		return nil, fiber.NewError(fiber.StatusBadRequest, "property read only")
@@ -124,6 +124,7 @@ func (c *ThingsContainer) CreateThing(data []byte) (*Thing, error) {
 	c.Lock()
 	defer c.Unlock()
 	thing, err := NewThing(data, c)
+	thing.setConnected(true)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +149,7 @@ func (c *ThingsContainer) UpdateThing(data []byte) error {
 	defer c.Unlock()
 	id := json.Get(data, "id")
 	if id.ValueType() != json.StringValue {
-		return fmt.Errorf("thing id invaild")
+		return fiber.NewError(fiber.StatusBadRequest, "thing id invalid")
 	}
 	thingId := json.Get(data, "id").ToString()
 	if _, ok := c.things[thingId]; ok {

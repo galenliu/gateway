@@ -158,18 +158,18 @@ func (tc *thingsController) handleSetThing(c *fiber.Ctx) error {
 	}
 	thing := tc.model.GetThing(thingId)
 	if thing == nil {
-		return fiber.NewError(http.StatusInternalServerError, "Failed to retrieve thing(%s)", thingId)
+		return util.NotFoundError("thing %s not found", thingId)
 	}
 	title := strings.Trim(json.Get(c.Body(), "title").ToString(), " ")
 	if len(title) == 0 || title == "" {
-		return fiber.NewError(http.StatusInternalServerError, "Invalid title")
+		return fiber.NewError(http.StatusBadRequest, "Invalid title")
 	}
 	thing.SetTitle(title)
 	selectedCapability := strings.Trim(json.Get(c.Body(), "selectedCapability").ToString(), " ")
 	if selectedCapability != "" {
 		thing.SetSelectedCapability(selectedCapability)
 	}
-	return c.Status(fiber.StatusOK).SendString("")
+	return c.SendStatus(fiber.StatusOK)
 }
 
 // Patch thing
@@ -193,14 +193,14 @@ func (tc *thingsController) handleUpdateThing(c *fiber.Ctx) error {
 	if thingId != "" && pin != "" {
 		device, err := tc.manager.SetPIN(ctx, thingId, pin)
 		if err != nil {
-			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 		return c.JSON(device)
 	}
 	if thingId != "" && username != "" && password != "" {
 		device, err := tc.manager.SetCredentials(ctx, thingId, username, password)
 		if err != nil {
-			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 		return c.JSON(device)
 	}

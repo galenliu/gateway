@@ -120,7 +120,7 @@ func (c *wsClint) addThing(t *things.Thing) {
 		}
 		write(t.GetId(), constant.Connected, message.Connected)
 	}
-	removeConnectedFunc := c.container.Subscribe(topic.ThingConnected, onThingConnected)
+	removeConnectedFunc := t.AddConnectedSubscription(onThingConnected)
 
 	onThingRemoved := func(message topic.ThingRemovedMessage) {
 		c.logger.Infof("onThingRemoved message: %s", message)
