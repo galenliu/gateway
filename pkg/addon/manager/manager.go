@@ -19,19 +19,19 @@ type Manager struct {
 	adapters sync.Map
 }
 
-func (m *Manager) AddDevice(d Device) {
+func (m *Manager) StoreDevice(d Device) {
 	m.devices.Store(d.GetId(), d)
 }
 
-func (m *Manager) RemoveDevice(id string) {
+func (m *Manager) DeleteDevice(id string) {
 	m.devices.Delete(id)
 }
 
-func (m *Manager) AddAdapter(a Adapter) {
+func (m *Manager) StoreAdapter(a Adapter) {
 	m.adapters.Store(a.GetId(), a)
 }
 
-func (m *Manager) RemoveAdapter(id string) {
+func (m *Manager) DeleteAdapter(id string) {
 	m.adapters.Delete(id)
 }
 

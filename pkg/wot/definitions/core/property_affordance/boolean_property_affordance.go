@@ -4,7 +4,7 @@ import (
 	ia "github.com/galenliu/gateway/pkg/wot/definitions/core/interaction_affordance"
 	schema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
-	json "github.com/json-iterator/go"
+	"github.com/goccy/go-json"
 )
 
 type BooleanPropertyAffordance struct {
@@ -92,5 +92,5 @@ func (p *BooleanPropertyAffordance) MarshalJSON() ([]byte, error) {
 		Type:         p.Type,
 		Observable:   p.Observable,
 	}
-	return json.MarshalIndent(prop, "", "  ")
+	return json.Marshal(prop)
 }

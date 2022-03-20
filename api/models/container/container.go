@@ -7,6 +7,7 @@ import (
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/gofiber/fiber/v2"
 	json "github.com/json-iterator/go"
 	"sync"
 	"time"
@@ -75,14 +76,14 @@ func (c *ThingsContainer) GetThing(id string) *Thing {
 func (c *ThingsContainer) SetThingPropertyValue(thingId, propName string, value any) (any, error) {
 	thing := c.GetThing(thingId)
 	if thing == nil {
-		return nil, fmt.Errorf("thing: %s not found", thing.GetId())
+		return nil, fiber.NewError(fiber.StatusNotFound, "thing: %s not found", thing.GetId())
 	}
 	prop, ok := thing.Properties[propName]
 	if !ok {
-		return nil, fmt.Errorf("property:%s not found", propName)
+		return nil, fiber.NewError(fiber.StatusNotFound, "thing property:%s not found", propName)
 	}
 	if prop.IsReadOnly() {
-		return nil, fmt.Errorf("property read only")
+		return nil, fiber.NewError(fiber.StatusBadRequest, "property read only")
 	}
 	ctx, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)
 	defer func() {

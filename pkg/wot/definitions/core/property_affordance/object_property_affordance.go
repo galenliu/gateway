@@ -4,7 +4,7 @@ import (
 	ia "github.com/galenliu/gateway/pkg/wot/definitions/core/interaction_affordance"
 	schema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
-	json "github.com/json-iterator/go"
+	"github.com/goccy/go-json"
 )
 
 type ObjectPropertyAffordance struct {
@@ -74,7 +74,7 @@ func (p *ObjectPropertyAffordance) UnmarshalJSON(data []byte) error {
 		Properties: prop.Properties,
 		Required:   prop.Required,
 	}
-	p.Observable = json.Get(data, "observable").ToBool()
+	p.Observable = prop.Observable
 	return nil
 }
 

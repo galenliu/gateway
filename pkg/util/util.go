@@ -5,7 +5,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/logging"
-	json "github.com/json-iterator/go"
+	"github.com/goccy/go-json"
 	"io"
 	"io/ioutil"
 	"os"

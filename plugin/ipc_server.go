@@ -1,16 +1,33 @@
 package plugin
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/fasthttp/websocket"
+	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"log"
 	"net/http"
 	"sync"
 	"time"
 )
 
-var upgrader = websocket.Upgrader{
+const (
+	// Time allowed to write a message to the peer.
+	writeWait = 10 * time.Second
+
+	// Time allowed to read the next pong message from the peer.
+	pongWait = 60 * time.Second
+
+	// Send pings to peer with this period. Must be less than pongWait.
+	pingPeriod = (pongWait * 9) / 10
+
+	// Maximum message size allowed from peer.
+	maxMessageSize = 8172
+)
+
+var upgrade = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
@@ -18,12 +35,18 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-var wsChan chan *websocket.Conn
+type client struct {
+	registered bool
+	conn       *websocket.Conn
+}
 
-func NewIpcServer(ctx context.Context, addr string) (chan *websocket.Conn, chan string) {
+var clientChan chan *client
+var errChan chan string
 
-	wsChan = make(chan *websocket.Conn, 64)
-	errChan := make(chan string)
+func NewIpcServer(ctx context.Context, addr string) (chan *client, chan string) {
+
+	clientChan = make(chan *client, 64)
+	errChan = make(chan string)
 	http.HandleFunc("/", serveWs)
 	srv := http.Server{
 		Addr:    addr,
@@ -41,6 +64,7 @@ func NewIpcServer(ctx context.Context, addr string) (chan *websocket.Conn, chan 
 		}
 		wg.Done()
 		close(errChan)
+		close(clientChan)
 	}()
 	go func() {
 		log.Println("listening at " + addr)
@@ -48,25 +72,71 @@ func NewIpcServer(ctx context.Context, addr string) (chan *websocket.Conn, chan 
 		fmt.Println("waiting for the remaining connections to finish...")
 		wg.Wait()
 		if err != nil && err != http.ErrServerClosed {
+			close(clientChan)
 			select {
 			case errChan <- err.Error():
 			}
 		}
 		log.Println("gracefully shutdown the http server...")
 	}()
-	return wsChan, errChan
+	return clientChan, errChan
 }
 
 func serveWs(w http.ResponseWriter, r *http.Request) {
-	ws, err := upgrader.Upgrade(w, r, nil)
+	ws, err := upgrade.Upgrade(w, r, nil)
 	if err != nil {
 		return
 	}
 	select {
-	case wsChan <- ws:
+	case clientChan <- &client{
+		registered: false,
+		conn:       ws,
+	}:
 	}
 }
 
-func ReadLong(ws *websocket.Conn) chan []byte {
-	return nil
+type message struct {
+	MessageType messages.MessageType `json:"messageType"`
+	Data        any                  `json:"data"`
+}
+
+func (c *client) sendMsg(mt messages.MessageType, data any) error {
+	m := message{
+		MessageType: mt,
+		Data:        data,
+	}
+	byt, err := json.Marshal(m)
+	if err != nil {
+		return err
+	}
+	return c.write(byt)
+}
+
+func (c *client) read() ([]byte, error) {
+
+	//err := c.conn.SetReadDeadline(time.Now().Add(pongWait))
+	//if err != nil {
+	//	return nil, err
+	//}
+	_, data, err := c.conn.ReadMessage()
+	data = bytes.Trim(data, "\n")
+	data = bytes.Trim(data, " ")
+	if err != nil {
+		if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+			log.Printf("websocket close error: %v", err)
+			return nil, err
+		}
+		return nil, err
+	}
+	return data, nil
+}
+
+func (c *client) write(data []byte) error {
+	data = bytes.Trim(data, "\n")
+	data = bytes.Trim(data, " ")
+	err := c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+	if err != nil {
+		return err
+	}
+	return c.conn.WriteMessage(websocket.TextMessage, data)
 }

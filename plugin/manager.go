@@ -189,16 +189,16 @@ func (m *Manager) CancelRemoveThing(deviceId string) {
 }
 
 func (m *Manager) handleAdapterAdded(adapter *Adapter) {
-	m.AddAdapter(adapter)
+	m.StoreAdapter(adapter)
 	m.Publish(topic.AdapterAdded, adapter)
 }
 
 func (m *Manager) handleAdapterUnload(adapterId string) {
-	m.RemoveAdapter(adapterId)
+	m.DeleteAdapter(adapterId)
 }
 
 func (m *Manager) handleDeviceAdded(device *device) {
-	m.AddDevice(device)
+	m.StoreDevice(device)
 	m.logger.Debugf("Thing added:\t\n %s ", util.JsonIndent(things.AsWebOfThing(*device.Device)))
 	m.Publish(topic.DeviceAdded, topic.DeviceAddedMessage{
 		DeviceId: device.GetId(),
@@ -207,7 +207,7 @@ func (m *Manager) handleDeviceAdded(device *device) {
 }
 
 func (m *Manager) handleDeviceRemoved(device *device) {
-	m.RemoveDevice(device.GetId())
+	m.DeleteDevice(device.GetId())
 	task, ok := m.deferredRemove.Load(device.GetId())
 	if ok {
 		taskChan := task.(chan struct{})
@@ -383,7 +383,7 @@ func (m *Manager) loadAddons() {
 }
 
 func (m *Manager) removeAdapter(adapter *Adapter) {
-	m.RemoveAdapter(adapter.GetId())
+	m.DeleteAdapter(adapter.GetId())
 }
 
 func (m *Manager) removeNotifier(notifierId string) {

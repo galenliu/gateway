@@ -125,11 +125,8 @@ func (t *Thing) SetTitle(title string) bool {
 }
 
 func (t *Thing) setConnected(connected bool) {
-	if t.Connected == connected {
-		return
-	}
 	t.Connected = connected
-	go t.container.Publish(topic.ThingConnected, topic.ThingConnectedMessage{
+	t.container.Publish(topic.ThingConnected, topic.ThingConnectedMessage{
 		ThingId:   t.GetId(),
 		Connected: connected,
 	})

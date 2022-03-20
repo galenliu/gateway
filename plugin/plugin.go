@@ -7,13 +7,13 @@ import (
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/bus/topic"
-	"github.com/galenliu/gateway/pkg/ipc"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	json "github.com/json-iterator/go"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 	"sync"
 )
@@ -24,7 +24,6 @@ type Plugin struct {
 	exec         string
 	execPath     string
 	closeChan    chan struct{}
-	connection   ipc.Connection
 	registered   bool
 	logger       logging.Logger
 	sendChan     chan []byte
@@ -78,35 +77,49 @@ func (plugin *Plugin) getAdapter(adapterId string) *Adapter {
 	return adapter
 }
 
-func (plugin *Plugin) handleWs(ws *websocket.Conn) {
-	ctx, cancelFunc := context.WithCancel(context.Background())
-	defer cancelFunc()
+func (plugin *Plugin) handleWs(ctx context.Context, client *client) {
+	ctx, cancelFunc := context.WithCancel(ctx)
+	plugin.registered = true
+	defer func() {
+		cancelFunc()
+		plugin.registered = false
+	}()
 	go func(ctx context.Context) {
 		for {
 			select {
-			case d := <-plugin.sendChan:
-				err := ws.WriteMessage(websocket.TextMessage, d)
-				if err != nil {
-					plugin.logger.Infof("websocket write error: %v", err)
+			case d, ok := <-plugin.sendChan:
+				if !ok {
+					return
 				}
+				err := client.write(d)
+				if err != nil {
+					plugin.logger.Infof(err.Error())
+					return
+				}
+
 			case <-ctx.Done():
-				plugin.logger.Infof("websocket stop write")
+				_ = client.conn.WriteMessage(websocket.CloseMessage, nil)
 				return
+			case <-plugin.closeChan:
+				_ = client.conn.WriteMessage(websocket.CloseMessage, nil)
 			}
 		}
 	}(ctx)
 
 	for {
-		_, data, err := ws.ReadMessage()
-		if err != nil {
-			break
-		}
+		data, err := client.read()
 		if websocket.IsCloseError(err) {
+			plugin.logger.Info("websocket close: %s", err.Error())
 			return
 		}
-		plugin.OnMsg(data)
+		if err != nil {
+			plugin.logger.Errorf("websocket read err: %s", err.Error())
+			return
+		}
+		if err == nil {
+			plugin.OnMsg(data)
+		}
 	}
-
 }
 
 func (plugin *Plugin) getAdapters() (adapters []*Adapter) {
@@ -146,11 +159,11 @@ func (plugin *Plugin) getApiHandlers() (apiHandlers []*ApiHandler) {
 }
 
 func (plugin *Plugin) OnMsg(bt []byte) {
-	type msg struct {
+	type message struct {
 		MessageType messages.MessageType `json:"messageType"`
 		Data        any                  `json:"data"`
 	}
-	var m msg
+	var m message
 	err := json.Unmarshal(bt, &m)
 	if err != nil {
 		plugin.logger.Info("Bad message")
@@ -169,7 +182,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 			var message messages.AdapterAddedNotificationJsonData
 			err := json.Unmarshal(data, &message)
 			if err != nil {
-				plugin.logger.Errorf("Bad message %s", messages.MessageType_AdapterAddedNotification)
+				plugin.logger.Errorf("Bad message : %s", m.MessageType)
 				return
 			}
 			adapter := NewAdapter(message.AdapterId, message.Name, message.PackageName, plugin)
@@ -206,7 +219,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 			var message messages.NotifierAddedNotificationJsonData
 			err := json.Unmarshal(data, &message)
 			if err != nil {
-				plugin.logger.Errorf("Bad message : %s", messages.MessageType_NotifierAddedNotification)
+				plugin.logger.Errorf("Bad message : %s", m.MessageType)
 				return
 			}
 			return
@@ -225,7 +238,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 		var message messages.OutletNotifyRequestJsonData
 		err := json.Unmarshal(data, &message)
 		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", messages.MessageType_OutletNotifyResponse)
+			plugin.logger.Errorf("Bad message : %s", m.MessageType)
 			return
 		}
 		return
@@ -234,7 +247,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 		var message messages.AdapterUnloadRequestJsonData
 		err := json.Unmarshal(data, &message)
 		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", messages.MessageType_AdapterUnloadResponse)
+			plugin.logger.Errorf("Bad message : %s", m.MessageType)
 			return
 		}
 		go plugin.handleAdapterUnload(message.AdapterId)
@@ -244,7 +257,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 		var message messages.ApiHandlerApiRequestJsonData
 		err := json.Unmarshal(data, &message)
 		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", messages.MessageType_ApiHandlerApiResponse)
+			plugin.logger.Errorf("Bad message : %s", m.MessageType)
 			return
 		}
 		return
@@ -253,7 +266,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 		var message messages.ApiHandlerAddedNotificationJsonData
 		err := json.Unmarshal(data, &message)
 		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", messages.MessageType_ApiHandlerAddedNotification)
+			plugin.logger.Errorf("Bad message : %s", m.MessageType)
 			return
 		}
 		return
@@ -452,15 +465,16 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 }
 
 func (plugin *Plugin) send(mt messages.MessageType, d any) {
+
 	type msg struct {
-		MessageType messages.MessageType
-		Data        any
+		MessageType messages.MessageType `json:"messageType"`
+		Data        any                  `json:"data"`
 	}
 	m := msg{
 		MessageType: mt,
 		Data:        d,
 	}
-	data, err := json.Marshal(m)
+	data, err := json.Marshal(&m)
 	if err != nil {
 		plugin.logger.Infof("bad message")
 		return
@@ -509,7 +523,13 @@ func (plugin *Plugin) start() {
 	//}
 	//
 	var cmd *exec.Cmd
-	cmd = exec.CommandContext(ctx, commands[0], commands[1:]...)
+	var exc = commands[0]
+	if runtime.GOOS == "windows" {
+		if exc == "python3" {
+			exc = "python"
+		}
+	}
+	cmd = exec.CommandContext(ctx, exc, commands[1:]...)
 	//stdout, _ := cmd.StdoutPipe()
 	//stderr, _ := cmd.StderrPipe()
 	//
@@ -578,12 +598,6 @@ func (plugin *Plugin) unloadComponents() {
 	if len(adapters) == 0 && len(notifiers) == 0 && len(apiHandlers) == 0 {
 		go plugin.notifyUnload()
 	}
-}
-
-func (plugin *Plugin) register(connection ipc.Connection) {
-	plugin.registered = true
-	plugin.connection = connection
-	connection.Register(plugin.getId())
 }
 
 // closed the plugin connection

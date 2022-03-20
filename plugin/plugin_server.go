@@ -2,11 +2,9 @@ package plugin
 
 //	plugin api
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/fasthttp/websocket"
-	"github.com/galenliu/gateway/pkg/ipc"
+
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
 	"sync"
@@ -15,7 +13,6 @@ import (
 type PluginsServer struct {
 	Plugins sync.Map
 	manager *Manager
-	ipc     *ipc.WebSocketServer
 	logger  logging.Logger
 }
 
@@ -27,29 +24,41 @@ func NewPluginServer(manager *Manager) *PluginsServer {
 	//s.ipc = ipc.NewIPCServer(s, manager.config.IPCPort, manager.config.UserProfile, s.logger)
 	wsChan, errChan := NewIpcServer(ctx, manager.config.IPCPort)
 	go func() {
+		ctx, cancel := context.WithCancel(ctx)
+		defer cancel()
 		for {
 			select {
 			case err := <-errChan:
 				s.logger.Infof(err)
-			case ws := <-wsChan:
-				go s.handleRegister(ws)
+			case ws, ok := <-wsChan:
+				if !ok {
+					s.logger.Infof("ip server closed channel")
+					return
+				}
+				go s.handleRegister(ctx, ws)
 			}
 		}
 	}()
 	return s
 }
 
-func (s *PluginsServer) handleRegister(conn *websocket.Conn) {
-	_, data, err := conn.ReadMessage()
+func (s *PluginsServer) handleRegister(ctx context.Context, client *client) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	data, err := client.read()
 	if err != nil {
-		s.logger.Error("received error:", err.Error())
+		s.logger.Errorf("plugin register err:%s", err.Error())
 		return
 	}
-	data = bytes.Trim(data, "\n")
 	var message messages.PluginRegisterRequestJson
 	err = json.Unmarshal(data, &message)
 	if err != nil {
-		s.logger.Info("bad register message")
+		s.logger.Errorf("plugin register:bad message err:%s", err.Error)
+		return
+	}
+	plugin := s.registerPlugin(message.Data.PluginId)
+	if client.registered {
+		plugin.handleWs(ctx, client)
 		return
 	}
 	msg := messages.PluginRegisterResponseJson{
@@ -66,15 +75,15 @@ func (s *PluginsServer) handleRegister(conn *websocket.Conn) {
 		s.logger.Errorf(err.Error())
 		return
 	}
-	err = conn.WriteMessage(websocket.TextMessage, data)
+	err = client.write(data)
 	if err != nil {
-		s.logger.Errorf(err.Error())
+		s.logger.Errorf("plugin register:bad message err:%s", err.Error)
 		return
 	}
-	plugin := s.registerPlugin(message.Data.PluginId)
+
 	s.logger.Infof("plugin: %s register success", message.Data.PluginId)
-	plugin.registered = true
-	plugin.handleWs(conn)
+	client.registered = true
+	plugin.handleWs(ctx, client)
 }
 
 //func (s *PluginsServer) RegisterPlugin(connection ipc.Connection) (ipc.PluginHandler, error) {

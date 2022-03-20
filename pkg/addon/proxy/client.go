@@ -45,7 +45,6 @@ type Client struct {
 
 func (c *Client) Dial() (*websocket.Conn, error) {
 	u := url.URL{Scheme: "ws", Host: c.host.String(), Path: "/"}
-	log.Printf(u.String())
 	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
 		return nil, err
@@ -71,11 +70,10 @@ func (c *Client) readPump(ctx context.Context, chanel chan []byte) {
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("error: %v", err)
+				return
 			}
-			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		fmt.Println(message)
 		select {
 		case chanel <- message:
 		case <-ctx.Done():
@@ -103,11 +101,10 @@ func (c *Client) writePump() {
 		case message, ok := <-c.send:
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
-				// The hub closed the channel.
+				// The manager closed the channel.
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
-
 			w, err := c.conn.NextWriter(websocket.TextMessage)
 			if err != nil {
 				return
@@ -115,12 +112,6 @@ func (c *Client) writePump() {
 			w.Write(message)
 
 			// Add queued chat messages to the current websocket message.
-			n := len(c.send)
-			for i := 0; i < n; i++ {
-				w.Write(newline)
-				w.Write(<-c.send)
-			}
-
 			if err := w.Close(); err != nil {
 				return
 			}

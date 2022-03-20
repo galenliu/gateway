@@ -121,10 +121,7 @@ func (tc *thingsController) handleSetProperty(c *fiber.Ctx) error {
 	}
 	v, err := tc.model.SetThingPropertyValue(thingId, propName, value)
 	if err != nil {
-		if err.Error() == "timeout" {
-			return fiber.ErrGatewayTimeout
-		}
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		return err
 	}
 	return c.Status(fiber.StatusOK).JSON(v)
 }
@@ -137,7 +134,7 @@ func (tc *thingsController) handleGetPropertyValue(c *fiber.Ctx) error {
 	propName := c.Params("*")
 	v, err := tc.manager.GetPropertyValue(id, propName)
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		return err
 	}
 	return c.Status(fiber.StatusOK).JSON(map[string]any{propName: v})
 }

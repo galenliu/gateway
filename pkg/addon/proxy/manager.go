@@ -74,7 +74,7 @@ func NewAddonManager(ctx context.Context, pluginId string) (*Manager, error) {
 func (m *Manager) AddAdapters(adapters ...AdapterProxy) {
 	for _, adapter := range adapters {
 		adapter.registered(m)
-		m.Manager.AddAdapter(adapter)
+		m.Manager.StoreAdapter(adapter)
 		m.send(messages.MessageType_AdapterAddedNotification, messages.AdapterAddedNotificationJsonData{
 			AdapterId:   adapter.GetId(),
 			Name:        adapter.GetName(),
@@ -107,7 +107,7 @@ func (m *Manager) handleDeviceRemoved(device DeviceProxy) {
 }
 
 func (m *Manager) HandleAdapterRemoved(id string) {
-	m.Manager.RemoveAdapter(id)
+	m.Manager.DeleteAdapter(id)
 }
 
 func (m *Manager) GetAdapter(adapterId string) AdapterProxy {

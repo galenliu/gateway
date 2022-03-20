@@ -8,6 +8,7 @@ import (
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/gofiber/fiber/v2"
 	"sync"
 )
 
@@ -86,12 +87,12 @@ func (adapter *Adapter) setDevicePin(ctx context.Context, deviceId, pin string) 
 	if ok {
 		select {
 		case <-ctx.Done():
-			return nil, fmt.Errorf("timeout for setting device pin")
+			return nil, fiber.NewError(fiber.StatusRequestTimeout, "timeout for setting device pin")
 		case d := <-task:
 			return d, nil
 		}
 	}
-	return nil, fmt.Errorf("failed set device pin")
+	return nil, fiber.NewError(fiber.StatusLocked, "failed set device pin")
 }
 
 func (adapter *Adapter) startPairing(timeout int) {
@@ -143,6 +144,7 @@ func (adapter *Adapter) handleDeviceRemoved(d *device) {
 }
 
 func (adapter *Adapter) handleDeviceAdded(device *device) {
+	device.logger = adapter.logger
 	device.SetHandler(adapter)
 	adapter.AddDevice(device)
 	adapter.plugin.manager.handleDeviceAdded(device)

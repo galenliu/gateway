@@ -2,19 +2,20 @@ package plugin
 
 import (
 	"context"
-	"fmt"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
+	"github.com/galenliu/gateway/pkg/util"
 )
 
-func (m *Manager) SetPropertyValue(ctx context.Context, deviceId, propName string, newValue any) (any, error) {
-	device := m.getDevice(deviceId)
+// SetPropertyValue 返回Fiber.NewError
+func (m *Manager) SetPropertyValue(ctx context.Context, thingId, propName string, newValue any) (any, error) {
+	device := m.getDevice(thingId)
 	if device == nil {
-		return nil, fmt.Errorf("device:%s not found", deviceId)
+		return nil, util.NotFoundError("device %s not found", thingId)
 	}
 	p := device.GetProperty(propName)
 	if p == nil {
-		return nil, fmt.Errorf("property:%s not found", propName)
+		return nil, util.NotFoundError("property %s not found", propName)
 	}
 	return device.setPropertyValue(ctx, propName, newValue)
 }
@@ -22,20 +23,20 @@ func (m *Manager) SetPropertyValue(ctx context.Context, deviceId, propName strin
 func (m *Manager) GetPropertyValue(thingId, propName string) (any, error) {
 	device := m.getDevice(thingId)
 	if device == nil {
-		return nil, fmt.Errorf("device:%s not found", thingId)
+		return nil, util.NotFoundError("device %s not found", thingId)
 	}
 	p := device.GetProperty(propName)
 	if p == nil {
-		return nil, fmt.Errorf("property:%s not found", propName)
+		return nil, util.NotFoundError("property %s not found", propName)
 	}
 	return p.GetCachedValue(), nil
 }
 
-func (m *Manager) GetPropertiesValue(deviceId string) (map[string]any, error) {
+func (m *Manager) GetPropertiesValue(thingId string) (map[string]any, error) {
 	data := make(map[string]any)
-	device := m.getDevice(deviceId)
+	device := m.getDevice(thingId)
 	if device == nil {
-		return nil, fmt.Errorf("device:%s not found", deviceId)
+		return nil, util.NotFoundError("device:%s not found", thingId)
 	}
 	propMap := device.GetProperties()
 	for n, p := range propMap {
@@ -70,7 +71,7 @@ func (m *Manager) GetDevices() (devices []*device) {
 func (m *Manager) SetPIN(ctx context.Context, thingId string, pin string) (*messages.Device, error) {
 	device := m.getDevice(thingId)
 	if device == nil {
-		return nil, fmt.Errorf("con not finid addon:" + thingId)
+		return nil, util.NotFoundError("device:%s not found", thingId)
 	}
 	return device.getAdapter().setDevicePin(ctx, thingId, pin)
 }
@@ -78,7 +79,7 @@ func (m *Manager) SetPIN(ctx context.Context, thingId string, pin string) (*mess
 func (m *Manager) SetCredentials(ctx context.Context, thingId, username, password string) (*messages.Device, error) {
 	device := m.getDevice(thingId)
 	if device == nil {
-		return nil, fmt.Errorf("con not finid addon:" + thingId)
+		return nil, util.NotFoundError("device:%s not found", thingId)
 	}
 	return device.getAdapter().setDeviceCredentials(ctx, thingId, username, password)
 }

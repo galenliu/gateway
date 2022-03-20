@@ -2,7 +2,6 @@ package plugin
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/devices"
@@ -12,6 +11,7 @@ import (
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
+	"github.com/gofiber/fiber/v2"
 	"github.com/xiam/to"
 	"sync"
 )
@@ -205,7 +205,7 @@ func (device *device) setPropertyValue(ctx context.Context, name string, value a
 
 	p := device.GetProperty(name)
 	if p == nil {
-		return nil, errors.New("property not found")
+		return nil, fiber.NewError(fiber.StatusNotFound, "device property not found")
 	}
 	if p.GetType() == TypeBoolean {
 		value = to.Bool(value)
@@ -239,7 +239,7 @@ func (device *device) setPropertyValue(ctx context.Context, name string, value a
 	for {
 		select {
 		case <-ctx.Done():
-			return nil, fmt.Errorf("timeout")
+			return nil, fiber.NewError(fiber.StatusRequestTimeout)
 		case v := <-task:
 			return v, nil
 		}

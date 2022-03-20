@@ -115,7 +115,6 @@ func (c *wsClint) addThing(t *things.Thing) {
 	}
 
 	onThingConnected := func(message topic.ThingConnectedMessage) {
-		c.logger.Infof("onThingConnected message: %s", message)
 		if message.ThingId != t.GetId() {
 			return
 		}

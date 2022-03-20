@@ -109,5 +109,5 @@ func (p *NumberPropertyAffordance) MarshalJSON() ([]byte, error) {
 		Type:             p.Type,
 		Observable:       p.Observable,
 	}
-	return json.MarshalIndent(prop, "", "  ")
+	return json.Marshal(prop)
 }
