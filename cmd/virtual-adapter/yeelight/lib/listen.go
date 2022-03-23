@@ -20,7 +20,6 @@ func (c Client) Listen(ctx context.Context) (<-chan string, error) {
 			for {
 				bytes, err := bufio.NewReader(conn).ReadBytes('\n')
 				if err != nil {
-					conn.Close()
 					fmt.Printf("Error reading %s", err.Error())
 					break
 				}
