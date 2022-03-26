@@ -3,10 +3,9 @@ package plugin
 //	plugin api
 import (
 	"context"
-	"encoding/json"
-
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
+	json "github.com/json-iterator/go"
 	"sync"
 )
 
