@@ -40,7 +40,7 @@ type Addon struct {
 
 func NewAddonSettingFromString(str string, store AddonsStore) *Addon {
 	var a Addon
-	err := json.UnmarshalFromString(str, &a)
+	err := json.Unmarshal([]byte(str), &a)
 	if err != nil {
 		return nil
 	}

@@ -4,7 +4,8 @@ go 1.18
 
 require (
 	github.com/fasthttp/websocket v1.5.0
-	github.com/gofiber/fiber/v2 v2.29.0
+	github.com/goccy/go-json v0.9.5
+	github.com/gofiber/fiber/v2 v2.30.0
 	github.com/gofiber/websocket/v2 v2.0.14
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/json-iterator/go v1.1.12
@@ -32,7 +33,6 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
-	github.com/goccy/go-json v0.9.5 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
