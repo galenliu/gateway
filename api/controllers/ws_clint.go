@@ -120,8 +120,8 @@ func (c *wsClint) addThing(t *things.Thing) {
 		}
 		write(t.GetId(), constant.Connected, message.Connected)
 	}
-	removeConnectedFunc := t.AddConnectedSubscription(onThingConnected)
 
+	removeConnectedFunc := t.AddConnectedSubscription(onThingConnected)
 	onThingRemoved := func(message topic.ThingRemovedMessage) {
 		c.logger.Infof("onThingRemoved message: %s", message)
 		if message.ThingId != t.GetId() {
@@ -181,14 +181,12 @@ func (c *wsClint) addThing(t *things.Thing) {
 	for n, _ := range t.Properties {
 		v, err := t.GetPropertyValue(n)
 		if err == nil {
-			data[n] = v
+			write(t.GetId(), constant.PropertyStatus, map[string]any{n: v})
 			c.logger.Infof("data message: %v", data)
 			continue
 		}
 		c.logger.Errorf(err.Error())
 	}
-
-	write(t.GetId(), constant.PropertyStatus, data)
 
 	c.thingCleanups[t.GetId()] = thingCleanup
 }
