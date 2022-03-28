@@ -21,7 +21,7 @@ func (c Client) Listen(ctx context.Context) (<-chan string, error) {
 				bytes, err := bufio.NewReader(conn).ReadBytes('\n')
 				if err != nil {
 					fmt.Printf("Error reading %s", err.Error())
-					break
+					return
 				}
 				select {
 				case <-ctx.Done():
