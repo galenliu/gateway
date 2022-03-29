@@ -125,7 +125,7 @@ func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log l
 		//Get the properties of a thing
 		thingsGroup.Get("/:thingId"+constant.PropertiesPath, thingsController.handleGetProperties)
 
-		// Modify a ThingInfo.
+		// Modify a Thing
 		thingsGroup.Put("/:thingId", thingsController.handleSetThing)
 		thingsGroup.Patch("/", auth, thingsController.handlePatchThings)
 		thingsGroup.Patch("/:thingId", thingsController.handlePatchThing)

@@ -139,10 +139,6 @@ func (c *ThingsContainer) CreateThing(data []byte) (*Thing, error) {
 	if err != nil {
 		return nil, fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
-	//thing.setConnected(true)
-	if err != nil {
-		return nil, err
-	}
 	err = c.store.CreateThing(thing.GetId(), thing)
 	if err != nil {
 		return nil, err
@@ -164,7 +160,7 @@ func (c *ThingsContainer) RemoveThing(thingId string) error {
 		c.logger.Errorf(err.Error())
 	}
 	if t == nil {
-		return util.NotFoundError("Thing[%s] Not Found", thingId)
+		return util.NotFoundError("Thing Not Found")
 	}
 	c.things.Delete(thingId)
 	c.Publish(topic.ThingRemoved, topic.ThingRemovedMessage{ThingId: thingId})
@@ -172,7 +168,6 @@ func (c *ThingsContainer) RemoveThing(thingId string) error {
 }
 
 func (c *ThingsContainer) UpdateThing(data []byte) error {
-
 	thingId := json.Get(data, "id").ToString()
 	if thingId == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "Thing id invalid")

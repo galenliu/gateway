@@ -93,32 +93,22 @@ func (t *Thing) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (t *Thing) SetSelectedCapability(selectedCapability string) bool {
-	for _, s := range t.AtType {
-		if s == selectedCapability {
-			t.SelectedCapability = selectedCapability
-			err := t.container.store.UpdateThing(t.GetId(), t)
-			if err != nil {
-				return false
-			}
-			go t.container.Publish(topic.ThingModify, topic.ThingModifyMessage{ThingId: t.GetId()})
-			return true
-		}
+func (t *Thing) SetSelectedCapability(selectedCapability string) {
+	t.SelectedCapability = selectedCapability
+	err := t.container.store.UpdateThing(t.GetId(), t)
+	if err != nil {
+		t.container.logger.Errorf(err.Error())
 	}
-	return false
+	t.container.Publish(topic.ThingModify, topic.ThingModifyMessage{ThingId: t.GetId()})
 }
 
-func (t *Thing) SetTitle(title string) bool {
-	if t.Title == title {
-		return false
-	}
+func (t *Thing) SetTitle(title string) {
 	t.Title = title
 	err := t.container.store.UpdateThing(t.GetId(), t)
 	if err != nil {
-		return false
+		t.container.logger.Errorf(err.Error())
 	}
-	go t.container.Publish(topic.ThingModify, topic.ThingModifyMessage{ThingId: t.GetId()})
-	return true
+	t.container.Publish(topic.ThingModify, topic.ThingModifyMessage{ThingId: t.GetId()})
 }
 
 func (t *Thing) setConnected(connected bool) {

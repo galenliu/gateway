@@ -37,19 +37,17 @@ func (t *EventBus) Subscribe(topic topic.Topic, fn any) func() {
 		}
 	}
 	return func() {
-		if t.bus.HasCallback(string(topic)) {
-			err := t.bus.Unsubscribe(top, fn)
-			if err != nil {
-				fmt.Printf("bus unsubscribe error: %s \t\n", err.Error())
-				return
-			}
+		err := t.bus.Unsubscribe(top, fn)
+		if err != nil {
+			fmt.Printf("bus unsubscribe error: %s \t\n", err.Error())
+			return
 		}
 	}
 }
 
 func (t *EventBus) Publish(topic topic.Topic, args ...any) {
 	top := string(topic)
-	go t.bus.Publish(top, args...)
+	t.bus.Publish(top, args...)
 }
 
 func (t *EventBus) Unsubscribe(topic topic.Topic, f any) {

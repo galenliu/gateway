@@ -103,7 +103,7 @@ func (tc *thingsController) handlePatchThing(c *fiber.Ctx) error {
 	return nil
 }
 
-//PUT /:thing/a/:propertyName
+//PUT /:thing/properties/:propertyName
 func (tc *thingsController) handleSetProperty(c *fiber.Ctx) error {
 	thingId, err := url.QueryUnescape(c.Params("thingId"))
 	if err != nil {
@@ -150,11 +150,9 @@ func (tc *thingsController) handleGetProperties(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(m)
 }
 
+// Put /things/:thingId
 func (tc *thingsController) handleSetThing(c *fiber.Ctx) error {
-	thingId, err := url.QueryUnescape(c.Params("thingId"))
-	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest)
-	}
+	thingId, _ := url.QueryUnescape(c.Params("thingId"))
 	thing := tc.model.GetThing(thingId)
 	if thing == nil {
 		return util.NotFoundError("thing %s not found", thingId)
@@ -163,11 +161,11 @@ func (tc *thingsController) handleSetThing(c *fiber.Ctx) error {
 	if len(title) == 0 || title == "" {
 		return util.BadRequestError("Invalid title")
 	}
-	thing.SetTitle(title)
 	selectedCapability := strings.Trim(json.Get(c.Body(), "selectedCapability").ToString(), " ")
 	if selectedCapability != "" {
 		thing.SetSelectedCapability(selectedCapability)
 	}
+	thing.SetTitle(title)
 	return c.SendStatus(fiber.StatusOK)
 }
 
