@@ -5,6 +5,7 @@ import (
 	"context"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/gofiber/websocket/v2"
 	json "github.com/json-iterator/go"
 	"sync"
 )
@@ -21,14 +22,12 @@ func NewPluginServer(manager *Manager) *PluginsServer {
 	s.logger = manager.logger
 	s.manager = manager
 	//s.ipc = ipc.NewIPCServer(s, manager.config.IPCPort, manager.config.UserProfile, s.logger)
-	wsChan, errChan := NewIpcServer(ctx, manager.config.IPCPort)
+	wsChan := NewIpcServer(manager.config.IPCPort)
 	go func() {
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 		for {
 			select {
-			case err := <-errChan:
-				s.logger.Infof(err)
 			case ws, ok := <-wsChan:
 				if !ok {
 					s.logger.Infof("ip server closed channel")
@@ -41,16 +40,16 @@ func NewPluginServer(manager *Manager) *PluginsServer {
 	return s
 }
 
-func (s *PluginsServer) handleRegister(ctx context.Context, client *client) {
+func (s *PluginsServer) handleRegister(ctx context.Context, client *wsConnection) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	data, err := client.read()
+	m, err := client.wsRead()
 	if err != nil {
 		s.logger.Errorf("plugin register err:%s", err.Error())
 		return
 	}
 	var message messages.PluginRegisterRequestJson
-	err = json.Unmarshal(data, &message)
+	err = json.Unmarshal(m.data, &message)
 	if err != nil {
 		s.logger.Errorf("plugin register:bad message err:%s", err.Error)
 		return
@@ -69,12 +68,12 @@ func (s *PluginsServer) handleRegister(ctx context.Context, client *client) {
 		},
 		MessageType: int(messages.MessageType_PluginRegisterResponse),
 	}
-	data, err = json.Marshal(msg)
+	data, err := json.Marshal(msg)
 	if err != nil {
 		s.logger.Errorf(err.Error())
 		return
 	}
-	err = client.write(data)
+	err = client.wsWrite(websocket.TextMessage, data)
 	if err != nil {
 		s.logger.Errorf("plugin register:bad message err:%s", err.Error)
 		return

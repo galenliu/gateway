@@ -1,12 +1,9 @@
 package plugin
 
 import (
-	"bytes"
-	"context"
-	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/fasthttp/websocket"
-	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"log"
 	"net/http"
 	"sync"
@@ -27,6 +24,18 @@ const (
 	maxMessageSize = 8172
 )
 
+// ws 的所有连接
+// 用于广播
+var wsConnAll map[int64]*wsConnection
+var maxConnId int64
+
+// 客户端读写消息
+type wsMessage struct {
+	// websocket.TextMessage 消息类型
+	messageType int
+	data        []byte
+}
+
 var upgrade = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
@@ -35,51 +44,54 @@ var upgrade = websocket.Upgrader{
 	},
 }
 
-type client struct {
+// 客户端连接
+type wsConnection struct {
 	registered bool
-	conn       *websocket.Conn
+	wsSocket   *websocket.Conn // 底层websocket
+	inChan     chan *wsMessage // 读队列
+	outChan    chan *wsMessage // 写队列
+	mutex      sync.Mutex      // 避免重复关闭管道,加锁处理
+	isClosed   bool
+	closeChan  chan byte // 关闭通知
+	id         int64
 }
 
-var clientChan chan *client
-var errChan chan string
+var clientChan chan *wsConnection
 
-func NewIpcServer(ctx context.Context, addr string) (chan *client, chan string) {
+func NewIpcServer(addr string) chan *wsConnection {
 
-	clientChan = make(chan *client, 64)
-	errChan = make(chan string)
+	clientChan = make(chan *wsConnection, 64)
 	http.HandleFunc("/", serveWs)
 	srv := http.Server{
 		Addr:    addr,
 		Handler: http.DefaultServeMux,
 	}
-	var wg sync.WaitGroup
-	go func() {
-		<-ctx.Done()
-		wg.Add(1)
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-		defer cancel()
-		err := srv.Shutdown(ctx)
-		if err != nil {
-			log.Printf("error shutting down:%s", err.Error())
-		}
-		wg.Done()
-		close(errChan)
-		close(clientChan)
-	}()
+
+	//
+	//go func() {
+	//	<-ctx.Done()
+	//	wg.Add(1)
+	//	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	//	defer cancel()
+	//	err := srv.Shutdown(ctx)
+	//	if err != nil {
+	//		log.Printf("error shutting down:%s", err.Error())
+	//	}
+	//	wg.Done()
+	//	close(errChan)
+	//	close(clientChan)
+	//}()
+
 	go func() {
 		log.Println("listening at " + addr)
 		err := srv.ListenAndServe()
 		fmt.Println("waiting for the remaining connections to finish...")
-		wg.Wait()
 		if err != nil && err != http.ErrServerClosed {
 			close(clientChan)
-			select {
-			case errChan <- err.Error():
-			}
 		}
 		log.Println("gracefully shutdown the http server...")
 	}()
-	return clientChan, errChan
+	return clientChan
 }
 
 func serveWs(w http.ResponseWriter, r *http.Request) {
@@ -87,56 +99,137 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	select {
-	case clientChan <- &client{
+	maxConnId++
+	c := &wsConnection{
 		registered: false,
-		conn:       ws,
-	}:
+		wsSocket:   ws,
+		inChan:     make(chan *wsMessage, 1000),
+		outChan:    make(chan *wsMessage, 1000),
+		closeChan:  make(chan byte),
+		isClosed:   false,
+		id:         maxConnId,
 	}
+	// 处理器,发送定时信息，避免意外关闭
+	//go c.processLoop()
+	// 读协程
+	go c.wsReadLoop()
+	// 写协程
+	go c.wsWriteLoop()
+	select {
+	case clientChan <- c:
+	}
+
 }
 
-type message struct {
-	MessageType messages.MessageType `json:"messageType"`
-	Data        any                  `json:"data"`
-}
+//// 处理队列中的消息
+//func (wsConn *wsConnection) processLoop() {
+//	// 处理消息队列中的消息
+//	// 获取到消息队列中的消息，处理完成后，发送消息给客户端
+//	for {
+//		msg, err := wsConn.wsRead()
+//		if err != nil {
+//			log.Println("获取消息出现错误", err.Error())
+//			break
+//		}
+//		log.Println("接收到消息", string(msg.data))
+//		// 修改以下内容把客户端传递的消息传递给处理程序
+//		err = wsConn.wsWrite(msg.messageType, msg.data)
+//		if err != nil {
+//			log.Println("发送消息给客户端出现错误", err.Error())
+//			break
+//		}
+//	}
+//}
 
-func (c *client) sendMsg(mt messages.MessageType, data any) error {
-	m := message{
-		MessageType: mt,
-		Data:        data,
-	}
-	byt, err := json.Marshal(m)
-	if err != nil {
-		return err
-	}
-	return c.write(byt)
-}
-
-func (c *client) read() ([]byte, error) {
-
-	//err := c.conn.SetReadDeadline(time.Now().Add(pongWait))
-	//if err != nil {
-	//	return nil, err
-	//}
-	_, data, err := c.conn.ReadMessage()
-	data = bytes.Trim(data, "\n")
-	data = bytes.Trim(data, " ")
-	if err != nil {
-		if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-			log.Printf("websocket close error: %v", err)
-			return nil, err
+// 处理消息队列中的消息
+func (wsConn *wsConnection) wsReadLoop() {
+	// 设置消息的最大长度
+	wsConn.wsSocket.SetReadLimit(maxMessageSize)
+	wsConn.wsSocket.SetReadDeadline(time.Now().Add(pongWait))
+	for {
+		// 读一个message
+		msgType, data, err := wsConn.wsSocket.ReadMessage()
+		if err != nil {
+			websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure)
+			log.Println("消息读取出现错误", err.Error())
+			wsConn.close()
+			return
 		}
-		return nil, err
+		req := &wsMessage{
+			msgType,
+			data,
+		}
+		// 放入请求队列,消息入栈
+		select {
+		case wsConn.inChan <- req:
+		case <-wsConn.closeChan:
+			return
+		}
 	}
-	return data, nil
 }
 
-func (c *client) write(data []byte) error {
-	data = bytes.Trim(data, "\n")
-	data = bytes.Trim(data, " ")
-	err := c.conn.SetWriteDeadline(time.Now().Add(writeWait))
-	if err != nil {
-		return err
+// 发送消息给客户端
+func (wsConn *wsConnection) wsWriteLoop() {
+	ticker := time.NewTicker(pingPeriod)
+	defer func() {
+		ticker.Stop()
+	}()
+	for {
+		select {
+		// 取一个应答
+		case msg := <-wsConn.outChan:
+			// 写给websocket
+			if err := wsConn.wsSocket.WriteMessage(msg.messageType, msg.data); err != nil {
+				log.Println("发送消息给客户端发生错误", err.Error())
+				// 切断服务
+				wsConn.close()
+				return
+			}
+		case <-wsConn.closeChan:
+			// 获取到关闭通知
+			return
+		case <-ticker.C:
+			// 出现超时情况
+			wsConn.wsSocket.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := wsConn.wsSocket.WriteMessage(websocket.PingMessage, nil); err != nil {
+				return
+			}
+		}
 	}
-	return c.conn.WriteMessage(websocket.TextMessage, data)
+}
+
+// 写入消息到队列中
+func (wsConn *wsConnection) wsWrite(messageType int, data []byte) error {
+	select {
+	case wsConn.outChan <- &wsMessage{messageType, data}:
+	case <-wsConn.closeChan:
+		return errors.New("连接已经关闭")
+	}
+	return nil
+}
+
+// 读取消息队列中的消息
+func (wsConn *wsConnection) wsRead() (*wsMessage, error) {
+	select {
+	case msg := <-wsConn.inChan:
+		// 获取到消息队列中的消息
+		return msg, nil
+	case <-wsConn.closeChan:
+
+	}
+	return nil, errors.New("连接已经关闭")
+}
+
+// 关闭连接
+func (wsConn *wsConnection) close() {
+	log.Println("关闭连接被调用了")
+	wsConn.wsSocket.Close()
+	wsConn.mutex.Lock()
+	defer wsConn.mutex.Unlock()
+	if wsConn.isClosed == false {
+		wsConn.isClosed = true
+		// 删除这个连接的变量
+		delete(wsConnAll, wsConn.id)
+		close(wsConn.closeChan)
+	}
 }

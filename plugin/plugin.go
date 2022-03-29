@@ -77,7 +77,7 @@ func (plugin *Plugin) getAdapter(adapterId string) *Adapter {
 	return adapter
 }
 
-func (plugin *Plugin) handleWs(ctx context.Context, client *client) {
+func (plugin *Plugin) handleWs(ctx context.Context, client *wsConnection) {
 	ctx, cancelFunc := context.WithCancel(ctx)
 	plugin.registered = true
 	defer func() {
@@ -91,23 +91,23 @@ func (plugin *Plugin) handleWs(ctx context.Context, client *client) {
 				if !ok {
 					return
 				}
-				err := client.write(d)
+				err := client.wsWrite(websocket.TextMessage, d)
 				if err != nil {
 					plugin.logger.Infof(err.Error())
 					return
 				}
 
 			case <-ctx.Done():
-				_ = client.conn.WriteMessage(websocket.CloseMessage, nil)
+				_ = client.close
 				return
 			case <-plugin.closeChan:
-				_ = client.conn.WriteMessage(websocket.CloseMessage, nil)
+				_ = client.close
 			}
 		}
 	}(ctx)
 
 	for {
-		data, err := client.read()
+		data, err := client.wsRead()
 		if websocket.IsCloseError(err) {
 			plugin.logger.Info("websocket close: %s", err.Error())
 			return
@@ -117,7 +117,7 @@ func (plugin *Plugin) handleWs(ctx context.Context, client *client) {
 			return
 		}
 		if err == nil {
-			plugin.OnMsg(data)
+			plugin.OnMsg(data.data)
 		}
 	}
 }
