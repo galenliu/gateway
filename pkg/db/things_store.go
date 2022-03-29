@@ -36,8 +36,8 @@ func (s *Storage) CreateThing(id string, thing *container.Thing) error {
 	return nil
 }
 
-func (s *Storage) GetThings() map[string]*container.Thing {
-	things := make(map[string]*container.Thing)
+func (s *Storage) GetThings() map[string][]byte {
+	things := make(map[string][]byte)
 	rows, err := s.db.Query("SELECT id, description FROM things")
 	defer func(rows *sql.Rows) {
 		err := rows.Close()
@@ -55,12 +55,7 @@ func (s *Storage) GetThings() map[string]*container.Thing {
 		if err != nil {
 			continue
 		}
-		var thing container.Thing
-		err := json.Unmarshal([]byte(description), &thing)
-		if err != nil {
-			continue
-		}
-		things[id] = &thing
+		things[id] = []byte(description)
 	}
 	return things
 }

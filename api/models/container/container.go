@@ -35,18 +35,21 @@ type ThingsStorage interface {
 	DeleteThing(id string) error
 	CreateThing(id string, thing *Thing) error
 	UpdateThing(id string, thing *Thing) error
-	GetThings() map[string]*Thing
+	GetThings() map[string][]byte
 }
 
+// ThingsContainer 管理所有Thing Models
+// 向外部发送ThingAdded,ThingRemoved,ThingModify,ThingConnected事件
 type ThingsContainer struct {
 	sync.Mutex
-	things  map[string]*Thing
+	things  sync.Map
 	manager Manager
 	store   ThingsStorage
 	logger  logging.Logger
 	bus.ThingsBus
 }
 
+// NewThingsContainerModel 管理所有Thing Models
 func NewThingsContainerModel(manager Manager, store ThingsStorage, log logging.Logger) *ThingsContainer {
 	t := &ThingsContainer{}
 	t.Mutex = sync.Mutex{}
@@ -54,7 +57,6 @@ func NewThingsContainerModel(manager Manager, store ThingsStorage, log logging.L
 	t.manager = manager
 	t.ThingsBus = bus.NewBus()
 	t.logger = log
-	t.things = make(map[string]*Thing, 1)
 	t.updateThings()
 	_ = manager.Subscribe(topic.DeviceAdded, t.handleDeviceAdded)
 	_ = manager.Subscribe(topic.DeviceRemoved, t.handleDeviceRemoved)
@@ -66,7 +68,8 @@ func NewThingsContainerModel(manager Manager, store ThingsStorage, log logging.L
 }
 
 func (c *ThingsContainer) GetThing(id string) *Thing {
-	t, ok := c.things[id]
+	a, _ := c.things.Load(id)
+	t, ok := a.(*Thing)
 	if !ok {
 		return nil
 	}
@@ -96,11 +99,19 @@ func (c *ThingsContainer) SetThingPropertyValue(thingId, propName string, value 
 	return v, nil
 }
 
-func (c *ThingsContainer) GetThings() (ts []*Thing) {
-	c.updateThings()
-	for _, t := range c.things {
-		ts = append(ts, t)
-	}
+func (c *ThingsContainer) GetThings() []*Thing {
+	return c.getThings()
+}
+
+func (c *ThingsContainer) getThings() (ts []*Thing) {
+	ts = make([]*Thing, 0)
+	c.things.Range(func(key, value any) bool {
+		t, ok := value.(*Thing)
+		if ok {
+			ts = append(ts, t)
+		}
+		return true
+	})
 	return
 }
 
@@ -120,82 +131,126 @@ func (c *ThingsContainer) GetMapOfThings() map[string]*Thing {
 	return thingsMap
 }
 
+// CreateThing container和store中创建Thing
+//ThingAdded事件
 func (c *ThingsContainer) CreateThing(data []byte) (*Thing, error) {
-	c.Lock()
-	defer c.Unlock()
+
 	thing, err := NewThing(data, c)
-	thing.setConnected(true)
+	if err != nil {
+		return nil, fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+	//thing.setConnected(true)
 	if err != nil {
 		return nil, err
 	}
+	err = c.store.CreateThing(thing.GetId(), thing)
+	if err != nil {
+		return nil, err
+	}
+	c.things.Store(thing.GetId(), thing)
+	c.Publish(topic.ThingAdded, topic.ThingAddedMessage{
+		ThingId: thing.GetId(),
+		Data:    data,
+	})
 	return thing, nil
 }
 
-func (c *ThingsContainer) RemoveThing(thingId string) {
-	c.Lock()
-	defer c.Unlock()
-	t, _ := c.things[thingId]
+// RemoveThing 从container和store中删除Thing
+//向定阅发送ThingRemoved事件
+func (c *ThingsContainer) RemoveThing(thingId string) error {
+	t := c.GetThing(thingId)
+	err := c.store.DeleteThing(thingId)
+	if err != nil {
+		c.logger.Errorf(err.Error())
+	}
 	if t == nil {
-		c.logger.Errorf("thing with id %s not found", thingId)
-		return
+		return util.NotFoundError("Thing[%s] Not Found", thingId)
 	}
-	t.removed()
-	delete(c.things, thingId)
-	return
-}
-
-func (c *ThingsContainer) UpdateThing(data []byte) error {
-	c.Lock()
-	defer c.Unlock()
-	id := json.Get(data, "id")
-	if id.ValueType() != json.StringValue {
-		return fiber.NewError(fiber.StatusBadRequest, "thing id invalid")
-	}
-	thingId := json.Get(data, "id").ToString()
-	if _, ok := c.things[thingId]; ok {
-		var newThing Thing
-		err := json.Unmarshal(data, &newThing)
-		if err != nil {
-			return err
-		}
-		newThing.container = c
-
-		c.things[newThing.Id.GetId()] = &newThing
-		newThing.update()
-	}
+	c.things.Delete(thingId)
+	c.Publish(topic.ThingRemoved, topic.ThingRemovedMessage{ThingId: thingId})
 	return nil
 }
 
+func (c *ThingsContainer) UpdateThing(data []byte) error {
+
+	thingId := json.Get(data, "id").ToString()
+	if thingId == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "Thing id invalid")
+	}
+	thing := c.GetThing(thingId)
+	if thing == nil {
+		return fiber.NewError(fiber.StatusBadRequest, "Thing Not Found")
+	}
+	newThing, err := NewThing(data, c)
+	if err != nil {
+		return err
+	}
+	return c.updateThing(newThing)
+}
+
+//在container和Store中更新Thing
+func (c *ThingsContainer) updateThing(thing *Thing) error {
+	err := c.store.UpdateThing(thing.GetId(), thing)
+	if err != nil {
+		return err
+	}
+	c.things.Store(thing.GetId(), thing)
+	c.Publish(topic.ThingModify, topic.ThingModifyMessage{ThingId: thing.GetId()})
+	return nil
+}
+
+//如果container为空，则从Store里加载所有的Things
 func (c *ThingsContainer) updateThings() {
-	c.Lock()
-	defer c.Unlock()
-	if len(c.things) < 1 {
-		for id, thing := range c.store.GetThings() {
-			thing.container = c
-			c.things[id] = thing
+	things := c.getThings()
+	if len(things) == 0 {
+		for id, data := range c.store.GetThings() {
+			thing, err := NewThing(data, c)
+			if err != nil {
+				c.logger.Errorf(err.Error())
+				continue
+			}
+			c.things.Store(id, thing)
 		}
 	}
 }
 
+//当Manager中有设备移除，则更新Container中Thing中Connected为false
+//并且向定阅发达ThingConnected通知
 func (c *ThingsContainer) handleDeviceRemoved(thingId string) {
 	t := c.GetThing(thingId)
 	if t != nil {
 		t.setConnected(false)
 	}
+	c.Publish(topic.ThingConnected, topic.ThingConnectedMessage{
+		ThingId:   t.GetId(),
+		Connected: true,
+	})
 }
 
+//当Manager中有新设备，则更新Container中Thing状态
+//并且向定阅发达ThingConnected通知
 func (c *ThingsContainer) handleDeviceAdded(msg topic.DeviceAddedMessage) {
 	t := c.GetThing(msg.DeviceId)
 	if t != nil {
 		t.setConnected(true)
 	}
+	c.Publish(topic.ThingConnected, topic.ThingConnectedMessage{
+		ThingId:   msg.Id,
+		Connected: true,
+	})
 }
 
+//当Manager中有设备离线消息时，同步Thing的状态
+//并向Container中的定阅发送ThingConnected消息
 func (c *ThingsContainer) handleDeviceConnected(msg topic.DeviceConnectedMessage) {
 	t := c.GetThing(msg.DeviceId)
 	if t != nil {
 		t.setConnected(msg.Connected)
 	}
+	c.Publish(topic.ThingConnected, topic.ThingConnectedMessage{
+		ThingId:   t.GetId(),
+		Connected: msg.Connected,
+	})
 }
 
 func (c *ThingsContainer) handleDevicePropertyChanged(message topic.DevicePropertyChangedMessage) {
@@ -203,7 +258,14 @@ func (c *ThingsContainer) handleDevicePropertyChanged(message topic.DeviceProper
 	if t == nil {
 		return
 	}
-	t.onPropertyChanged(message)
+	if p := t.GetProperty(message.PropertyName); p == nil {
+		return
+	}
+	c.Publish(topic.ThingPropertyChanged, topic.ThingPropertyChangedMessage{
+		ThingId:      t.GetId(),
+		PropertyName: message.Name,
+		Value:        message.Value,
+	})
 }
 
 func (c *ThingsContainer) handleDeviceActionStatus(msg topic.DeviceActionStatusMessage) {

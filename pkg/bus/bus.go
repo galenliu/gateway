@@ -29,7 +29,7 @@ func NewBus() *EventBus {
 
 func (t *EventBus) Subscribe(topic topic.Topic, fn any) func() {
 	top := string(topic)
-	err := t.bus.SubscribeAsync(top, fn, false)
+	err := t.bus.Subscribe(top, fn)
 	if err != nil {
 		fmt.Printf("bus subscription error: %s \t\n", err.Error())
 		return func() {
@@ -49,7 +49,7 @@ func (t *EventBus) Subscribe(topic topic.Topic, fn any) func() {
 
 func (t *EventBus) Publish(topic topic.Topic, args ...any) {
 	top := string(topic)
-	t.bus.Publish(top, args...)
+	go t.bus.Publish(top, args...)
 }
 
 func (t *EventBus) Unsubscribe(topic topic.Topic, f any) {

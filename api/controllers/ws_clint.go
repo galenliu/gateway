@@ -32,9 +32,9 @@ func NewWsClint(ws *websocket.Conn, thingId string, container things.Container, 
 }
 
 func (c *wsClint) handle() error {
+	defer c.close()
 
 	onThingAdded := func(message topic.ThingAddedMessage) {
-		c.logger.Infof("OnThingsAdded message: %v", message)
 		err := c.ws.WriteJSON(map[string]any{
 			"id":          message.ThingId,
 			"messageType": constant.ThingAdded,
@@ -65,11 +65,15 @@ func (c *wsClint) handle() error {
 	}
 
 	for {
+
 		mt, data, err := c.ws.ReadMessage()
 		if mt == websocket.CloseMessage || err != nil {
-			c.close()
 			return fmt.Errorf("websocket  close message")
 		}
+		if err != nil {
+			return fmt.Errorf("websocket error: %s", err.Error())
+		}
+
 		go c.handleMessage(data)
 	}
 }
@@ -120,16 +124,15 @@ func (c *wsClint) addThing(t *things.Thing) {
 		}
 		write(t.GetId(), constant.Connected, message.Connected)
 	}
+	removeConnectedFunc := c.container.Subscribe(topic.ThingConnected, onThingConnected)
 
-	removeConnectedFunc := t.AddConnectedSubscription(onThingConnected)
 	onThingRemoved := func(message topic.ThingRemovedMessage) {
-		c.logger.Infof("onThingRemoved message: %s", message)
 		if message.ThingId != t.GetId() {
 			return
 		}
 		f, ok := c.thingCleanups[t.GetId()]
 		if ok {
-			f()
+			go f()
 		}
 		delete(c.thingCleanups, t.GetId())
 		write(t.GetId(), constant.ThingRemoved, nil)
@@ -187,6 +190,7 @@ func (c *wsClint) addThing(t *things.Thing) {
 		}
 		c.logger.Errorf(err.Error())
 	}
+	write(t.GetId(), constant.Connected, t.Connected)
 
 	c.thingCleanups[t.GetId()] = thingCleanup
 }

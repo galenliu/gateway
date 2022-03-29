@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/fasthttp/websocket"
-	"log"
 	"net/netip"
 	"net/url"
 	"time"
@@ -68,10 +67,7 @@ func (c *Client) readPump(ctx context.Context, chanel chan []byte) {
 	for {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
-				return
-			}
+			return
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
 		select {

@@ -5,7 +5,6 @@ import (
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/events"
 	"github.com/galenliu/gateway/pkg/bus/topic"
-	"github.com/galenliu/gateway/pkg/util"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 
@@ -46,8 +45,6 @@ func NewThing(data []byte, container *ThingsContainer) (*Thing, error) {
 	}
 	thing.Created = &controls.DataTime{Time: time.Now()}
 	thing.container = container
-	thing.create()
-	container.things[thing.GetId()] = &thing
 	return &thing, nil
 }
 
@@ -126,45 +123,6 @@ func (t *Thing) SetTitle(title string) bool {
 
 func (t *Thing) setConnected(connected bool) {
 	t.Connected = connected
-	t.container.Publish(topic.ThingConnected, topic.ThingConnectedMessage{
-		ThingId:   t.GetId(),
-		Connected: connected,
-	})
-}
-
-func (t *Thing) removed() {
-	err := t.container.store.DeleteThing(t.GetId())
-	if err != nil {
-		fmt.Printf("delete thing err:%s", err.Error())
-	}
-	go t.container.Publish(topic.ThingRemoved, topic.ThingRemovedMessage{ThingId: t.GetId()})
-}
-
-func (t *Thing) update() {
-	err := t.container.store.UpdateThing(t.GetId(), t)
-	if err != nil {
-		return
-	}
-	go t.container.Publish(topic.ThingModify, topic.ThingModifyMessage{ThingId: t.GetId()})
-}
-
-func (t *Thing) create() {
-	err := t.container.store.CreateThing(t.GetId(), t)
-	if err != nil {
-		t.container.logger.Errorf(err.Error())
-	}
-	t.container.Publish(topic.ThingAdded, topic.ThingAddedMessage{ThingId: t.GetId(), Data: []byte(util.JsonIndent(t))})
-}
-
-func (t *Thing) onPropertyChanged(msg topic.DevicePropertyChangedMessage) {
-	if p := t.GetProperty(msg.PropertyName); p == nil {
-		return
-	}
-	t.container.Publish(topic.ThingPropertyChanged, topic.ThingPropertyChangedMessage{
-		ThingId:      t.GetId(),
-		PropertyName: msg.Name,
-		Value:        msg.Value,
-	})
 }
 
 func (t *Thing) onActionStatus(a actions.ActionDescription) {
@@ -201,12 +159,4 @@ func (t *Thing) GetPropertyValue(name string) (any, error) {
 
 func (t *Thing) AddEventSubscription(f func(message topic.ThingEventMessage)) {
 	go t.container.Subscribe(topic.ThingEvent+topic.Topic(t.GetId()), f)
-}
-
-func (t *Thing) AddConnectedSubscription(f func(message topic.ThingConnectedMessage)) func() {
-	f(topic.ThingConnectedMessage{
-		ThingId:   t.GetId(),
-		Connected: t.Connected,
-	})
-	return t.container.Subscribe(topic.ThingConnected, f)
 }

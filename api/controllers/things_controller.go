@@ -53,25 +53,25 @@ func (tc *thingsController) handleCreateThing(c *fiber.Ctx) error {
 func (tc *thingsController) handleDeleteThing(c *fiber.Ctx) error {
 	thingId, err := url.QueryUnescape(c.Params("thingId"))
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest)
+		return util.BadRequestError("Invalid thing id")
 	}
-	if thingId == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "thing id must be provided")
+	err = tc.model.RemoveThing(thingId)
+	if err != nil {
+		return err
 	}
-	tc.model.RemoveThing(thingId)
 	return c.SendStatus(http.StatusNoContent)
 }
 
 //GET /things/:thingId
 func (tc *thingsController) handleGetThing(c *fiber.Ctx) error {
+	if websocket.IsWebSocketUpgrade(c) {
+		return c.Next()
+	}
 	thingId, err := url.QueryUnescape(c.Params("thingId"))
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest)
 	}
-	if websocket.IsWebSocketUpgrade(c) {
-		c.Locals("thingId", thingId)
-		return c.Next()
-	}
+
 	t := tc.model.GetThing(thingId)
 	if t == nil {
 		return fiber.NewError(http.StatusBadRequest, "thing not found")
@@ -82,7 +82,6 @@ func (tc *thingsController) handleGetThing(c *fiber.Ctx) error {
 //GET /things
 func (tc *thingsController) handleGetThings(c *fiber.Ctx) error {
 	if websocket.IsWebSocketUpgrade(c) {
-		c.Locals("thingId", "")
 		return c.Next()
 	}
 	ts := tc.model.GetThings()
@@ -162,7 +161,7 @@ func (tc *thingsController) handleSetThing(c *fiber.Ctx) error {
 	}
 	title := strings.Trim(json.Get(c.Body(), "title").ToString(), " ")
 	if len(title) == 0 || title == "" {
-		return fiber.NewError(http.StatusBadRequest, "Invalid title")
+		return util.BadRequestError("Invalid title")
 	}
 	thing.SetTitle(title)
 	selectedCapability := strings.Trim(json.Get(c.Body(), "selectedCapability").ToString(), " ")
@@ -179,15 +178,15 @@ func (tc *thingsController) handleUpdateThing(c *fiber.Ctx) error {
 	defer cancelFunc()
 	thingId, err := url.QueryUnescape(c.Params("thingId"))
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest)
+		return util.BadRequestError("Invalid thing id")
 	}
 	username, err := url.QueryUnescape(json.Get(c.Body(), "username").ToString())
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest)
+		return util.BadRequestError("Invalid username")
 	}
 	password, err := url.QueryUnescape(json.Get(c.Body(), "password").ToString())
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest)
+		return util.BadRequestError("Invalid password")
 	}
 	pin := json.Get(c.Body(), "pin").ToString()
 	if thingId != "" && pin != "" {
