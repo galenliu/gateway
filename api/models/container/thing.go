@@ -96,7 +96,7 @@ func (t *Thing) SetSelectedCapability(selectedCapability string) {
 	if err != nil {
 		t.container.logger.Errorf(err.Error())
 	}
-	t.container.Publish(topic.ThingModify, topic.ThingModifyMessage{ThingId: t.GetId()})
+
 }
 
 func (t *Thing) SetTitle(title string) {
@@ -105,7 +105,6 @@ func (t *Thing) SetTitle(title string) {
 	if err != nil {
 		t.container.logger.Errorf(err.Error())
 	}
-	t.container.Publish(topic.ThingModify, topic.ThingModifyMessage{ThingId: t.GetId()})
 }
 
 func (t *Thing) setConnected(connected bool) {

@@ -165,6 +165,10 @@ func (tc *thingsController) handleSetThing(c *fiber.Ctx) error {
 		thing.SetSelectedCapability(selectedCapability)
 	}
 	thing.SetTitle(title)
+	err := tc.model.UpdateThing(thing)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotModified, err.Error())
+	}
 	return c.SendStatus(fiber.StatusOK)
 }
 

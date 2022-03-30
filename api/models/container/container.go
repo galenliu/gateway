@@ -8,7 +8,6 @@ import (
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/gofiber/fiber/v2"
-	json "github.com/json-iterator/go"
 	"sync"
 	"time"
 )
@@ -39,11 +38,10 @@ type ThingsStorage interface {
 }
 
 type Listener interface {
-	func(message topic.ThingAddedMessage)
-	func(message topic.ThingRemovedMessage)
-	func(message topic.ThingAddedMessage)
-	func(message topic.ThingModifyMessage)
-	func(message topic.ThingPropertyChangedMessage)
+	onThingRemoved(message topic.ThingRemovedMessage)
+	onThingAdded(message topic.ThingAddedMessage)
+	onThingModify(message topic.ThingModifyMessage)
+	onThingPropertyChanged(message topic.ThingPropertyChangedMessage)
 }
 
 // ThingsContainer 管理所有Thing Models
@@ -54,12 +52,6 @@ type ThingsContainer struct {
 	store   ThingsStorage
 	logger  logging.Logger
 	bus.ThingsBus
-	Listeners map[string]Listener
-	//ThingAddedFuncs           map[string]func(message topic.ThingAddedMessage)
-	//ThingRemovedFuncs         map[string]func(message topic.ThingRemovedMessage)
-	//ThingConnectedFuncs       map[string]func(message topic.ThingAddedMessage)
-	//ThingModifyFuncs          map[string]func(message topic.ThingModifyMessage)
-	//ThingPropertyChangedFuncs map[string]func(message topic.ThingPropertyChangedMessage)
 }
 
 // NewThingsContainerModel 管理所有Thing Models
@@ -70,7 +62,6 @@ func NewThingsContainerModel(manager Manager, store ThingsStorage, log logging.L
 	t.ThingsBus = bus.NewBus()
 	t.logger = log
 	t.updateThings()
-
 	_ = manager.Subscribe(topic.DeviceAdded, t.handleDeviceAdded)
 	_ = manager.Subscribe(topic.DeviceRemoved, t.handleDeviceRemoved)
 	_ = manager.Subscribe(topic.DeviceConnected, t.handleDeviceConnected)
@@ -180,24 +171,8 @@ func (c *ThingsContainer) RemoveThing(thingId string) error {
 	return nil
 }
 
-func (c *ThingsContainer) UpdateThing(data []byte) error {
-	thingId := json.Get(data, "id").ToString()
-	if thingId == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "Thing id invalid")
-	}
-	thing := c.GetThing(thingId)
-	if thing == nil {
-		return fiber.NewError(fiber.StatusBadRequest, "Thing Not Found")
-	}
-	newThing, err := NewThing(data, c)
-	if err != nil {
-		return err
-	}
-	return c.updateThing(newThing)
-}
-
-//在container和Store中更新Thing
-func (c *ThingsContainer) updateThing(thing *Thing) error {
+// UpdateThing 在container和Store中更新Thing
+func (c *ThingsContainer) UpdateThing(thing *Thing) error {
 	err := c.store.UpdateThing(thing.GetId(), thing)
 	if err != nil {
 		return err

@@ -165,7 +165,7 @@ func handleWebsocket(container things.Container, log logging.Logger) func(ws *we
 				if message.ThingId != id {
 					return
 				}
-				delete(thingCleanups, id)
+				//delete(thingCleanups, id)
 				write(id, constant.ThingRemoved)
 
 			}
