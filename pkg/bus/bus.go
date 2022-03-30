@@ -47,7 +47,7 @@ func (t *EventBus) Subscribe(topic topic.Topic, fn any) func() {
 
 func (t *EventBus) Publish(topic topic.Topic, args ...any) {
 	top := string(topic)
-	t.bus.Publish(top, args...)
+	go t.bus.Publish(top, args...)
 }
 
 func (t *EventBus) Unsubscribe(topic topic.Topic, f any) {

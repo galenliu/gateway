@@ -109,8 +109,6 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 		isClosed:   false,
 		id:         maxConnId,
 	}
-	// 处理器,发送定时信息，避免意外关闭
-	//go c.processLoop()
 	// 读协程
 	go c.wsReadLoop()
 	// 写协程
@@ -118,39 +116,22 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 	select {
 	case clientChan <- c:
 	}
-
 }
-
-//// 处理队列中的消息
-//func (wsConn *wsConnection) processLoop() {
-//	// 处理消息队列中的消息
-//	// 获取到消息队列中的消息，处理完成后，发送消息给客户端
-//	for {
-//		msg, err := wsConn.wsRead()
-//		if err != nil {
-//			log.Println("获取消息出现错误", err.Error())
-//			break
-//		}
-//		log.Println("接收到消息", string(msg.data))
-//		// 修改以下内容把客户端传递的消息传递给处理程序
-//		err = wsConn.wsWrite(msg.messageType, msg.data)
-//		if err != nil {
-//			log.Println("发送消息给客户端出现错误", err.Error())
-//			break
-//		}
-//	}
-//}
 
 // 处理消息队列中的消息
 func (wsConn *wsConnection) wsReadLoop() {
 	// 设置消息的最大长度
 	wsConn.wsSocket.SetReadLimit(maxMessageSize)
 	wsConn.wsSocket.SetReadDeadline(time.Now().Add(pongWait))
+	wsConn.wsSocket.SetPongHandler(func(string) error {
+		wsConn.wsSocket.SetReadDeadline(time.Now().Add(pongWait))
+		return nil
+	})
 	for {
 		// 读一个message
 		msgType, data, err := wsConn.wsSocket.ReadMessage()
 		if err != nil {
-			websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure)
+			log.Println(websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure))
 			log.Println("消息读取出现错误", err.Error())
 			wsConn.close()
 			return
@@ -190,10 +171,12 @@ func (wsConn *wsConnection) wsWriteLoop() {
 			return
 		case <-ticker.C:
 			// 出现超时情况
-			wsConn.wsSocket.SetWriteDeadline(time.Now().Add(writeWait))
-			if err := wsConn.wsSocket.WriteMessage(websocket.PingMessage, nil); err != nil {
-				return
+			if err := wsConn.wsSocket.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(writeWait)); err != nil {
+				log.Println("ping:", err)
 			}
+			//if err := wsConn.wsSocket.WriteMessage(websocket.PingMessage, nil); err != nil {
+			//	return
+			//}
 		}
 	}
 }

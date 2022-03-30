@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/fasthttp/websocket"
+	"log"
 	"net/netip"
 	"net/url"
 	"time"
@@ -63,7 +64,10 @@ func (c *Client) readPump(ctx context.Context, chanel chan []byte) {
 	}()
 	c.conn.SetReadLimit(maxMessageSize)
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
-	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+	c.conn.SetPongHandler(func(string) error {
+		c.conn.SetReadDeadline(time.Now().Add(pongWait))
+		return nil
+	})
 	for {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
@@ -113,7 +117,8 @@ func (c *Client) writePump() {
 			}
 		case <-ticker.C:
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
-			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+			if err := c.conn.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(writeWait)); err != nil {
+				log.Println("ping:", err)
 				return
 			}
 		}

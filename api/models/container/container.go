@@ -38,26 +38,39 @@ type ThingsStorage interface {
 	GetThings() map[string][]byte
 }
 
+type Listener interface {
+	func(message topic.ThingAddedMessage)
+	func(message topic.ThingRemovedMessage)
+	func(message topic.ThingAddedMessage)
+	func(message topic.ThingModifyMessage)
+	func(message topic.ThingPropertyChangedMessage)
+}
+
 // ThingsContainer 管理所有Thing Models
 // 向外部发送ThingAdded,ThingRemoved,ThingModify,ThingConnected事件
 type ThingsContainer struct {
-	sync.Mutex
 	things  sync.Map
 	manager Manager
 	store   ThingsStorage
 	logger  logging.Logger
 	bus.ThingsBus
+	Listeners map[string]Listener
+	//ThingAddedFuncs           map[string]func(message topic.ThingAddedMessage)
+	//ThingRemovedFuncs         map[string]func(message topic.ThingRemovedMessage)
+	//ThingConnectedFuncs       map[string]func(message topic.ThingAddedMessage)
+	//ThingModifyFuncs          map[string]func(message topic.ThingModifyMessage)
+	//ThingPropertyChangedFuncs map[string]func(message topic.ThingPropertyChangedMessage)
 }
 
 // NewThingsContainerModel 管理所有Thing Models
 func NewThingsContainerModel(manager Manager, store ThingsStorage, log logging.Logger) *ThingsContainer {
 	t := &ThingsContainer{}
-	t.Mutex = sync.Mutex{}
 	t.store = store
 	t.manager = manager
 	t.ThingsBus = bus.NewBus()
 	t.logger = log
 	t.updateThings()
+
 	_ = manager.Subscribe(topic.DeviceAdded, t.handleDeviceAdded)
 	_ = manager.Subscribe(topic.DeviceRemoved, t.handleDeviceRemoved)
 	_ = manager.Subscribe(topic.DeviceConnected, t.handleDeviceConnected)

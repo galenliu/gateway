@@ -41,7 +41,6 @@ func NewThingsControllerFunc(manager ThingsManager, model *container.ThingsConta
 
 // POST /things  create a new thing
 func (tc *thingsController) handleCreateThing(c *fiber.Ctx) error {
-	tc.logger.Debugf("Post /things:\t\n %s", c.Body())
 	thing, err := tc.model.CreateThing(c.Body())
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())

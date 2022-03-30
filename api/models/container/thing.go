@@ -9,8 +9,7 @@ import (
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 
 	json "github.com/json-iterator/go"
-	//"github.com/goccy/go-json"
-	"sync"
+
 	"time"
 )
 
@@ -34,7 +33,6 @@ type Thing struct {
 	//LayoutIndex         uint `json:"layoutIndex"`
 	GroupId   string `json:"groupId,omitempty"`
 	container *ThingsContainer
-	sync.Mutex
 }
 
 func NewThing(data []byte, container *ThingsContainer) (*Thing, error) {
@@ -54,7 +52,6 @@ func (t *Thing) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	t.Mutex = sync.Mutex{}
 	if thing.Title == "" {
 		return fmt.Errorf("thing title cannot be empty")
 	}
