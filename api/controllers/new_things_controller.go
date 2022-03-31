@@ -59,11 +59,10 @@ func (c *NewThingsController) handleNewThingsWebsocket() func(conn *websocket.Co
 
 		}
 		addonDevices := c.manager.GetMapOfDevices()
-		unSub := c.manager.Subscribe(topic.DeviceAdded, addThing)
+		_ = c.manager.Subscribe(topic.DeviceAdded, addThing)
 		defer func() {
-			//removeFunc()
 			locker = nil
-			unSub()
+			c.manager.Unsubscribe(topic.DeviceAdded, addThing)
 			_ = conn.Close()
 		}()
 		savedThings := c.thingContainer.GetMapOfThings()

@@ -3,6 +3,7 @@ package bus
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/bus/topic"
+	"reflect"
 )
 
 type ThingsBus interface {
@@ -15,7 +16,7 @@ type Publisher interface {
 }
 
 type Subscriber interface {
-	Subscribe(topic2 topic.Topic, f any) func()
+	Subscribe(topic2 topic.Topic, f any) error
 	Unsubscribe(topic2 topic.Topic, f any)
 }
 
@@ -27,30 +28,26 @@ func NewBus() *EventBus {
 	return &EventBus{bus: New()}
 }
 
-func (t *EventBus) Subscribe(topic topic.Topic, fn any) func() {
+func (t *EventBus) Subscribe(topic topic.Topic, fn any) error {
+	fmt.Printf("subscribe Topic: %s Fn: %v\n", topic, reflect.ValueOf(fn).Pointer())
 	top := string(topic)
 	err := t.bus.Subscribe(top, fn)
 	if err != nil {
-		fmt.Printf("bus subscription error: %s \t\n", err.Error())
-		return func() {
-			fmt.Printf("bus unsubscribe error: %s \t\n", err.Error())
-		}
+		return err
 	}
-	return func() {
-		err := t.bus.Unsubscribe(top, fn)
-		if err != nil {
-			fmt.Printf("bus unsubscribe error: %s \t\n", err.Error())
-			return
-		}
-	}
+	return nil
 }
 
 func (t *EventBus) Publish(topic topic.Topic, args ...any) {
+	if !t.bus.HasCallback(string(topic)) {
+		return
+	}
 	top := string(topic)
-	go t.bus.Publish(top, args...)
+	t.bus.Publish(top, args...)
 }
 
 func (t *EventBus) Unsubscribe(topic topic.Topic, f any) {
+	fmt.Printf("unsubscribe Topic: %s Fn: %v\n", topic, reflect.ValueOf(f).Pointer())
 	top := string(topic)
 	err := t.bus.Unsubscribe(top, f)
 	if err != nil {

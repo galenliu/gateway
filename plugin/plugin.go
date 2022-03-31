@@ -2,11 +2,9 @@ package plugin
 
 import (
 	"context"
-	"fmt"
 	"github.com/fasthttp/websocket"
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/properties"
-	"github.com/galenliu/gateway/pkg/bus/topic"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
@@ -187,30 +185,32 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 			}
 			adapter := NewAdapter(message.AdapterId, message.Name, message.PackageName, plugin)
 
-			send := func(msg topic.ThingAddedMessage) {
-				var device messages.DeviceWithoutId
-				err := json.Unmarshal(msg.Data, &device)
-				if err != nil {
-					fmt.Println(err.Error())
-					return
-				}
-				adapter.Send(messages.MessageType_DeviceSavedNotification, messages.DeviceSavedNotificationJsonData{
-					AdapterId: adapter.GetId(),
-					Device:    device,
-					DeviceId:  msg.ThingId,
-					PluginId:  plugin.getId(),
-				})
-			}
-
-			if plugin.manager.thingContainer != nil {
-				for _, t := range plugin.manager.thingContainer.GetThings() {
-					send(topic.ThingAddedMessage{
-						ThingId: t.GetId(),
-						Data:    []byte(util.JsonIndent(t)),
-					})
-				}
-			}
-			adapter.eventHandler[string(topic.ThingAdded)] = plugin.manager.thingContainer.Subscribe(topic.ThingAdded, send)
+			//send := func(msg topic.ThingAddedMessage) {
+			//	var device messages.DeviceWithoutId
+			//	err := json.Unmarshal(msg.Data, &device)
+			//	if err != nil {
+			//		fmt.Println(err.Error())
+			//		return
+			//	}
+			//	adapter.Send(messages.MessageType_DeviceSavedNotification, messages.DeviceSavedNotificationJsonData{
+			//		AdapterId: adapter.GetId(),
+			//		Device:    device,
+			//		DeviceId:  msg.ThingId,
+			//		PluginId:  plugin.getId(),
+			//	})
+			//}
+			//
+			//if plugin.manager.thingContainer != nil {
+			//	for _, t := range plugin.manager.thingContainer.GetThings() {
+			//		send(topic.ThingAddedMessage{
+			//			ThingId: t.GetId(),
+			//			Data:    []byte(util.JsonIndent(t)),
+			//		})
+			//	}
+			//}
+			//adapter.eventHandler[string(topic.ThingAdded)] = func() {
+			//	plugin.manager.thingContainer.Unsubscribe(topic.ThingAdded, send)
+			//}
 
 			go plugin.handleAdapterAdded(adapter)
 			return

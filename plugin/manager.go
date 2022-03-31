@@ -28,7 +28,8 @@ type managerStore interface {
 }
 
 type ThingsContainer interface {
-	Subscribe(topic topic.Topic, fn any) func()
+	Subscribe(topic topic.Topic, fn any) error
+	Unsubscribe(topic topic.Topic, fn any)
 	GetThings() []*things.Thing
 }
 

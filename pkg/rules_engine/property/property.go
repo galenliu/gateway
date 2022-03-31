@@ -68,11 +68,27 @@ func (p *Property) onThingConnected(msg topic.ThingConnectedMessage) {
 }
 
 func (p *Property) Start() {
-	p.cleanUp = append(p.cleanUp, p.container.Subscribe(topic.ThingPropertyChanged, p.onPropertyChanged))
-	err := p.getInitialValue()
+	err := p.container.Subscribe(topic.ThingPropertyChanged, p.onPropertyChanged)
+	if err == nil {
+		p.cleanUp = append(p.cleanUp, func() {
+			p.container.Unsubscribe(topic.ThingPropertyChanged, p.onPropertyChanged)
+		})
+	}
+
+	err = p.getInitialValue()
 	if err != nil {
-		p.cleanUp = append(p.cleanUp, p.container.Subscribe(topic.ThingAdded, p.onThingAdded))
-		p.cleanUp = append(p.cleanUp, p.container.Subscribe(topic.ThingConnected, p.onThingConnected))
+		err := p.container.Subscribe(topic.ThingAdded, p.onThingAdded)
+		if err == nil {
+			p.cleanUp = append(p.cleanUp, func() {
+				p.container.Unsubscribe(topic.ThingAdded, p.onThingAdded)
+			})
+		}
+		err = p.container.Subscribe(topic.ThingConnected, p.onThingConnected)
+		if err == nil {
+			p.cleanUp = append(p.cleanUp, func() {
+				p.container.Unsubscribe(topic.ThingConnected, p.onThingConnected)
+			})
+		}
 		return
 	}
 }

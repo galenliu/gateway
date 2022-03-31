@@ -16,7 +16,8 @@ type Container interface {
 	SetThingPropertyValue(thingId, propertyName string, value any) (any, error)
 	GetThingPropertyValue(thingId, propertyName string) (any, error)
 	Publish(topic2 topic.Topic, args ...any)
-	Subscribe(topic2 topic.Topic, f any) func()
+	Subscribe(topic2 topic.Topic, f any) error
+	Unsubscribe(topic2 topic.Topic, f any)
 	GetThing(thing string) *Thing
 	GetThings() []*Thing
 }
@@ -26,7 +27,7 @@ type Manager interface {
 	GetPropertyValue(thingId, propertyName string) (any, error)
 	GetPropertiesValue(thingId string) (map[string]any, error)
 	Publish(topic2 topic.Topic, args ...any)
-	Subscribe(topic2 topic.Topic, f any) func()
+	Subscribe(topic2 topic.Topic, f any) error
 }
 
 // ThingsStorage CRUD
@@ -35,13 +36,6 @@ type ThingsStorage interface {
 	CreateThing(id string, thing *Thing) error
 	UpdateThing(id string, thing *Thing) error
 	GetThings() map[string][]byte
-}
-
-type Listener interface {
-	onThingRemoved(message topic.ThingRemovedMessage)
-	onThingAdded(message topic.ThingAddedMessage)
-	onThingModify(message topic.ThingModifyMessage)
-	onThingPropertyChanged(message topic.ThingPropertyChangedMessage)
 }
 
 // ThingsContainer 管理所有Thing Models
@@ -103,11 +97,7 @@ func (c *ThingsContainer) SetThingPropertyValue(thingId, propName string, value 
 	return v, nil
 }
 
-func (c *ThingsContainer) GetThings() []*Thing {
-	return c.getThings()
-}
-
-func (c *ThingsContainer) getThings() (ts []*Thing) {
+func (c *ThingsContainer) GetThings() (ts []*Thing) {
 	ts = make([]*Thing, 0)
 	c.things.Range(func(key, value any) bool {
 		t, ok := value.(*Thing)
@@ -184,7 +174,7 @@ func (c *ThingsContainer) UpdateThing(thing *Thing) error {
 
 //如果container为空，则从Store里加载所有的Things
 func (c *ThingsContainer) updateThings() {
-	things := c.getThings()
+	things := c.GetThings()
 	if len(things) == 0 {
 		for id, data := range c.store.GetThings() {
 			thing, err := NewThing(data, c)
@@ -206,7 +196,7 @@ func (c *ThingsContainer) handleDeviceRemoved(thingId string) {
 	}
 	c.Publish(topic.ThingConnected, topic.ThingConnectedMessage{
 		ThingId:   t.GetId(),
-		Connected: true,
+		Connected: false,
 	})
 }
 

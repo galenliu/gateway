@@ -119,7 +119,7 @@ func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log l
 		thingsGroup.Patch("/:thingId", thingsController.handleUpdateThing)
 		thingsGroup.Get("/", thingsController.handleGetThings)
 
-		thingsGroup.Get("/:thingId", websocket.New(handleWebsocket(containerModel, log)))
+		//thingsGroup.Get("/:thingId", websocket.New(handleWebsocket(containerModel, log)))
 		thingsGroup.Get("/", websocket.New(handleWebsocket(containerModel, log)))
 
 		//Get the properties of a thing
@@ -183,7 +183,7 @@ func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log l
 		rulesController := NewRulesController(store, containerModel)
 		rulesGroup.Get("/", rulesController.handleGetRules)
 		rulesGroup.Get("/:id", rulesController.handleGetRule)
-		rulesGroup.Get("/:id", rulesController.handlerDeleteRule)
+		rulesGroup.Delete("/:id", rulesController.handlerDeleteRule)
 		rulesGroup.Put("/:id", rulesController.handlerUpdateRule)
 		rulesGroup.Post("/", rulesController.handleCreateRule)
 	}

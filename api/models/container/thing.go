@@ -126,7 +126,7 @@ func (t *Thing) onActionStatus(a actions.ActionDescription) {
 }
 
 func (t *Thing) OnEvent(event *events.EventDescription) {
-	go t.container.Publish(topic.ThingEvent, t.GetId(), event)
+	t.container.Publish(topic.ThingEvent, t.GetId(), event)
 }
 
 func (t *Thing) AddAction(name string) bool {
@@ -144,5 +144,5 @@ func (t *Thing) GetPropertyValue(name string) (any, error) {
 }
 
 func (t *Thing) AddEventSubscription(f func(message topic.ThingEventMessage)) {
-	go t.container.Subscribe(topic.ThingEvent+topic.Topic(t.GetId()), f)
+	_ = t.container.Subscribe(topic.ThingEvent+topic.Topic(t.GetId()), f)
 }
