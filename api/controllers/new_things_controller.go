@@ -58,13 +58,14 @@ func (c *NewThingsController) handleNewThingsWebsocket() func(conn *websocket.Co
 			}
 
 		}
-		addonDevices := c.manager.GetMapOfDevices()
+
 		_ = c.manager.Subscribe(topic.DeviceAdded, addThing)
 		defer func() {
 			locker = nil
 			c.manager.Unsubscribe(topic.DeviceAdded, addThing)
 			_ = conn.Close()
 		}()
+		addonDevices := c.manager.GetMapOfDevices()
 		savedThings := c.thingContainer.GetMapOfThings()
 		for id, dev := range addonDevices {
 			_, ok := savedThings[id]

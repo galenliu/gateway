@@ -29,7 +29,7 @@ func NewBus() *EventBus {
 }
 
 func (t *EventBus) Subscribe(topic topic.Topic, fn any) error {
-	fmt.Printf("subscribe Topic: %s Fn: %v\n", topic, reflect.ValueOf(fn).Pointer())
+	fmt.Printf("subscribe Topic: %s Pointer: %v Type: %v\n", topic, reflect.ValueOf(fn).Pointer(), reflect.ValueOf(fn).Type())
 	top := string(topic)
 	err := t.bus.Subscribe(top, fn)
 	if err != nil {
@@ -47,7 +47,7 @@ func (t *EventBus) Publish(topic topic.Topic, args ...any) {
 }
 
 func (t *EventBus) Unsubscribe(topic topic.Topic, f any) {
-	fmt.Printf("unsubscribe Topic: %s Fn: %v\n", topic, reflect.ValueOf(f).Pointer())
+	fmt.Printf("unsubscribe Topic: %s Pointer: %v Type: %v\n", topic, reflect.ValueOf(f).Pointer(), reflect.ValueOf(f).Type())
 	top := string(topic)
 	err := t.bus.Unsubscribe(top, f)
 	if err != nil {

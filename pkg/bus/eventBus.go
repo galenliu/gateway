@@ -142,6 +142,7 @@ func (bus *eventBus) Publish(topic string, args ...interface{}) {
 			}
 			if !handler.async {
 				bus.doPublish(handler, topic, args...)
+
 			} else {
 				bus.wg.Add(1)
 				if handler.transactional {
@@ -157,6 +158,7 @@ func (bus *eventBus) Publish(topic string, args ...interface{}) {
 
 func (bus *eventBus) doPublish(handler *eventHandler, topic string, args ...interface{}) {
 	passedArguments := bus.setUpPublish(handler, args...)
+	fmt.Printf("Publish Topic: %s Pointer: %v Type: %v\n", topic, handler.callBack.Pointer(), handler.callBack.Type())
 	handler.callBack.Call(passedArguments)
 }
 
