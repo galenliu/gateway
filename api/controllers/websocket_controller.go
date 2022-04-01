@@ -45,7 +45,11 @@ func (conn *Connection) write(id string, messageType string, data any) error {
 	defer conn.locker.Unlock()
 	if conn.Conn != nil && !conn.isClosed {
 		if conn.thingId == "" || id == conn.thingId {
-			err := conn.WriteJSON(message{
+			err := conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if err != nil {
+				return err
+			}
+			err = conn.WriteJSON(message{
 				Id:          id,
 				MessageType: messageType,
 				Data:        data,
@@ -176,6 +180,17 @@ func (conn *Connection) handler() {
 	_ = conn.container.Subscribe(topic.ThingPropertyChanged, conn.onPropertyChanged)
 	_ = conn.container.Subscribe(topic.ThingRemoved, conn.onThingRemoved)
 	conn.notify()
+	err := conn.SetReadDeadline(time.Now().Add(pongWait))
+	if err != nil {
+		return
+	}
+	conn.SetPongHandler(func(appData string) error {
+		err := conn.SetReadDeadline(time.Now().Add(pongWait))
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 	for {
 		_, data, err := conn.ReadMessage()
 		if err != nil {
