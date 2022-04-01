@@ -126,6 +126,11 @@ func (d *YeelightDevice) Listen(ctx context.Context) error {
 							if err != nil {
 								d.ColorTemperature.SetCachedValueAndNotify(v)
 							}
+						case yeelight.BrightWithZero:
+							v := to.Float64(value)
+							if err != nil {
+								d.Brightness.SetCachedValueAndNotify(v)
+							}
 						default:
 							fmt.Printf("Bad Params name: %s,value : %v \t\n", name, value)
 						}

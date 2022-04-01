@@ -63,6 +63,7 @@ func (bus *eventBus) doSubscribe(topic string, fn interface{}, handler *eventHan
 	bus.lock.Lock()
 	defer bus.lock.Unlock()
 	if !(reflect.TypeOf(fn).Kind() == reflect.Func) {
+		fmt.Printf("%s is not of type reflect.Func", reflect.TypeOf(fn).Kind())
 		return fmt.Errorf("%s is not of type reflect.Func", reflect.TypeOf(fn).Kind())
 	}
 	bus.handlers[topic] = append(bus.handlers[topic], handler)

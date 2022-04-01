@@ -34,7 +34,7 @@ func (a *YeelightAdapter) HandleDeviceSaved(msg messages.DeviceSavedNotification
 
 func (a *YeelightAdapter) StartPairing(timeout <-chan time.Time) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	devices, err := yeelight.Discovery(ctx)
@@ -59,31 +59,6 @@ func (a *YeelightAdapter) StartPairing(timeout <-chan time.Time) {
 		a.devices[device.ID] = found
 		a.HandleDeviceAdded(found)
 	}
-	//fmt.Printf("start pairing...\n")
-	//if timeout == nil {
-	//	timeout = time.After(5 * time.Second)
-	//}
-	//
-	//discover := func() *yeelight.Yeelight {
-	//	bulb, err := yeelight.Discover()
-	//	if err != nil {
-	//		fmt.Printf("adapter:%s  err:%s \t\n", a.GetId(), err.Error())
-	//		return nil
-	//	}
-	//	return bulb
-	//}
-	//for {
-	//	foundDevice := discover()
-	//	if foundDevice != nil {
-	//		yl := NewYeelightBulb(foundDevice)
-	//		a.HandleDeviceAdded(yl)
-	//	}
-	//	select {
-	//	case <-timeout:
-	//		return
-	//	}
-	//}
-
 }
 
 func (a *YeelightAdapter) HandleDeviceRemoved(device proxy.DeviceProxy) {

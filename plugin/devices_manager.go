@@ -3,6 +3,7 @@ package plugin
 import (
 	"context"
 	"github.com/galenliu/gateway/pkg/addon/devices"
+	"github.com/galenliu/gateway/pkg/bus/topic"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/util"
 )
@@ -11,6 +12,10 @@ import (
 func (m *Manager) SetPropertyValue(ctx context.Context, thingId, propName string, newValue any) (any, error) {
 	device := m.getDevice(thingId)
 	if device == nil {
+		m.Publish(topic.DeviceConnected, topic.DeviceConnectedMessage{
+			DeviceId:  thingId,
+			Connected: false,
+		})
 		return nil, util.NotFoundError("device %s not found", thingId)
 	}
 	p := device.GetProperty(propName)

@@ -25,6 +25,7 @@ const (
 	PropertyBgSat        = "bg_sat"
 	PropertyNlBr         = "nl_br"
 	PropertyActiveMode   = "active_mode"
+	BrightWithZero       = "bright_with_zero"
 )
 
 // Properties return a list of all susceptible properties

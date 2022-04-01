@@ -23,7 +23,7 @@ type DiscoveryResultItem struct {
 // Discovery scans the network for devices.
 // This feature can`t stop itself. It MUST be stopped by context.
 func Discovery(ctx context.Context) (items []DiscoveryResultItem, err error) {
-	const discoverMSG = "M-SEARCH * HTTP/1.1\r\n HOST:239.255.255.250:1982\r\n MAN:\"ssdp:discover\"\r\n ST:wifi_bulb\r\n"
+	const discoverMSG = "M-SEARCH * HTTP/1.1\r\nHOST:239.255.255.250:1982\r\nMAN:\"ssdp:discover\"\r\nST:wifi_bulb\r\n"
 	const ssdpAddr = "239.255.255.250:1982"
 
 	ssdp, err := net.ResolveUDPAddr("udp4", ssdpAddr)
