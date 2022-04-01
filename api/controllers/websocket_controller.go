@@ -206,14 +206,14 @@ func (conn *Connection) handleMessage(data []byte) {
 
 func (conn *Connection) close() {
 	conn.log.Infof("关闭连接: %v", conn.connId)
-	conn.locker.Lock()
-	defer conn.locker.Unlock()
 	conn.container.Unsubscribe(topic.ThingAdded, conn.onThingAdded)
 	conn.container.Unsubscribe(topic.ThingModify, conn.onThingModified)
 	conn.container.Unsubscribe(topic.ThingConnected, conn.onThingConnected)
 	conn.container.Unsubscribe(topic.ThingPropertyChanged, conn.onPropertyChanged)
 	conn.container.Unsubscribe(topic.ThingRemoved, conn.onThingRemoved)
 	if !conn.isClosed && conn.Conn != nil {
+		conn.locker.Lock()
+		defer conn.locker.Unlock()
 		err := conn.Close()
 		if err != nil {
 			conn.log.Infof("websocket close error: %s", err.Error())
