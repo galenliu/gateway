@@ -1,8 +1,8 @@
-package yeelight
+package yeelight_adapter
 
 import (
 	"context"
-	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/lib"
+	"github.com/galenliu/gateway/cmd/yeelight-adapter/lib"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	"image/color"
 	"strconv"

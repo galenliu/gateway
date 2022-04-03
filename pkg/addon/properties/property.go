@@ -67,7 +67,7 @@ type Property struct {
 	AtType      PropertyType `json:"@type,omitempty"`
 	Unit        Unit         `json:"unit,omitempty"`
 	Description string       `json:"description,omitempty"`
-	Minimum     any          `json:"minimum"`
+	Minimum     any          `json:"minimum,omitempty"`
 	Maximum     any          `json:"maximum,omitempty"`
 	Enum        []any        `json:"enum,omitempty"`
 	ReadOnly    bool         `json:"readOnly"`

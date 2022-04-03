@@ -4,10 +4,10 @@ import (
 	"github.com/galenliu/gateway/pkg/addon/properties"
 )
 
-type OnOffSwitchHandler interface {
-	TurnOn()
-	TurnOff()
-	SetBrightness(brightness int)
+type OnOffSwitchDevice interface {
+	TurnOn() error
+	TurnOff() error
+	Toggle() error
 }
 
 type OnOffSwitch struct {

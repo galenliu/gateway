@@ -14,7 +14,7 @@ func NewColorModeProperty(value ColorModePropertyEnum, opts ...Option) *ColorMod
 	p.StringProperty = NewStringProperty(StringPropertyDescription{
 		Name:     "color_mode",
 		AtType:   TypeColorModeProperty,
-		Title:    "color mode",
+		Title:    "ColorMode",
 		Type:     TypeString,
 		Enum:     []string{ColorModePropertyEnumColor, ColorModePropertyEnumTemperature},
 		ReadOnly: false,

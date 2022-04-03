@@ -5,8 +5,8 @@ type LevelProperty struct {
 }
 
 func NewLevelProperty(value Number, min, max Number, opts ...Option) *LevelProperty {
-
 	l := &LevelProperty{}
+	opts = append(opts, WithTitle("Level"))
 	l.NumberProperty = NewNumberProperty(NumberPropertyDescription{
 		Name:     "level",
 		AtType:   TypeLevelProperty,

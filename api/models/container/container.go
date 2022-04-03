@@ -130,6 +130,7 @@ func (c *ThingsContainer) GetMapOfThings() map[string]*Thing {
 func (c *ThingsContainer) CreateThing(data []byte) (*Thing, error) {
 
 	thing, err := NewThing(data, c)
+	thing.Connected = true
 	if err != nil {
 		return nil, fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}

@@ -1,10 +1,10 @@
-package yeelight
+package yeelight_adapter
 
 import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/lib"
+	"github.com/galenliu/gateway/cmd/yeelight-adapter/lib"
 	"github.com/galenliu/gateway/pkg/addon/proxy"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"log"
@@ -56,6 +56,9 @@ func (a *YeelightAdapter) StartPairing(timeout <-chan time.Time) {
 			_ = client.SetName(context.Background(), "yeelight"+device.Location)
 		}
 		found := NewYeelightBulb(&client, device.ID, device.Name, device.Location)
+		if found == nil {
+			continue
+		}
 		a.devices[device.ID] = found
 		a.HandleDeviceAdded(found)
 	}

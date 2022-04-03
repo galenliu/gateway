@@ -1,4 +1,4 @@
-package virtual
+package virtual_adapter
 
 import (
 	"fmt"

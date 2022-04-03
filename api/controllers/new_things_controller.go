@@ -6,8 +6,10 @@ import (
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/util"
 	"github.com/gofiber/websocket/v2"
 	"sync"
+	"time"
 )
 
 type manager interface {
@@ -20,7 +22,7 @@ type thingContainer interface {
 }
 
 type NewThingsController struct {
-	locker         *sync.Mutex
+	locker         sync.Mutex
 	ws             *websocket.Conn
 	foundThing     chan string
 	closeChan      chan struct{}
@@ -34,34 +36,39 @@ func NewNewThingsController(manager manager, thingContainer thingContainer, log 
 	c.logger = log
 	c.manager = manager
 	c.thingContainer = thingContainer
-	c.locker = new(sync.Mutex)
+	c.locker = sync.Mutex{}
 	c.closeChan = make(chan struct{})
 	c.foundThing = make(chan string)
 	return c
 }
 
 func (c *NewThingsController) handleNewThingsWebsocket() func(conn *websocket.Conn) {
+
 	return func(conn *websocket.Conn) {
-		locker := new(sync.Mutex)
+
 		addThing := func(msg topic.DeviceAddedMessage) {
-			if conn != nil && locker != nil {
-				locker.Lock()
-				defer locker.Unlock()
+			if conn != nil {
 				if t := c.thingContainer.GetThing(msg.DeviceId); t != nil {
 					return
 				}
-				err := conn.WriteJSON(things.AsWebOfThing(msg.Device))
+				c.locker.Lock()
+				defer c.locker.Unlock()
+				err := conn.SetWriteDeadline(time.Now().Add(2 * time.Second))
+				if err != nil {
+					return
+				}
+				data := util.JsonIndent(things.AsWebOfThing(msg.Device))
+				c.logger.Infof("New thing: %s", data)
+				err = conn.WriteMessage(websocket.TextMessage, []byte(data))
 				if err != nil {
 					c.logger.Error("new thing websocket err:%s", err.Error())
 					return
 				}
 			}
-
 		}
 
 		_ = c.manager.Subscribe(topic.DeviceAdded, addThing)
 		defer func() {
-			locker = nil
 			c.manager.Unsubscribe(topic.DeviceAdded, addThing)
 			_ = conn.Close()
 		}()
@@ -77,7 +84,11 @@ func (c *NewThingsController) handleNewThingsWebsocket() func(conn *websocket.Co
 			}
 		}
 		for {
-			_, _, err := conn.ReadMessage()
+			err := conn.SetReadDeadline(time.Now().Add(30 * time.Second))
+			if err != nil {
+				return
+			}
+			_, _, err = conn.ReadMessage()
 			if err != nil {
 				return
 			}

@@ -1,4 +1,4 @@
-package yeelight
+package yeelight_adapter
 
 import (
 	"github.com/galenliu/gateway/pkg/addon/properties"

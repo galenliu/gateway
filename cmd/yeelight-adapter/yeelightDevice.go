@@ -1,9 +1,9 @@
-package yeelight
+package yeelight_adapter
 
 import (
 	"context"
 	"fmt"
-	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight/lib"
+	"github.com/galenliu/gateway/cmd/yeelight-adapter/lib"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	json "github.com/json-iterator/go"
@@ -36,9 +36,10 @@ func NewYeelightBulb(clint *yeelight.Client, id, name, ip string) *YeelightDevic
 		Client: clint,
 	}
 
-	props, err := yeeDevice.Client.GetProperties(context.Background(), []string{yeelight.PropertyPower, yeelight.PropertyColorMode, yeelight.PropertyBright, yeelight.PropertyCT, yeelight.PropertyHue, yeelight.PropertyRGB})
+	props, err := yeeDevice.Client.GetProperties(yeeDevice.ctx, []string{yeelight.PropertyPower, yeelight.PropertyColorMode, yeelight.PropertyBright, yeelight.PropertyCT, yeelight.PropertyHue, yeelight.PropertyRGB})
 	if err != nil {
-		log.Fatalln(err)
+		log.Printf(err.Error())
+		return nil
 	}
 	for name, value := range props {
 		fmt.Println("> ", name, ":", value)
@@ -52,7 +53,6 @@ func NewYeelightBulb(clint *yeelight.Client, id, name, ip string) *YeelightDevic
 			prop := NewOn(yeeDevice, isPowerOn(value))
 			yeeDevice.AddProperties(prop)
 		case yeelight.PropertyBright:
-
 			value, _ := strconv.Atoi(value)
 			prop := NewBrightness(yeeDevice, properties.Integer(value))
 			yeeDevice.AddProperties(prop)

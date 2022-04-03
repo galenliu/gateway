@@ -9,8 +9,8 @@ import (
 type NumberPropertyDescription struct {
 	Name       string       `json:"name,omitempty"`
 	AtType     PropertyType `json:"@type,omitempty"`
-	Minimum    Number       `json:"minimum,omitempty"`
-	Maximum    Number       `json:"maximum,omitempty"`
+	Minimum    any          `json:"minimum,omitempty"`
+	Maximum    any          `json:"maximum,omitempty"`
 	Enum       []Number     `json:"enum,omitempty"`
 	ReadOnly   bool         `json:"readOnly,omitempty"`
 	MultipleOf any          `json:"multipleOf,omitempty"`
@@ -49,20 +49,6 @@ func NewNumberProperty(desc NumberPropertyDescription, opts ...Option) *NumberPr
 		Value:      desc.Value,
 	}, opts...)
 	return n
-}
-
-// OnValueRemoteGet calls fn when the value was read by a client.
-func (prop *NumberProperty) OnValueRemoteGet(fn func() float64) {
-	//prop.OnValueGet(func() interface{} {
-	//	return fn()
-	//})
-}
-
-// OnValueRemoteUpdate calls fn when the value was updated by a client.
-func (prop *NumberProperty) OnValueRemoteUpdate(fn func(float64)) {
-	//prop.OnValueUpdate(func(Property *addon.PropertyProxy, newValue, oldValue interface{}) {
-	//	fn(newValue.(float64))
-	//})
 }
 
 func (prop *NumberProperty) GetValue() Number {

@@ -9,9 +9,9 @@ import (
 )
 
 type LightHandler interface {
-	TurnOn()
-	TurnOff()
-	SetBrightness(brightness int)
+	TurnOn() error
+	TurnOff() error
+	SetBrightness(brightness int) error
 }
 
 type Light struct {

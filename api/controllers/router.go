@@ -141,7 +141,6 @@ func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log l
 		newThingsGroup := app.Group(constant.NewThingsPath)
 		newThingsGroup.Use("/", func(c *fiber.Ctx) error {
 			if websocket.IsWebSocketUpgrade(c) {
-				c.Locals("websocket", true)
 				return c.Next()
 			}
 			return fiber.ErrUpgradeRequired

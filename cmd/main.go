@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/galenliu/gateway/cmd/virtual-adapter/virtual"
-	"github.com/galenliu/gateway/cmd/virtual-adapter/yeelight"
+	"github.com/galenliu/gateway/cmd/virtual-adapter"
+	"github.com/galenliu/gateway/cmd/yeelight-adapter"
 	"github.com/galenliu/gateway/pkg/addon/proxy"
 	"log"
 	"os"
@@ -24,13 +24,13 @@ func main() {
 		fmt.Printf("err: %s", err.Error())
 		return
 	}
-	yeeAdapter := yeelight.NewVirtualAdapter(yeelightAdapterId)
-	virtualAdapter := virtual.NewVirtualAdapter(virtualAdapterId)
+	yeeAdapter := yeelight_adapter.NewVirtualAdapter(yeelightAdapterId)
+	virtualAdapter := virtual_adapter.NewVirtualAdapter(virtualAdapterId)
 
 	manager.AddAdapters(yeeAdapter, virtualAdapter)
 
-	yeeAdapter.StartPairing(nil)
-	virtualAdapter.StartPairing(nil)
+	go yeeAdapter.StartPairing(nil)
+	go virtualAdapter.StartPairing(nil)
 
 	interruptChannel := make(chan os.Signal, 1)
 	signal.Notify(interruptChannel, syscall.SIGINT, syscall.SIGTERM)
@@ -41,6 +41,7 @@ func main() {
 			case s := <-interruptChannel:
 				log.Printf("signal %s exit", s.String())
 			case <-manager.Done:
+				log.Printf("Done shutting")
 				return
 			}
 		}
