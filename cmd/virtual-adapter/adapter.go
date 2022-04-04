@@ -98,7 +98,7 @@ func (a *Adapter) StartPairing(t <-chan time.Time) {
 	{
 		//空调
 		thermostat := NewVirtualDevice(devices.NewThermostat("virtual_thermostat"))
-		temperature := properties.NewTemperatureProperty(0, properties.WithReadOnly())
+		temperature := properties.NewTemperatureProperty(10, properties.WithReadOnly())
 		targetTemperature := properties.NewTargetTemperatureProperty(25)
 		heatingCooling := properties.NewHeatingCoolingProperty(properties.HeatingCoolingEnumOff)
 		thermostatMode := properties.NewThermostatModeProperty(properties.ThermostatModeEnumAuto)

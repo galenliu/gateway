@@ -81,11 +81,10 @@ func defaultTransport(ctx context.Context, host string, raw string) ([]byte, err
 	var d net.Dialer
 
 	conn, err := d.DialContext(ctx, "tcp", host)
+	defer conn.Close()
 	if err != nil {
 		return nil, processDialError(err)
 	}
-
-	defer conn.Close()
 
 	if _, err := fmt.Fprint(conn, raw+crlf); err != nil {
 		return nil, err
