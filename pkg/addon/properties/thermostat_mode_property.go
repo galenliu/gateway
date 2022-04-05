@@ -2,24 +2,29 @@ package properties
 
 type ThermostatModeEnum string
 
-var ThermostatModeEnumOff = "off"
-var ThermostatModeEnumHeat = "heat"
-var ThermostatModeEnumCool = "cool"
-var ThermostatModeEnumAuto = "auto"
+var ThermostatModeEnumOff ThermostatModeEnum = "off"
+var ThermostatModeEnumHeat ThermostatModeEnum = "heat"
+var ThermostatModeEnumCool ThermostatModeEnum = "cool"
+var ThermostatModeEnumAuto ThermostatModeEnum = "auto"
 
 type ThermostatModeProperty struct {
 	*StringProperty
 }
 
-func NewThermostatModeProperty(value string, opts ...Option) *ThermostatModeProperty {
+func NewThermostatModeProperty(value ThermostatModeEnum, enum []ThermostatModeEnum, opts ...Option) *ThermostatModeProperty {
 	b := &ThermostatModeProperty{}
-	opts = append(opts, WithTitle("ThermostatMode"), WithUnit(UnitVolt))
+	opts = append(opts, WithTitle("Mode"), WithUnit(UnitVolt))
 	b.StringProperty = NewStringProperty(StringPropertyDescription{
-		Name:     "thermostatMode",
-		ReadOnly: true,
-		Enum:     []string{ThermostatModeEnumOff, ThermostatModeEnumHeat, ThermostatModeEnumCool, ThermostatModeEnumAuto},
-		AtType:   TypeThermostatModeProperty,
-		Value:    value,
+		Name: "thermostatMode",
+		Enum: func() []string {
+			em := make([]string, 0)
+			for _, e := range enum {
+				em = append(em, string(e))
+			}
+			return em
+		}(),
+		AtType: TypeThermostatModeProperty,
+		Value:  string(value),
 	}, opts...)
 	return b
 }
