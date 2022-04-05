@@ -3,7 +3,7 @@ package virtual_adapter
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/addon/devices"
-	"github.com/galenliu/gateway/pkg/addon/properties"
+	p "github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/addon/proxy"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"time"
@@ -25,34 +25,34 @@ func (a *Adapter) StartPairing(t <-chan time.Time) {
 
 	{
 		light := NewVirtualDevice(devices.NewLightBulb("virtual_light"))
-		on := properties.NewColorProperty("#ff0000")
-		color := properties.NewOnOffProperty(true)
-		level := properties.NewBrightnessProperty(20)
+		on := p.NewColorProperty("#ff0000")
+		color := p.NewOnOffProperty(true)
+		level := p.NewBrightnessProperty(20)
 		light.addProperties(on.Property, color.Property, level.Property)
 		devs = append(devs, light)
 	}
 
 	{
 		light := NewVirtualDevice(devices.NewLightBulb("virtual_light1", devices.WithPin("12345678")))
-		on := properties.NewColorProperty("#ff0000")
-		color := properties.NewOnOffProperty(true)
-		level := properties.NewBrightnessProperty(20)
+		on := p.NewColorProperty("#ff0000")
+		color := p.NewOnOffProperty(true)
+		level := p.NewBrightnessProperty(20)
 		light.addProperties(on.Property, color.Property, level.Property)
 		devs = append(devs, light)
 	}
 
 	{
 		levelSwitch := NewVirtualDevice(devices.NewMultiLevelSwitch("virtual_level"))
-		level := properties.NewLevelProperty(10, 0, 100, properties.WithUnit(properties.UnitPercent))
-		onOff := properties.NewOnOffProperty(false)
+		level := p.NewLevelProperty(10, 0, 100, p.WithUnit(p.UnitPercent))
+		onOff := p.NewOnOffProperty(false)
 		levelSwitch.addProperties(level.Property, onOff.Property)
 		devs = append(devs, levelSwitch)
 	}
 
 	{
 		levelSwitch := NewVirtualDevice(devices.NewMultiLevelSwitch("virtual_level1", devices.WithCredentialsRequired()))
-		level := properties.NewLevelProperty(10, 0, 100)
-		onOff := properties.NewOnOffProperty(false)
+		level := p.NewLevelProperty(10, 0, 100)
+		onOff := p.NewOnOffProperty(false)
 		levelSwitch.addProperties(level.Property, onOff.Property)
 		devs = append(devs, levelSwitch)
 	}
@@ -60,19 +60,19 @@ func (a *Adapter) StartPairing(t <-chan time.Time) {
 	{
 		smartPlug := NewVirtualDevice(devices.NewSmartPlug("smart_plug"))
 		//开关
-		onOff := properties.NewOnOffProperty(false)
+		onOff := p.NewOnOffProperty(false)
 		//级别
-		level := properties.NewLevelProperty(10, 0, 100)
+		level := p.NewLevelProperty(10, 0, 100)
 		//功率
-		power := properties.NewInstantaneousPowerProperty(0, properties.WithReadOnly())
+		power := p.NewInstantaneousPowerProperty(0, p.WithReadOnly())
 		//频率
-		factor := properties.NewInstantaneousPowerFactorProperty(0, properties.WithReadOnly())
+		factor := p.NewInstantaneousPowerFactorProperty(0, p.WithReadOnly())
 		//电压
-		voltage := properties.NewVoltageProperty(0, properties.WithReadOnly())
+		voltage := p.NewVoltageProperty(0, p.WithReadOnly())
 		//电流
-		current := properties.NewCurrentProperty(0, properties.WithReadOnly())
+		current := p.NewCurrentProperty(0, p.WithReadOnly())
 		//频率
-		frequency := properties.NewFrequencyProperty(0, properties.WithReadOnly())
+		frequency := p.NewFrequencyProperty(0, p.WithReadOnly())
 		smartPlug.addProperties(onOff.Property, level.Property, power.Property, factor.Property,
 			voltage.Property, current.Property, frequency.Property)
 		devs = append(devs, smartPlug)
@@ -81,7 +81,7 @@ func (a *Adapter) StartPairing(t <-chan time.Time) {
 	{
 		//运动传感器
 		motionSensor := NewVirtualDevice(devices.NewMotionSensor("virtual_motion_sensor"))
-		motion := properties.NewLevelProperty(0, 0, 100, properties.WithReadOnly())
+		motion := p.NewLevelProperty(0, 0, 100, p.WithReadOnly())
 		motionSensor.addProperties(motion.Property)
 		devs = append(devs, motionSensor)
 
@@ -90,7 +90,7 @@ func (a *Adapter) StartPairing(t <-chan time.Time) {
 	{
 		//多级传感器
 		motionLevelSensor := NewVirtualDevice(devices.NewMultiLevelSensor("virtual_motion_level_sensor"))
-		motion := properties.NewLevelProperty(0, 0, 100, properties.WithReadOnly())
+		motion := p.NewLevelProperty(0, 0, 100, p.WithReadOnly())
 		motionLevelSensor.addProperties(motion.Property)
 		devs = append(devs, motionLevelSensor)
 	}
@@ -98,11 +98,22 @@ func (a *Adapter) StartPairing(t <-chan time.Time) {
 	{
 		//空调
 		thermostat := NewVirtualDevice(devices.NewThermostat("virtual_thermostat"))
-		temperature := properties.NewTemperatureProperty(10, properties.WithReadOnly())
-		targetTemperature := properties.NewTargetTemperatureProperty(25)
-		heatingCooling := properties.NewHeatingCoolingProperty(properties.HeatingCoolingEnumOff)
-		thermostatMode := properties.NewThermostatModeProperty(properties.ThermostatModeEnumAuto)
-		thermostat.addProperties(temperature.Property, targetTemperature.Property, heatingCooling.Property, thermostatMode.Property)
+		//当前温度
+		temperature := p.NewTemperatureProperty(0, p.WithReadOnly())
+		//制热目标温度
+		coolingTargetTemperature := p.NewTargetTemperatureProperty(25, p.WithTitle("Heating Target"))
+		//制冷目标温度
+		heatingTargetTemperature := p.NewTargetTemperatureProperty(19, p.WithTitle("Cooling Target"))
+
+		//制热制冷只读属性
+		mode := []p.HeatingCoolingEnum{p.HeatingCoolingEnumHeating, p.HeatingCoolingEnumCooling, p.HeatingCoolingEnumOff, p.HeatingCoolingEnumAuto}
+		heatingCooling := p.NewHeatingCoolingProperty(p.HeatingCoolingEnumOff, mode, p.WithUnit("Heating/Cooling"))
+
+		//制热制冷模式
+		var mode1 = []p.ThermostatModeEnum{p.ThermostatModeEnumOff, p.ThermostatModeEnumCool, p.ThermostatModeEnumHeat}
+		thermostatMode := p.NewThermostatModeProperty(p.ThermostatModeEnumAuto, mode1, p.WithUnit("Mode"))
+
+		thermostat.addProperties(temperature.Property, heatingTargetTemperature.Property, coolingTargetTemperature.Property, heatingCooling.Property, thermostatMode.Property)
 		devs = append(devs, thermostat)
 	}
 	a.HandleDeviceAdded(devs...)
