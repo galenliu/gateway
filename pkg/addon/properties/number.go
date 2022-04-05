@@ -12,8 +12,10 @@ type NumberPropertyDescription struct {
 	Minimum    any          `json:"minimum,omitempty"`
 	Maximum    any          `json:"maximum,omitempty"`
 	Enum       []Number     `json:"enum,omitempty"`
+	Title      string       `json:"title,omitempty"`
 	ReadOnly   bool         `json:"readOnly,omitempty"`
 	MultipleOf any          `json:"multipleOf,omitempty"`
+	Unit       string       `json:"unit,omitempty"`
 	Value      Number       `json:"value,omitempty"`
 }
 
@@ -37,6 +39,7 @@ func NewNumberProperty(desc NumberPropertyDescription, opts ...Option) *NumberPr
 		Type:    TypeNumber,
 		Minimum: desc.Minimum,
 		Maximum: desc.Maximum,
+		Unit:    desc.Unit,
 		Enum: func() []any {
 			enum := make([]any, 0)
 			for _, e := range desc.Enum {

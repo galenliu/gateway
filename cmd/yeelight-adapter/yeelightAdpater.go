@@ -41,6 +41,10 @@ func (a *YeelightAdapter) StartPairing(timeout <-chan time.Time) {
 	if err != nil && !errors.Is(err, context.DeadlineExceeded) {
 		log.Fatalln(err)
 	}
+	if len(devices) == 0 {
+		fmt.Printf("没有找到Yeelight\t\n")
+		return
+	}
 
 	for _, device := range devices {
 		fmt.Println(`------`)

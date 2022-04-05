@@ -53,15 +53,11 @@ func (c *NewThingsController) handleNewThingsWebsocket() func(conn *websocket.Co
 				}
 				c.locker.Lock()
 				defer c.locker.Unlock()
-				err := conn.SetWriteDeadline(time.Now().Add(2 * time.Second))
-				if err != nil {
-					return
-				}
 				data := util.JsonIndent(things.AsWebOfThing(msg.Device))
-				c.logger.Infof("New thing: %s", data)
-				err = conn.WriteMessage(websocket.TextMessage, []byte(data))
+				c.logger.Infof("New thing: %s \t\n", data)
+				err := conn.WriteMessage(websocket.TextMessage, []byte(data))
 				if err != nil {
-					c.logger.Error("new thing websocket err:%s", err.Error())
+					c.logger.Infof("new thing websocket err:%s\t\n", err.Error())
 					return
 				}
 			}
@@ -72,17 +68,19 @@ func (c *NewThingsController) handleNewThingsWebsocket() func(conn *websocket.Co
 			c.manager.Unsubscribe(topic.DeviceAdded, addThing)
 			_ = conn.Close()
 		}()
-		addonDevices := c.manager.GetMapOfDevices()
-		savedThings := c.thingContainer.GetMapOfThings()
-		for id, dev := range addonDevices {
-			_, ok := savedThings[id]
-			if !ok {
-				addThing(topic.DeviceAddedMessage{
-					DeviceId: dev.GetId(),
-					Device:   *dev,
-				})
+		go func() {
+			addonDevices := c.manager.GetMapOfDevices()
+			savedThings := c.thingContainer.GetMapOfThings()
+			for id, dev := range addonDevices {
+				_, ok := savedThings[id]
+				if !ok {
+					addThing(topic.DeviceAddedMessage{
+						DeviceId: dev.GetId(),
+						Device:   *dev,
+					})
+				}
 			}
-		}
+		}()
 		for {
 			err := conn.SetReadDeadline(time.Now().Add(30 * time.Second))
 			if err != nil {

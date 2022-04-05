@@ -6,14 +6,17 @@ type TemperatureProperty struct {
 
 func NewTemperatureProperty(value Number, opts ...Option) *TemperatureProperty {
 	b := &TemperatureProperty{}
-	opts = append(opts, WithTitle("Temperature"), WithUnit(UnitArcDegrees))
+	opts = append(opts, WithTitle("Temperature"))
 	b.NumberProperty = NewNumberProperty(NumberPropertyDescription{
-		Name:     "temperature",
-		AtType:   TypeTemperatureProperty,
-		ReadOnly: true,
-		Minimum:  -100,
-		Maximum:  100,
-		Value:    value,
+		Name:       "temperature",
+		Unit:       UnitDegreeCelsius,
+		AtType:     TypeTemperatureProperty,
+		ReadOnly:   true,
+		Title:      "Temperature",
+		Minimum:    10,
+		Maximum:    38,
+		MultipleOf: 0.1,
+		Value:      value,
 	}, opts...)
 	return b
 }

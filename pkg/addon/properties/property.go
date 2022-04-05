@@ -329,6 +329,12 @@ func WithDescription(description string) Option {
 	}
 }
 
+func WithName(name string) Option {
+	return func(p *Property) {
+		p.Name = name
+	}
+}
+
 func WithUnit(unit Unit) Option {
 	return func(p *Property) {
 		p.Unit = unit

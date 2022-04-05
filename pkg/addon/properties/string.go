@@ -8,11 +8,11 @@ import (
 type StringPropertyDescription struct {
 	Name     string       `json:"name,omitempty"`
 	AtType   PropertyType `json:"@type,omitempty"`
-	Type     string       `json:"type,omitempty"`
 	Enum     []string     `json:"enum,omitempty"`
 	Title    string       `json:"title,omitempty"`
 	ReadOnly bool         `json:"readOnly,omitempty"`
-	Value    string       `json:"value,omitempty"`
+	Unit     string
+	Value    string `json:"value,omitempty"`
 }
 
 type StringEntity interface {
@@ -39,6 +39,7 @@ func NewStringProperty(desc StringPropertyDescription, opts ...Option) *StringPr
 			}
 			return enum
 		}(),
+
 		ReadOnly: desc.ReadOnly,
 		Value:    desc.Value,
 	}, opts...)

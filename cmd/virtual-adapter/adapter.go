@@ -101,17 +101,15 @@ func (a *Adapter) StartPairing(t <-chan time.Time) {
 		//当前温度
 		temperature := p.NewTemperatureProperty(0, p.WithReadOnly())
 		//制热目标温度
-		coolingTargetTemperature := p.NewTargetTemperatureProperty(25, p.WithTitle("Heating Target"))
+		coolingTargetTemperature := p.NewTargetTemperatureProperty(25, p.WithTitle("Heating Target"), p.WithName("coolingTargetTemperature"))
 		//制冷目标温度
-		heatingTargetTemperature := p.NewTargetTemperatureProperty(19, p.WithTitle("Cooling Target"))
+		heatingTargetTemperature := p.NewTargetTemperatureProperty(19, p.WithTitle("Cooling Target"), p.WithName("heatingTargetTemperature"))
 
-		//制热制冷只读属性
-		mode := []p.HeatingCoolingEnum{p.HeatingCoolingEnumHeating, p.HeatingCoolingEnumCooling, p.HeatingCoolingEnumOff, p.HeatingCoolingEnumAuto}
-		heatingCooling := p.NewHeatingCoolingProperty(p.HeatingCoolingEnumOff, mode, p.WithUnit("Heating/Cooling"))
+		//制热制冷属性
+		heatingCooling := p.NewHeatingCoolingProperty(p.HeatingCoolingEnumOff, p.WithTitle("Heating/Cooling"))
 
 		//制热制冷模式
-		var mode1 = []p.ThermostatModeEnum{p.ThermostatModeEnumOff, p.ThermostatModeEnumCool, p.ThermostatModeEnumHeat}
-		thermostatMode := p.NewThermostatModeProperty(p.ThermostatModeEnumAuto, mode1, p.WithUnit("Mode"))
+		thermostatMode := p.NewThermostatModeProperty(p.ThermostatModeEnumAuto)
 
 		thermostat.addProperties(temperature.Property, heatingTargetTemperature.Property, coolingTargetTemperature.Property, heatingCooling.Property, thermostatMode.Property)
 		devs = append(devs, thermostat)

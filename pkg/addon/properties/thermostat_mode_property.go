@@ -11,18 +11,13 @@ type ThermostatModeProperty struct {
 	*StringProperty
 }
 
-func NewThermostatModeProperty(value ThermostatModeEnum, enum []ThermostatModeEnum, opts ...Option) *ThermostatModeProperty {
+func NewThermostatModeProperty(value ThermostatModeEnum, opts ...Option) *ThermostatModeProperty {
 	b := &ThermostatModeProperty{}
-	opts = append(opts, WithTitle("Mode"), WithUnit(UnitVolt))
 	b.StringProperty = NewStringProperty(StringPropertyDescription{
-		Name: "thermostatMode",
-		Enum: func() []string {
-			em := make([]string, 0)
-			for _, e := range enum {
-				em = append(em, string(e))
-			}
-			return em
-		}(),
+		Name:   "thermostatMode",
+		Enum:   []string{string(ThermostatModeEnumOff), string(ThermostatModeEnumHeat), string(ThermostatModeEnumCool), string(ThermostatModeEnumAuto)},
+		Unit:   UnitDegreeCelsius,
+		Title:  "Mode",
 		AtType: TypeThermostatModeProperty,
 		Value:  string(value),
 	}, opts...)

@@ -12,15 +12,13 @@ type ColorProperty struct {
 }
 
 func NewColorProperty(value string, opts ...Option) *ColorProperty {
-
 	c := &ColorProperty{}
 	c.StringProperty = NewStringProperty(StringPropertyDescription{
 		Name:     "color",
 		AtType:   TypeColorProperty,
-		Type:     TypeString,
 		ReadOnly: false,
 		Value:    value,
-	})
+	}, opts...)
 	return c
 }
 
