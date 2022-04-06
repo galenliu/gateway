@@ -14,6 +14,17 @@ func NewVirtualProperty(p *properties.Property) *Property {
 }
 
 func (p *Property) SetPropertyValue(v any) error {
+	if p.GetAtType() == properties.TypeThermostatModeProperty {
+		str, ok := v.(string)
+		if ok {
+			if str != "auto" {
+				p.GetDevice().NotifyPropertyChanged(properties.PropertyDescription{
+					Name:  "heatingCooling",
+					Value: str,
+				})
+			}
+		}
+	}
 	p.SetCachedValue(v)
 	p.NotifyChanged()
 	fmt.Printf("device: %s set property: %s value: %v \t\n", p.GetDevice().GetId(), p.GetName(), v)

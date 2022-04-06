@@ -98,11 +98,11 @@ func (a *Adapter) StartPairing(t <-chan time.Time) {
 		//空调
 		thermostat := NewVirtualDevice(devices.NewThermostat("virtual_thermostat"))
 		//当前温度
-		temperature := p.NewTemperatureProperty(0, p.WithReadOnly())
+		temperature := p.NewTemperatureProperty(20, p.WithReadOnly())
 		//制热目标温度
-		coolingTargetTemperature := p.NewTargetTemperatureProperty(25, p.WithTitle("Heating Target"), p.WithName("coolingTargetTemperature"))
+		coolingTargetTemperature := p.NewTargetTemperatureProperty(25, p.WithTitle("Cooling Target"), p.WithName("coolingTargetTemperature"))
 		//制冷目标温度
-		heatingTargetTemperature := p.NewTargetTemperatureProperty(19, p.WithTitle("Cooling Target"), p.WithName("heatingTargetTemperature"))
+		heatingTargetTemperature := p.NewTargetTemperatureProperty(19, p.WithTitle("Heating Target"), p.WithName("heatingTargetTemperature"))
 
 		//制热制冷属性
 		heatingCooling := p.NewHeatingCoolingProperty(p.HeatingCoolingEnumOff, p.WithTitle("Heating/Cooling"))
