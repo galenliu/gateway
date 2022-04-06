@@ -19,8 +19,19 @@ func (p *Property) SetPropertyValue(v any) error {
 		if ok {
 			if str != "auto" {
 				p.GetDevice().NotifyPropertyChanged(properties.PropertyDescription{
-					Name:  "heatingCooling",
-					Value: str,
+					Name:        "heatingCooling",
+					AtType:      properties.TypeHeatingCoolingProperty,
+					Title:       "Heating/Cooling",
+					Type:        "String",
+					Unit:        properties.UnitDegreeCelsius,
+					Description: "",
+					Minimum:     nil,
+					Maximum:     nil,
+					Enum:        nil,
+					ReadOnly:    false,
+					MultipleOf:  nil,
+					Links:       nil,
+					Value:       str,
 				})
 			}
 		}
