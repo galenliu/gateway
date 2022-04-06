@@ -84,7 +84,6 @@ func (a *Adapter) StartPairing(t <-chan time.Time) {
 		motion := p.NewLevelProperty(0, 0, 100, p.WithReadOnly())
 		motionSensor.addProperties(motion.Property)
 		devs = append(devs, motionSensor)
-
 	}
 
 	{
