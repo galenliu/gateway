@@ -14,7 +14,7 @@ func NewTargetTemperatureProperty(value Number, opts ...Option) *TargetTemperatu
 		AtType:     TypeTargetTemperatureProperty,
 		Minimum:    10,
 		Maximum:    38,
-		MultipleOf: 0.1,
+		MultipleOf: 0.5,
 		Value:      value,
 	}, opts...)
 	return b
