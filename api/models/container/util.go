@@ -54,10 +54,10 @@ func AsWebOfThing(device devices.Device) *Thing {
 	return &thing
 }
 
-func mapOfWotProperties(props devices.DeviceProperties) (mapOfProperty map[string]wot.PropertyAffordance) {
+func mapOfWotProperties(props devices.DeviceProperties) (mapOfProperty map[string]*pa.PropertyAffordance) {
 
-	asWotProperty := func(p properties.Entity) wot.PropertyAffordance {
-		var wp wot.PropertyAffordance
+	asWotProperty := func(p properties.Entity) *pa.PropertyAffordance {
+		var wp *pa.PropertyAffordance
 		var i = &ia.InteractionAffordance{
 			AtType:       p.GetAtType(),
 			Title:        p.GetTitle(),
@@ -98,9 +98,9 @@ func mapOfWotProperties(props devices.DeviceProperties) (mapOfProperty map[strin
 
 		switch p.GetType() {
 		case controls.TypeInteger:
-			wp = &pa.IntegerPropertyAffordance{
+			wp = &pa.PropertyAffordance{
 				InteractionAffordance: i,
-				IntegerSchema: &schema.IntegerSchema{
+				PropertySchema: &schema.IntegerSchema{
 					DataSchema: dataSchema,
 					Minimum: func() *controls.Integer {
 						if v := p.GetMinimum(); v != nil {
@@ -130,9 +130,9 @@ func mapOfWotProperties(props devices.DeviceProperties) (mapOfProperty map[strin
 				Value:      p.GetCachedValue(),
 			}
 		case controls.TypeNumber:
-			wp = &pa.NumberPropertyAffordance{
+			wp = &pa.PropertyAffordance{
 				InteractionAffordance: i,
-				NumberSchema: &schema.NumberSchema{
+				PropertySchema: &schema.NumberSchema{
 					DataSchema: dataSchema,
 					Minimum: func() *controls.Double {
 						if m := p.GetMinimum(); m != nil {
@@ -162,16 +162,16 @@ func mapOfWotProperties(props devices.DeviceProperties) (mapOfProperty map[strin
 				Value:      p.GetCachedValue(),
 			}
 		case controls.TypeBoolean:
-			wp = &pa.BooleanPropertyAffordance{
+			wp = &pa.PropertyAffordance{
 				InteractionAffordance: i,
-				BooleanSchema:         &schema.BooleanSchema{DataSchema: dataSchema},
+				PropertySchema:        &schema.BooleanSchema{DataSchema: dataSchema},
 				Observable:            false,
 				Value:                 p.GetCachedValue(),
 			}
 		case controls.TypeString:
-			wp = &pa.StringPropertyAffordance{
+			wp = &pa.PropertyAffordance{
 				InteractionAffordance: i,
-				StringSchema: &schema.StringSchema{
+				PropertySchema: &schema.StringSchema{
 					DataSchema: dataSchema,
 					MinLength: func() *controls.UnsignedInt {
 						if v := p.GetMinimum(); v != nil {
@@ -203,7 +203,7 @@ func mapOfWotProperties(props devices.DeviceProperties) (mapOfProperty map[strin
 		return wp
 	}
 
-	mapOfProperty = make(map[string]wot.PropertyAffordance)
+	mapOfProperty = make(map[string]*pa.PropertyAffordance)
 	for name, p := range props {
 		if propertyAffordance := asWotProperty(p); propertyAffordance != nil {
 			mapOfProperty[name] = propertyAffordance
@@ -307,16 +307,3 @@ func arrayOfThingForms(t *wot.Thing) []controls.Form {
 	}
 	return fs
 }
-
-//type Valuer interface {
-//	~string | ~float64 | ~bool
-//}
-//
-//func ToPointer[T Valuer](value T) *T {
-//	switch value.(type) {
-//	case Valuer:
-//		str := value
-//		return &str
-//	}
-//	return nil
-//}

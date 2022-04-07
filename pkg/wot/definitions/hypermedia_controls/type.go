@@ -16,14 +16,16 @@ const DefaultInteger Integer = 0
 const DefaultNumber Number = 0
 const DefaultDouble Double = 0
 
+type DataSchemaType = string
+
 const (
-	TypeNumber  = "number"
-	TypeString  = "string"
-	TypeInteger = "integer"
-	TypeNull    = "null"
-	TypeObject  = "object"
-	TypeArray   = "array"
-	TypeBoolean = "boolean"
+	TypeNumber  DataSchemaType = "number"
+	TypeString  DataSchemaType = "string"
+	TypeInteger DataSchemaType = "integer"
+	TypeNull    DataSchemaType = "null"
+	TypeObject  DataSchemaType = "object"
+	TypeArray   DataSchemaType = "array"
+	TypeBoolean DataSchemaType = "boolean"
 )
 
 func (u URI) ToString() string {
