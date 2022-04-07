@@ -1,20 +1,14 @@
 package properties
 
-type HeatingCoolingEnum string
-
-var HeatingCoolingEnumOff HeatingCoolingEnum = "off"
-var HeatingCoolingEnumHeating HeatingCoolingEnum = "heating"
-var HeatingCoolingEnumCooling HeatingCoolingEnum = "cooling"
-
 type HeatingCoolingProperty struct {
 	*StringProperty
 }
 
-func NewHeatingCoolingProperty(value HeatingCoolingEnum, opts ...Option) *HeatingCoolingProperty {
+func NewHeatingCoolingProperty(value ThermostatModeEnum, opts ...Option) *HeatingCoolingProperty {
 	b := &HeatingCoolingProperty{}
 	b.StringProperty = NewStringProperty(StringPropertyDescription{
 		Name:   "heatingCooling",
-		Enum:   []string{"off", "heating", "cooling"},
+		Enum:   []string{"off", "heat", "cool"},
 		Title:  "HeatingCooling",
 		Unit:   UnitDegreeCelsius,
 		AtType: TypeHeatingCoolingProperty,

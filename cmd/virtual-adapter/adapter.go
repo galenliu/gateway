@@ -105,10 +105,10 @@ func (a *Adapter) StartPairing(t <-chan time.Time) {
 		heatingTargetTemperature := p.NewTargetTemperatureProperty(19, p.WithTitle("Heating Target"), p.WithName("heatingTargetTemperature"))
 
 		//制热制冷属性
-		heatingCooling := p.NewHeatingCoolingProperty(p.HeatingCoolingEnumOff, p.WithTitle("Heating/Cooling"))
+		heatingCooling := p.NewHeatingCoolingProperty(p.ThermostatCool, p.WithTitle("Heating/Cooling"))
 
 		//制热制冷模式
-		thermostatMode := p.NewThermostatModeProperty(p.ThermostatModeEnumAuto)
+		thermostatMode := p.NewThermostatModeProperty(p.ThermostatCool)
 
 		thermostat.addProperties(temperature.Property, heatingTargetTemperature.Property, coolingTargetTemperature.Property, heatingCooling.Property, thermostatMode.Property)
 		devs = append(devs, thermostat)

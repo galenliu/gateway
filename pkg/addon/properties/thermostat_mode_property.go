@@ -2,10 +2,12 @@ package properties
 
 type ThermostatModeEnum string
 
-var ThermostatModeEnumOff ThermostatModeEnum = "off"
-var ThermostatModeEnumHeat ThermostatModeEnum = "heat"
-var ThermostatModeEnumCool ThermostatModeEnum = "cool"
-var ThermostatModeEnumAuto ThermostatModeEnum = "auto"
+var ThermostatOff ThermostatModeEnum = "off"
+var ThermostatHeat ThermostatModeEnum = "heat"
+var ThermostatCool ThermostatModeEnum = "cool"
+var ThermostatAuto ThermostatModeEnum = "auto"
+var ThermostatDry ThermostatModeEnum = "dry"
+var ThermostatWind ThermostatModeEnum = "wind"
 
 type ThermostatModeProperty struct {
 	*StringProperty
@@ -15,7 +17,7 @@ func NewThermostatModeProperty(value ThermostatModeEnum, opts ...Option) *Thermo
 	b := &ThermostatModeProperty{}
 	b.StringProperty = NewStringProperty(StringPropertyDescription{
 		Name:   "thermostatMode",
-		Enum:   []string{string(ThermostatModeEnumOff), string(ThermostatModeEnumHeat), string(ThermostatModeEnumCool), string(ThermostatModeEnumAuto)},
+		Enum:   []string{string(ThermostatOff), string(ThermostatHeat), string(ThermostatCool), string(ThermostatAuto), string(ThermostatDry), string(ThermostatWind)},
 		Unit:   UnitDegreeCelsius,
 		Title:  "Mode",
 		AtType: TypeThermostatModeProperty,
