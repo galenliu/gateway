@@ -16,6 +16,6 @@ var (
 		if commit != "" {
 			return fullVersion + "-" + commit
 		}
-		return fullVersion + "-dev"
+		return fullVersion
 	}()
 )

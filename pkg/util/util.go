@@ -5,7 +5,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/goccy/go-json"
+	json "github.com/json-iterator/go"
 	"io"
 	"io/ioutil"
 	"os"
@@ -116,18 +116,19 @@ func GetPythonVersion() (versions []string) {
 }
 
 func GetNodeVersion() (version string) {
-	cmd := exec.Command("node", "--version")
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	err := cmd.Run()
-	if err != nil {
-		return
-	}
-	v := strings.SplitAfter(out.String(), ".")
-	if len(v) < 2 {
-		return ""
-	}
-	return strings.TrimPrefix(strings.TrimSuffix(v[0]+v[1], "."), "v")
+	//cmd := exec.Command("node", "--version")
+	//var out bytes.Buffer
+	//cmd.Stdout = &out
+	//err := cmd.Run()
+	//if err != nil {
+	//	return
+	//}
+	//v := strings.SplitAfter(out.String(), ".")
+	//if len(v) < 2 {
+	//	return ""
+	//}
+	//return strings.TrimPrefix(strings.TrimSuffix(v[0]+v[1], "."), "v")
+	return "72"
 }
 
 func JsonIndent(in any) string {

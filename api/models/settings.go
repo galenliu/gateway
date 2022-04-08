@@ -9,11 +9,11 @@ import (
 )
 
 type AddonInfo struct {
-	Urls          []string `json:"urls"`
-	Architecture  string   `json:"architecture"`
-	Version       string   `json:"version"`
-	NodeVersion   string   `json:"nodeVersion"`
-	PythonVersion []string `json:"pythonVersion"`
+	Urls           []string `json:"urls"`
+	Architecture   string   `json:"architecture"`
+	Version        string   `json:"version"`
+	NodeVersion    string   `json:"nodeVersion"`
+	PythonVersions []string `json:"pythonVersions"`
 }
 
 type SettingsStore interface {
@@ -30,11 +30,11 @@ type Settings struct {
 func NewSettingsModel(addonUrl []string, storage SettingsStore, logger logging.Logger) *Settings {
 	s := Settings{}
 	s.addonInfo = AddonInfo{
-		Urls:          addonUrl,
-		Architecture:  util.GetArch(),
-		Version:       constant.Version,
-		NodeVersion:   util.GetNodeVersion(),
-		PythonVersion: util.GetPythonVersion(),
+		Urls:           addonUrl,
+		Architecture:   util.GetArch(),
+		Version:        constant.Version,
+		NodeVersion:    util.GetNodeVersion(),
+		PythonVersions: util.GetPythonVersion(),
 	}
 	logger.Debugf("settings model: %s", util.JsonIndent(s.addonInfo))
 	s.storage = storage
@@ -57,4 +57,8 @@ func (s *Settings) GetTunnelInfo() string {
 
 func (s *Settings) GetAddonInfo() AddonInfo {
 	return s.addonInfo
+}
+
+func (s *Settings) GetTemperatureUnits() (string, error) {
+	return s.storage.GetSetting("localization.units.temperature")
 }

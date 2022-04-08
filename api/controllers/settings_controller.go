@@ -20,3 +20,11 @@ func NewSettingController(model *models.Settings, log logging.Logger) *SettingsC
 func (s *SettingsController) handleGetAddonsInfo(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(s.model.GetAddonInfo())
 }
+
+func (s *SettingsController) handleGetUnits(ctx *fiber.Ctx) error {
+	temp, err := s.model.GetTemperatureUnits()
+	if err != nil {
+		return ctx.JSON(fiber.Map{"temperature": "degree celsius"})
+	}
+	return ctx.JSON(fiber.Map{"temperature": temp})
+}

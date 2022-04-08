@@ -15,6 +15,7 @@ func NewColorTemperatureProperty(value Integer, opts ...Option) *ColorTemperatur
 	colorTemperature.IntegerProperty = NewIntegerProperty(IntegerPropertyDescription{
 		Name:    "ct",
 		AtType:  TypeColorTemperatureProperty,
+		Title:   "Color Temperature",
 		Unit:    UnitKelvin,
 		Minimum: 2000,
 		Maximum: 8000,

@@ -174,6 +174,7 @@ func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log l
 		settingsGroup := app.Group(constant.SettingsPath)
 		settingsController := NewSettingController(settingModel, log)
 		settingsGroup.Get("/addonsInfo", settingsController.handleGetAddonsInfo)
+		settingsGroup.Get("/localization/units", settingsController.handleGetUnits)
 	}
 
 	//rules
