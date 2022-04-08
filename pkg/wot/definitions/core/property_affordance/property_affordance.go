@@ -21,20 +21,12 @@ type PropertyAffordance struct {
 }
 
 func (p *PropertyAffordance) UnmarshalJSON(data []byte) error {
-	var prop ArrayPropertyDescription
-	err := json.Unmarshal(data, &prop)
+	var in ia.InteractionAffordance
+	err := json.Unmarshal(data, &in)
 	if err != nil {
 		return err
 	}
-	p.InteractionAffordance = &ia.InteractionAffordance{
-		AtType:       prop.AtType,
-		Title:        prop.Title,
-		Titles:       prop.Titles,
-		Description:  prop.Description,
-		Descriptions: prop.Descriptions,
-		Forms:        prop.Forms,
-		UriVariables: prop.UriVariables,
-	}
+	p.InteractionAffordance = &in
 	dataType := json.Get(data, "type").ToString()
 	switch dataType {
 	case controls.TypeInteger:
@@ -90,7 +82,7 @@ func (p *PropertyAffordance) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("unsupported type: %s", dataType)
 
 	}
-	p.Observable = prop.Observable
+	p.Observable = json.Get(data, "observable").ToBool()
 	return nil
 }
 

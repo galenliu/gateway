@@ -9,7 +9,8 @@ type DataTime struct {
 }
 
 //func (d DataTime) MarshalJSON() ([]byte, error) {
-//	return []byte(d.Time.Format("2006-01-02 15:04:05")), nil
+//	str := "\"" + d.Time.Format("2006-01-02 15:04:05") + "\""
+//	return []byte(str), nil
 //}
 //
 //func (d *DataTime) UnmarshalJSON(data []byte) error {
