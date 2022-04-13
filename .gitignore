@@ -1,10 +1,6 @@
 .vscode
 .vscode/
 ##git submodule updata --init --recursive
-/configs/addons
-/configs/config
-/configs/log
-/configs/media
-/configs/data
+/configs
 .DS_Store
 .idea
