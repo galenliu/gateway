@@ -7,6 +7,7 @@ import (
 	"github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/util"
 	"github.com/gofiber/fiber/v2"
 	"time"
 )
@@ -28,28 +29,29 @@ func NewActionsController(model *models.ActionsModel, thing *container.ThingsCon
 	}
 }
 
+// Post actions
+type action struct {
+	Input map[string]any `json:"input,omitempty"`
+}
+
 func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
-
-	type action struct {
-		Input map[string]any `json:"input,omitempty"`
-	}
-
 	thingId := c.Params("thingId")
-	var actionBody map[string]action
+	var actionBody map[string]*action
 	err := c.BodyParser(&actionBody)
+	// 确保一个Action，有且只有一个Input
 	if err != nil || len(actionBody) != 1 {
 		err := fmt.Errorf("incorrect number of parameters. body:  %s", c.Body())
 		a.logger.Error(err.Error())
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 	var actionName string
-	var actionParams action
+	var actionParams *action
 	for a, params := range actionBody {
 		actionName = a
 		actionParams = params
 	}
 
-	if actionName == "" {
+	if actionName == "" || actionParams == nil {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
@@ -58,16 +60,14 @@ func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 	if thingId != "" {
 		thing = a.thingContainer.GetThing(thingId)
 		if thing == nil {
-			err := fmt.Errorf("thing does not exist: %s", thingId)
-			a.logger.Error(err.Error())
-			return fiber.NewError(fiber.StatusNotFound, err.Error())
+			return util.NotFoundError("Thing: %s do not exist", thingId)
 		}
 		actionModel = models.NewActionModel(actionName, actionParams.Input, a.bus, a.logger, thing)
 		ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*3)
 		err := a.manager.RequestAction(ctx, thing.GetId(), actionModel.GetName(), actionParams.Input)
 		cancelFunc()
 		if err != nil {
-			return fiber.NewError(fiber.StatusNotFound, fmt.Sprintf("create actions: %s failed. err: %s", actionName, err.Error()))
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("create actions: %s failed. err: %s", actionName, err.Error()))
 		}
 	}
 	if thing == nil && actionModel == nil {
