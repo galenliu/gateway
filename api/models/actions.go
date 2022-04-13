@@ -46,7 +46,6 @@ func NewActionsModel(m ActionsManager, container *container.ThingsContainer, log
 func (m *ActionsModel) Add(a *Action) error {
 	m.actions.Store(a.GetId(), a)
 	defer m.actions.Delete(a.GetId())
-
 	if a.GetThingId() != "" {
 		a.updateStatus(ActionPending)
 		thing := m.container.GetThing(a.GetThingId())

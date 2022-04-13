@@ -17,7 +17,7 @@ type ActionsController struct {
 	thingContainer *container.ThingsContainer
 	actions        *models.ActionsModel
 	manager        models.ActionsManager
-	bus            *bus.ThingsBus
+	bus            bus.ThingsBus
 }
 
 func NewActionsController(model *models.ActionsModel, thing *container.ThingsContainer, manager models.ActionsManager, log logging.Logger) *ActionsController {
@@ -26,6 +26,7 @@ func NewActionsController(model *models.ActionsModel, thing *container.ThingsCon
 		manager:        manager,
 		thingContainer: thing,
 		actions:        model,
+		bus:            bus.NewBus(),
 	}
 }
 
@@ -62,16 +63,16 @@ func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 		if thing == nil {
 			return util.NotFoundError("Thing: %s do not exist", thingId)
 		}
-		actionModel = models.NewActionModel(actionName, actionParams.Input, a.bus, a.logger, thing)
+		actionModel = models.NewActionModel(actionName, actionParams.Input, a.logger, thing)
 		ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*3)
 		err := a.manager.RequestAction(ctx, thing.GetId(), actionModel.GetName(), actionParams.Input)
 		cancelFunc()
 		if err != nil {
-			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("create actions: %s failed. err: %s", actionName, err.Error()))
+			return err
 		}
 	}
 	if thing == nil && actionModel == nil {
-		actionModel = models.NewActionModel(actionName, actionParams.Input, a.bus, a.logger)
+		actionModel = models.NewActionModel(actionName, actionParams.Input, a.logger)
 	}
 	err = a.actions.Add(actionModel)
 	if err != nil {

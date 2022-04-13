@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/addon/actions"
-	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/logging"
 	uuid "github.com/satori/go.uuid"
@@ -29,11 +28,10 @@ type Action struct {
 	TimeCompleted *time.Time     `json:"timeCompleted,omitempty"`
 	Status        string         `json:"status,omitempty"`
 	Error         error          `json:"error,omitempty"`
-	bus           *bus.ThingsBus
 	logger        logging.Logger
 }
 
-func NewActionModel(name string, input map[string]any, bus *bus.ThingsBus, log logging.Logger, things ...*container.Thing) *Action {
+func NewActionModel(name string, input map[string]any, log logging.Logger, things ...*container.Thing) *Action {
 	t := time.Now()
 	a := &Action{
 		logger:        log,
@@ -43,7 +41,6 @@ func NewActionModel(name string, input map[string]any, bus *bus.ThingsBus, log l
 		TimeRequested: &t,
 		TimeCompleted: nil,
 		ThingId:       "",
-		bus:           bus,
 	}
 	a.updateStatus(ActionCreated)
 	if things != nil && len(things) > 0 {

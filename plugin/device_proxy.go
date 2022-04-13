@@ -191,7 +191,7 @@ func (device *device) requestAction(ctx context.Context, id, name string, input 
 	for {
 		select {
 		case <-ctx.Done():
-			return fmt.Errorf("requestActionTask timeout")
+			return fmt.Errorf("request action timeout,deviceId: %s,name: %s", id, name)
 		case b := <-task:
 			if b {
 				return nil

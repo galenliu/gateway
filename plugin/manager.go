@@ -87,7 +87,7 @@ func (m *Manager) SetThingsContainer(thingContainer ThingsContainer) {
 func (m *Manager) RequestAction(ctx context.Context, thingId, actionName string, input map[string]any) error {
 	device := m.getDevice(thingId)
 	if device == nil {
-		return fmt.Errorf("device %s not found", thingId)
+		return util.NotFoundError("device %s not found", thingId)
 	}
 	return device.requestAction(ctx, thingId, actionName, input)
 }
@@ -388,7 +388,7 @@ func (m *Manager) removeAdapter(adapter *Adapter) {
 }
 
 func (m *Manager) removeNotifier(notifierId string) {
-
+	//TODO
 }
 
 func (m *Manager) handleOutletRemoved(outlet *Outlet) {
