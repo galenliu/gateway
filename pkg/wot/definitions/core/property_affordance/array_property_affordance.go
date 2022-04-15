@@ -53,7 +53,7 @@ func (p *ArrayPropertyAffordance) UnmarshalJSON(data []byte) error {
 		Description:  prop.Description,
 		Descriptions: prop.Descriptions,
 		Forms:        prop.Forms,
-		UriVariables: prop.UriVariables,
+		//UriVariables: prop.UriVariables,
 	}
 	p.ArraySchema = &schema.ArraySchema{
 		DataSchema: &schema.DataSchema{
@@ -89,20 +89,20 @@ func (p *ArrayPropertyAffordance) MarshalJSON() ([]byte, error) {
 		Description:  p.Description,
 		Descriptions: p.Descriptions,
 		Forms:        p.Forms,
-		UriVariables: p.UriVariables,
-		Items:        p.Items,
-		MinItems:     p.MinItems,
-		MaxItems:     p.MaxItems,
-		Const:        p.Const,
-		Default:      p.Default,
-		Unit:         p.Unit,
-		OneOf:        p.OneOf,
-		Enum:         p.Enum,
-		ReadOnly:     p.ReadOnly,
-		WriteOnly:    p.WriteOnly,
-		Format:       p.Format,
-		Type:         p.Type,
-		Observable:   p.Observable,
+		//UriVariables: p.UriVariables,
+		Items:      p.Items,
+		MinItems:   p.MinItems,
+		MaxItems:   p.MaxItems,
+		Const:      p.Const,
+		Default:    p.Default,
+		Unit:       p.Unit,
+		OneOf:      p.OneOf,
+		Enum:       p.Enum,
+		ReadOnly:   p.ReadOnly,
+		WriteOnly:  p.WriteOnly,
+		Format:     p.Format,
+		Type:       p.Type,
+		Observable: p.Observable,
 	}
 	return json.Marshal(prop)
 }

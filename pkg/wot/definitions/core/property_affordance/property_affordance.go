@@ -8,14 +8,9 @@ import (
 	json "github.com/json-iterator/go"
 )
 
-type PropertySchema interface {
-	GetType() controls.DataSchemaType
-	IsReadOnly() bool
-}
-
 type PropertyAffordance struct {
 	*ia.InteractionAffordance
-	PropertySchema
+	schema.Schema
 	Observable bool `json:"observable,omitempty"`
 	Value      any  `json:"value,omitempty" wot:"optional"`
 }
@@ -35,49 +30,49 @@ func (p *PropertyAffordance) UnmarshalJSON(data []byte) error {
 		if err != nil {
 			return err
 		}
-		p.PropertySchema = dataSchema
+		p.Schema = dataSchema
 	case controls.TypeNumber:
 		var dataSchema schema.NumberSchema
 		err := json.Unmarshal(data, &dataSchema)
 		if err != nil {
 			return err
 		}
-		p.PropertySchema = dataSchema
+		p.Schema = dataSchema
 	case controls.TypeBoolean:
 		var dataSchema schema.BooleanSchema
 		err := json.Unmarshal(data, &dataSchema)
 		if err != nil {
 			return err
 		}
-		p.PropertySchema = dataSchema
+		p.Schema = dataSchema
 	case controls.TypeArray:
 		var dataSchema schema.ArraySchema
 		err := json.Unmarshal(data, &dataSchema)
 		if err != nil {
 			return err
 		}
-		p.PropertySchema = dataSchema
+		p.Schema = dataSchema
 	case controls.TypeObject:
 		var dataSchema schema.ObjectSchema
 		err := json.Unmarshal(data, &dataSchema)
 		if err != nil {
 			return err
 		}
-		p.PropertySchema = dataSchema
+		p.Schema = dataSchema
 	case controls.TypeNull:
 		var dataSchema schema.NullSchema
 		err := json.Unmarshal(data, &dataSchema)
 		if err != nil {
 			return err
 		}
-		p.PropertySchema = dataSchema
+		p.Schema = dataSchema
 	case controls.TypeString:
 		var dataSchema schema.StringSchema
 		err := json.Unmarshal(data, &dataSchema)
 		if err != nil {
 			return err
 		}
-		p.PropertySchema = dataSchema
+		p.Schema = dataSchema
 	default:
 		return fmt.Errorf("unsupported type: %s", dataType)
 
@@ -88,9 +83,9 @@ func (p *PropertyAffordance) UnmarshalJSON(data []byte) error {
 
 func (p PropertyAffordance) MarshalJSON() ([]byte, error) {
 
-	switch p.PropertySchema.(type) {
+	switch p.Schema.(type) {
 	case schema.NumberSchema:
-		dataSchema, ok := p.PropertySchema.(schema.NumberSchema)
+		dataSchema, ok := p.Schema.(schema.NumberSchema)
 		if !ok {
 			return nil, fmt.Errorf("type error")
 		}
@@ -101,7 +96,7 @@ func (p PropertyAffordance) MarshalJSON() ([]byte, error) {
 		}{p.InteractionAffordance, dataSchema, p.Observable})
 
 	case schema.IntegerSchema:
-		dataSchema, ok := p.PropertySchema.(schema.IntegerSchema)
+		dataSchema, ok := p.Schema.(schema.IntegerSchema)
 		if !ok {
 			return nil, fmt.Errorf("type error")
 		}
@@ -112,7 +107,7 @@ func (p PropertyAffordance) MarshalJSON() ([]byte, error) {
 		}{p.InteractionAffordance, dataSchema, p.Observable})
 
 	case schema.StringSchema:
-		dataSchema, ok := p.PropertySchema.(schema.StringSchema)
+		dataSchema, ok := p.Schema.(schema.StringSchema)
 		if !ok {
 			return nil, fmt.Errorf("type error")
 		}
@@ -123,7 +118,7 @@ func (p PropertyAffordance) MarshalJSON() ([]byte, error) {
 		}{p.InteractionAffordance, dataSchema, p.Observable})
 
 	case schema.BooleanSchema:
-		dataSchema, ok := p.PropertySchema.(schema.BooleanSchema)
+		dataSchema, ok := p.Schema.(schema.BooleanSchema)
 		if !ok {
 			return nil, fmt.Errorf("type error")
 		}
@@ -134,7 +129,7 @@ func (p PropertyAffordance) MarshalJSON() ([]byte, error) {
 		}{p.InteractionAffordance, dataSchema, p.Observable})
 
 	case schema.ObjectSchema:
-		dataSchema, ok := p.PropertySchema.(schema.ObjectSchema)
+		dataSchema, ok := p.Schema.(schema.ObjectSchema)
 		if !ok {
 			return nil, fmt.Errorf("type error")
 		}
@@ -145,7 +140,7 @@ func (p PropertyAffordance) MarshalJSON() ([]byte, error) {
 		}{p.InteractionAffordance, dataSchema, p.Observable})
 
 	case schema.ArraySchema:
-		dataSchema, ok := p.PropertySchema.(schema.ArraySchema)
+		dataSchema, ok := p.Schema.(schema.ArraySchema)
 		if !ok {
 			return nil, fmt.Errorf("type error")
 		}
@@ -156,7 +151,7 @@ func (p PropertyAffordance) MarshalJSON() ([]byte, error) {
 		}{p.InteractionAffordance, dataSchema, p.Observable})
 
 	case schema.NullSchema:
-		dataSchema, ok := p.PropertySchema.(schema.NullSchema)
+		dataSchema, ok := p.Schema.(schema.NullSchema)
 		if !ok {
 			return nil, fmt.Errorf("type error")
 		}
@@ -170,5 +165,4 @@ func (p PropertyAffordance) MarshalJSON() ([]byte, error) {
 		return nil, fmt.Errorf("type error")
 
 	}
-
 }

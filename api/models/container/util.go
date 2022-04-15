@@ -100,7 +100,7 @@ func mapOfWotProperties(props devices.DeviceProperties) (mapOfProperty map[strin
 		case controls.TypeInteger:
 			wp = &pa.PropertyAffordance{
 				InteractionAffordance: i,
-				PropertySchema: &schema.IntegerSchema{
+				Schema: &schema.IntegerSchema{
 					DataSchema: dataSchema,
 					Minimum: func() *controls.Integer {
 						if v := p.GetMinimum(); v != nil {
@@ -132,7 +132,7 @@ func mapOfWotProperties(props devices.DeviceProperties) (mapOfProperty map[strin
 		case controls.TypeNumber:
 			wp = &pa.PropertyAffordance{
 				InteractionAffordance: i,
-				PropertySchema: &schema.NumberSchema{
+				Schema: &schema.NumberSchema{
 					DataSchema: dataSchema,
 					Minimum: func() *controls.Double {
 						if m := p.GetMinimum(); m != nil {
@@ -164,14 +164,14 @@ func mapOfWotProperties(props devices.DeviceProperties) (mapOfProperty map[strin
 		case controls.TypeBoolean:
 			wp = &pa.PropertyAffordance{
 				InteractionAffordance: i,
-				PropertySchema:        &schema.BooleanSchema{DataSchema: dataSchema},
+				Schema:                &schema.BooleanSchema{DataSchema: dataSchema},
 				Observable:            false,
 				Value:                 p.GetCachedValue(),
 			}
 		case controls.TypeString:
 			wp = &pa.PropertyAffordance{
 				InteractionAffordance: i,
-				PropertySchema: &schema.StringSchema{
+				Schema: &schema.StringSchema{
 					DataSchema: dataSchema,
 					MinLength: func() *controls.UnsignedInt {
 						if v := p.GetMinimum(); v != nil {

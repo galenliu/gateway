@@ -22,6 +22,5 @@ func TestThingMarshal(t *testing.T) {
 			return
 		}
 		assert.Equal(t, string(marshal), data, "thing marshal ok")
-
 	}
 }

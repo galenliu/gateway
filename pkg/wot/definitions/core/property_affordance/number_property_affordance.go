@@ -55,7 +55,7 @@ func (p *NumberPropertyAffordance) UnmarshalJSON(data []byte) error {
 		Description:  prop.Description,
 		Descriptions: prop.Descriptions,
 		Forms:        prop.Forms,
-		UriVariables: prop.UriVariables,
+		//UriVariables: prop.UriVariables,
 	}
 	p.NumberSchema = &schema.NumberSchema{
 		DataSchema: &schema.DataSchema{
@@ -86,13 +86,13 @@ func (p *NumberPropertyAffordance) UnmarshalJSON(data []byte) error {
 
 func (p *NumberPropertyAffordance) MarshalJSON() ([]byte, error) {
 	prop := NumberPropertyDescription{
-		AtType:           p.AtType,
-		Title:            p.Title,
-		Titles:           p.Titles,
-		Description:      p.Description,
-		Descriptions:     p.Descriptions,
-		Forms:            p.Forms,
-		UriVariables:     p.UriVariables,
+		AtType:       p.AtType,
+		Title:        p.Title,
+		Titles:       p.Titles,
+		Description:  p.Description,
+		Descriptions: p.Descriptions,
+		Forms:        p.Forms,
+		//UriVariables:     p.UriVariables,
 		Minimum:          p.Minimum,
 		ExclusiveMinimum: p.ExclusiveMinimum,
 		Maximum:          p.Maximum,

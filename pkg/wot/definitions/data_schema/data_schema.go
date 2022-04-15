@@ -1,7 +1,9 @@
 package data_schema
 
 import (
+	"fmt"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
+	json "github.com/json-iterator/go"
 )
 
 const (
@@ -14,6 +16,11 @@ const (
 	SenmlXML        = "application/senml+xml"
 	EXI             = "application/exi"
 )
+
+type Schema interface {
+	GetType() controls.DataSchemaType
+	IsReadOnly() bool
+}
 
 type DataSchema struct {
 	AtType       string                 `json:"@type,omitempty" wot:"optional"`
@@ -30,6 +37,66 @@ type DataSchema struct {
 	WriteOnly    bool                   `json:"writeOnly,omitempty" wot:"withDefault"`
 	Format       string                 `json:"format,omitempty" wot:"optional"`
 	Type         string                 `json:"type,,omitempty" wot:"optional"`
+}
+
+func MarshalSchema(raw json.Any) (s Schema, e error) {
+	dataType := raw.Get("type").ToString()
+	if dataType == "" {
+		return nil, fmt.Errorf("schema type missing")
+	}
+	switch dataType {
+	case controls.TypeInteger:
+		var dataSchema IntegerSchema
+		raw.ToVal(&dataSchema)
+		if raw.LastError() != nil {
+			return nil, raw.LastError()
+		}
+		return dataSchema, nil
+	case controls.TypeNumber:
+		var dataSchema NumberSchema
+		raw.ToVal(&dataSchema)
+		if raw.LastError() != nil {
+			return nil, raw.LastError()
+		}
+		return dataSchema, nil
+	case controls.TypeBoolean:
+		var dataSchema BooleanSchema
+		raw.ToVal(&dataSchema)
+		if raw.LastError() != nil {
+			return nil, raw.LastError()
+		}
+		return dataSchema, nil
+	case controls.TypeArray:
+		var dataSchema ArraySchema
+		raw.ToVal(&dataSchema)
+		if raw.LastError() != nil {
+			return nil, raw.LastError()
+		}
+		return dataSchema, nil
+	case controls.TypeObject:
+		var dataSchema ObjectSchema
+		raw.ToVal(&dataSchema)
+		if raw.LastError() != nil {
+			return nil, raw.LastError()
+		}
+		return dataSchema, nil
+	case controls.TypeNull:
+		var dataSchema NullSchema
+		raw.ToVal(&dataSchema)
+		if raw.LastError() != nil {
+			return nil, raw.LastError()
+		}
+		return dataSchema, nil
+	case controls.TypeString:
+		var dataSchema StringSchema
+		raw.ToVal(&dataSchema)
+		if raw.LastError() != nil {
+			return nil, raw.LastError()
+		}
+		return dataSchema, nil
+	default:
+		return nil, fmt.Errorf("unsupported type: %s", dataType)
+	}
 }
 
 func (schema *DataSchema) GetType() string {

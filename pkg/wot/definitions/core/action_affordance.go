@@ -9,81 +9,34 @@ import (
 
 type ActionAffordance struct {
 	*ia.InteractionAffordance
-	Input      *data_schema.DataSchema `json:"input,omitempty"`
-	Output     *data_schema.DataSchema `json:"output,omitempty"`
-	Safe       bool                    `json:"safe,omitempty" wot:"withDefault"`
-	Idempotent bool                    `json:"idempotent,omitempty" wot:"withDefault"`
+	Input      data_schema.Schema `json:"input,omitempty"`
+	Output     data_schema.Schema `json:"output,omitempty"`
+	Safe       bool               `json:"safe,omitempty" wot:"withDefault"`
+	Idempotent bool               `json:"idempotent,omitempty" wot:"withDefault"`
 }
+
+type ActionSchema = data_schema.Schema
 
 type ActionDescription struct {
-	AtType       string                            `json:"@type,omitempty,optional"`
-	Title        string                            `json:"title,omitempty,optional"`
-	Titles       map[string]string                 `json:"titles,omitempty,optional"`
-	Description  string                            `json:"description,omitempty,optional"`
-	Descriptions map[string]string                 `json:"descriptions,omitempty,optional"`
-	Forms        []controls.Form                   `json:"forms,omitempty,mandatory" wot:"optional"`
-	UriVariables map[string]data_schema.DataSchema `json:"uriVariables,omitempty"`
+	AtType       string                        `json:"@type,omitempty,optional"`
+	Title        string                        `json:"title,omitempty,optional"`
+	Titles       map[string]string             `json:"titles,omitempty,optional"`
+	Description  string                        `json:"description,omitempty,optional"`
+	Descriptions map[string]string             `json:"descriptions,omitempty,optional"`
+	Forms        []controls.Form               `json:"forms,omitempty,mandatory" wot:"optional"`
+	UriVariables map[string]data_schema.Schema `json:"uriVariables,omitempty"`
 
-	Input      *data_schema.DataSchema `json:"input,omitempty"`
-	Output     *data_schema.DataSchema `json:"output,omitempty"`
-	Safe       bool                    `json:"safe,omitempty" wot:"withDefault"`
-	Idempotent bool                    `json:"idempotent,omitempty" wot:"withDefault"`
-}
-
-func FromDescription(desc ActionDescription) ActionAffordance {
-	return ActionAffordance{
-		InteractionAffordance: &ia.InteractionAffordance{
-			AtType:       desc.AtType,
-			Title:        desc.Title,
-			Titles:       desc.Titles,
-			Description:  desc.Description,
-			Descriptions: desc.Descriptions,
-			Forms:        desc.Forms,
-			UriVariables: desc.UriVariables,
-		},
-		Input:      desc.Input,
-		Output:     desc.Output,
-		Safe:       desc.Safe,
-		Idempotent: desc.Idempotent,
-	}
-}
-
-func (a *ActionAffordance) MarshalJSON() ([]byte, error) {
-	action := ActionDescription{
-		AtType:       a.AtType,
-		Title:        a.Title,
-		Titles:       a.Titles,
-		Description:  a.Description,
-		Descriptions: a.Descriptions,
-		Forms:        a.Forms,
-		UriVariables: a.UriVariables,
-		Input:        a.Input,
-		Output:       a.Output,
-		Safe:         a.Safe,
-		Idempotent:   a.Idempotent,
-	}
-	return json.Marshal(action)
+	Input      ActionSchema       `json:"input,omitempty"`
+	Output     data_schema.Schema `json:"output,omitempty"`
+	Safe       bool               `json:"safe,omitempty" wot:"withDefault"`
+	Idempotent bool               `json:"idempotent,omitempty" wot:"withDefault"`
 }
 
 func (a *ActionAffordance) UnmarshalJSON(data []byte) error {
-
-	var action ActionDescription
-	err := json.Unmarshal(data, &action)
-	if err != nil {
-		return err
-	}
-	a.InteractionAffordance = &ia.InteractionAffordance{
-		AtType:       action.AtType,
-		Title:        action.Title,
-		Titles:       action.Titles,
-		Description:  action.Description,
-		Descriptions: action.Descriptions,
-		Forms:        action.Forms,
-		UriVariables: action.UriVariables,
-	}
-	a.Input = action.Input
-	a.Output = action.Output
-	a.Safe = action.Safe
-	a.Idempotent = action.Idempotent
+	json.Get(data).ToVal(a.InteractionAffordance)
+	a.Input, _ = data_schema.MarshalSchema(json.Get(data, "input"))
+	a.Output, _ = data_schema.MarshalSchema(json.Get(data, "input"))
+	a.Safe = json.Get(data, "safe").ToBool()
+	a.Idempotent = json.Get(data, "idempotent").ToBool()
 	return nil
 }

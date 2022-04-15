@@ -55,7 +55,7 @@ func (p *StringPropertyAffordance) UnmarshalJSON(data []byte) error {
 		Description:  prop.Description,
 		Descriptions: prop.Descriptions,
 		Forms:        prop.Forms,
-		UriVariables: prop.UriVariables,
+		//UriVariables: prop.UriVariables,
 	}
 	p.StringSchema = &schema.StringSchema{
 		DataSchema: &schema.DataSchema{
@@ -86,13 +86,13 @@ func (p *StringPropertyAffordance) UnmarshalJSON(data []byte) error {
 
 func (p *StringPropertyAffordance) MarshalJSON() ([]byte, error) {
 	prop := StringPropertyDescription{
-		AtType:           p.AtType,
-		Title:            p.Title,
-		Titles:           p.Titles,
-		Description:      p.Description,
-		Descriptions:     p.Descriptions,
-		Forms:            p.Forms,
-		UriVariables:     p.UriVariables,
+		AtType:       p.AtType,
+		Title:        p.Title,
+		Titles:       p.Titles,
+		Description:  p.Description,
+		Descriptions: p.Descriptions,
+		Forms:        p.Forms,
+		//UriVariables:     p.UriVariables,
 		MinLength:        p.MinLength,
 		MaxLength:        p.MaxLength,
 		Pattern:          p.Pattern,
