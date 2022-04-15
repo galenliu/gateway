@@ -16,22 +16,38 @@ type InteractionAffordance struct {
 	UriVariables map[string]schema.Schema `json:"uriVariables,omitempty"`
 }
 
-func (v InteractionAffordance) UnmarshalJSON(data []byte) error {
+func (v *InteractionAffordance) UnmarshalJSON(data []byte) error {
+
 	v.AtType = json.Get(data, "@type").ToString()
 	v.Title = json.Get(data, "title").ToString()
-	json.Get(data, "titles").ToVal(&v.Titles)
 	v.Description = json.Get(data, "description").ToString()
-	json.Get(data, "descriptions").ToVal(&v.Descriptions)
-	json.Get(data, "forms").ToVal(&v.Forms)
-	var uriVariablesMap map[string]json.Any
-	var uriVariables = make(map[string]schema.Schema, 0)
-	json.Get(data, "uriVariables").ToVal(&uriVariablesMap)
-	for n, u := range uriVariablesMap {
-		s, e := schema.MarshalSchema(u)
-		if e != nil {
-			uriVariables[n] = s
-		}
+
+	if json.Get(data, "titles").LastError() == nil {
+		v.Titles = make(map[string]string, 0)
+		json.Get(data, "titles").ToVal(&v.Titles)
 	}
-	v.UriVariables = uriVariables
+	if json.Get(data, "descriptions").LastError() == nil {
+		v.Descriptions = make(map[string]string, 0)
+		json.Get(data, "descriptions").ToVal(&v.Descriptions)
+	}
+
+	if json.Get(data, "forms").LastError() == nil {
+		v.Forms = make([]controls.Form, 0)
+		json.Get(data, "forms").ToVal(&v.Forms)
+	}
+
+	if json.Get(data, "uriVariables").LastError() == nil {
+		var uriVariables = make(map[string]schema.Schema, 0)
+		v.UriVariables = make(map[string]schema.Schema, 0)
+		var uriVariablesMap map[string]json.Any
+		json.Get(data, "uriVariables").ToVal(&uriVariablesMap)
+		for n, u := range uriVariablesMap {
+			s, e := schema.MarshalSchema(u)
+			if e != nil {
+				uriVariables[n] = s
+			}
+		}
+		v.UriVariables = uriVariables
+	}
 	return nil
 }
