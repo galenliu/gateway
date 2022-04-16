@@ -44,68 +44,6 @@ type Thing struct {
 	SchemaDefinitions ThingSchemaDefinitions `json:"schemaDefinitions,omitempty" wot:"optional"`
 }
 
-//func (props *ThingProperties) UnmarshalJSON(data []byte) error {
-//	propsAff := make(ThingProperties)
-//	mapProperties := json.Get(data)
-//	for _, name := range json.Get(data).Keys() {
-//		prop := mapProperties.Get(name)
-//		typ := mapProperties.Get(name, "type").ToString()
-//		if prop.LastError() != nil || typ == "" {
-//			continue
-//		}
-//		switch typ {
-//		case controls.TypeString:
-//			var p wot_properties.StringPropertyAffordance
-//			prop.ToVal(&p)
-//			if &p != nil {
-//				propsAff[name] = &p
-//			}
-//		case controls.TypeBoolean:
-//			var p wot_properties.BooleanPropertyAffordance
-//			prop.ToVal(&p)
-//			if &p != nil {
-//				propsAff[name] = &p
-//			}
-//		case controls.TypeInteger:
-//			var p wot_properties.IntegerPropertyAffordance
-//			prop.ToVal(&p)
-//			if &p != nil {
-//				propsAff[name] = &p
-//			}
-//		case controls.TypeNumber:
-//			var p wot_properties.NumberPropertyAffordance
-//			prop.ToVal(&p)
-//			if &p != nil {
-//				propsAff[name] = &p
-//			}
-//		case controls.TypeObject:
-//			var p wot_properties.ObjectPropertyAffordance
-//			prop.ToVal(&p)
-//			if &p != nil {
-//				propsAff[name] = &p
-//			}
-//		case controls.TypeArray:
-//			var p wot_properties.ArrayPropertyAffordance
-//			prop.ToVal(&p)
-//			if &p != nil {
-//				propsAff[name] = &p
-//			}
-//		case controls.TypeNull:
-//			var p wot_properties.NullPropertyAffordance
-//			prop.ToVal(&p)
-//			if &p != nil {
-//				propsAff[name] = &p
-//			}
-//		default:
-//			continue
-//		}
-//	}
-//	if props != nil && len(propsAff) > 0 {
-//		*props = propsAff
-//	}
-//	return nil
-//}
-
 func (t *Thing) GetId() string {
 	return t.Id.GetId()
 }

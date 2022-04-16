@@ -75,7 +75,6 @@ func (p *PropertyAffordance) UnmarshalJSON(data []byte) error {
 		p.Schema = dataSchema
 	default:
 		return fmt.Errorf("unsupported type: %s", dataType)
-
 	}
 	p.Observable = json.Get(data, "observable").ToBool()
 	return nil
