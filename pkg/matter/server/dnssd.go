@@ -40,7 +40,7 @@ func (d *DnssdServer) SetInterfaceId(id any) {
 func (d DnssdServer) StartServer() error {
 	d.advertiser = dnssd.NewAdvertiser()
 
-	err := d.advertiser.Init()
+	err := d.advertiser.Init(nil)
 	if err != nil {
 		return err
 	}
