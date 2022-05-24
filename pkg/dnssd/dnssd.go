@@ -1,21 +1,21 @@
 package dnssd
 
-import "github.com/google/martian/log"
+import "log"
 
-type Dnssd struct {
+type DnssdServer struct {
 	securedServicePort   int
 	unsecuredServicePort int
 }
 
 // NewDnssd Dnssd初始化
-func NewDnssd(mSecuredServicePort, mUnsecuredServicePort int) *Dnssd {
-	return &Dnssd{
+func NewDnssd(mSecuredServicePort, mUnsecuredServicePort int) *DnssdServer {
+	return &DnssdServer{
 		securedServicePort:   mSecuredServicePort,
 		unsecuredServicePort: mUnsecuredServicePort,
 	}
 }
 
 // StartServer 开启Dnssd服务
-func (d Dnssd) StartServer() {
-	log.Infof("DNS-SD StartServer")
+func (d DnssdServer) StartServer() {
+	log.Printf("")
 }

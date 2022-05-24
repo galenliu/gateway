@@ -1,26 +1,40 @@
 package server
 
-import "github.com/galenliu/gateway/pkg/dnssd"
+import "github.com/galenliu/gateway/pkg/matter/credentials"
 
 type Config struct {
-	ChipDeviceConfigEnableDnssd bool
+	UnsecureServicePort int
+	SecureServicePort   int
 }
 
 type CHIPServer struct {
-	mSecuredServicePort   int
-	mUnsecuredServicePort int
-	config                Config
-	dnssd                 *dnssd.Dnssd
+	mSecuredServicePort            int
+	mUnsecuredServicePort          int
+	mOperationalServicePort        int
+	mUserDirectedCommissioningPort int
+	interfaceId                    any
+	config                         Config
+	dnssdServer                    *DnssdServer
+	mFabrics                       *credentials.FabricTable
 }
 
 func NewCHIPServer() *CHIPServer {
 	return &CHIPServer{}
 }
 
-func (chip CHIPServer) Init(secureServicePort, unsecureServicePort int) {
-	chip.mUnsecuredServicePort = unsecureServicePort
-	chip.mSecuredServicePort = secureServicePort
-	if chip.config.ChipDeviceConfigEnableDnssd {
-		chip.dnssd = dnssd.NewDnssd(chip.mSecuredServicePort, chip.mUnsecuredServicePort)
+func (chip CHIPServer) Init(con Config) {
+	chip.mUnsecuredServicePort = con.UnsecureServicePort
+	chip.mSecuredServicePort = con.SecureServicePort
+
+	chip.dnssdServer = NewDnssdServer()
+	chip.dnssdServer.SetFabricTable(chip.mFabrics)
+
+	chip.dnssdServer.SetSecuredPort(chip.mOperationalServicePort)
+	chip.dnssdServer.SetUnsecuredPort(chip.mUserDirectedCommissioningPort)
+	chip.dnssdServer.SetInterfaceId(chip.interfaceId)
+	err := chip.dnssdServer.StartServer()
+	if err != nil {
+		return
 	}
+
 }
