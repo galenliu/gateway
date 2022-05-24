@@ -1,6 +1,9 @@
 package server
 
-import "github.com/galenliu/gateway/pkg/matter/credentials"
+import (
+	"github.com/galenliu/gateway/pkg/matter/credentials"
+	"sync"
+)
 
 type Config struct {
 	UnsecureServicePort int
@@ -22,9 +25,19 @@ func NewCHIPServer() *CHIPServer {
 	return &CHIPServer{}
 }
 
-func (chip CHIPServer) Init(con Config) {
-	chip.mUnsecuredServicePort = con.UnsecureServicePort
-	chip.mSecuredServicePort = con.SecureServicePort
+var ins *CHIPServer
+var once sync.Once
+
+func GetInstance() *CHIPServer {
+	once.Do(func() {
+		ins = NewCHIPServer()
+	})
+	return ins
+}
+
+func (chip CHIPServer) Init(unsecureServicePort, secureServicePort int) {
+	chip.mUnsecuredServicePort = unsecureServicePort
+	chip.mSecuredServicePort = secureServicePort
 
 	chip.dnssdServer = NewDnssdServer()
 	chip.dnssdServer.SetFabricTable(chip.mFabrics)

@@ -1,5 +1,7 @@
 package server
 
+import "github.com/galenliu/gateway/pkg/dnssd"
+
 type Fabrics interface {
 }
 
@@ -7,6 +9,7 @@ type DnssdServer struct {
 	mSecuredPort   int
 	mUnsecuredPort int
 	mInterfaceId   any
+	advertiser     *dnssd.Advertiser
 	mFabrics       Fabrics
 }
 
@@ -35,5 +38,26 @@ func (d *DnssdServer) SetInterfaceId(id any) {
 }
 
 func (d DnssdServer) StartServer() error {
+	d.advertiser = dnssd.NewAdvertiser()
+
+	err := d.advertiser.Init()
+	if err != nil {
+		return err
+	}
+
+	err = d.advertiser.RemoveServices()
+	if err != nil {
+		return err
+	}
+
+	err = d.AdvertiseOperational()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (d DnssdServer) AdvertiseOperational() error {
 	return nil
 }

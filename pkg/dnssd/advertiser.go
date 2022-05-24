@@ -2,34 +2,43 @@ package dnssd
 
 import "github.com/galenliu/gateway/pkg/dnssd/mdns"
 
-const (
-	CommssionAdvertiseModeCommissionableNode = iota
-	CommssionAdvertiseModeCommissioner
-)
-
-const (
-	CommissioningModeDisabled        = iota // Commissioning Mode is disabled, CM=0 in DNS-SD key/value pairs
-	CommissioningModeEnabledBasic           // Basic Commissioning Mode, CM=1 in DNS-SD key/value pairs
-	CommissioningModeEnabledEnhanced        // Enhanced Commissioning Mode, CM=2 in DNS-SD key/value pairs
-)
+const MdnsPort = 5353
 
 type MdnsServerBase interface {
 	Shutdown()
 }
 
-type ServiceAdvertiser struct {
-	mResponseSender ResponseSender
+type Advertiser struct {
+	mResponseSender *ResponseSender
+	mdnsServer      *mdns.MdnsServer
 }
 
-func NewServiceAdvertiser() *ServiceAdvertiser {
-	return &ServiceAdvertiser{}
+func NewAdvertiser() *Advertiser {
+	return &Advertiser{}
 }
 
-func (s ServiceAdvertiser) Init() error {
+func (s *Advertiser) Init(layer mdns.InetLayer) error {
 
-	server := mdns.NewMdnsServer()
+	s.mdnsServer = mdns.NewMdnsServer()
+	s.mdnsServer.Shutdown()
 
-	s.mResponseSender.mServer.Shutdown()
-	s.mResponseSender.SetServer(server)
+	s.mResponseSender = NewResponseSender()
+	s.mResponseSender.SetServer(s.mdnsServer)
+
+	err := s.mdnsServer.StartServer(layer, MdnsPort)
+	if err != nil {
+		return err
+	}
+
+	s.AdvertiseRecords()
+
 	return nil
+}
+
+func (s *Advertiser) RemoveServices() error {
+	return nil
+}
+
+func (s *Advertiser) AdvertiseRecords() {
+
 }

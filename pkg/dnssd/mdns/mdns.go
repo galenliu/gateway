@@ -1,14 +1,7 @@
 package mdns
 
-import "net/netip"
-
-type EndpointInfo struct {
-	network    netip.Addr
-	enableIPV4 bool
-}
-
-func (info EndpointInfo) IsIpv6() bool {
-	return info.network.Is6()
+type InetLayer interface {
+	NewUDPEndPoint()
 }
 
 type MdnsServer struct {
@@ -22,6 +15,12 @@ func (m MdnsServer) Shutdown() {
 
 }
 
-func (m MdnsServer) StartServer() error {
+func (m *MdnsServer) StartServer(inetLayer InetLayer, port int) error {
+	m.Shutdown()
+	return m.Listen(inetLayer, port)
+}
+
+func (m *MdnsServer) Listen(inetLayer InetLayer, port int) error {
+	m.Shutdown()
 	return nil
 }
