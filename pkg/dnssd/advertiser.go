@@ -42,3 +42,13 @@ func (s *Advertiser) RemoveServices() error {
 func (s *Advertiser) AdvertiseRecords() {
 
 }
+
+func (s *Advertiser) Advertise(params CommissionAdvertisingParameters) error {
+	if params.GetCommissionAdvertiseMode() == CommissionableNode {
+
+	} else {
+
+	}
+
+	return nil
+}

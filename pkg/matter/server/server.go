@@ -10,7 +10,7 @@ type Config struct {
 	SecureServicePort   int
 }
 
-type CHIPServer struct {
+type Server struct {
 	mSecuredServicePort            int
 	mUnsecuredServicePort          int
 	mOperationalServicePort        int
@@ -21,23 +21,23 @@ type CHIPServer struct {
 	mFabrics                       *credentials.FabricTable
 }
 
-func NewCHIPServer() *CHIPServer {
-	return &CHIPServer{}
+func NewCHIPServer() *Server {
+	return &Server{}
 }
 
-var ins *CHIPServer
+var ins *Server
 var once sync.Once
 
-func GetInstance() *CHIPServer {
+func GetInstance() *Server {
 	once.Do(func() {
 		ins = NewCHIPServer()
 	})
 	return ins
 }
 
-func (chip CHIPServer) Init(unsecureServicePort, secureServicePort int) {
-	chip.mUnsecuredServicePort = unsecureServicePort
-	chip.mSecuredServicePort = secureServicePort
+func (chip Server) Init(initParams ServerInitParams) {
+	chip.mUnsecuredServicePort = initParams.operationalServicePort
+	chip.mSecuredServicePort = initParams.userDirectedCommissioningPort
 
 	chip.dnssdServer = NewDnssdServer()
 	chip.dnssdServer.SetFabricTable(chip.mFabrics)
@@ -45,6 +45,7 @@ func (chip CHIPServer) Init(unsecureServicePort, secureServicePort int) {
 	chip.dnssdServer.SetSecuredPort(chip.mOperationalServicePort)
 	chip.dnssdServer.SetUnsecuredPort(chip.mUserDirectedCommissioningPort)
 	chip.dnssdServer.SetInterfaceId(chip.interfaceId)
+
 	err := chip.dnssdServer.StartServer()
 	if err != nil {
 		return
