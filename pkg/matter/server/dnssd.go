@@ -3,8 +3,8 @@ package server
 import (
 	"github.com/galenliu/gateway/pkg/dnssd"
 	"github.com/galenliu/gateway/pkg/matter/config"
-	"github.com/galenliu/gateway/pkg/matter/device"
 	"github.com/galenliu/gateway/pkg/matter/inet"
+	"github.com/galenliu/gateway/pkg/matter/platform"
 	"github.com/galenliu/gateway/pkg/util"
 	"net"
 	"sync"
@@ -116,48 +116,49 @@ func (d DnssdServer) AdvertiseOperational() error {
 }
 
 func (d DnssdServer) AdvertiseCommissioner() error {
-	return nil
+	return d.Advertise(false, dnssd.KDisabled)
 }
 
 func (d DnssdServer) HaveOperationalCredentials() bool {
 	return d.mFabrics.FabricCount() != 0
 }
 
-func (d DnssdServer) Advertise(commissionAbleNode bool, mode dnssd.CommissioningMode, config device.ConfigurationManager) error {
+func (d DnssdServer) Advertise(commissionAbleNode bool, mode dnssd.CommissioningMode) error {
+
 	advertiseParameters := dnssd.CommissionAdvertisingParameters{}
-	if commissionAbleNode {
-		advertiseParameters.SetPort(d.GetSecuredPort())
-		advertiseParameters.SetCommissionAdvertiseMode(dnssd.CommissionableNode)
-	} else {
-		advertiseParameters.SetPort(d.GetUnsecuredPort())
-		advertiseParameters.SetCommissionAdvertiseMode(dnssd.Commissioner)
-	}
+
+	advertiseParameters.SetPort(util.ConditionFunc(commissionAbleNode, d.GetUnsecuredPort, d.GetUnsecuredPort))
+	advertiseParameters.SetCommissionAdvertiseMode(util.ConditionValue(commissionAbleNode, dnssd.CommissionableNode, dnssd.Commissioner))
+
 	advertiseParameters.SetCommissioningMode(mode)
 
-	advertiseParameters.EnableIpV4(true)
-	advertiseParameters.SetVendorId(config.GetVendorId())
-	advertiseParameters.SetProductId(config.GetProductId())
+	advertiseParameters.SetMaC("")
 
-	if config.IsCommissionableDeviceTypeEnabled() {
-		advertiseParameters.SetDeviceType(config.GetDeviceTypeId())
+	advertiseParameters.SetVendorId(platform.CMInstance().GetVendorId())
+
+	advertiseParameters.SetProductId(platform.CMInstance().GetProductId())
+
+	advertiseParameters.EnableIpV4(true)
+	if platform.CMInstance().IsCommissionableDeviceTypeEnabled() {
+		advertiseParameters.SetDeviceType(platform.CMInstance().GetDeviceTypeId())
 	}
-	if config.IsCommissionableDeviceNameEnabled() {
-		name := config.GetCommissionableDeviceName()
+	if platform.CMInstance().IsCommissionableDeviceNameEnabled() {
+		name := platform.CMInstance().GetCommissionableDeviceName()
 		advertiseParameters.SetDeviceName(name)
 	}
 	advertiseParameters.SetTcpSupported(true)
 
 	if !d.HaveOperationalCredentials() {
-		value := config.GetInitialPairingHint()
+		value := platform.CMInstance().GetInitialPairingHint()
 		advertiseParameters.SetPairingHint(value)
 
-		ist := config.GetInitialPairingInstruction()
+		ist := platform.CMInstance().GetInitialPairingInstruction()
 		advertiseParameters.SetPairingInstruction(ist)
 	} else {
-		hint := config.GetSecondaryPairingHint()
+		hint := platform.CMInstance().GetSecondaryPairingHint()
 		advertiseParameters.SetPairingHint(hint)
 
-		ins := config.GetSecondaryPairingInstruction()
+		ins := platform.CMInstance().GetSecondaryPairingInstruction()
 		advertiseParameters.SetPairingInstruction(ins)
 	}
 	mdnsAdvertiser := dnssd.NewAdvertiser()

@@ -1,8 +1,10 @@
-package device
+package platform
 
 import (
+	"github.com/galenliu/gateway/pkg/matter/device"
 	"net"
 	"strings"
+	"sync"
 )
 
 type Config struct {
@@ -15,12 +17,30 @@ type Config struct {
 	ChipDeviceConfigPairingSecondaryInstruction string
 }
 
+var cmInstance *ConfigurationManager
+var cmOnce sync.Once
+
+func CMInstance() *ConfigurationManager {
+	cmOnce.Do(func() {
+		cmInstance = newConfigurationManager(Config{
+			ChipDeviceConfigPairingSecondaryHint:        0,
+			ChipDeviceConfigDeviceVendorName:            "",
+			ChipDeviceConfigDeviceType:                  0,
+			ChipDeviceConfigDeviceProductName:           "",
+			ChipDeviceConfigPairingInitialHint:          0,
+			ChipDeviceConfigPairingInitialInstruction:   "",
+			ChipDeviceConfigPairingSecondaryInstruction: "",
+		})
+	})
+	return cmInstance
+}
+
 type ConfigurationManager struct {
 	mVendorId                                  int
 	mVendorName                                string
 	mProductName                               string
 	mProductId                                 int
-	mDeviceType                                MatterDeviceType
+	mDeviceType                                device.MatterDeviceType
 	mDeviceName                                string
 	mTcpSupported                              bool
 	mDevicePairingHint                         int
@@ -31,8 +51,8 @@ type ConfigurationManager struct {
 	deviceConfigEnableCommissionableDeviceType bool
 }
 
-func NewConfigurationManager(conf Config) ConfigurationManager {
-	return ConfigurationManager{
+func newConfigurationManager(conf Config) *ConfigurationManager {
+	return &ConfigurationManager{
 		mVendorId:                                0,
 		mVendorName:                              "",
 		mProductName:                             "",
@@ -80,11 +100,11 @@ func (c ConfigurationManager) IsCommissionableDeviceTypeEnabled() bool {
 	return c.deviceConfigEnableCommissionableDeviceType
 }
 
-func (c ConfigurationManager) GetDeviceTypeId() MatterDeviceType {
+func (c ConfigurationManager) GetDeviceTypeId() device.MatterDeviceType {
 	return c.mDeviceType
 }
 
-func (c ConfigurationManager) SetDeviceTypeId(t MatterDeviceType) {
+func (c ConfigurationManager) SetDeviceTypeId(t device.MatterDeviceType) {
 	c.mDeviceType = t
 }
 

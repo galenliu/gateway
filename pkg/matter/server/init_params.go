@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/galenliu/gateway/pkg/matter/access"
+	"github.com/galenliu/gateway/pkg/matter/config"
 	"github.com/galenliu/gateway/pkg/matter/lib"
 	"net"
 )
@@ -20,8 +21,8 @@ type InitParams struct {
 
 func DefaultServerInitParams() *InitParams {
 	return &InitParams{
-		OperationalServicePort:        ChipPort,
-		UserDirectedCommissioningPort: ChipUdcPort,
+		OperationalServicePort:        config.ChipPort,
+		UserDirectedCommissioningPort: config.ChipUdcPort,
 	}
 }
 

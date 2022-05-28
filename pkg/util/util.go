@@ -161,3 +161,17 @@ func GetAnyFromPointer[T Valuer](value *T) any {
 	}
 	return nil
 }
+
+func ConditionValue[T any](c bool, a, b T) T {
+	if c {
+		return a
+	}
+	return b
+}
+
+func ConditionFunc[T any](c bool, a, b func() T) T {
+	if c {
+		return a()
+	}
+	return b()
+}
