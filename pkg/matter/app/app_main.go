@@ -16,8 +16,13 @@ func AppMainInit(con Config) {
 }
 
 func AppMainLoop() {
-	con := config.GetInstance()
-	s := server.GetInstance()
 
-	s.Init(con.SecuredDevicePort, con.SecuredCommissionerPort)
+	initParams := server.InitializeStaticResourcesBeforeServerInit()
+	initParams.OperationalServicePort = config.ChipPort
+	initParams.UserDirectedCommissioningPort = config.ChipUdcPort
+
+	server.GetInstance().Init(initParams)
+
+	server.GetInstance().Shutdown()
+
 }

@@ -2,19 +2,37 @@ package server
 
 import (
 	"github.com/galenliu/gateway/pkg/dnssd"
+	"github.com/galenliu/gateway/pkg/matter/config"
 	"github.com/galenliu/gateway/pkg/matter/device"
+	"github.com/galenliu/gateway/pkg/matter/inet"
+	"github.com/galenliu/gateway/pkg/util"
+	"net"
+	"sync"
 )
+
+const Pkg = "Dnssd"
 
 type Fabrics interface {
 	FabricCount() int
 }
 
 type DnssdServer struct {
-	mSecuredPort   int
-	mUnsecuredPort int
-	mInterfaceId   any
-	advertiser     *dnssd.Advertiser
-	mFabrics       Fabrics
+	mSecuredPort               int
+	mUnsecuredPort             int
+	mInterfaceId               net.Interface
+	mCommissioningModeProvider *CommissioningWindowManager
+	advertiser                 *dnssd.Advertiser
+	mFabrics                   Fabrics
+}
+
+var insDnssd *DnssdServer
+var onceDnssd sync.Once
+
+func DnssdInstance() *DnssdServer {
+	onceDnssd.Do(func() {
+		insDnssd = NewDnssdServer()
+	})
+	return insDnssd
 }
 
 func NewDnssdServer() *DnssdServer {
@@ -45,31 +63,55 @@ func (d *DnssdServer) GetUnsecuredPort() int {
 	return d.mUnsecuredPort
 }
 
-func (d *DnssdServer) SetInterfaceId(id any) {
-	d.mInterfaceId = id
+func (d *DnssdServer) SetInterfaceId(inter net.Interface) {
+	d.mInterfaceId = inter
 }
 
-func (d DnssdServer) StartServer() error {
-	d.advertiser = dnssd.NewAdvertiser()
-	err := d.advertiser.Init(nil)
-	if err != nil {
-		return err
+func (d *DnssdServer) StartServer() error {
+	var mode = dnssd.KDisabled
+	if d.mCommissioningModeProvider != nil {
+		mode = d.mCommissioningModeProvider.GetCommissioningMode()
 	}
+	return d.startServer(mode)
+}
+
+func (d *DnssdServer) startServer(mode dnssd.CommissioningMode) error {
+
+	d.advertiser = dnssd.NewAdvertiser()
+
+	err := d.advertiser.Init(inet.UDPEndpointManager{})
+	util.LogError(err, Pkg, "Failed initialize advertiser")
 
 	err = d.advertiser.RemoveServices()
-	if err != nil {
-		return err
-	}
+	util.LogError(err, Pkg, "Failed to remove advertised services")
 
 	err = d.AdvertiseOperational()
-	if err != nil {
-		return err
+	util.LogError(err, Pkg, "Failed to advertise operational node")
+
+	if mode != dnssd.KDisabled {
+		err = d.AdvertiseCommissionableNode(mode)
+		util.LogError(err, Pkg, "Failed to advertise commissionable node")
 	}
+
+	// If any fabrics exist, the commissioning window must have been opened by the administrator
+	// commissioning cluster commands which take care of the timeout.
+	if !d.HaveOperationalCredentials() {
+		d.ScheduleDiscoveryExpiration()
+	}
+
+	if config.ChipDeviceConfigEnableCommissionerDiscovery {
+		err = d.AdvertiseCommissioner()
+		util.LogError(err, Pkg, "Failed to advertise commissioner")
+	}
+
+	err = d.advertiser.FinalizeServiceUpdate()
+	util.LogError(err, Pkg, "Failed to finalize service update")
 
 	return nil
 }
 
 func (d DnssdServer) AdvertiseOperational() error {
+
 	return nil
 }
 
@@ -120,4 +162,17 @@ func (d DnssdServer) Advertise(commissionAbleNode bool, mode dnssd.Commissioning
 	}
 	mdnsAdvertiser := dnssd.NewAdvertiser()
 	return mdnsAdvertiser.Advertise(advertiseParameters)
+}
+
+func (d *DnssdServer) SetCommissioningModeProvider(manager *CommissioningWindowManager) {
+	d.mCommissioningModeProvider = manager
+}
+
+func (d *DnssdServer) AdvertiseCommissionableNode(mode dnssd.CommissioningMode) error {
+	return nil
+}
+
+func (d DnssdServer) ScheduleDiscoveryExpiration() {
+	//TODO
+	return
 }
