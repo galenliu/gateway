@@ -56,7 +56,7 @@ func (s *Advertiser) AdvertiseRecords() {
 }
 
 func (s *Advertiser) Advertise(params CommissionAdvertisingParameters) error {
-	if params.GetCommissionAdvertiseMode() == CommissionableNode {
+	if params.GetCommissionAdvertiseMode() == KCommissionableNode {
 
 	} else {
 

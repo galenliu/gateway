@@ -128,7 +128,7 @@ func (d DnssdServer) Advertise(commissionAbleNode bool, mode dnssd.Commissioning
 	advertiseParameters := dnssd.CommissionAdvertisingParameters{}
 
 	advertiseParameters.SetPort(util.ConditionFunc(commissionAbleNode, d.GetUnsecuredPort, d.GetUnsecuredPort))
-	advertiseParameters.SetCommissionAdvertiseMode(util.ConditionValue(commissionAbleNode, dnssd.CommissionableNode, dnssd.Commissioner))
+	advertiseParameters.SetCommissionAdvertiseMode(util.ConditionValue(commissionAbleNode, dnssd.KCommissionableNode, dnssd.KCommissioner))
 
 	advertiseParameters.SetCommissioningMode(mode)
 
