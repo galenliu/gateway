@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"github.com/bytedance/sonic"
 	"github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
@@ -113,7 +114,7 @@ func (tc *thingsController) handleSetProperty(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid params")
 	}
 	var value any
-	err = json.Unmarshal(c.Body(), &value)
+	err = sonic.Unmarshal(c.Body(), &value)
 	if err != nil {
 		return err
 	}
@@ -156,7 +157,11 @@ func (tc *thingsController) handleSetThing(c *fiber.Ctx) error {
 	if thing == nil {
 		return util.NotFoundError("thing %s not found", thingId)
 	}
-	title := strings.Trim(json.Get(c.Body(), "title").ToString(), " ")
+
+	node, _ := sonic.Get(c.Body(), "title")
+	t, _ := node.String()
+	title := strings.Trim(t, " ")
+
 	if len(title) == 0 || title == "" {
 		return util.BadRequestError("Invalid title")
 	}

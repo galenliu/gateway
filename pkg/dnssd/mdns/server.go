@@ -48,6 +48,6 @@ func (m *MdnsServer) OnUdpPacketReceived(updEndPoint *inet.UDPEndpoint, data []b
 func (m *MdnsServer) Listen(udpEndPoint inet.UDPEndpointManager, port int) error {
 	m.Shutdown()
 	udpEndPoint.Bind(netip.Addr{}, port)
-	udpEndPoint.Listen(m.OnUdpPacketReceived, nil)
+	//udpEndPoint.Listen(m.OnUdpPacketReceived, nil)
 	return nil
 }
