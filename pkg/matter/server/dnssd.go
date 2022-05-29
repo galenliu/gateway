@@ -4,13 +4,12 @@ import (
 	"github.com/galenliu/gateway/pkg/dnssd"
 	"github.com/galenliu/gateway/pkg/matter/config"
 	"github.com/galenliu/gateway/pkg/matter/inet"
+	"github.com/galenliu/gateway/pkg/matter/messageing"
 	"github.com/galenliu/gateway/pkg/matter/platform"
 	"github.com/galenliu/gateway/pkg/util"
 	"net"
 	"sync"
 )
-
-const Pkg = "Dnssd"
 
 type Fabrics interface {
 	FabricCount() int
@@ -21,7 +20,6 @@ type DnssdServer struct {
 	mUnsecuredPort             int
 	mInterfaceId               net.Interface
 	mCommissioningModeProvider *CommissioningWindowManager
-	advertiser                 *dnssd.Advertiser
 	mFabrics                   Fabrics
 }
 
@@ -77,20 +75,19 @@ func (d *DnssdServer) StartServer() error {
 
 func (d *DnssdServer) startServer(mode dnssd.CommissioningMode) error {
 
-	d.advertiser = dnssd.NewAdvertiser()
+	//使用UDPEndPointManager初始化一个Dnssd-Advertiser
+	err := dnssd.AdvertiserInstance().Init(inet.UDPEndpointManager{})
+	util.LogError(err, "Discover", "Failed initialize advertiser")
 
-	err := d.advertiser.Init(inet.UDPEndpointManager{})
-	util.LogError(err, Pkg, "Failed initialize advertiser")
-
-	err = d.advertiser.RemoveServices()
-	util.LogError(err, Pkg, "Failed to remove advertised services")
+	err = dnssd.AdvertiserInstance().RemoveServices()
+	util.LogError(err, "Discover", "Failed to remove advertised services")
 
 	err = d.AdvertiseOperational()
-	util.LogError(err, Pkg, "Failed to advertise operational node")
+	util.LogError(err, "Discover", "Failed to advertise operational node")
 
 	if mode != dnssd.KDisabled {
 		err = d.AdvertiseCommissionableNode(mode)
-		util.LogError(err, Pkg, "Failed to advertise commissionable node")
+		util.LogError(err, "Discover", "Failed to advertise commissionable node")
 	}
 
 	// If any fabrics exist, the commissioning window must have been opened by the administrator
@@ -101,11 +98,11 @@ func (d *DnssdServer) startServer(mode dnssd.CommissioningMode) error {
 
 	if config.ChipDeviceConfigEnableCommissionerDiscovery {
 		err = d.AdvertiseCommissioner()
-		util.LogError(err, Pkg, "Failed to advertise commissioner")
+		util.LogError(err, "Discover", "Failed to advertise commissioner")
 	}
 
-	err = d.advertiser.FinalizeServiceUpdate()
-	util.LogError(err, Pkg, "Failed to finalize service update")
+	err = dnssd.AdvertiserInstance().FinalizeServiceUpdate()
+	util.LogError(err, "Discover", "Failed to finalize service update")
 
 	return nil
 }
@@ -132,36 +129,71 @@ func (d DnssdServer) Advertise(commissionAbleNode bool, mode dnssd.Commissioning
 
 	advertiseParameters.SetCommissioningMode(mode)
 
-	advertiseParameters.SetMaC("")
+	mac, err := platform.ConfigurationMgr().GetPrimaryMACAddress()
+	util.LogError(err, "Discovery", "Failed to get primary mac address of device. Generating a random one.")
+	advertiseParameters.SetMaC(util.ConditionValue(err != nil, mac, util.GenerateMac()))
 
-	advertiseParameters.SetVendorId(platform.CMInstance().GetVendorId())
-
-	advertiseParameters.SetProductId(platform.CMInstance().GetProductId())
-
-	advertiseParameters.EnableIpV4(true)
-	if platform.CMInstance().IsCommissionableDeviceTypeEnabled() {
-		advertiseParameters.SetDeviceType(platform.CMInstance().GetDeviceTypeId())
+	vid, err := platform.ConfigurationMgr().GetVendorId()
+	util.LogError(err, "Discovery", "Vendor ID not known")
+	if err != nil {
+		advertiseParameters.SetVendorId(vid)
 	}
-	if platform.CMInstance().IsCommissionableDeviceNameEnabled() {
-		name := platform.CMInstance().GetCommissionableDeviceName()
-		advertiseParameters.SetDeviceName(name)
+
+	pid, err := platform.ConfigurationMgr().GetProductId()
+	util.LogError(err, "Discovery", "Product ID not known")
+	if err != nil {
+		advertiseParameters.SetProductId(pid)
 	}
-	advertiseParameters.SetTcpSupported(true)
+
+	//uint16_t discriminator = 0;
+	//CHIP_ERROR error       = DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator);
+	//if (error != CHIP_NO_ERROR)
+	//{
+	//	ChipLogError(Discovery,
+	//		"Setup discriminator read error (%" CHIP_ERROR_FORMAT ")! Critical error, will not be commissionable.",
+	//	error.Format());
+	//	return error;
+	//}
+
+	// Override discriminator with temporary one if one is set
+	//discriminator = mEphemeralDiscriminator.ValueOr(discriminator);
+	//
+	//advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>((discriminator >> 8) & 0x0F))
+	//.SetLongDiscriminator(discriminator);
+	//
+
+	if platform.ConfigurationMgr().IsCommissionableDeviceTypeEnabled() {
+		did, err := platform.ConfigurationMgr().GetDeviceTypeId()
+		if err != nil {
+			advertiseParameters.SetDeviceType(did)
+		}
+	}
+
+	if platform.ConfigurationMgr().IsCommissionableDeviceNameEnabled() {
+		name, err := platform.ConfigurationMgr().GetCommissionableDeviceName()
+		if err != nil {
+			advertiseParameters.SetDeviceName(name)
+		}
+	}
+
+	advertiseParameters.SetMRPConfig(messageing.GetLocalMRPConfig())
+	advertiseParameters.SetTcpSupported(inet.InetConfigEnableTcpEndpoint)
 
 	if !d.HaveOperationalCredentials() {
-		value := platform.CMInstance().GetInitialPairingHint()
+		value := platform.ConfigurationMgr().GetInitialPairingHint()
+
 		advertiseParameters.SetPairingHint(value)
 
-		ist := platform.CMInstance().GetInitialPairingInstruction()
+		ist := platform.ConfigurationMgr().GetInitialPairingInstruction()
 		advertiseParameters.SetPairingInstruction(ist)
 	} else {
-		hint := platform.CMInstance().GetSecondaryPairingHint()
+		hint := platform.ConfigurationMgr().GetSecondaryPairingHint()
 		advertiseParameters.SetPairingHint(hint)
 
-		ins := platform.CMInstance().GetSecondaryPairingInstruction()
+		ins := platform.ConfigurationMgr().GetSecondaryPairingInstruction()
 		advertiseParameters.SetPairingInstruction(ins)
 	}
-	mdnsAdvertiser := dnssd.NewAdvertiser()
+	mdnsAdvertiser := dnssd.AdvertiserInstance()
 	return mdnsAdvertiser.Advertise(advertiseParameters)
 }
 

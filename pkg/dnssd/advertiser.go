@@ -4,9 +4,10 @@ import (
 	"github.com/galenliu/gateway/pkg/dnssd/mdns"
 	"github.com/galenliu/gateway/pkg/matter/inet"
 	"math/rand"
+	"sync"
 )
 
-const MdnsPort = 5353
+const KMdnsPort = 5353
 
 type MdnsServerBase interface {
 	Shutdown()
@@ -15,27 +16,35 @@ type MdnsServerBase interface {
 type Advertiser struct {
 	mResponseSender             *ResponseSender
 	mCommissionableInstanceName uint64
-	mdnsServer                  *mdns.MdnsServer
 	mIsInitialized              bool
 }
 
-func NewAdvertiser() *Advertiser {
+var insAdvertiser *Advertiser
+var advertiserOnce sync.Once
+
+func AdvertiserInstance() *Advertiser {
+	advertiserOnce.Do(func() {
+		insAdvertiser = newAdvertiser()
+	})
+	return insAdvertiser
+}
+
+func newAdvertiser() *Advertiser {
 	return &Advertiser{}
 }
 
-func (s *Advertiser) Init(mgr inet.UDPEndpointManager) error {
+func (s *Advertiser) Init(udpEndPointManager inet.UDPEndpointManager) error {
 
-	s.mdnsServer = mdns.NewMdnsServer()
-	s.mdnsServer.Shutdown()
+	mdns.GlobalMdnsServer().Shutdown()
 
 	if s.mIsInitialized {
 		s.UpdateCommissionableInstanceName()
 	}
 
 	s.mResponseSender = NewResponseSender()
-	s.mResponseSender.SetServer(s.mdnsServer)
+	s.mResponseSender.SetServer(mdns.GlobalMdnsServer())
 
-	err := s.mdnsServer.StartServer(mgr, MdnsPort)
+	err := mdns.GlobalMdnsServer().StartServer(udpEndPointManager, KMdnsPort)
 	if err != nil {
 		return err
 	}

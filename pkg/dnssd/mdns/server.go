@@ -1,6 +1,10 @@
 package mdns
 
-import "github.com/galenliu/gateway/pkg/matter/inet"
+import (
+	"github.com/galenliu/gateway/pkg/matter/inet"
+	"net/netip"
+	"sync"
+)
 
 type Server interface {
 	Shutdown()
@@ -13,14 +17,20 @@ type Server interface {
 	SetDelegate()
 }
 
-type InetLayer interface {
-	NewUDPEndPoint()
-}
-
 type MdnsServer struct {
 }
 
-func NewMdnsServer() *MdnsServer {
+var insServer *MdnsServer
+var serOnce sync.Once
+
+func GlobalMdnsServer() *MdnsServer {
+	serOnce.Do(func() {
+		insServer = newMdnsServer()
+	})
+	return insServer
+}
+
+func newMdnsServer() *MdnsServer {
 	return &MdnsServer{}
 }
 
@@ -33,9 +43,11 @@ func (m *MdnsServer) StartServer(mgr inet.UDPEndpointManager, port int) error {
 	return m.Listen(mgr, port)
 }
 
-func (m *MdnsServer) OnUdpPacketReceived(data []byte) {}
+func (m *MdnsServer) OnUdpPacketReceived(updEndPoint *inet.UDPEndpoint, data []byte) {}
 
 func (m *MdnsServer) Listen(udpEndPoint inet.UDPEndpointManager, port int) error {
 	m.Shutdown()
+	udpEndPoint.Bind(netip.Addr{}, port)
+	udpEndPoint.Listen(m.OnUdpPacketReceived, nil)
 	return nil
 }

@@ -20,7 +20,7 @@ type Config struct {
 var cmInstance *ConfigurationManager
 var cmOnce sync.Once
 
-func CMInstance() *ConfigurationManager {
+func ConfigurationMgr() *ConfigurationManager {
 	cmOnce.Do(func() {
 		cmInstance = newConfigurationManager(Config{
 			ChipDeviceConfigPairingSecondaryHint:        0,
@@ -66,24 +66,24 @@ func newConfigurationManager(conf Config) *ConfigurationManager {
 	}
 }
 
-func (c ConfigurationManager) GetVendorId() int {
-	return c.mVendorId
+func (c ConfigurationManager) GetVendorId() (int, error) {
+	return c.mVendorId, nil
 }
 
 func (c ConfigurationManager) GetVendorName() string {
 	return c.mVendorName
 }
 
-func (c ConfigurationManager) GetProductId() int {
-	return c.mProductId
+func (c ConfigurationManager) GetProductId() (int, error) {
+	return c.mProductId, nil
 }
 
 func (c ConfigurationManager) GetProductName() string {
 	return c.mProductName
 }
 
-func (c ConfigurationManager) GetPrimaryMACAddress() (mac net.HardwareAddr) {
-	return c.GetPrimaryWiFiMACAddress()
+func (c ConfigurationManager) GetPrimaryMACAddress() (mac net.HardwareAddr, err error) {
+	return c.GetPrimaryWiFiMACAddress(), nil
 }
 
 func (c ConfigurationManager) GetPrimaryWiFiMACAddress() (mac net.HardwareAddr) {
@@ -100,8 +100,8 @@ func (c ConfigurationManager) IsCommissionableDeviceTypeEnabled() bool {
 	return c.deviceConfigEnableCommissionableDeviceType
 }
 
-func (c ConfigurationManager) GetDeviceTypeId() device.MatterDeviceType {
-	return c.mDeviceType
+func (c ConfigurationManager) GetDeviceTypeId() (device.MatterDeviceType, error) {
+	return c.mDeviceType, nil
 }
 
 func (c ConfigurationManager) SetDeviceTypeId(t device.MatterDeviceType) {
@@ -112,8 +112,8 @@ func (c ConfigurationManager) IsCommissionableDeviceNameEnabled() bool {
 	return true
 }
 
-func (c ConfigurationManager) GetCommissionableDeviceName() string {
-	return c.mDeviceName
+func (c ConfigurationManager) GetCommissionableDeviceName() (string, error) {
+	return c.mDeviceName, nil
 }
 
 func (c ConfigurationManager) GetInitialPairingHint() int {

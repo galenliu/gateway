@@ -1,13 +1,19 @@
 package dnssd
 
+import (
+	"github.com/galenliu/gateway/pkg/matter/messageing"
+	"net"
+)
+
 type Mac struct {
 	mac string
 }
 
 type BaseAdvertisingParams struct {
 	mPort       int
-	mMac        Mac
+	mMac        net.HardwareAddr
 	mEnableIPv4 bool
+	mMRPConfig  *messageing.ReliableMessageProtocolConfig
 }
 
 type CommissionAdvertisingParameters struct {
@@ -21,7 +27,6 @@ type CommissionAdvertisingParameters struct {
 	mMode              CommssionAdvertiseMode
 	mCommissioningMode CommissioningMode
 	mTcpSupported      bool
-	mMac               Mac
 }
 
 func (c *CommissionAdvertisingParameters) SetCommissioningMode(mode CommissioningMode) {
@@ -68,6 +73,10 @@ func (c *CommissionAdvertisingParameters) SetPairingInstruction(ist string) {
 	c.mPairingInstr = ist
 }
 
+func (c *CommissionAdvertisingParameters) SetMRPConfig(config *messageing.ReliableMessageProtocolConfig) {
+	c.mMRPConfig = config
+}
+
 func (b *BaseAdvertisingParams) SetPort(port int) {
 	b.mPort = port
 }
@@ -76,12 +85,12 @@ func (b *BaseAdvertisingParams) GetPort() int {
 	return b.mPort
 }
 
-func (b *BaseAdvertisingParams) SetMaC(mac string) {
-	b.mMac = Mac{mac: mac}
+func (b *BaseAdvertisingParams) SetMaC(mac net.HardwareAddr) {
+	b.mMac = mac
 }
 
-func (b *BaseAdvertisingParams) GetMac() string {
-	return b.mMac.mac
+func (b *BaseAdvertisingParams) GetMac() net.HardwareAddr {
+	return b.mMac
 }
 
 func (b *BaseAdvertisingParams) EnableIpV4(enable bool) {
