@@ -1,9 +1,10 @@
 package interaction_affordance
 
 import (
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	schema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
-	json "github.com/json-iterator/go"
 )
 
 type InteractionAffordance struct {
@@ -18,36 +19,56 @@ type InteractionAffordance struct {
 
 func (v *InteractionAffordance) UnmarshalJSON(data []byte) error {
 
-	v.AtType = json.Get(data, "@type").ToString()
-	v.Title = json.Get(data, "title").ToString()
-	v.Description = json.Get(data, "description").ToString()
+	var node ast.Node
+	var err error
+	var nodeMap map[string]ast.Node
 
-	if json.Get(data, "titles").LastError() == nil {
-		v.Titles = make(map[string]string, 0)
-		json.Get(data, "titles").ToVal(&v.Titles)
-	}
-	if json.Get(data, "descriptions").LastError() == nil {
-		v.Descriptions = make(map[string]string, 0)
-		json.Get(data, "descriptions").ToVal(&v.Descriptions)
+	node, err = sonic.Get(data, "@type")
+	if node.Exists() && err == nil {
+		v.AtType, _ = node.String()
 	}
 
-	if json.Get(data, "forms").LastError() == nil {
-		v.Forms = make([]controls.Form, 0)
-		json.Get(data, "forms").ToVal(&v.Forms)
+	node, err = sonic.Get(data, "title")
+	if node.Exists() && err == nil {
+		v.Title, _ = node.String()
 	}
 
-	if json.Get(data, "uriVariables").LastError() == nil {
-		var uriVariables = make(map[string]schema.Schema, 0)
-		v.UriVariables = make(map[string]schema.Schema, 0)
-		var uriVariablesMap map[string]json.Any
-		json.Get(data, "uriVariables").ToVal(&uriVariablesMap)
-		for n, u := range uriVariablesMap {
-			s, e := schema.MarshalSchema(u)
-			if e != nil {
-				uriVariables[n] = s
+	node, err = sonic.Get(data, "description")
+	if node.Exists() && err == nil {
+		v.Description, _ = node.String()
+	}
+
+	node, err = sonic.Get(data, "titles")
+	if node.Exists() && err == nil {
+		d, _ := node.MarshalJSON()
+		_ = sonic.Unmarshal(d, &v.Titles)
+	}
+
+	node, err = sonic.Get(data, "descriptions")
+	if node.Exists() && err == nil {
+		d, _ := node.MarshalJSON()
+		_ = sonic.Unmarshal(d, &v.Descriptions)
+	}
+
+	node, err = sonic.Get(data, "forms")
+	if node.Exists() && err == nil {
+		d, _ := node.MarshalJSON()
+		_ = sonic.Unmarshal(d, &v.Forms)
+	}
+
+	node, err = sonic.Get(data, "uriVariables")
+	if node.Exists() && err == nil {
+		nodeMap, err = node.MapUseNode()
+		if err == nil {
+			for name, value := range nodeMap {
+				d, _ := value.MarshalJSON()
+				s, err := schema.MarshalSchema(d)
+				if err != nil {
+					v.UriVariables[name] = s
+				}
 			}
 		}
-		v.UriVariables = uriVariables
 	}
+
 	return nil
 }

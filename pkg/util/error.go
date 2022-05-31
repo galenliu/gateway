@@ -27,3 +27,10 @@ func LogError(err error, name, msg string) {
 		log.Printf(msg, err.Error())
 	}
 }
+
+func ReturnErrorCodeIf(c bool, info string) error {
+	if c {
+		return nil
+	}
+	return fmt.Errorf(info)
+}

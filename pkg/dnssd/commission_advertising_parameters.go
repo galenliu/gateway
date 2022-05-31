@@ -1,6 +1,7 @@
 package dnssd
 
 import (
+	"github.com/galenliu/gateway/pkg/matter/lib/dns"
 	"github.com/galenliu/gateway/pkg/matter/messageing"
 	"net"
 )
@@ -10,10 +11,12 @@ type Mac struct {
 }
 
 type BaseAdvertisingParams struct {
-	mPort       int
-	mMac        net.HardwareAddr
-	mEnableIPv4 bool
-	mMRPConfig  *messageing.ReliableMessageProtocolConfig
+	mPort         int
+	mMac          net.HardwareAddr
+	mEnableIPv4   bool
+	mInterfaceId  net.Interface
+	mMRPConfig    *messageing.ReliableMessageProtocolConfig
+	mTcpSupported bool
 }
 
 type CommissionAdvertisingParameters struct {
@@ -26,7 +29,23 @@ type CommissionAdvertisingParameters struct {
 	mDeviceName        string //设备名称
 	mMode              CommssionAdvertiseMode
 	mCommissioningMode CommissioningMode
-	mTcpSupported      bool
+}
+
+type OperationalAdvertisingParameters struct {
+	*BaseAdvertisingParams
+	mPeerId dns.PeerId
+}
+
+func (o *OperationalAdvertisingParameters) SetPeerId(peerId dns.PeerId) {
+	o.mPeerId = peerId
+}
+
+func (o *OperationalAdvertisingParameters) GetCompressedFabricId() dns.CompressedFabricId {
+	return o.mPeerId.GetCompressedFabricId()
+}
+
+func (o *OperationalAdvertisingParameters) GetPeerId() dns.PeerId {
+	return o.mPeerId
 }
 
 func (c *CommissionAdvertisingParameters) SetCommissioningMode(mode CommissioningMode) {

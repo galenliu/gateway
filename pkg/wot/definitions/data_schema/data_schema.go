@@ -2,8 +2,8 @@ package data_schema
 
 import (
 	"fmt"
+	"github.com/bytedance/sonic"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
-	json "github.com/json-iterator/go"
 )
 
 const (
@@ -39,59 +39,60 @@ type DataSchema struct {
 	Type         string                 `json:"type,,omitempty" wot:"optional"`
 }
 
-func MarshalSchema(raw json.Any) (s Schema, e error) {
-	dataType := raw.Get("type").ToString()
-	if dataType == "" {
-		return nil, fmt.Errorf("schema type missing")
+func MarshalSchema(data []byte) (s Schema, e error) {
+	node, err := sonic.Get(data, "type")
+	dataType, err := node.String()
+	if err != nil {
+		return nil, err
 	}
 	switch dataType {
 	case controls.TypeInteger:
 		var dataSchema IntegerSchema
-		raw.ToVal(&dataSchema)
-		if raw.LastError() != nil {
-			return nil, raw.LastError()
+		err = sonic.Unmarshal(data, &dataSchema)
+		if err != nil {
+			return nil, err
 		}
 		return dataSchema, nil
 	case controls.TypeNumber:
 		var dataSchema NumberSchema
-		raw.ToVal(&dataSchema)
-		if raw.LastError() != nil {
-			return nil, raw.LastError()
+		err = sonic.Unmarshal(data, &dataSchema)
+		if err != nil {
+			return nil, err
 		}
 		return dataSchema, nil
 	case controls.TypeBoolean:
 		var dataSchema BooleanSchema
-		raw.ToVal(&dataSchema)
-		if raw.LastError() != nil {
-			return nil, raw.LastError()
+		err = sonic.Unmarshal(data, &dataSchema)
+		if err != nil {
+			return nil, err
 		}
 		return dataSchema, nil
 	case controls.TypeArray:
 		var dataSchema ArraySchema
-		raw.ToVal(&dataSchema)
-		if raw.LastError() != nil {
-			return nil, raw.LastError()
+		err = sonic.Unmarshal(data, &dataSchema)
+		if err != nil {
+			return nil, err
 		}
 		return dataSchema, nil
 	case controls.TypeObject:
 		var dataSchema ObjectSchema
-		raw.ToVal(&dataSchema)
-		if raw.LastError() != nil {
-			return nil, raw.LastError()
+		err = sonic.Unmarshal(data, &dataSchema)
+		if err != nil {
+			return nil, err
 		}
 		return dataSchema, nil
 	case controls.TypeNull:
 		var dataSchema NullSchema
-		raw.ToVal(&dataSchema)
-		if raw.LastError() != nil {
-			return nil, raw.LastError()
+		err = sonic.Unmarshal(data, &dataSchema)
+		if err != nil {
+			return nil, err
 		}
 		return dataSchema, nil
 	case controls.TypeString:
 		var dataSchema StringSchema
-		raw.ToVal(&dataSchema)
-		if raw.LastError() != nil {
-			return nil, raw.LastError()
+		err = sonic.Unmarshal(data, &dataSchema)
+		if err != nil {
+			return nil, err
 		}
 		return dataSchema, nil
 	default:

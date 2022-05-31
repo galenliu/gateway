@@ -1,10 +1,10 @@
 package core
 
 import (
+	"github.com/bytedance/sonic"
 	ia "github.com/galenliu/gateway/pkg/wot/definitions/core/interaction_affordance"
 	"github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
-	json "github.com/json-iterator/go"
 )
 
 type ActionAffordance struct {
@@ -33,10 +33,37 @@ type ActionDescription struct {
 }
 
 func (a *ActionAffordance) UnmarshalJSON(data []byte) error {
-	json.Get(data).ToVal(a.InteractionAffordance)
-	a.Input, _ = data_schema.MarshalSchema(json.Get(data, "input"))
-	a.Output, _ = data_schema.MarshalSchema(json.Get(data, "input"))
-	a.Safe = json.Get(data, "safe").ToBool()
-	a.Idempotent = json.Get(data, "idempotent").ToBool()
+
+	err := sonic.Unmarshal(data, a.InteractionAffordance)
+	if err != nil {
+		return err
+	}
+	node, _ := sonic.Get(data, "input")
+	if node.Exists() {
+		d, err := node.MarshalJSON()
+		schema, err := data_schema.MarshalSchema(d)
+		if err == nil {
+			a.Input = schema
+		}
+	}
+
+	node, _ = sonic.Get(data, "output")
+	if node.Exists() {
+		d, err := node.MarshalJSON()
+		schema, err := data_schema.MarshalSchema(d)
+		if err == nil {
+			a.Input = schema
+		}
+	}
+	node, _ = sonic.Get(data, "safe")
+	if node.Exists() {
+		a.Safe, _ = node.Bool()
+	}
+
+	node, _ = sonic.Get(data, "idempotent")
+	if node.Exists() {
+		a.Idempotent, _ = node.Bool()
+	}
+
 	return nil
 }

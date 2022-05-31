@@ -76,7 +76,7 @@ func (d *DnssdServer) StartServer() error {
 func (d *DnssdServer) startServer(mode dnssd.CommissioningMode) error {
 
 	//使用UDPEndPointManager初始化一个Dnssd-Advertiser
-	err := dnssd.AdvertiserInstance().Init(inet.UDPEndpointManager{})
+	err := dnssd.AdvertiserInstance().Init(inet.UDPEndpoint{})
 	util.LogError(err, "Discover", "Failed initialize advertiser")
 
 	err = dnssd.AdvertiserInstance().RemoveServices()

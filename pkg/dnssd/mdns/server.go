@@ -2,6 +2,7 @@ package mdns
 
 import (
 	"github.com/galenliu/gateway/pkg/matter/inet"
+	"net"
 	"net/netip"
 	"sync"
 )
@@ -38,16 +39,16 @@ func (m MdnsServer) Shutdown() {
 
 }
 
-func (m *MdnsServer) StartServer(mgr inet.UDPEndpointManager, port int) error {
+func (m *MdnsServer) StartServer(mgr inet.UDPEndpoint, port int) error {
 	m.Shutdown()
 	return m.Listen(mgr, port)
 }
 
-func (m *MdnsServer) OnUdpPacketReceived(updEndPoint *inet.UDPEndpoint, data []byte) {}
+func (m *MdnsServer) OnUdpPacketReceived(updEndPoint inet.UDPEndpoint, data []byte) {}
 
-func (m *MdnsServer) Listen(udpEndPoint inet.UDPEndpointManager, port int) error {
+func (m *MdnsServer) Listen(udpEndPoint inet.UDPEndpoint, port int) error {
 	m.Shutdown()
-	udpEndPoint.Bind(netip.Addr{}, port)
+	udpEndPoint.Bind(netip.IPv6LinkLocalAllNodes(), port, net.Interface{})
 	//udpEndPoint.Listen(m.OnUdpPacketReceived, nil)
 	return nil
 }
