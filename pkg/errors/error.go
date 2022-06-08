@@ -1,4 +1,4 @@
-package util
+package errors
 
 import (
 	"fmt"
@@ -8,6 +8,14 @@ import (
 
 func NotFoundError(info string, args ...string) error {
 	return fiber.NewError(fiber.StatusNotFound, fmt.Sprintf(info, args))
+}
+
+func IncorrectState(info string) error {
+	return fmt.Errorf("incorrect State: %s", info)
+}
+
+func NotImplement(info string) error {
+	return fmt.Errorf("not implement: %s", info)
 }
 
 func BadRequestError(info string, args ...string) error {

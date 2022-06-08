@@ -2,8 +2,10 @@ package server
 
 import (
 	"github.com/galenliu/gateway/pkg/dnssd"
+	"github.com/galenliu/gateway/pkg/errors"
 	"github.com/galenliu/gateway/pkg/matter/config"
 	"github.com/galenliu/gateway/pkg/matter/inet"
+	"github.com/galenliu/gateway/pkg/matter/inet/udp_endpoint"
 	"github.com/galenliu/gateway/pkg/matter/messageing"
 	"github.com/galenliu/gateway/pkg/matter/platform"
 	"github.com/galenliu/gateway/pkg/util"
@@ -76,18 +78,18 @@ func (d *DnssdServer) StartServer() error {
 func (d *DnssdServer) startServer(mode dnssd.CommissioningMode) error {
 
 	//使用UDPEndPointManager初始化一个Dnssd-Advertiser
-	err := dnssd.AdvertiserInstance().Init(inet.UDPEndpoint{})
-	util.LogError(err, "Discover", "Failed initialize advertiser")
+	err := dnssd.AdvertiserInstance().Init(udp_endpoint.UDPEndpoint{})
+	errors.LogError(err, "Discover", "Failed initialize advertiser")
 
 	err = dnssd.AdvertiserInstance().RemoveServices()
-	util.LogError(err, "Discover", "Failed to remove advertised services")
+	errors.LogError(err, "Discover", "Failed to remove advertised services")
 
 	err = d.AdvertiseOperational()
-	util.LogError(err, "Discover", "Failed to advertise operational node")
+	errors.LogError(err, "Discover", "Failed to advertise operational node")
 
 	if mode != dnssd.KDisabled {
 		err = d.AdvertiseCommissionableNode(mode)
-		util.LogError(err, "Discover", "Failed to advertise commissionable node")
+		errors.LogError(err, "Discover", "Failed to advertise commissionable node")
 	}
 
 	// If any fabrics exist, the commissioning window must have been opened by the administrator
@@ -98,11 +100,11 @@ func (d *DnssdServer) startServer(mode dnssd.CommissioningMode) error {
 
 	if config.ChipDeviceConfigEnableCommissionerDiscovery {
 		err = d.AdvertiseCommissioner()
-		util.LogError(err, "Discover", "Failed to advertise commissioner")
+		errors.LogError(err, "Discover", "Failed to advertise commissioner")
 	}
 
 	err = dnssd.AdvertiserInstance().FinalizeServiceUpdate()
-	util.LogError(err, "Discover", "Failed to finalize service update")
+	errors.LogError(err, "Discover", "Failed to finalize service update")
 
 	return nil
 }
@@ -130,17 +132,17 @@ func (d DnssdServer) Advertise(commissionAbleNode bool, mode dnssd.Commissioning
 	advertiseParameters.SetCommissioningMode(mode)
 
 	mac, err := platform.ConfigurationMgr().GetPrimaryMACAddress()
-	util.LogError(err, "Discovery", "Failed to get primary mac address of device. Generating a random one.")
+	errors.LogError(err, "Discovery", "Failed to get primary mac address of device. Generating a random one.")
 	advertiseParameters.SetMaC(util.ConditionValue(err != nil, mac, util.GenerateMac()))
 
 	vid, err := platform.ConfigurationMgr().GetVendorId()
-	util.LogError(err, "Discovery", "Vendor ID not known")
+	errors.LogError(err, "Discovery", "Vendor ID not known")
 	if err != nil {
 		advertiseParameters.SetVendorId(vid)
 	}
 
 	pid, err := platform.ConfigurationMgr().GetProductId()
-	util.LogError(err, "Discovery", "Product ID not known")
+	errors.LogError(err, "Discovery", "Product ID not known")
 	if err != nil {
 		advertiseParameters.SetProductId(pid)
 	}

@@ -22,6 +22,10 @@ func (q *QueryResponderAllocator) AllocateQName(serviceType, kCommissionProtocol
 	}
 }
 
+func (q *QueryResponderAllocator) GetQueryResponder() *responders.QueryResponder {
+	return nil
+}
+
 func (q *QueryResponderAllocator) AllocateQNameSpace(size uint) {
 
 }

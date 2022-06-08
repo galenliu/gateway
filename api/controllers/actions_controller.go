@@ -6,8 +6,8 @@ import (
 	"github.com/galenliu/gateway/api/models"
 	"github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/bus"
+	"github.com/galenliu/gateway/pkg/errors"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/util"
 	"github.com/gofiber/fiber/v2"
 	"time"
 )
@@ -61,7 +61,7 @@ func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 	if thingId != "" {
 		thing = a.thingContainer.GetThing(thingId)
 		if thing == nil {
-			return util.NotFoundError("Thing: %s do not exist", thingId)
+			return errors.NotFoundError("Thing: %s do not exist", thingId)
 		}
 		actionModel = models.NewActionModel(actionName, actionParams.Input, a.logger, thing)
 		ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*3)

@@ -5,8 +5,8 @@ import (
 	"github.com/galenliu/gateway/pkg/addon/events"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
+	"github.com/galenliu/gateway/pkg/errors"
 	"github.com/galenliu/gateway/pkg/logging"
-	"github.com/galenliu/gateway/pkg/util"
 	"github.com/gofiber/fiber/v2"
 	"sync"
 	"time"
@@ -77,11 +77,11 @@ func (c *ThingsContainer) GetThing(id string) *Thing {
 func (c *ThingsContainer) SetThingPropertyValue(thingId, propName string, value any) (any, error) {
 	thing := c.GetThing(thingId)
 	if thing == nil {
-		return nil, util.NotFoundError("thing: %s not found", thing.GetId())
+		return nil, errors.NotFoundError("thing: %s not found", thing.GetId())
 	}
 	prop, ok := thing.Properties[propName]
 	if !ok {
-		return nil, util.NotFoundError("thing property:%s not found", propName)
+		return nil, errors.NotFoundError("thing property:%s not found", propName)
 	}
 	if prop.IsReadOnly() {
 		return nil, fiber.NewError(fiber.StatusBadRequest, "property read only")
@@ -155,7 +155,7 @@ func (c *ThingsContainer) RemoveThing(thingId string) error {
 		c.logger.Errorf(err.Error())
 	}
 	if t == nil {
-		return util.NotFoundError("Thing Not Found")
+		return errors.NotFoundError("Thing Not Found")
 	}
 	c.things.Delete(thingId)
 	c.Publish(topic.ThingRemoved, topic.ThingRemovedMessage{ThingId: thingId})

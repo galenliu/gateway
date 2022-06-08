@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/galenliu/gateway/pkg/dnssd"
+	"github.com/galenliu/gateway/pkg/errors"
 	"github.com/galenliu/gateway/pkg/matter/access"
 	"github.com/galenliu/gateway/pkg/matter/config"
 	"github.com/galenliu/gateway/pkg/matter/controller"
@@ -11,7 +12,6 @@ import (
 	"github.com/galenliu/gateway/pkg/matter/messageing"
 	"github.com/galenliu/gateway/pkg/matter/server/internal"
 	"github.com/galenliu/gateway/pkg/matter/transport"
-	"github.com/galenliu/gateway/pkg/util"
 	"log"
 	"net"
 	"sync"
@@ -68,18 +68,18 @@ func (s *Server) Init(initParams InitParams) {
 	// Set up attribute persistence before we try to bring up the data model
 	// handler.
 	err = s.mAttributePersister.Init(s.mDeviceStorage)
-	util.SuccessOrExit(err)
+	errors.SuccessOrExit(err)
 
 	err = s.mFabrics.Init(s.mDeviceStorage)
-	util.SuccessOrExit(err)
+	errors.SuccessOrExit(err)
 
 	//少sDeviceTypeResolver参数
 	err = s.mAccessControl.Init(initParams.AccessDelegate)
-	util.SuccessOrExit(err)
+	errors.SuccessOrExit(err)
 
 	s.mAclStorage = initParams.AclStorage
 	err = s.mAclStorage.Init(s.mDeviceStorage, s.mFabrics)
-	util.SuccessOrExit(err)
+	errors.SuccessOrExit(err)
 
 	DnssdInstance().SetFabricTable(s.mFabrics)
 	DnssdInstance().SetCommissioningModeProvider(s.mCommissioningWindowManager)
@@ -101,10 +101,10 @@ func (s *Server) Init(initParams InitParams) {
 	params.SetListenPort(s.mOperationalServicePort)
 	params.SetNativeParams(initParams.EndpointNativeParams)
 	s.mTransports, err = transport.NewUdpTransport(inet.UDPEndpointManager{}, params)
-	util.SuccessOrExit(err)
+	errors.SuccessOrExit(err)
 
 	s.mListener, err = server.IntGroupDataProviderListener(s.mTransports)
-	util.SuccessOrExit(err)
+	errors.SuccessOrExit(err)
 
 	dnssd.ResolverInstance().Init(inet.UDPEndpointManager{})
 
@@ -124,11 +124,11 @@ func (s *Server) Init(initParams InitParams) {
 	if config.ChipDeviceConfigEnablePairingAutostart {
 		s.GetFabricTable().DeleteAllFabrics()
 		err = s.mCommissioningWindowManager.OpenBasicCommissioningWindow()
-		util.SuccessOrExit(err)
+		errors.SuccessOrExit(err)
 	}
 
 	err = DnssdInstance().StartServer()
-	util.SuccessOrExit(err)
+	errors.SuccessOrExit(err)
 }
 
 var ins *Server

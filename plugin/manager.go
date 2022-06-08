@@ -10,6 +10,7 @@ import (
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
+	"github.com/galenliu/gateway/pkg/errors"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
@@ -87,7 +88,7 @@ func (m *Manager) SetThingsContainer(thingContainer ThingsContainer) {
 func (m *Manager) RequestAction(ctx context.Context, thingId, actionName string, input map[string]any) error {
 	device := m.getDevice(thingId)
 	if device == nil {
-		return util.NotFoundError("device %s not found", thingId)
+		return errors.NotFoundError("device %s not found", thingId)
 	}
 	return device.requestAction(ctx, thingId, actionName, input)
 }

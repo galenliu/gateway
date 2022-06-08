@@ -5,6 +5,7 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/addon/devices"
+	"github.com/galenliu/gateway/pkg/errors"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/galenliu/gateway/pkg/util"
@@ -53,7 +54,7 @@ func (tc *thingsController) handleCreateThing(c *fiber.Ctx) error {
 func (tc *thingsController) handleDeleteThing(c *fiber.Ctx) error {
 	thingId, err := url.QueryUnescape(c.Params("thingId"))
 	if err != nil {
-		return util.BadRequestError("Invalid thing id")
+		return errors.BadRequestError("Invalid thing id")
 	}
 	err = tc.model.RemoveThing(thingId)
 	if err != nil {
@@ -155,7 +156,7 @@ func (tc *thingsController) handleSetThing(c *fiber.Ctx) error {
 	thingId, _ := url.QueryUnescape(c.Params("thingId"))
 	thing := tc.model.GetThing(thingId)
 	if thing == nil {
-		return util.NotFoundError("thing %s not found", thingId)
+		return errors.NotFoundError("thing %s not found", thingId)
 	}
 
 	node, _ := sonic.Get(c.Body(), "title")
@@ -163,7 +164,7 @@ func (tc *thingsController) handleSetThing(c *fiber.Ctx) error {
 	title := strings.Trim(t, " ")
 
 	if len(title) == 0 || title == "" {
-		return util.BadRequestError("Invalid title")
+		return errors.BadRequestError("Invalid title")
 	}
 	selectedCapability := strings.Trim(json.Get(c.Body(), "selectedCapability").ToString(), " ")
 	if selectedCapability != "" {
@@ -184,15 +185,15 @@ func (tc *thingsController) handleUpdateThing(c *fiber.Ctx) error {
 	defer cancelFunc()
 	thingId, err := url.QueryUnescape(c.Params("thingId"))
 	if err != nil {
-		return util.BadRequestError("Invalid thing id")
+		return errors.BadRequestError("Invalid thing id")
 	}
 	username, err := url.QueryUnescape(json.Get(c.Body(), "username").ToString())
 	if err != nil {
-		return util.BadRequestError("Invalid username")
+		return errors.BadRequestError("Invalid username")
 	}
 	password, err := url.QueryUnescape(json.Get(c.Body(), "password").ToString())
 	if err != nil {
-		return util.BadRequestError("Invalid password")
+		return errors.BadRequestError("Invalid password")
 	}
 	pin := json.Get(c.Body(), "pin").ToString()
 	if thingId != "" && pin != "" {
