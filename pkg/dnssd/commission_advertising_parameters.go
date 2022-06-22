@@ -1,7 +1,7 @@
 package dnssd
 
 import (
-	"github.com/galenliu/gateway/pkg/matter/lib/dns"
+	"github.com/galenliu/gateway/pkg/matter/core"
 	"github.com/galenliu/gateway/pkg/matter/messageing"
 	"net"
 )
@@ -12,7 +12,7 @@ type Mac struct {
 
 type BaseAdvertisingParams struct {
 	mPort         int
-	mMac          net.HardwareAddr
+	mMac          string
 	mEnableIPv4   bool
 	mInterfaceId  net.Interface
 	mMRPConfig    *messageing.ReliableMessageProtocolConfig
@@ -21,30 +21,31 @@ type BaseAdvertisingParams struct {
 
 type CommissionAdvertisingParameters struct {
 	*BaseAdvertisingParams
-	mVendorId          int    //供应商口称
-	mProductId         int    //产品ID
-	mDeviceType        int    //设备类型
-	mPairingHint       int    //设备配提示
-	mPairingInstr      string //设备配对指南
-	mDeviceName        string //设备名称
+	mVendorId          *uint16 //供应商口称
+	mProductId         *uint16 //产品ID
+	mDeviceType        *int32  //设备类型
+	mPairingHint       int     //设备配提示
+	mPairingInstr      string  //设备配对指南
+	mDeviceName        string  //设备名称
 	mMode              CommssionAdvertiseMode
 	mCommissioningMode CommissioningMode
+	mPeerId            *core.PeerId
 }
 
 type OperationalAdvertisingParameters struct {
 	*BaseAdvertisingParams
-	mPeerId dns.PeerId
+	mPeerId core.PeerId
 }
 
-func (o *OperationalAdvertisingParameters) SetPeerId(peerId dns.PeerId) {
+func (o *OperationalAdvertisingParameters) SetPeerId(peerId core.PeerId) {
 	o.mPeerId = peerId
 }
 
-func (o *OperationalAdvertisingParameters) GetCompressedFabricId() dns.CompressedFabricId {
+func (o *OperationalAdvertisingParameters) GetCompressedFabricId() core.CompressedFabricId {
 	return o.mPeerId.GetCompressedFabricId()
 }
 
-func (o *OperationalAdvertisingParameters) GetPeerId() dns.PeerId {
+func (o *OperationalAdvertisingParameters) GetPeerId() core.PeerId {
 	return o.mPeerId
 }
 
@@ -64,16 +65,16 @@ func (c *CommissionAdvertisingParameters) GetCommissionAdvertiseMode() Commssion
 	return c.mMode
 }
 
-func (c *CommissionAdvertisingParameters) SetVendorId(id int) {
-	c.mVendorId = id
+func (c *CommissionAdvertisingParameters) SetVendorId(id uint16) {
+	c.mVendorId = &id
 }
 
-func (c *CommissionAdvertisingParameters) SetProductId(id int) {
-	c.mProductId = id
+func (c *CommissionAdvertisingParameters) SetProductId(id uint16) {
+	c.mProductId = &id
 }
 
-func (c *CommissionAdvertisingParameters) SetDeviceType(t int) {
-	c.mDeviceType = t
+func (c *CommissionAdvertisingParameters) SetDeviceType(t int32) {
+	c.mDeviceType = &t
 }
 
 func (c *CommissionAdvertisingParameters) SetDeviceName(name string) {
@@ -96,6 +97,26 @@ func (c *CommissionAdvertisingParameters) SetMRPConfig(config *messageing.Reliab
 	c.mMRPConfig = config
 }
 
+func (c *CommissionAdvertisingParameters) GetVendorId() *uint16 {
+	return c.mVendorId
+}
+
+func (c *CommissionAdvertisingParameters) GetDeviceType() *int32 {
+	return c.mDeviceType
+}
+
+func (c *CommissionAdvertisingParameters) GetProductId() *uint16 {
+	return c.mProductId
+}
+
+func (c *CommissionAdvertisingParameters) GetDeviceName() string {
+	return c.mDeviceName
+}
+
+func (b *BaseAdvertisingParams) IsIPv4Enabled() bool {
+	return b.mEnableIPv4
+}
+
 func (b *BaseAdvertisingParams) SetPort(port int) {
 	b.mPort = port
 }
@@ -104,11 +125,21 @@ func (b *BaseAdvertisingParams) GetPort() int {
 	return b.mPort
 }
 
-func (b *BaseAdvertisingParams) SetMaC(mac net.HardwareAddr) {
+func (b *BaseAdvertisingParams) SetMaC(mac string) {
 	b.mMac = mac
 }
 
-func (b *BaseAdvertisingParams) GetMac() net.HardwareAddr {
+func (b *BaseAdvertisingParams) GetMac() string {
+	if b.mMac == "" {
+		b.mMac = mac48Address(randHex())
+	}
+	return b.mMac
+}
+
+func (b *BaseAdvertisingParams) GetUUID() string {
+	if b.mMac == "" {
+		b.mMac = mac48Address(randHex())
+	}
 	return b.mMac
 }
 

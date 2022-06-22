@@ -7,21 +7,21 @@ import (
 	"errors"
 	"fmt"
 	"github.com/galenliu/gateway/api/models"
-	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
 	"strings"
 )
 
 type JWTMiddleware struct {
-	logger  logging.Logger
+	logger  log.Logger
 	storage models.JsonwebtokenStore
 }
 
-func NewJWTMiddleware(storage models.JsonwebtokenStore, logger logging.Logger) *JWTMiddleware {
+func NewJWTMiddleware(storage models.JsonwebtokenStore) *JWTMiddleware {
 	j := &JWTMiddleware{}
 	j.storage = storage
-	j.logger = logger
+
 	return j
 }
 

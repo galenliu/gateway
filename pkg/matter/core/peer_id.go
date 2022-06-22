@@ -1,10 +1,10 @@
-package dns
+package core
 
-type NodeId = uint64
-type CompressedFabricId = uint64
-type FabricId = uint64
+type CompressedFabricId uint64
+type FabricId uint64
 
 const kUndefinedCompressedFabricId CompressedFabricId = 0
+
 const kUndefinedFabricId FabricId = 0
 
 type PeerId struct {
@@ -20,7 +20,7 @@ func NewPeerId(compressedFabricId CompressedFabricId, nodeId NodeId) *PeerId {
 }
 
 func (p PeerId) SetNodeId(id uint64) {
-	p.mNodeId = id
+	p.mNodeId = NodeId(id)
 }
 
 func (p PeerId) GetNodeId() NodeId {

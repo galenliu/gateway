@@ -12,9 +12,10 @@ import (
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/errors"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
-	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/robfig/cron"
+
 	"io"
 	"os"
 	"strings"
@@ -57,19 +58,17 @@ type Manager struct {
 	running        bool
 	pairTask       chan bool
 	locker         *sync.Mutex
-	logger         logging.Logger
 	storage        managerStore
 	ctx            context.Context
 	thingContainer ThingsContainer
 	deferredRemove sync.Map
 }
 
-func NewAddonsManager(ctx context.Context, conf Config, s managerStore, log logging.Logger) *Manager {
+func NewAddonsManager(ctx context.Context, conf Config, s managerStore) *Manager {
 	am := &Manager{}
 	am.Manager = manager.NewManager()
 	am.config = conf
 	am.ctx = ctx
-	am.logger = log
 	am.addonsLoaded = false
 	am.isPairing = false
 	am.running = false
@@ -105,19 +104,19 @@ func (m *Manager) AddNewThings(timeout int) error {
 	timeoutChan := time.After(time.Duration(timeout) * time.Millisecond)
 	var handlePairingTimeout = func() {
 		for _, adapter := range m.getAdapters() {
-			m.logger.Infof("%s to call startPairing on", adapter.GetId)
+			log.Infof("%s to call startPairing on", adapter.GetId)
 			adapter.startPairing(timeout)
 		}
 		for {
 			select {
 			case <-timeoutChan:
 				m.pairTask = nil
-				m.logger.Info("pairing timeout")
+				log.Info("pairing timeout")
 				m.Publish(topic.PairingTimeout)
 				m.CancelAddNewThing()
 				return
 			case <-m.pairTask:
-				m.logger.Info("pairing cancel")
+				log.Info("pairing cancel")
 				m.pairTask = nil
 				return
 			}
@@ -147,7 +146,7 @@ func (m *Manager) RemoveThing(deviceId string) error {
 	}
 	device := m.getDevice(deviceId)
 	if device == nil {
-		m.logger.Infof("thing %s removed", deviceId)
+		log.Infof("thing %s removed", deviceId)
 		return nil
 	}
 	adapter := device.getAdapter()
@@ -163,7 +162,7 @@ func (m *Manager) RemoveThing(deviceId string) error {
 			m.CancelRemoveThing(deviceId)
 		case <-removeTask:
 			m.deferredRemove.Delete(deviceId)
-			m.logger.Infof("thing %s removed", deviceId)
+			log.Infof("thing %s removed", deviceId)
 			return
 		}
 	}()
@@ -201,7 +200,7 @@ func (m *Manager) handleAdapterUnload(adapterId string) {
 
 func (m *Manager) handleDeviceAdded(device *device) {
 	m.StoreDevice(device)
-	m.logger.Debugf("Thing added:\t\n %s ", util.JsonIndent(things.AsWebOfThing(*device.Device)))
+	log.Debugf("Thing added:\t\n %s ", util.JsonIndent(things.AsWebOfThing(*device.Device)))
 	m.Publish(topic.DeviceAdded, topic.DeviceAddedMessage{
 		DeviceId: device.GetId(),
 		Device:   *device.Device,
@@ -215,7 +214,7 @@ func (m *Manager) handleDeviceRemoved(device *device) {
 		taskChan := task.(chan struct{})
 		select {
 		case taskChan <- struct{}{}:
-			m.logger.Infof("handle device removed")
+			log.Infof("handle device removed")
 		}
 	}
 	m.Publish(topic.DeviceRemoved, device.GetId())
@@ -303,13 +302,13 @@ func (m *Manager) installAddon(packageId, packageDir string) error {
 	if !m.addonsLoaded {
 		return fmt.Errorf("cannot install add-on before other add-ons have been loaded")
 	}
-	m.logger.Infof("start install %s", packageId)
+	log.Infof("start install %s", packageId)
 
 	f, err := os.Open(packageDir)
 	defer func() {
 		e := f.Close()
 		if e != nil {
-			m.logger.Error(e.Error())
+			log.Error(e.Error())
 		}
 	}()
 	zp, _ := gzip.NewReader(f)
@@ -351,7 +350,7 @@ func (m *Manager) loadAddons() {
 	if m.addonsLoaded {
 		return
 	}
-	m.logger.Info("starting loading addons.")
+	log.Info("starting loading addons.")
 
 	if m.pluginServer == nil {
 		m.pluginServer = NewPluginServer(m)
@@ -359,14 +358,14 @@ func (m *Manager) loadAddons() {
 	load := func(dir string) {
 		fs, err := os.ReadDir(dir)
 		if err != nil {
-			m.logger.Warningf("load addon  %s ,err: %s", dir, err.Error())
+			log.Warningf("load addon  %s ,err: %s", dir, err.Error())
 			return
 		}
 		for _, fi := range fs {
 			if fi.IsDir() {
 				err := m.LoadAddon(fi.Name())
 				if err != nil {
-					m.logger.Errorf(err.Error())
+					log.Errorf(err.Error())
 					continue
 				}
 			}
@@ -376,7 +375,7 @@ func (m *Manager) loadAddons() {
 	m.addonsLoaded = true
 	//每天的23：00更新一次Add-on
 	c := cron.New()
-	m.logger.Infof("time task for update addons every day 23:00")
+	log.Infof("time task for update addons every day 23:00")
 	_ = c.AddFunc("\"0 0 23 * * ?\"", func() {
 		m.updateAddons()
 	})
@@ -402,7 +401,7 @@ func (m *Manager) removeApiHandler(id int) {
 
 // 定时任务，更新Add-on
 func (m *Manager) updateAddons() {
-	m.logger.Infof("time task: addons upgrade %s", time.Now().String())
+	log.Infof("time task: addons upgrade %s", time.Now().String())
 }
 
 func (m *Manager) GetPreferences() *messages.PluginRegisterResponseJsonDataPreferences {

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/galenliu/gateway/api/models/container"
+	log "github.com/sirupsen/logrus"
 )
 
 const ThingTable = "things"
@@ -22,7 +23,7 @@ func (s *Storage) CreateThing(id string, thing *container.Thing) error {
 	defer func(stmt *sql.Stmt) {
 		err := stmt.Close()
 		if err != nil {
-			s.logger.Error(err.Error())
+			log.Error(err.Error())
 		}
 	}(stmt)
 	res, ee := stmt.Exec(id, bytes)
@@ -68,7 +69,7 @@ func (s *Storage) DeleteThing(id string) error {
 	defer func(stmt *sql.Stmt) {
 		err := stmt.Close()
 		if err != nil {
-			s.logger.Error("stmt close err: %s", err.Error())
+			log.Error("stmt close err: %s", err.Error())
 		}
 	}(stmt)
 	_, err = stmt.Exec(id)

@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"fmt"
-	"github.com/galenliu/gateway/pkg/logging"
 	json "github.com/json-iterator/go"
+	log "github.com/sirupsen/logrus"
 	"io"
 	"io/ioutil"
 	"math/rand"
@@ -16,7 +16,7 @@ import (
 	"strings"
 )
 
-func EnsureDir(log logging.Logger, baseDir string, dirs ...string) {
+func EnsureDir(baseDir string, dirs ...string) {
 	_, err := ioutil.ReadDir(baseDir)
 	if os.IsNotExist(err) {
 		e := os.MkdirAll(baseDir, os.ModePerm)

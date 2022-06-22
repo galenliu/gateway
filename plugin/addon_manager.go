@@ -3,6 +3,7 @@ package plugin
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/constant"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/melbahja/got"
 	"os"
@@ -59,7 +60,7 @@ func (m *Manager) InstallAddonFromUrl(id, url, checksum string) error {
 	fileName := list[len(list)-1]
 
 	file := path.Join(os.TempDir(), fileName)
-	m.logger.Infof("fetching add-on %s as %s", url, file)
+	log.Infof("fetching add-on %s as %s", url, file)
 	g := got.New()
 	err := g.Download(url, file)
 	if err != nil {
@@ -68,23 +69,23 @@ func (m *Manager) InstallAddonFromUrl(id, url, checksum string) error {
 	defer func() {
 		err := os.Remove(file)
 		if err != nil {
-			m.logger.Infof("remove temp file failed ,err:%s", err.Error())
+			log.Infof("remove temp file failed ,err:%s", err.Error())
 		}
 	}()
 
 	err = os.Chmod(file, 777)
 	if err != nil {
-		m.logger.Infof("chmod err,package id:%s,err:%v", id, err.Error())
+		log.Infof("chmod err,package id:%s,err:%v", id, err.Error())
 		return err
 	}
 	if !util.CheckSum(file, checksum) {
-		m.logger.Infof("checksum err,package id:%s", id)
+		log.Infof("checksum err,package id:%s", id)
 		return fmt.Errorf("checksum err,package id:%s", id)
 	}
-	m.logger.Infof("download %s successful", id)
+	log.Infof("download %s successful", id)
 	err = m.installAddon(id, file)
 	if err != nil {
-		m.logger.Infof("install %s failed error: %s", id, err.Error())
+		log.Infof("install %s failed error: %s", id, err.Error())
 		return err
 	}
 	return nil
@@ -98,7 +99,7 @@ func (m *Manager) UninstallAddon(packetId string, disable bool) error {
 			if addon != nil {
 				err := addon.DeleteSettingAndConfig()
 				if err != nil {
-					m.logger.Infof(err.Error())
+					log.Infof(err.Error())
 				}
 			}
 		}
@@ -111,17 +112,17 @@ func (m *Manager) UninstallAddon(packetId string, disable bool) error {
 	}
 	err = util.RemoveDir(path.Join(m.config.AddonsDir, packetId))
 	if err != nil {
-		m.logger.Errorf("delete plugin addon dir failed err: %s", err.Error())
+		log.Errorf("delete plugin addon dir failed err: %s", err.Error())
 	}
 	err = util.RemoveDir(path.Join(m.config.UserProfile.DataDir, packetId))
 	if err != nil {
-		m.logger.Errorf("delete plugin data dir failed err:%s", err.Error())
+		log.Errorf("delete plugin data dir failed err:%s", err.Error())
 	}
 	return nil
 }
 
 func (m *Manager) LoadAddon(packageId string) error {
-	m.logger.Infof("starting loading addon %s.", packageId)
+	log.Infof("starting loading addon %s.", packageId)
 	var addonInfo *Addon
 	var obj any
 	var err error
@@ -136,7 +137,7 @@ func (m *Manager) LoadAddon(packageId string) error {
 	} else {
 		err = addonInfo.save()
 		if err != nil {
-			m.logger.Errorf("addon save err: %s", err.Error())
+			log.Errorf("addon save err: %s", err.Error())
 		}
 	}
 	addonConf, err := m.storage.LoadAddonConfig(packageId)
@@ -144,7 +145,7 @@ func (m *Manager) LoadAddon(packageId string) error {
 		if obj != nil {
 			err := m.storage.StoreAddonsConfig(packageId, obj)
 			if err != nil {
-				m.logger.Errorf("store addon config err: %s", err.Error())
+				log.Errorf("store addon config err: %s", err.Error())
 			}
 		}
 	}
@@ -157,7 +158,7 @@ func (m *Manager) LoadAddon(packageId string) error {
 		}
 		m.extensions.Store(addonInfo.ID, ext)
 	}
-	util.EnsureDir(m.logger, path.Join(m.config.UserProfile.DataDir, packageId))
+	util.EnsureDir(path.Join(m.config.UserProfile.DataDir, packageId))
 	if addonInfo.Exec == "" {
 		return fmt.Errorf("addon %s has not exec", addonInfo.ID)
 

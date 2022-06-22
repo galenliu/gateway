@@ -4,7 +4,7 @@ package plugin
 import (
 	"context"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
-	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/gofiber/websocket/v2"
 	json "github.com/json-iterator/go"
 	"sync"
@@ -13,13 +13,11 @@ import (
 type PluginsServer struct {
 	Plugins sync.Map
 	manager *Manager
-	logger  logging.Logger
 }
 
 func NewPluginServer(manager *Manager) *PluginsServer {
 	ctx := context.TODO()
 	s := &PluginsServer{}
-	s.logger = manager.logger
 	s.manager = manager
 	//s.ipc = ipc.NewIPCServer(s, manager.config.IPCPort, manager.config.UserProfile, s.logger)
 	wsChan := NewIpcServer(manager.config.IPCPort)
@@ -30,7 +28,7 @@ func NewPluginServer(manager *Manager) *PluginsServer {
 			select {
 			case ws, ok := <-wsChan:
 				if !ok {
-					s.logger.Infof("ip server closed channel")
+					log.Infof("ip server closed channel")
 					return
 				}
 				go s.handleRegister(ctx, ws)
@@ -45,13 +43,13 @@ func (s *PluginsServer) handleRegister(ctx context.Context, client *wsConnection
 	defer cancel()
 	m, err := client.wsRead()
 	if err != nil {
-		s.logger.Errorf("plugin register err:%s", err.Error())
+		log.Errorf("plugin register err:%s", err.Error())
 		return
 	}
 	var message messages.PluginRegisterRequestJson
 	err = json.Unmarshal(m.data, &message)
 	if err != nil {
-		s.logger.Errorf("plugin register:bad message err:%s", err.Error)
+		log.Errorf("plugin register:bad message err:%s", err.Error)
 		return
 	}
 	plugin := s.registerPlugin(message.Data.PluginId)
@@ -70,16 +68,16 @@ func (s *PluginsServer) handleRegister(ctx context.Context, client *wsConnection
 	}
 	data, err := json.Marshal(msg)
 	if err != nil {
-		s.logger.Errorf(err.Error())
+		log.Errorf(err.Error())
 		return
 	}
 	err = client.wsWrite(websocket.TextMessage, data)
 	if err != nil {
-		s.logger.Errorf("plugin register:bad message err:%s", err.Error)
+		log.Errorf("plugin register:bad message err:%s", err.Error)
 		return
 	}
 
-	s.logger.Infof("plugin: %s register success", message.Data.PluginId)
+	log.Infof("plugin: %s register success", message.Data.PluginId)
 	client.registered = true
 	plugin.handleWs(ctx, client)
 }
@@ -129,7 +127,7 @@ func (s *PluginsServer) registerPlugin(pluginId string) *Plugin {
 	if plugin != nil {
 		return plugin
 	}
-	plugin = NewPlugin(pluginId, s.manager, s.logger)
+	plugin = NewPlugin(pluginId, s.manager)
 	s.Plugins.Store(pluginId, plugin)
 	return plugin
 }

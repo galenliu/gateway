@@ -7,7 +7,7 @@ import (
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
-	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/gofiber/fiber/v2"
 	"sync"
 )
@@ -16,7 +16,7 @@ type Adapter struct {
 	*adapter.Adapter
 	isPairing          bool
 	packageName        string
-	logger             logging.Logger
+	logger             log.Logger
 	plugin             *Plugin
 	setCredentialsTask sync.Map
 	setPinTask         sync.Map
@@ -31,7 +31,6 @@ func NewAdapter(adapterId string, name string, packageName string, plugin *Plugi
 	a.name = name
 	a.packageName = packageName
 	a.plugin = plugin
-	a.logger = plugin.logger
 	a.eventHandler = make(map[string]func(), 0)
 	a.packageName = plugin.pluginId
 	a.nextId = 0

@@ -5,7 +5,7 @@ import (
 	"github.com/galenliu/gateway/api"
 	"github.com/galenliu/gateway/pkg/db"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
-	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/galenliu/gateway/plugin"
 	"path"
@@ -30,13 +30,13 @@ type Gateway struct {
 	config       Config
 	addonManager *plugin.Manager
 	sever        *api.WebServe
-	logger       logging.Logger
+	logger       log.Logger
 }
 
-func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gateway, error) {
+func NewGateway(ctx context.Context, config Config) (*Gateway, error) {
 
 	g := &Gateway{}
-	g.logger = logger
+
 	g.config = config
 	u := &messages.PluginRegisterResponseJsonDataUserProfile{
 		BaseDir:    g.config.BaseDir,
@@ -47,20 +47,21 @@ func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gat
 		LogDir:     path.Join(g.config.BaseDir, "log"),
 		GatewayDir: g.config.BaseDir,
 	}
-	logger.Infof("userprofile: %v ", util.JsonIndent(u))
+	log.Infof("userprofile: %v ", util.JsonIndent(u))
 
 	//检查Gateway运行需要的文件目录
-	util.EnsureDir(logger, u.BaseDir, u.DataDir, u.ConfigDir, u.AddonsDir, u.ConfigDir, u.MediaDir, u.LogDir)
+	util.EnsureDir(u.BaseDir, u.DataDir, u.ConfigDir, u.AddonsDir, u.ConfigDir, u.MediaDir, u.LogDir)
 
 	// 数据初始化
-	storage, err := db.NewStorage(u.ConfigDir, logger, db.Config{
+	storage, err := db.NewStorage(u.ConfigDir, db.Config{
 		Reset: config.RemoveBeforeOpen,
 	})
 	if err != nil {
-		logger.Error(err.Error())
+		log.Error(err.Error())
 		return nil, err
 	}
-	logger.Infof("database init.")
+
+	log.Info("database init.")
 
 	//Addon manager init
 	g.addonManager = plugin.NewAddonsManager(ctx, plugin.Config{
@@ -68,8 +69,8 @@ func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gat
 		AddonsDir:   u.AddonsDir,
 		IPCPort:     config.IPCPort,
 		RPCPort:     config.RPCPort,
-	}, storage, logger)
-	logger.Infof("addon manager init.")
+	}, storage)
+	log.Infof("addon manager init.")
 
 	// Web service init
 	g.sever = api.NewServe(ctx, api.Config{
@@ -80,13 +81,13 @@ func NewGateway(ctx context.Context, config Config, logger logging.Logger) (*Gat
 		TemplateDir: path.Join(g.config.BaseDir, "template"),
 		UploadDir:   path.Join(g.config.BaseDir, "upload"),
 		LogDir:      path.Join(g.config.BaseDir, "log"),
-	}, g.addonManager, storage, logger)
+	}, g.addonManager, storage)
 	return g, nil
 }
 
 func (g *Gateway) Stop() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	g.logger.Info("shutting down, wait 5 second ...")
+	log.Info("shutting down, wait 5 second ...")
 	defer cancel()
 	err := g.Shutdown(ctx)
 	if err != nil {

@@ -20,9 +20,6 @@ func AppMainLoop() {
 	initParams := server.InitializeStaticResourcesBeforeServerInit()
 	initParams.OperationalServicePort = config.ChipPort
 	initParams.UserDirectedCommissioningPort = config.ChipUdcPort
-
 	server.GetInstance().Init(initParams)
-
 	server.GetInstance().Shutdown()
-
 }

@@ -5,7 +5,7 @@ import (
 	"github.com/galenliu/gateway/api/models"
 	things "github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/constant"
-	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/rules_engine"
 	"github.com/galenliu/gateway/plugin"
 	"github.com/gofiber/fiber/v2"
@@ -38,31 +38,30 @@ type Models struct {
 type Router struct {
 	*fiber.App
 	addonUrls []string
-	logger    logging.Logger
+	logger    log.Logger
 }
 
-func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log logging.Logger) *Router {
+func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage) *Router {
 
 	//router init
 	app := Router{}
 	app.addonUrls = addonUrls
-	app.logger = log
 	app.App = fiber.New()
 	app.Use(recover.New())
 	app.Use(cors.New(cors.ConfigDefault))
 	app.Use(compress.New())
 
 	//models init
-	settingModel := models.NewSettingsModel(app.addonUrls, store, log)
-	containerModel := things.NewThingsContainerModel(manager, store, log)
+	settingModel := models.NewSettingsModel(app.addonUrls, store)
+	containerModel := things.NewThingsContainerModel(manager, store)
 	manager.SetThingsContainer(containerModel)
-	jwtMiddleware := middleware.NewJWTMiddleware(store, log)
+	jwtMiddleware := middleware.NewJWTMiddleware(store)
 	auth := jwtMiddleware.Auth
-	usersModel := models.NewUsersModel(store, log)
-	addonModel := models.NewAddonsModel(store, log)
-	jsonwebtokenModel := models.NewJsonwebtokenModel(settingModel, store, log)
+	usersModel := models.NewUsersModel(store)
+	addonModel := models.NewAddonsModel(store)
+	jsonwebtokenModel := models.NewJsonwebtokenModel(settingModel, store)
 
-	actionsModel := models.NewActionsModel(manager, containerModel, log)
+	actionsModel := models.NewActionsModel(manager, containerModel)
 
 	// recover middleware
 	app.Use(recover.New(recover.Config{
@@ -82,20 +81,20 @@ func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log l
 
 	// login
 	{
-		loginController := NewLoginController(usersModel, jsonwebtokenModel, log)
+		loginController := NewLoginController(usersModel, jsonwebtokenModel)
 		app.Post(constant.LoginPath, loginController.handleLogin)
 	}
 
 	// Users
 	{
-		usersController := NewUsersController(usersModel, jsonwebtokenModel, log)
+		usersController := NewUsersController(usersModel, jsonwebtokenModel)
 		usersGroup := app.Group(constant.UsersPath)
 		usersGroup.Get("/count", usersController.getCount)
 		usersGroup.Post("/", usersController.createUser)
 	}
 
 	//actions EventBus
-	actionsController := NewActionsController(actionsModel, containerModel, manager, log)
+	actionsController := NewActionsController(actionsModel, containerModel, manager)
 	{
 		actionsGroup := app.Group(constant.ActionsPath)
 		actionsGroup.Post("/", actionsController.handleCreateAction)
@@ -106,7 +105,7 @@ func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log l
 
 	//Things
 	{
-		thingsController := NewThingsControllerFunc(manager, containerModel, log)
+		thingsController := NewThingsControllerFunc(manager, containerModel)
 		thingsGroup := app.Group(constant.ThingsPath)
 
 		thingsGroup.Put("/:thingId/properties/*", thingsController.handleSetProperty)
@@ -120,7 +119,7 @@ func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log l
 		thingsGroup.Get("/", thingsController.handleGetThings)
 
 		//thingsGroup.Get("/:thingId", websocket.New(handleWebsocket(containerModel, log)))
-		thingsGroup.Get("/", websocket.New(handleWebsocket(containerModel, log)))
+		thingsGroup.Get("/", websocket.New(handleWebsocket(containerModel)))
 
 		//Get the properties of a thing
 		thingsGroup.Get("/:thingId"+constant.PropertiesPath, thingsController.handleGetProperties)
@@ -137,7 +136,7 @@ func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log l
 
 	//New Things
 	{
-		newThingsController := NewNewThingsController(manager, containerModel, log)
+		newThingsController := NewNewThingsController(manager, containerModel)
 		newThingsGroup := app.Group(constant.NewThingsPath)
 		newThingsGroup.Use("/", func(c *fiber.Ctx) error {
 			if websocket.IsWebSocketUpgrade(c) {
@@ -150,7 +149,7 @@ func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log l
 
 	//Addons
 	{
-		addonController := NewAddonController(manager, addonModel, log)
+		addonController := NewAddonController(manager, addonModel)
 		addonGroup := app.Group(constant.AddonsPath)
 		addonGroup.Get("/", addonController.handlerGetInstalledAddons)
 		addonGroup.Delete("/:addonId", addonController.handlerDeleteAddon)
@@ -172,7 +171,7 @@ func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage, log l
 	//Settings
 	{
 		settingsGroup := app.Group(constant.SettingsPath)
-		settingsController := NewSettingController(settingModel, log)
+		settingsController := NewSettingController(settingModel)
 		settingsGroup.Get("/addonsInfo", settingsController.handleGetAddonsInfo)
 		settingsGroup.Get("/localization/units", settingsController.handleGetUnits)
 	}

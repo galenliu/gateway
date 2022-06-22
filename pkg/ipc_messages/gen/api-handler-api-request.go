@@ -64,7 +64,7 @@ type ApiHandlerApiRequestJsonData struct {
 	// Unique ID of this message
 	MessageId int `json:"messageId" yaml:"messageId"`
 
-	// Name of the add-on package
+	// Instance of the add-on package
 	PackageName string `json:"packageName" yaml:"packageName"`
 
 	// ID of the plugin

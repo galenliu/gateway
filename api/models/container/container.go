@@ -6,7 +6,7 @@ import (
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/errors"
-	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/gofiber/fiber/v2"
 	"sync"
 	"time"
@@ -44,17 +44,17 @@ type ThingsContainer struct {
 	things  sync.Map
 	manager Manager
 	store   ThingsStorage
-	logger  logging.Logger
+
 	bus.ThingsBus
 }
 
 // NewThingsContainerModel 管理所有Thing Models
-func NewThingsContainerModel(manager Manager, store ThingsStorage, log logging.Logger) *ThingsContainer {
+func NewThingsContainerModel(manager Manager, store ThingsStorage) *ThingsContainer {
 	t := &ThingsContainer{}
 	t.store = store
 	t.manager = manager
 	t.ThingsBus = bus.NewBus()
-	t.logger = log
+
 	t.updateThings()
 	_ = manager.Subscribe(topic.DeviceAdded, t.handleDeviceAdded)
 	_ = manager.Subscribe(topic.DeviceRemoved, t.handleDeviceRemoved)
@@ -126,7 +126,7 @@ func (c *ThingsContainer) GetMapOfThings() map[string]*Thing {
 }
 
 // CreateThing container和store中创建Thing
-//ThingAdded事件
+// ThingAdded事件
 func (c *ThingsContainer) CreateThing(data []byte) (*Thing, error) {
 
 	thing, err := NewThing(data, c)
@@ -147,12 +147,12 @@ func (c *ThingsContainer) CreateThing(data []byte) (*Thing, error) {
 }
 
 // RemoveThing 从container和store中删除Thing
-//向定阅发送ThingRemoved事件
+// 向定阅发送ThingRemoved事件
 func (c *ThingsContainer) RemoveThing(thingId string) error {
 	t := c.GetThing(thingId)
 	err := c.store.DeleteThing(thingId)
 	if err != nil {
-		c.logger.Errorf(err.Error())
+		log.Errorf(err.Error())
 	}
 	if t == nil {
 		return errors.NotFoundError("Thing Not Found")
@@ -173,14 +173,14 @@ func (c *ThingsContainer) UpdateThing(thing *Thing) error {
 	return nil
 }
 
-//如果container为空，则从Store里加载所有的Things
+// 如果container为空，则从Store里加载所有的Things
 func (c *ThingsContainer) updateThings() {
 	things := c.GetThings()
 	if len(things) == 0 {
 		for id, data := range c.store.GetThings() {
 			thing, err := NewThing(data, c)
 			if err != nil {
-				c.logger.Errorf(err.Error())
+				log.Errorf(err.Error())
 				continue
 			}
 			c.things.Store(id, thing)
@@ -188,8 +188,8 @@ func (c *ThingsContainer) updateThings() {
 	}
 }
 
-//当Manager中有设备移除，则更新Container中Thing中Connected为false
-//并且向定阅发达ThingConnected通知
+// 当Manager中有设备移除，则更新Container中Thing中Connected为false
+// 并且向定阅发达ThingConnected通知
 func (c *ThingsContainer) handleDeviceRemoved(thingId string) {
 	t := c.GetThing(thingId)
 	if t != nil {
@@ -201,8 +201,8 @@ func (c *ThingsContainer) handleDeviceRemoved(thingId string) {
 	})
 }
 
-//当Manager中有新设备，则更新Container中Thing状态
-//并且向定阅发达ThingConnected通知
+// 当Manager中有新设备，则更新Container中Thing状态
+// 并且向定阅发达ThingConnected通知
 func (c *ThingsContainer) handleDeviceAdded(msg topic.DeviceAddedMessage) {
 	t := c.GetThing(msg.DeviceId)
 	if t != nil {
@@ -214,8 +214,8 @@ func (c *ThingsContainer) handleDeviceAdded(msg topic.DeviceAddedMessage) {
 	})
 }
 
-//当Manager中有设备离线消息时，同步Thing的状态
-//并向Container中的定阅发送ThingConnected消息
+// 当Manager中有设备离线消息时，同步Thing的状态
+// 并向Container中的定阅发送ThingConnected消息
 func (c *ThingsContainer) handleDeviceConnected(msg topic.DeviceConnectedMessage) {
 	t := c.GetThing(msg.DeviceId)
 	if t != nil {

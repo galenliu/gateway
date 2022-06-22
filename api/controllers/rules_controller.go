@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	things "github.com/galenliu/gateway/api/models/container"
-	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/rules_engine"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/gofiber/fiber/v2"
@@ -13,7 +13,7 @@ import (
 
 type RulesController struct {
 	engine *rules_engine.Engine
-	logger logging.Logger
+	logger log.Logger
 }
 
 func NewRulesController(db rules_engine.RuleDB, container things.Container) *RulesController {

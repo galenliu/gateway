@@ -2,16 +2,16 @@ package controllers
 
 import (
 	"context"
-	"github.com/bytedance/sonic"
+	"encoding/json"
 	"github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/errors"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
-	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
-	json "github.com/json-iterator/go"
+	"github.com/tidwall/gjson"
 	"net/http"
 	"net/url"
 	"strings"
@@ -28,16 +28,16 @@ type ThingsManager interface {
 }
 
 type thingsController struct {
-	model   *container.ThingsContainer
-	logger  logging.Logger
+	model *container.ThingsContainer
+
 	manager ThingsManager
 }
 
-func NewThingsControllerFunc(manager ThingsManager, model *container.ThingsContainer, log logging.Logger) *thingsController {
+func NewThingsControllerFunc(manager ThingsManager, model *container.ThingsContainer) *thingsController {
 	tc := &thingsController{}
 	tc.manager = manager
 	tc.model = model
-	tc.logger = log
+
 	return tc
 }
 
@@ -94,13 +94,13 @@ func (tc *thingsController) handleGetThings(c *fiber.Ctx) error {
 
 //patch things
 func (tc *thingsController) handlePatchThings(c *fiber.Ctx) error {
-	tc.logger.Info("container controller handle patch container")
+	log.Info("container controller handle patch container")
 	return nil
 }
 
 //PATCH /things/:thingId
 func (tc *thingsController) handlePatchThing(c *fiber.Ctx) error {
-	tc.logger.Info("container controller handle patch thing")
+	log.Info("container controller handle patch thing")
 	return nil
 }
 
@@ -115,7 +115,7 @@ func (tc *thingsController) handleSetProperty(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid params")
 	}
 	var value any
-	err = sonic.Unmarshal(c.Body(), &value)
+	err = json.Unmarshal(c.Body(), &value)
 	if err != nil {
 		return err
 	}
@@ -159,16 +159,15 @@ func (tc *thingsController) handleSetThing(c *fiber.Ctx) error {
 		return errors.NotFoundError("thing %s not found", thingId)
 	}
 
-	node, _ := sonic.Get(c.Body(), "title")
-	t, _ := node.String()
+	t := gjson.GetBytes(c.Body(), "title").String()
 	title := strings.Trim(t, " ")
 
 	if len(title) == 0 || title == "" {
 		return errors.BadRequestError("Invalid title")
 	}
-	selectedCapability := strings.Trim(json.Get(c.Body(), "selectedCapability").ToString(), " ")
-	if selectedCapability != "" {
-		thing.SetSelectedCapability(selectedCapability)
+	selectedCapability := gjson.GetBytes(c.Body(), "selectedCapability")
+	if selectedCapability.Exists() {
+		thing.SetSelectedCapability(strings.Trim(selectedCapability.String(), " "))
 	}
 	thing.SetTitle(title)
 	err := tc.model.UpdateThing(thing)
@@ -187,15 +186,15 @@ func (tc *thingsController) handleUpdateThing(c *fiber.Ctx) error {
 	if err != nil {
 		return errors.BadRequestError("Invalid thing id")
 	}
-	username, err := url.QueryUnescape(json.Get(c.Body(), "username").ToString())
+	username, err := url.QueryUnescape(gjson.GetBytes(c.Body(), "username").String())
 	if err != nil {
 		return errors.BadRequestError("Invalid username")
 	}
-	password, err := url.QueryUnescape(json.Get(c.Body(), "password").ToString())
+	password, err := url.QueryUnescape(gjson.GetBytes(c.Body(), "password").String())
 	if err != nil {
 		return errors.BadRequestError("Invalid password")
 	}
-	pin := json.Get(c.Body(), "pin").ToString()
+	pin := gjson.GetBytes(c.Body(), "pin").String()
 	if thingId != "" && pin != "" {
 		device, err := tc.manager.SetPIN(ctx, thingId, pin)
 		if err != nil {

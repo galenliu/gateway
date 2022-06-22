@@ -3,8 +3,8 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"github.com/galenliu/gateway/pkg/logging"
 	_ "github.com/mattn/go-sqlite3"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"path"
 )
@@ -17,14 +17,13 @@ type Config struct {
 }
 
 type Storage struct {
-	file   string
-	db     *sql.DB
-	logger logging.Logger
+	file string
+	db   *sql.DB
 }
 
-func NewStorage(filePath string, log logging.Logger, conf ...Config) (*Storage, error) {
+func NewStorage(filePath string, conf ...Config) (*Storage, error) {
 	s := &Storage{}
-	s.logger = log
+
 	var config = Config{
 		Reset: false,
 	}
@@ -160,19 +159,19 @@ func (s *Storage) setValue(key string, value, table string) error {
 	defer func(stmt *sql.Stmt) {
 		err := stmt.Close()
 		if err != nil {
-			s.logger.Error(err.Error())
+			log.Error(err.Error())
 		}
 	}(stmt)
 	res, ee := stmt.Exec(key, value)
 	if ee != nil {
-		s.logger.Errorf("insert %s: key:%s err:", table, key, err.Error())
+		log.Errorf("insert %s: key:%s err:", table, key, err.Error())
 		return ee
 	}
 	_, eee := res.LastInsertId()
 	if eee != nil {
-		s.logger.Errorf("insert %s: key:%s err:", table, key, err.Error())
+		log.Errorf("insert %s: key:%s err:", table, key, err.Error())
 		return eee
 	}
-	s.logger.Debugf("insert %s,id: %s \t\n", table)
+	log.Debugf("insert %s,id: %s \t\n", table)
 	return nil
 }

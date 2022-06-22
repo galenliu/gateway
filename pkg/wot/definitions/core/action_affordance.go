@@ -1,10 +1,11 @@
 package core
 
 import (
-	"github.com/bytedance/sonic"
+	"encoding/json"
 	ia "github.com/galenliu/gateway/pkg/wot/definitions/core/interaction_affordance"
 	"github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
+	"github.com/tidwall/gjson"
 )
 
 type ActionAffordance struct {
@@ -34,36 +35,36 @@ type ActionDescription struct {
 
 func (a *ActionAffordance) UnmarshalJSON(data []byte) error {
 
-	err := sonic.Unmarshal(data, a.InteractionAffordance)
+	err := json.Unmarshal(data, a.InteractionAffordance)
 	if err != nil {
 		return err
 	}
-	node, _ := sonic.Get(data, "input")
+	node := gjson.GetBytes(data, "input")
 	if node.Exists() {
-		d, err := node.MarshalJSON()
-		schema, err := data_schema.MarshalSchema(d)
+		inputData := data[node.Index : node.Index+len(node.Raw)]
+		schema, err := data_schema.UnmarshalSchema(inputData)
 		if err == nil {
 			a.Input = schema
 		}
 	}
 
-	node, _ = sonic.Get(data, "output")
+	node = gjson.GetBytes(data, "output")
 	if node.Exists() {
-		d, err := node.MarshalJSON()
-		schema, err := data_schema.MarshalSchema(d)
+		outputData := data[node.Index : node.Index+len(node.Raw)]
+		schema, err := data_schema.UnmarshalSchema(outputData)
 		if err == nil {
 			a.Input = schema
 		}
 	}
-	node, _ = sonic.Get(data, "safe")
+
+	node = gjson.GetBytes(data, "safe")
 	if node.Exists() {
-		a.Safe, _ = node.Bool()
+		a.Safe = node.Bool()
 	}
 
-	node, _ = sonic.Get(data, "idempotent")
+	node = gjson.GetBytes(data, "idempotent")
 	if node.Exists() {
-		a.Idempotent, _ = node.Bool()
+		a.Idempotent = node.Bool()
 	}
-
 	return nil
 }

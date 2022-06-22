@@ -5,7 +5,7 @@ import (
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/bus/topic"
-	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/gofiber/websocket/v2"
 	"sync"
@@ -22,18 +22,18 @@ type thingContainer interface {
 }
 
 type NewThingsController struct {
-	locker         sync.Mutex
-	ws             *websocket.Conn
-	foundThing     chan string
-	closeChan      chan struct{}
-	logger         logging.Logger
+	locker     sync.Mutex
+	ws         *websocket.Conn
+	foundThing chan string
+	closeChan  chan struct{}
+
 	manager        manager
 	thingContainer thingContainer
 }
 
-func NewNewThingsController(manager manager, thingContainer thingContainer, log logging.Logger) *NewThingsController {
+func NewNewThingsController(manager manager, thingContainer thingContainer) *NewThingsController {
 	c := &NewThingsController{}
-	c.logger = log
+
 	c.manager = manager
 	c.thingContainer = thingContainer
 	c.locker = sync.Mutex{}
@@ -54,10 +54,10 @@ func (c *NewThingsController) handleNewThingsWebsocket() func(conn *websocket.Co
 				c.locker.Lock()
 				defer c.locker.Unlock()
 				data := util.JsonIndent(things.AsWebOfThing(msg.Device))
-				c.logger.Infof("New thing: %s \t\n", data)
+				log.Infof("New thing: %s \t\n", data)
 				err := conn.WriteMessage(websocket.TextMessage, []byte(data))
 				if err != nil {
-					c.logger.Infof("new thing websocket err:%s\t\n", err.Error())
+					log.Infof("new thing websocket err:%s\t\n", err.Error())
 					return
 				}
 			}

@@ -62,7 +62,7 @@ func (c *command) initStartCmd() (err error) {
 				LogRotateDays:    c.config.GetInt(optionLogRotateDays),
 				HomeKitPin:       c.config.GetString(optionHomeKitPin),
 				HomeKitEnable:    c.config.GetBool(optionHomeKitEnable),
-			}, logger)
+			})
 			if err != nil {
 				cancelFunc()
 				return err

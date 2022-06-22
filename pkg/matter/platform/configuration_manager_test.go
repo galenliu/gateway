@@ -15,7 +15,7 @@ func TestThingMarshal(t *testing.T) {
 	is := GetPrimaryWiFiMACAddress()
 	for _, i := range is {
 		fmt.Printf("------------------ -----------\t\n")
-		fmt.Printf("Name: %v \t\n", i.Name)
+		fmt.Printf("Instance: %v \t\n", i.Name)
 		fmt.Printf("Index: %v \t\n", i.Index)
 		fmt.Printf("Flags: %v \t\n", i.Flags)
 		fmt.Printf("MTU: %v \t\n", i.MTU)

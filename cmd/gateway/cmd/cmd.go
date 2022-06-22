@@ -7,7 +7,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -182,21 +182,21 @@ func (c *command) setAllFlags(cmd *cobra.Command) {
 	cmd.Flags().Bool(optionHomeKitEnable, true, "homekit enable")
 }
 
-func newLogger(cmd *cobra.Command, verbosity string) (logging.Logger, error) {
-	var logger logging.Logger
+func newLogger(cmd *cobra.Command, verbosity string) (log.Logger, error) {
+	var logger log.Logger
 	switch verbosity {
 	case "0", "silent":
-		logger = logging.New(ioutil.Discard, 0)
+		logger = log.New(ioutil.Discard, 0)
 	case "1", "error":
-		logger = logging.New(cmd.OutOrStdout(), logrus.ErrorLevel)
+		logger = log.New(cmd.OutOrStdout(), logrus.ErrorLevel)
 	case "2", "warn":
-		logger = logging.New(cmd.OutOrStdout(), logrus.WarnLevel)
+		logger = log.New(cmd.OutOrStdout(), logrus.WarnLevel)
 	case "3", "info":
-		logger = logging.New(cmd.OutOrStdout(), logrus.InfoLevel)
+		logger = log.New(cmd.OutOrStdout(), logrus.InfoLevel)
 	case "4", "debug":
-		logger = logging.New(cmd.OutOrStdout(), logrus.DebugLevel)
+		logger = log.New(cmd.OutOrStdout(), logrus.DebugLevel)
 	case "5", "trace":
-		logger = logging.New(cmd.OutOrStdout(), logrus.TraceLevel)
+		logger = log.New(cmd.OutOrStdout(), logrus.TraceLevel)
 	default:
 		return nil, fmt.Errorf("unknown verbosity level %q", verbosity)
 	}

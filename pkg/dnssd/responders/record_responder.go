@@ -1,16 +1,14 @@
 package responders
 
-import "github.com/galenliu/gateway/pkg/dnssd/core"
+import "github.com/galenliu/gateway/pkg/matter/inet"
 
-type RecordResponder struct {
-	*Responder
+const kDefaultTtl uint = 4500
+
+type RecordResponder interface {
+	AddAllResponses(info *inet.IPPacketInfo, delegate ResponderDelegate, configuration *ResponseConfiguration)
 }
 
-func NewRecordResponder(qType core.QType, qName core.FullQName) *RecordResponder {
-	return &RecordResponder{
-		&Responder{
-			mQName: qName,
-			mQType: qType,
-		},
-	}
+type recordResponder struct {
+	*responder
+	mTtl uint
 }

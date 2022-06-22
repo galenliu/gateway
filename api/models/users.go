@@ -2,7 +2,6 @@ package models
 
 import (
 	"github.com/galenliu/gateway/pkg/db"
-	"github.com/galenliu/gateway/pkg/logging"
 )
 
 type UsersStore interface {
@@ -13,14 +12,12 @@ type UsersStore interface {
 }
 
 type Users struct {
-	logger logging.Logger
-	store  UsersStore
+	store UsersStore
 }
 
-func NewUsersModel(store UsersStore, logger logging.Logger) *Users {
+func NewUsersModel(store UsersStore) *Users {
 	users := &Users{}
 	users.store = store
-	users.logger = logger
 	return users
 }
 

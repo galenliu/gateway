@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 )
 
 type User struct {
@@ -19,7 +20,7 @@ func (s *Storage) GetUsers() []*User {
 	var users []*User
 	rows, err := s.db.Query("SELECT * FROM users")
 	if err != nil {
-		s.logger.Error("DataBase GetUsers Err:", err.Error())
+		log.Error("DataBase GetUsers Err:", err.Error())
 		return nil
 	}
 	for rows.Next() {
@@ -62,7 +63,7 @@ func (s *Storage) CreateUser(u *User) (int64, error) {
 	defer func(stmt *sql.Stmt) {
 		err := stmt.Close()
 		if err != nil {
-			s.logger.Error(err.Error())
+			log.Error(err.Error())
 		}
 	}(stmt)
 	res, ee := stmt.Exec(u.Email, u.Hash, u.Name, u.MfaSharedSecret, u.MfaEnrolled, u.MfaBackupCodes)
@@ -81,7 +82,7 @@ func (s *Storage) DeleteUser(id int64) error {
 	defer func(stmt *sql.Stmt) {
 		err := stmt.Close()
 		if err != nil {
-			s.logger.Error(err.Error())
+			log.Error(err.Error())
 		}
 	}(stmt)
 	if err != nil {

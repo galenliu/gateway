@@ -6,7 +6,8 @@ import (
 	"github.com/galenliu/gateway/cmd/virtual-adapter"
 	"github.com/galenliu/gateway/cmd/yeelight-adapter"
 	"github.com/galenliu/gateway/pkg/addon/proxy"
-	"log"
+	"github.com/galenliu/gateway/pkg/log"
+
 	"os"
 	"os/signal"
 	"syscall"
@@ -39,9 +40,9 @@ func main() {
 		for {
 			select {
 			case s := <-interruptChannel:
-				log.Printf("signal %s exit", s.String())
+				log.Infof("signal %s exit", s.String())
 			case <-manager.Done:
-				log.Printf("Done shutting")
+				log.Infof("Done shutting")
 				return
 			}
 		}

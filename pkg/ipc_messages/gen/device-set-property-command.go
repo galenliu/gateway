@@ -252,7 +252,7 @@ type DeviceSetPropertyCommandJsonData struct {
 	// ID of the plugin
 	PluginId string `json:"pluginId" yaml:"pluginId"`
 
-	// Name of the property to set
+	// Instance of the property to set
 	PropertyName string `json:"propertyName" yaml:"propertyName"`
 
 	// New value of the property

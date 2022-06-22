@@ -5,7 +5,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/debug"
@@ -17,7 +17,7 @@ func isWindowsService() (bool, error) {
 	return svc.IsWindowsService()
 }
 
-func createWindowsEventLogger(svcName string, logger logging.Logger) (logging.Logger, error) {
+func createWindowsEventLogger(svcName string, logger log.Logger) (log.Logger, error) {
 	el, err := eventlog.Open(svcName)
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func createWindowsEventLogger(svcName string, logger logging.Logger) (logging.Lo
 }
 
 type windowsEventLogger struct {
-	logger logging.Logger
+	logger log.Logger
 	winlog debug.Log
 }
 

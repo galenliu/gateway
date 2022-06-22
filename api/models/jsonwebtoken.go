@@ -10,7 +10,6 @@ import (
 	"encoding/pem"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/db"
-	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/golang-jwt/jwt"
 	uuid "github.com/satori/go.uuid"
 	"time"
@@ -32,12 +31,11 @@ type JsonwebtokenStore interface {
 type Jsonwebtoken struct {
 	settingsModel *Settings
 	Store         JsonwebtokenStore
-	logger        logging.Logger
 }
 
-func NewJsonwebtokenModel(settingsModel *Settings, store JsonwebtokenStore, logger logging.Logger) *Jsonwebtoken {
+func NewJsonwebtokenModel(settingsModel *Settings, store JsonwebtokenStore) *Jsonwebtoken {
 	m := &Jsonwebtoken{}
-	m.logger = logger
+
 	m.Store = store
 	m.settingsModel = settingsModel
 	return m

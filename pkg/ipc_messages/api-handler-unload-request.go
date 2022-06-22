@@ -7,7 +7,7 @@ import "encoding/json"
 
 // Message-specific data
 type ApiHandlerUnloadRequestJsonData struct {
-	// Name of the add-on package
+	// Instance of the add-on package
 	PackageName string `json:"packageName" yaml:"packageName"`
 
 	// ID of the plugin

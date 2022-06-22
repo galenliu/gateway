@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"fmt"
 	things "github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/constant"
-	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/errors"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/gofiber/websocket/v2"
 	"sync"
 	"time"
@@ -36,7 +36,6 @@ type Connection struct {
 	isClosed  bool
 	locker    sync.Mutex
 	container things.Container
-	log       logging.Logger
 	connId    int64
 }
 
@@ -60,7 +59,7 @@ func (conn *Connection) write(id string, messageType string, data any) error {
 		}
 		return nil
 	}
-	return fmt.Errorf("websocket closed")
+	return errors.New("websocket closed")
 }
 
 func (conn *Connection) onPropertyChanged(msg topic.ThingPropertyChangedMessage) {
@@ -86,7 +85,7 @@ func (conn *Connection) onThingAdded(msg topic.ThingAddedMessage) {
 	if t != nil {
 		err := conn.write(t.GetId(), constant.Connected, t.Connected)
 		if err != nil {
-			conn.log.Error(err.Error())
+			log.Error(err.Error())
 			return
 		}
 		data := make(map[string]any, 0)
@@ -99,7 +98,7 @@ func (conn *Connection) onThingAdded(msg topic.ThingAddedMessage) {
 		}
 		err = conn.write(t.GetId(), constant.PropertyStatus, data)
 		if err != nil {
-			conn.log.Error(err.Error())
+			log.Error(err.Error())
 			return
 		}
 	}
@@ -128,7 +127,7 @@ func (conn *Connection) notify() {
 		for _, t := range copes {
 			err := conn.write(t.GetId(), constant.Connected, t.Connected)
 			if err != nil {
-				conn.log.Error(err.Error())
+				log.Error(err.Error())
 				return
 			}
 			data := make(map[string]any, 0)
@@ -141,7 +140,7 @@ func (conn *Connection) notify() {
 			}
 			err = conn.write(t.GetId(), constant.PropertyStatus, data)
 			if err != nil {
-				conn.log.Error(err.Error())
+				log.Error(err.Error())
 				return
 			}
 		}
@@ -150,7 +149,7 @@ func (conn *Connection) notify() {
 		if t != nil {
 			err := conn.write(t.GetId(), constant.Connected, t.Connected)
 			if err != nil {
-				conn.log.Error(err.Error())
+				log.Error(err.Error())
 				return
 			}
 			data := make(map[string]any, 0)
@@ -163,7 +162,7 @@ func (conn *Connection) notify() {
 			}
 			err = conn.write(t.GetId(), constant.PropertyStatus, data)
 			if err != nil {
-				conn.log.Error(err.Error())
+				log.Error(err.Error())
 				return
 			}
 		}
@@ -173,7 +172,7 @@ func (conn *Connection) notify() {
 
 func (conn *Connection) handler() {
 	defer conn.close()
-	conn.log.Infof("新建一个连接：%v", conn.connId)
+	log.Infof("新建一个连接：%v", conn.connId)
 	_ = conn.container.Subscribe(topic.ThingAdded, conn.onThingAdded)
 	_ = conn.container.Subscribe(topic.ThingModify, conn.onThingModified)
 	_ = conn.container.Subscribe(topic.ThingConnected, conn.onThingConnected)
@@ -201,11 +200,11 @@ func (conn *Connection) handler() {
 }
 
 func (conn *Connection) handleMessage(data []byte) {
-	conn.log.Infof("received message:%v", data)
+	log.Infof("received message:%v", data)
 }
 
 func (conn *Connection) close() {
-	conn.log.Infof("关闭连接: %v", conn.connId)
+	log.Infof("关闭连接: %v", conn.connId)
 	conn.container.Unsubscribe(topic.ThingAdded, conn.onThingAdded)
 	conn.container.Unsubscribe(topic.ThingModify, conn.onThingModified)
 	conn.container.Unsubscribe(topic.ThingConnected, conn.onThingConnected)
@@ -216,13 +215,13 @@ func (conn *Connection) close() {
 		defer conn.locker.Unlock()
 		err := conn.Close()
 		if err != nil {
-			conn.log.Infof("websocket close error: %s", err.Error())
+			log.Infof("websocket close error: %s", err.Error())
 		}
 	}
 	conn.isClosed = true
 }
 
-func handleWebsocket(container things.Container, log logging.Logger) func(ws *websocket.Conn) {
+func handleWebsocket(container things.Container) func(ws *websocket.Conn) {
 	return func(ws *websocket.Conn) {
 		thingId := ws.Params("thingId")
 		connectionId = connectionId + 1
@@ -232,7 +231,6 @@ func handleWebsocket(container things.Container, log logging.Logger) func(ws *we
 			isClosed:  false,
 			locker:    sync.Mutex{},
 			container: container,
-			log:       log,
 			connId:    connectionId,
 		}
 		conn.handler()

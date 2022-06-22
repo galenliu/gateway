@@ -39,7 +39,7 @@ type ConfigurationManager struct {
 	mVendorId                                  int
 	mVendorName                                string
 	mProductName                               string
-	mProductId                                 int
+	mProductId                                 int16
 	mDeviceType                                device.MatterDeviceType
 	mDeviceName                                string
 	mTcpSupported                              bool
@@ -74,7 +74,7 @@ func (c ConfigurationManager) GetVendorName() string {
 	return c.mVendorName
 }
 
-func (c ConfigurationManager) GetProductId() (int, error) {
+func (c ConfigurationManager) GetProductId() (int16, error) {
 	return c.mProductId, nil
 }
 

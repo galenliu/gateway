@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/galenliu/gateway/api/models"
-	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/gofiber/fiber/v2"
 	json "github.com/json-iterator/go"
 	"net/http"
@@ -23,14 +23,13 @@ type AddonManager interface {
 type AddonController struct {
 	model   *models.AddonsModel
 	manager AddonManager
-	logger  logging.Logger
 }
 
-func NewAddonController(manager AddonManager, m *models.AddonsModel, log logging.Logger) *AddonController {
+func NewAddonController(manager AddonManager, m *models.AddonsModel) *AddonController {
 	a := &AddonController{}
 	a.manager = manager
 	a.model = m
-	a.logger = log
+
 	return a
 }
 
@@ -100,13 +99,13 @@ func (addon *AddonController) handlerSetAddonConfig(c *fiber.Ctx) error {
 	}
 	err = addon.manager.UnloadAddon(addonId)
 	if err != nil {
-		addon.logger.Errorf(err.Error())
+		log.Errorf(err.Error())
 		return fiber.NewError(200, err.Error())
 	}
 	if addon.manager.AddonEnabled(addonId) {
 		err := addon.manager.LoadAddon(addonId)
 		if err != nil {
-			addon.logger.Errorf(err.Error())
+			log.Errorf(err.Error())
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 	}
@@ -148,7 +147,7 @@ func (addon *AddonController) handlerUpdateAddon(c *fiber.Ctx) error {
 	}
 	e := addon.manager.InstallAddonFromUrl(id, url, checksum)
 	if e != nil {
-		addon.logger.Errorf("install addon % err: %s", id, e.Error())
+		log.Errorf("install addon % err: %s", id, e.Error())
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": e.Error()})
 	}
 	setting, ee := addon.model.Store.LoadAddonSetting(id)

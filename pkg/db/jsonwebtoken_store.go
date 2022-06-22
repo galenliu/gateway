@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	log "github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -21,7 +22,7 @@ func (s *Storage) CreateJSONWebToken(t *TokeDataStorage) error {
 	defer func(stmt *sql.Stmt) {
 		err := stmt.Close()
 		if err != nil {
-			s.logger.Error(err.Error())
+			log.Error(err.Error())
 		}
 	}(stmt)
 	_, err = stmt.Exec(t.KeyId, t.User, t.IssuedAt, t.PublicKey, t.PayLoad)

@@ -1,6 +1,8 @@
 package dnssd
 
-import "log"
+import (
+	"log"
+)
 
 type DnssdServer struct {
 	securedServicePort   int

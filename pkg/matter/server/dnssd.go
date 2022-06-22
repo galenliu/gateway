@@ -133,18 +133,18 @@ func (d DnssdServer) Advertise(commissionAbleNode bool, mode dnssd.Commissioning
 
 	mac, err := platform.ConfigurationMgr().GetPrimaryMACAddress()
 	errors.LogError(err, "Discovery", "Failed to get primary mac address of device. Generating a random one.")
-	advertiseParameters.SetMaC(util.ConditionValue(err != nil, mac, util.GenerateMac()))
+	advertiseParameters.SetMaC(string(util.ConditionValue(err != nil, mac, util.GenerateMac())))
 
 	vid, err := platform.ConfigurationMgr().GetVendorId()
 	errors.LogError(err, "Discovery", "Vendor ID not known")
 	if err != nil {
-		advertiseParameters.SetVendorId(vid)
+		advertiseParameters.SetVendorId(uint16(vid))
 	}
 
 	pid, err := platform.ConfigurationMgr().GetProductId()
 	errors.LogError(err, "Discovery", "Product ID not known")
 	if err != nil {
-		advertiseParameters.SetProductId(pid)
+		advertiseParameters.SetProductId(uint16(pid))
 	}
 
 	//uint16_t discriminator = 0;
@@ -167,7 +167,7 @@ func (d DnssdServer) Advertise(commissionAbleNode bool, mode dnssd.Commissioning
 	if platform.ConfigurationMgr().IsCommissionableDeviceTypeEnabled() {
 		did, err := platform.ConfigurationMgr().GetDeviceTypeId()
 		if err != nil {
-			advertiseParameters.SetDeviceType(did)
+			advertiseParameters.SetDeviceType(int32(did))
 		}
 	}
 
@@ -196,7 +196,7 @@ func (d DnssdServer) Advertise(commissionAbleNode bool, mode dnssd.Commissioning
 		advertiseParameters.SetPairingInstruction(ins)
 	}
 	mdnsAdvertiser := dnssd.AdvertiserInstance()
-	return mdnsAdvertiser.Advertise(advertiseParameters)
+	return mdnsAdvertiser.AdvertiseCommission(advertiseParameters)
 }
 
 func (d *DnssdServer) SetCommissioningModeProvider(manager *CommissioningWindowManager) {

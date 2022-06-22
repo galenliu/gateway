@@ -10,7 +10,7 @@ type DeviceRemoveActionRequestJsonData struct {
 	// ID of the existing action
 	ActionId string `json:"actionId" yaml:"actionId"`
 
-	// Name of the action
+	// Instance of the action
 	ActionName string `json:"actionName" yaml:"actionName"`
 
 	// ID of the adapter

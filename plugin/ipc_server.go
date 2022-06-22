@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/fasthttp/websocket"
-	"log"
+	"github.com/galenliu/gateway/pkg/log"
 	"net/http"
 	"sync"
 	"time"
@@ -83,13 +83,13 @@ func NewIpcServer(addr string) chan *wsConnection {
 	//}()
 
 	go func() {
-		log.Println("listening at " + addr)
+		log.Infof("listening at " + addr)
 		err := srv.ListenAndServe()
 		fmt.Println("waiting for the remaining connections to finish...")
 		if err != nil && err != http.ErrServerClosed {
 			close(clientChan)
 		}
-		log.Println("gracefully shutdown the http server...")
+		log.Infof("gracefully shutdown the http server...")
 	}()
 	return clientChan
 }
@@ -131,8 +131,8 @@ func (wsConn *wsConnection) wsReadLoop() {
 		// 读一个message
 		msgType, data, err := wsConn.wsSocket.ReadMessage()
 		if err != nil {
-			log.Println(websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure))
-			log.Println("消息读取出现错误", err.Error())
+			log.Info(websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure))
+			log.Infof("消息读取出现错误: %s", err.Error())
 			wsConn.close()
 			return
 		}
@@ -161,7 +161,7 @@ func (wsConn *wsConnection) wsWriteLoop() {
 		case msg := <-wsConn.outChan:
 			// 写给websocket
 			if err := wsConn.wsSocket.WriteMessage(msg.messageType, msg.data); err != nil {
-				log.Println("发送消息给客户端发生错误", err.Error())
+				log.Infof("发送消息给客户端发生错误", err.Error())
 				// 切断服务
 				wsConn.close()
 				return
@@ -172,7 +172,7 @@ func (wsConn *wsConnection) wsWriteLoop() {
 		case <-ticker.C:
 			// 出现超时情况
 			if err := wsConn.wsSocket.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(writeWait)); err != nil {
-				log.Println("ping:", err)
+				log.Infof("ping:", err)
 			}
 			//if err := wsConn.wsSocket.WriteMessage(websocket.PingMessage, nil); err != nil {
 			//	return
@@ -205,7 +205,7 @@ func (wsConn *wsConnection) wsRead() (*wsMessage, error) {
 
 // 关闭连接
 func (wsConn *wsConnection) close() {
-	log.Println("关闭连接被调用了")
+	log.Infof("关闭连接被调用了")
 	wsConn.wsSocket.Close()
 	wsConn.mutex.Lock()
 	defer wsConn.mutex.Unlock()

@@ -7,22 +7,22 @@ import (
 	"github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/bus"
 	"github.com/galenliu/gateway/pkg/errors"
-	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/gofiber/fiber/v2"
+
 	"time"
 )
 
 type ActionsController struct {
-	logger         logging.Logger
 	thingContainer *container.ThingsContainer
 	actions        *models.ActionsModel
 	manager        models.ActionsManager
 	bus            bus.ThingsBus
 }
 
-func NewActionsController(model *models.ActionsModel, thing *container.ThingsContainer, manager models.ActionsManager, log logging.Logger) *ActionsController {
+func NewActionsController(model *models.ActionsModel, thing *container.ThingsContainer, manager models.ActionsManager) *ActionsController {
 	return &ActionsController{
-		logger:         log,
+
 		manager:        manager,
 		thingContainer: thing,
 		actions:        model,
@@ -42,7 +42,7 @@ func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 	// 确保一个Action，有且只有一个Input
 	if err != nil || len(actionBody) != 1 {
 		err := fmt.Errorf("incorrect number of parameters. body:  %s", c.Body())
-		a.logger.Error(err.Error())
+		log.Error(err.Error())
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 	var actionName string
@@ -63,7 +63,7 @@ func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 		if thing == nil {
 			return errors.NotFoundError("Thing: %s do not exist", thingId)
 		}
-		actionModel = models.NewActionModel(actionName, actionParams.Input, a.logger, thing)
+		actionModel = models.NewActionModel(actionName, actionParams.Input, thing)
 		ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*3)
 		err := a.manager.RequestAction(ctx, thing.GetId(), actionModel.GetName(), actionParams.Input)
 		cancelFunc()
@@ -72,7 +72,7 @@ func (a *ActionsController) handleCreateAction(c *fiber.Ctx) error {
 		}
 	}
 	if thing == nil && actionModel == nil {
-		actionModel = models.NewActionModel(actionName, actionParams.Input, a.logger)
+		actionModel = models.NewActionModel(actionName, actionParams.Input)
 	}
 	err = a.actions.Add(actionModel)
 	if err != nil {
@@ -109,13 +109,13 @@ func (a *ActionsController) handleDeleteAction(c *fiber.Ctx) error {
 	if thingId != "" {
 		err := a.manager.RemoveAction(thingId, actionId, actionName)
 		if err != nil {
-			a.logger.Error("delete actions failed err: %s", actionName)
+			log.Error("delete actions failed err: %s", actionName)
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
 	}
 	err := a.actions.Remove(actionId)
 	if err != nil {
-		a.logger.Error(err.Error())
+		log.Error(err.Error())
 		return fiber.NewError(fiber.StatusNoContent)
 	}
 	return c.SendStatus(fiber.StatusNoContent)

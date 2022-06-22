@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/rules_engine"
 	json "github.com/json-iterator/go"
+	log "github.com/sirupsen/logrus"
 )
 
 func (s *Storage) CreateRule(description rules_engine.Rule) (int64, error) {
@@ -19,7 +20,7 @@ func (s *Storage) CreateRule(description rules_engine.Rule) (int64, error) {
 	defer func(stmt *sql.Stmt) {
 		err := stmt.Close()
 		if err != nil {
-			s.logger.Error("stmt close err: %s", err.Error())
+			log.Error("stmt close err: %s", err.Error())
 		}
 	}(stmt)
 	res, ee := stmt.Exec(bytes)
@@ -50,7 +51,7 @@ func (s *Storage) DeleteRule(ruleId int64) error {
 	defer func(stmt *sql.Stmt) {
 		err := stmt.Close()
 		if err != nil {
-			s.logger.Error("stmt close err: %s", err.Error())
+			log.Error("stmt close err: %s", err.Error())
 		}
 	}(stmt)
 	_, err = stmt.Exec(ruleId)

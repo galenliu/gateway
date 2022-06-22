@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/galenliu/gateway/api/models"
-	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -13,14 +13,14 @@ type Users interface {
 type LoginController struct {
 	users        *models.Users
 	jsonwebtoken *models.Jsonwebtoken
-	logger       logging.Logger
+	logger       log.Logger
 }
 
-func NewLoginController(users *models.Users, jsonwebtoken *models.Jsonwebtoken, logger logging.Logger) *LoginController {
+func NewLoginController(users *models.Users, jsonwebtoken *models.Jsonwebtoken) *LoginController {
 	c := LoginController{}
 	c.users = users
 	c.jsonwebtoken = jsonwebtoken
-	c.logger = logger
+
 	c.users = users
 	return &c
 }

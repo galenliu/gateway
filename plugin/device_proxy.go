@@ -9,7 +9,7 @@ import (
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
-	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
 	"github.com/gofiber/fiber/v2"
 	"github.com/xiam/to"
@@ -18,7 +18,7 @@ import (
 
 type device struct {
 	*devices.Device
-	logger               logging.Logger
+	logger               log.Logger
 	requestActionTask    sync.Map
 	removeActionTask     sync.Map
 	setPropertyValueTask sync.Map

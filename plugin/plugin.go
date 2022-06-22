@@ -6,7 +6,7 @@ import (
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
-	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
 	json "github.com/json-iterator/go"
 	"os"
@@ -17,13 +17,13 @@ import (
 )
 
 type Plugin struct {
-	manager      *Manager
-	pluginId     string
-	exec         string
-	execPath     string
-	closeChan    chan struct{}
-	registered   bool
-	logger       logging.Logger
+	manager    *Manager
+	pluginId   string
+	exec       string
+	execPath   string
+	closeChan  chan struct{}
+	registered bool
+
 	sendChan     chan []byte
 	eventHandler map[string]func()
 	adapters     sync.Map
@@ -31,9 +31,9 @@ type Plugin struct {
 	apiHandlers  sync.Map
 }
 
-func NewPlugin(pluginId string, manager *Manager, log logging.Logger) (plugin *Plugin) {
+func NewPlugin(pluginId string, manager *Manager) (plugin *Plugin) {
 	plugin = &Plugin{}
-	plugin.logger = log
+
 	plugin.registered = false
 	plugin.manager = manager
 	plugin.pluginId = pluginId
@@ -91,7 +91,7 @@ func (plugin *Plugin) handleWs(ctx context.Context, client *wsConnection) {
 				}
 				err := client.wsWrite(websocket.TextMessage, d)
 				if err != nil {
-					plugin.logger.Infof(err.Error())
+					log.Infof(err.Error())
 					return
 				}
 
@@ -107,11 +107,11 @@ func (plugin *Plugin) handleWs(ctx context.Context, client *wsConnection) {
 	for {
 		data, err := client.wsRead()
 		if websocket.IsCloseError(err) {
-			plugin.logger.Info("websocket close: %s", err.Error())
+			log.Info("websocket close: %s", err.Error())
 			return
 		}
 		if err != nil {
-			plugin.logger.Errorf("websocket read err: %s", err.Error())
+			log.Errorf("websocket read err: %s", err.Error())
 			return
 		}
 		if err == nil {
@@ -164,12 +164,12 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 	var m message
 	err := json.Unmarshal(bt, &m)
 	if err != nil {
-		plugin.logger.Info("Bad message")
+		log.Info("Bad message")
 		return
 	}
 	data, err := json.Marshal(m.Data)
 	if err != nil {
-		plugin.logger.Info("Bad message")
+		log.Info("Bad message")
 		return
 	}
 
@@ -180,7 +180,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 			var message messages.AdapterAddedNotificationJsonData
 			err := json.Unmarshal(data, &message)
 			if err != nil {
-				plugin.logger.Errorf("Bad message : %s", m.MessageType)
+				log.Errorf("Bad message : %s", m.MessageType)
 				return
 			}
 			adapter := NewAdapter(message.AdapterId, message.Name, message.PackageName, plugin)
@@ -219,7 +219,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 			var message messages.NotifierAddedNotificationJsonData
 			err := json.Unmarshal(data, &message)
 			if err != nil {
-				plugin.logger.Errorf("Bad message : %s", m.MessageType)
+				log.Errorf("Bad message : %s", m.MessageType)
 				return
 			}
 			return
@@ -230,7 +230,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 	adapterId := json.Get(data, "adapterId").ToString()
 	adapter := plugin.getAdapter(adapterId)
 	if adapter == nil {
-		plugin.logger.Errorf("can not find adapter %s", adapterId)
+		log.Errorf("can not find adapter %s", adapterId)
 		return
 	}
 	switch m.MessageType {
@@ -238,7 +238,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 		var message messages.OutletNotifyRequestJsonData
 		err := json.Unmarshal(data, &message)
 		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", m.MessageType)
+			log.Errorf("Bad message : %s", m.MessageType)
 			return
 		}
 		return
@@ -247,7 +247,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 		var message messages.AdapterUnloadRequestJsonData
 		err := json.Unmarshal(data, &message)
 		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", m.MessageType)
+			log.Errorf("Bad message : %s", m.MessageType)
 			return
 		}
 		go plugin.handleAdapterUnload(message.AdapterId)
@@ -257,7 +257,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 		var message messages.ApiHandlerApiRequestJsonData
 		err := json.Unmarshal(data, &message)
 		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", m.MessageType)
+			log.Errorf("Bad message : %s", m.MessageType)
 			return
 		}
 		return
@@ -266,7 +266,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 		var message messages.ApiHandlerAddedNotificationJsonData
 		err := json.Unmarshal(data, &message)
 		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", m.MessageType)
+			log.Errorf("Bad message : %s", m.MessageType)
 			return
 		}
 		return
@@ -275,7 +275,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 		var message messages.ApiHandlerUnloadResponseJsonData
 		err := json.Unmarshal(data, &message)
 		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", m.MessageType)
+			log.Errorf("Bad message : %s", m.MessageType)
 			return
 		}
 		return
@@ -284,7 +284,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 		var message messages.PluginUnloadResponseJsonData
 		err := json.Unmarshal(data, &message)
 		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", m.MessageType)
+			log.Errorf("Bad message : %s", m.MessageType)
 			return
 		}
 		plugin.shutdown()
@@ -295,7 +295,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 		var message messages.PluginErrorNotificationJsonData
 		err := json.Unmarshal(data, &message)
 		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", m.MessageType)
+			log.Errorf("Bad message : %s", m.MessageType)
 			return
 		}
 		return
@@ -304,7 +304,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 		var message messages.DeviceAddedNotificationJsonData
 		err := json.Unmarshal(data, &message)
 		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", m.MessageType)
+			log.Errorf("Bad message : %s", m.MessageType)
 			return
 		}
 		device := newDeviceFromMessage(message.Device)
@@ -316,7 +316,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 	deviceId := json.Get(data, "deviceId").ToString()
 	dev := plugin.manager.getDevice(deviceId)
 	if dev == nil {
-		plugin.logger.Errorf("device:%s not found", deviceId)
+		log.Errorf("device:%s not found", deviceId)
 		return
 	}
 	switch m.MessageType {
@@ -324,7 +324,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 		var message messages.DeviceConnectedStateNotificationJsonData
 		err := json.Unmarshal(data, &message)
 		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", err.Error())
+			log.Errorf("Bad message : %s", err.Error())
 			return
 		}
 		dev.notifyDeviceConnected(message.Connected)
@@ -334,7 +334,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 		var message messages.DeviceActionStatusNotificationJsonData
 		err := json.Unmarshal(data, &message)
 		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", err.Error())
+			log.Errorf("Bad message : %s", err.Error())
 			return
 		}
 		dev.actionNotify(actions.ActionDescription{
@@ -356,7 +356,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 		var message messages.DeviceRequestActionResponseJsonData
 		err := json.Unmarshal(data, &message)
 		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", err.Error())
+			log.Errorf("Bad message : %s", err.Error())
 			return
 		}
 		go func() {
@@ -378,7 +378,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 		var message messages.DeviceRemoveActionResponseJsonData
 		err := json.Unmarshal(data, &message)
 		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", err.Error())
+			log.Errorf("Bad message : %s", err.Error())
 			return
 		}
 		go func() {
@@ -400,14 +400,14 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 		var message messages.DeviceSetCredentialsResponseJsonData
 		err := json.Unmarshal(data, &message)
 		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", err.Error())
+			log.Errorf("Bad message : %s", err.Error())
 			return
 		}
 		go func() {
 			t, ok := adapter.setCredentialsTask.Load(message.MessageId)
 			task, ok1 := t.(chan *device)
 			if !ok || task == nil || !ok1 {
-				plugin.logger.Errorf("unrecognized message id: %s", message.MessageId)
+				log.Errorf("unrecognized message id: %s", message.MessageId)
 				return
 			}
 			if message.Device != nil && message.Success {
@@ -424,11 +424,11 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 		var message messages.DevicePropertyChangedNotificationJsonData
 		err := json.Unmarshal(data, &message)
 		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", err.Error())
+			log.Errorf("Bad message : %s", err.Error())
 			return
 		}
 		if message.Property.Name == nil || message.Property.Value == nil {
-			plugin.logger.Errorf("Bad message")
+			log.Errorf("Bad message")
 			return
 		}
 		go dev.onPropertyChanged(properties.PropertyDescription{
@@ -452,14 +452,14 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 		var message messages.AdapterRemoveDeviceResponseJsonData
 		err := json.Unmarshal(data, &message)
 		if err != nil {
-			plugin.logger.Errorf("Bad message : %s", err.Error())
+			log.Errorf("Bad message : %s", err.Error())
 			return
 		}
 		go adapter.handleDeviceRemoved(dev)
 		return
 
 	default:
-		plugin.logger.Infof("unknown message:", m.MessageType)
+		log.Infof("unknown message:", m.MessageType)
 		return
 	}
 }
@@ -476,7 +476,7 @@ func (plugin *Plugin) send(mt messages.MessageType, d any) {
 	}
 	data, err := json.Marshal(&m)
 	if err != nil {
-		plugin.logger.Infof("bad message")
+		log.Infof("bad message")
 		return
 	}
 	if plugin.registered == true {
@@ -498,7 +498,7 @@ func (plugin *Plugin) start() {
 	command := strings.Replace(plugin.exec, "{path}", plugin.execPath, 1)
 	//command = strings.Replace(command, "{nodeLoader}", configs.GetNodeLoader(), 1)
 	if !strings.HasPrefix(command, "python") {
-		plugin.logger.Warningf("plugin %s only support with python", plugin.getId())
+		log.Warningf("plugin %s only support with python", plugin.getId())
 		return
 	}
 	commands := strings.Split(command, " ")
@@ -510,7 +510,7 @@ func (plugin *Plugin) start() {
 	//			strNum, err := reader.Read(buf)
 	//			if strNum > 0 {
 	//				outputByte := buf[:strNum]
-	//				plugin.logger.Debugf("%s out: %s", plugin.pluginId, string(outputByte))
+	//				log.Debugf("%s out: %s", plugin.pluginId, string(outputByte))
 	//			}
 	//			if err != nil {
 	//				//读到结尾
@@ -535,12 +535,12 @@ func (plugin *Plugin) start() {
 	//
 	//go syncLog(stdout)
 	//go syncLog(stderr)
-	//plugin.logger.Infof("%s start", plugin.pluginId)
+	//log.Infof("%s start", plugin.pluginId)
 	//
 	go func() {
 		err := cmd.Run()
 		if err != nil {
-			plugin.logger.Errorf("%s closed: %s", plugin.pluginId, err.Error())
+			log.Errorf("%s closed: %s", plugin.pluginId, err.Error())
 			return
 		}
 	}()
@@ -554,7 +554,7 @@ func (plugin *Plugin) start() {
 }
 
 func (plugin *Plugin) notifyUnload() {
-	plugin.logger.Infof("unloading plugin %s", plugin.getId())
+	log.Infof("unloading plugin %s", plugin.getId())
 	plugin.send(messages.MessageType_PluginUnloadRequest, messages.PluginUnloadRequestJsonData{PluginId: plugin.getId()})
 }
 

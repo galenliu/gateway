@@ -5,6 +5,7 @@ import (
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/events"
 	"github.com/galenliu/gateway/pkg/bus/topic"
+	"github.com/galenliu/gateway/pkg/log"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
 
@@ -94,7 +95,7 @@ func (t *Thing) SetSelectedCapability(selectedCapability string) {
 	t.SelectedCapability = selectedCapability
 	err := t.container.store.UpdateThing(t.GetId(), t)
 	if err != nil {
-		t.container.logger.Errorf(err.Error())
+		log.Errorf(err.Error())
 	}
 
 }
@@ -103,7 +104,7 @@ func (t *Thing) SetTitle(title string) {
 	t.Title = title
 	err := t.container.store.UpdateThing(t.GetId(), t)
 	if err != nil {
-		t.container.logger.Errorf(err.Error())
+		log.Errorf(err.Error())
 	}
 }
 

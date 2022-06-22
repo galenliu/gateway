@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"github.com/galenliu/gateway/api/models"
-	"github.com/galenliu/gateway/pkg/logging"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -10,7 +9,7 @@ type SettingsController struct {
 	model *models.Settings
 }
 
-func NewSettingController(model *models.Settings, log logging.Logger) *SettingsController {
+func NewSettingController(model *models.Settings) *SettingsController {
 	s := &SettingsController{}
 	s.model = model
 	return s

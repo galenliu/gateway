@@ -10,7 +10,7 @@ type DeviceRequestActionResponseJsonData struct {
 	// ID of the action
 	ActionId string `json:"actionId" yaml:"actionId"`
 
-	// Name of the action
+	// Instance of the action
 	ActionName string `json:"actionName" yaml:"actionName"`
 
 	// ID of the adapter

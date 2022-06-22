@@ -3,7 +3,7 @@ package models
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/constant"
-	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
 	json "github.com/json-iterator/go"
 )
@@ -22,12 +22,11 @@ type SettingsStore interface {
 }
 
 type Settings struct {
-	logger    logging.Logger
 	storage   SettingsStore
 	addonInfo AddonInfo
 }
 
-func NewSettingsModel(addonUrl []string, storage SettingsStore, logger logging.Logger) *Settings {
+func NewSettingsModel(addonUrl []string, storage SettingsStore) *Settings {
 	s := Settings{}
 	s.addonInfo = AddonInfo{
 		Urls:           addonUrl,
@@ -36,21 +35,20 @@ func NewSettingsModel(addonUrl []string, storage SettingsStore, logger logging.L
 		NodeVersion:    util.GetNodeVersion(),
 		PythonVersions: util.GetPythonVersion(),
 	}
-	logger.Debugf("settings model: %s", util.JsonIndent(s.addonInfo))
+	log.Debugf("settings model: %s", util.JsonIndent(s.addonInfo))
 	s.storage = storage
-	s.logger = logger
 	return &s
 }
 
 func (s *Settings) GetTunnelInfo() string {
 	token, err := s.storage.GetSetting("tunneltoken")
 	if err != nil {
-		s.logger.Info("Tunnel domain not set.")
+		log.Info("Tunnel domain not set.")
 		return "Not Set."
 	}
 	name := json.Get([]byte(token), "name").ToString()
 	base := json.Get([]byte(token), "base").ToString()
-	s.logger.Info("Tunnel domain found. Tunnel name is: &s and tunnel domain is: %s", name, base)
+	log.Info("Tunnel domain found. Tunnel name is: &s and tunnel domain is: %s", name, base)
 	tunnelDomain := fmt.Sprintf("https://%s.%s", name, base)
 	return tunnelDomain
 }

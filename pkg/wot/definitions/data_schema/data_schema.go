@@ -1,9 +1,10 @@
 package data_schema
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/bytedance/sonic"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
+	"github.com/tidwall/gjson"
 )
 
 const (
@@ -39,58 +40,58 @@ type DataSchema struct {
 	Type         string                 `json:"type,,omitempty" wot:"optional"`
 }
 
-func MarshalSchema(data []byte) (s Schema, e error) {
-	node, err := sonic.Get(data, "type")
-	dataType, err := node.String()
-	if err != nil {
-		return nil, err
+func UnmarshalSchema(data []byte) (s Schema, e error) {
+	dataType := gjson.GetBytes(data, "type").String()
+	if dataType == "" {
+		return nil, fmt.Errorf("invaild type")
 	}
+	var err error
 	switch dataType {
 	case controls.TypeInteger:
 		var dataSchema IntegerSchema
-		err = sonic.Unmarshal(data, &dataSchema)
+		err = json.Unmarshal(data, &dataSchema)
 		if err != nil {
 			return nil, err
 		}
 		return dataSchema, nil
 	case controls.TypeNumber:
 		var dataSchema NumberSchema
-		err = sonic.Unmarshal(data, &dataSchema)
+		err = json.Unmarshal(data, &dataSchema)
 		if err != nil {
 			return nil, err
 		}
 		return dataSchema, nil
 	case controls.TypeBoolean:
 		var dataSchema BooleanSchema
-		err = sonic.Unmarshal(data, &dataSchema)
+		err = json.Unmarshal(data, &dataSchema)
 		if err != nil {
 			return nil, err
 		}
 		return dataSchema, nil
 	case controls.TypeArray:
 		var dataSchema ArraySchema
-		err = sonic.Unmarshal(data, &dataSchema)
+		err = json.Unmarshal(data, &dataSchema)
 		if err != nil {
 			return nil, err
 		}
 		return dataSchema, nil
 	case controls.TypeObject:
 		var dataSchema ObjectSchema
-		err = sonic.Unmarshal(data, &dataSchema)
+		err = json.Unmarshal(data, &dataSchema)
 		if err != nil {
 			return nil, err
 		}
 		return dataSchema, nil
 	case controls.TypeNull:
 		var dataSchema NullSchema
-		err = sonic.Unmarshal(data, &dataSchema)
+		err = json.Unmarshal(data, &dataSchema)
 		if err != nil {
 			return nil, err
 		}
 		return dataSchema, nil
 	case controls.TypeString:
 		var dataSchema StringSchema
-		err = sonic.Unmarshal(data, &dataSchema)
+		err = json.Unmarshal(data, &dataSchema)
 		if err != nil {
 			return nil, err
 		}

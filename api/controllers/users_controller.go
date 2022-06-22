@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/galenliu/gateway/api/models"
-	"github.com/galenliu/gateway/pkg/logging"
+	"github.com/galenliu/gateway/pkg/log"
 	"github.com/gofiber/fiber/v2"
 	"strconv"
 )
@@ -13,15 +13,15 @@ type JWT interface {
 
 type UserController struct {
 	model  *models.Users
-	logger logging.Logger
+	logger log.Logger
 	jwt    JWT
 }
 
-func NewUsersController(m *models.Users, jwt JWT, log logging.Logger) *UserController {
+func NewUsersController(m *models.Users, jwt JWT) *UserController {
 	uc := &UserController{}
 	uc.jwt = jwt
 	uc.model = m
-	uc.logger = log
+
 	return uc
 }
 
