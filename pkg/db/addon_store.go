@@ -1,6 +1,9 @@
 package db
 
-import json "github.com/json-iterator/go"
+import (
+	"encoding/json"
+	"github.com/tidwall/gjson"
+)
 
 const AddonTable = "settings"
 
@@ -27,11 +30,11 @@ func (s *Storage) LoadAddonConfig(key string) (value string, err error) {
 }
 
 func (s *Storage) StoreAddonsConfig(key string, v any) error {
-	value, err := json.MarshalToString(v)
+	value, err := json.Marshal(v)
 	if err != nil {
 		return err
 	}
-	return s.SetSetting("addons.config."+key, value)
+	return s.SetSetting("addons.config."+key, gjson.GetBytes(value, "@pretty").String())
 }
 
 func (s *Storage) RemoveAddonSettingAndConfig(key string) error {

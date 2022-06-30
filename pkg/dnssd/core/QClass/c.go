@@ -1,12 +1,12 @@
 package QClass
 
-type QClass = uint16
+type T = uint16
 
 const (
 	kQClassUnicastAnswerFlag uint16 = 0x8000
 	kQClassResponseFlushBit  uint16 = 0x8000
-	IN                       QClass = 1
-	ANY                      QClass = 255
-	InUnicast                QClass = IN | kQClassUnicastAnswerFlag
-	InFlush                  QClass = IN | kQClassResponseFlushBit
+	IN                       T      = 1
+	ANY                      T      = 255
+	InUnicast                T      = IN | kQClassUnicastAnswerFlag
+	InFlush                  T      = IN | kQClassResponseFlushBit
 )

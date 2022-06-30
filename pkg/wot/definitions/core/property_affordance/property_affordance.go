@@ -1,11 +1,12 @@
 package property_affordance
 
 import (
+	"encoding/json"
 	"fmt"
 	ia "github.com/galenliu/gateway/pkg/wot/definitions/core/interaction_affordance"
 	schema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
-	json "github.com/json-iterator/go"
+	"github.com/tidwall/gjson"
 )
 
 type PropertyAffordance struct {
@@ -22,7 +23,7 @@ func (p *PropertyAffordance) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	p.InteractionAffordance = &in
-	dataType := json.Get(data, "type").ToString()
+	dataType := gjson.GetBytes(data, "type").String()
 	switch dataType {
 	case controls.TypeInteger:
 		var dataSchema schema.IntegerSchema
@@ -76,7 +77,7 @@ func (p *PropertyAffordance) UnmarshalJSON(data []byte) error {
 	default:
 		return fmt.Errorf("unsupported type: %s", dataType)
 	}
-	p.Observable = json.Get(data, "observable").ToBool()
+	p.Observable = gjson.GetBytes(data, "observable").Bool()
 	return nil
 }
 

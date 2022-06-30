@@ -14,7 +14,7 @@ type ResourceRecord interface {
 
 type resourceRecord struct {
 	mTtl        uint32
-	mQType      QType.QType
+	mQType      QType.T
 	mQname      *core.FullQName
 	mCacheFlush bool
 }

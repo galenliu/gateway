@@ -2,9 +2,9 @@ package proxy
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	things "github.com/galenliu/gateway/api/models/container"
-	json "github.com/json-iterator/go"
 	_ "github.com/mattn/go-sqlite3"
 )
 

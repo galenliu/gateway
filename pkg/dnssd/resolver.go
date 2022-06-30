@@ -1,7 +1,7 @@
 package dnssd
 
 import (
-	"github.com/galenliu/gateway/pkg/matter/inet"
+	"github.com/galenliu/gateway/pkg/inet"
 	"sync"
 )
 

@@ -1,9 +1,9 @@
 package effects
 
 import (
+	"encoding/json"
 	"github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/rules_engine/state"
-	json "github.com/json-iterator/go"
 )
 
 type Description = any

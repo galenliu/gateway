@@ -5,12 +5,15 @@ import (
 	"github.com/galenliu/gateway/pkg/dnssd/core"
 	"github.com/galenliu/gateway/pkg/dnssd/core/QClass"
 	"github.com/galenliu/gateway/pkg/dnssd/core/QType"
+	"github.com/galenliu/gateway/pkg/dnssd/core/ResourceType"
 	"github.com/galenliu/gateway/pkg/dnssd/mdns"
 	"github.com/galenliu/gateway/pkg/dnssd/record"
 	"github.com/galenliu/gateway/pkg/dnssd/responders"
 	"github.com/galenliu/gateway/pkg/errors"
-	"github.com/galenliu/gateway/pkg/matter/inet"
-	"github.com/galenliu/gateway/pkg/matter/inet/udp_endpoint"
+	"github.com/galenliu/gateway/pkg/inet/IP"
+	"github.com/galenliu/gateway/pkg/inet/IPPacket"
+	"github.com/galenliu/gateway/pkg/inet/Interface"
+	"github.com/galenliu/gateway/pkg/inet/udp_endpoint"
 	log "github.com/sirupsen/logrus"
 	"math/rand"
 	"strconv"
@@ -27,10 +30,6 @@ const (
 	kRemovingAll
 )
 
-type MdnsServerBase interface {
-	Shutdown()
-}
-
 // Advertiser 实现 PacketDelegate 和 ParserDelegate
 type Advertiser struct {
 	mResponseSender                        *ResponseSender
@@ -38,16 +37,17 @@ type Advertiser struct {
 	mIsInitialized                         bool
 	mQueryResponderAllocatorCommissionable *QueryResponderAllocator
 	mQueryResponderAllocatorCommissioner   *QueryResponderAllocator
-	mCurrentSource                         *inet.IPPacketInfo
-	mMessageId                             uint32
+	mCurrentSource                         *IPPacket.Info
+	mMessageId                             uint16
 }
 
 var insAdvertiser *Advertiser
 var advertiserOnce sync.Once
 
-func AdvertiserInstance() *Advertiser {
+func GetAdvertiserInstance() *Advertiser {
 	advertiserOnce.Do(func() {
-		insAdvertiser = newAdvertiser()
+		insAdvertiser = defaultAdvertiser()
+		insAdvertiser.mResponseSender = NewResponseSender(mdns.GlobalServer())
 		mdns.GlobalServer().SetQueryDelegate(insAdvertiser)
 		insAdvertiser.mResponseSender.AddQueryResponder(insAdvertiser.mQueryResponderAllocatorCommissionable.GetQueryResponder())
 		insAdvertiser.mResponseSender.AddQueryResponder(insAdvertiser.mQueryResponderAllocatorCommissioner.GetQueryResponder())
@@ -55,7 +55,7 @@ func AdvertiserInstance() *Advertiser {
 	return insAdvertiser
 }
 
-func newAdvertiser() *Advertiser {
+func defaultAdvertiser() *Advertiser {
 	return &Advertiser{}
 }
 
@@ -66,8 +66,7 @@ func (s *Advertiser) Init(udpEndPointManager udp_endpoint.UDPEndpoint) error {
 	if s.mIsInitialized {
 		s.UpdateCommissionableInstanceName()
 	}
-
-	s.mResponseSender = NewResponseSender()
+	s.mResponseSender = NewResponseSender(mdns.GlobalServer())
 	s.mResponseSender.SetServer(mdns.GlobalServer())
 
 	err := mdns.GlobalServer().StartServer(udpEndPointManager, kMdnsPort)
@@ -75,7 +74,7 @@ func (s *Advertiser) Init(udpEndPointManager udp_endpoint.UDPEndpoint) error {
 		return err
 	}
 
-	err = s.AdvertiseRecords(kStarted)
+	err = s.advertiseRecords(kStarted)
 	if err != nil {
 		return err
 	}
@@ -89,45 +88,39 @@ func (s *Advertiser) RemoveServices() error {
 	return nil
 }
 
-func (s *Advertiser) AdvertiseRecords(t BroadcastAdvertiseType) error {
+func (s *Advertiser) Shutdown() {
+
+}
+
+func (s *Advertiser) advertiseRecords(t BroadcastAdvertiseType) error {
 
 	responseConfiguration := &responders.ResponseConfiguration{}
 	if t == kRemovingAll {
 		responseConfiguration.SetTtlSecondsOverride(0)
 	}
 
-	//ifs, err := net.Interfaces()
-	//if err != nil {
-	//	return err
-	//}
-	//for _, f := range ifs {
-	//	if f.Flags < net.FlagMulticast {
-	//		continue
-	//	}
-	//	adders, err := f.Addrs()
-	//	if err != nil {
-	//		continue
-	//	}
-	//	for _, a := range adders {
-	//		ip, _ := netip.ParseAddr(a.String())
-	//		if ip.Is6() {
-	//
-	//		}
-	//	}
-	//}
-	{
-		var packetInfo inet.IPPacketInfo
-		packetInfo.SrcPort = kMdnsPort
-		packetInfo.DestPort = kMdnsPort
-		packetInfo.InterfaceId = inet.InterfaceId{}
-		queryData := mdns.NewQueryData(QType.PTR, QClass.IN, false)
-		queryData.SetIsInternalBroadcast(true)
+	for _, inter := range Interface.GetInterfaceIds() {
+		for _, addr := range IP.GetAddress(inter) {
+			var packetInfo IPPacket.Info
+			packetInfo.SrcAddress = addr
+			if addr.Is6() {
+				packetInfo.DestAddress = mdns.GetIpv6Into()
+			}
+			if addr.Is4() {
+				packetInfo.DestAddress = mdns.GetIpv4Into()
+			}
+			packetInfo.SrcPort = kMdnsPort
+			packetInfo.DestPort = kMdnsPort
+			packetInfo.InterfaceId = inter
 
-		err := s.mResponseSender.Respond(0, queryData, &packetInfo, responseConfiguration)
-		if err != nil {
-			return err
+			queryData := mdns.NewQueryData(QType.PTR, QClass.IN, false)
+			queryData.SetIsInternalBroadcast(true)
+
+			err := s.mResponseSender.Respond(0, queryData, &packetInfo, responseConfiguration)
+			if err != nil {
+				return err
+			}
 		}
-
 	}
 
 	//s.mQueryResponderAllocatorCommissionable.GetQueryResponder()
@@ -138,7 +131,7 @@ func (s *Advertiser) AdvertiseRecords(t BroadcastAdvertiseType) error {
 
 func (s *Advertiser) AdvertiseCommission(params CommissionAdvertisingParameters) error {
 
-	_ = s.AdvertiseRecords(kRemovingAll)
+	_ = s.advertiseRecords(kRemovingAll)
 
 	var allocator *QueryResponderAllocator
 	//var serviceType string
@@ -159,23 +152,11 @@ func (s *Advertiser) AdvertiseCommission(params CommissionAdvertisingParameters)
 	} else {
 		serviceType = kCommissionableServiceName
 	}
-	serviceName := &core.FullQName{
-		ServerType: serviceType,
-		Protocol:   kCommissionProtocol,
-		Domain:     kLocalDomain,
-	}
+	serviceName, _ := core.ParseFullQName(string(serviceType), kCommissionProtocol, kLocalDomain)
 
-	instanceName := &core.FullQName{
-		Instance:   s.GetCommissionableInstanceName(),
-		ServerType: serviceType,
-		Protocol:   kCommissionProtocol,
-		Domain:     kLocalDomain,
-	}
+	instanceName, _ := core.ParseFullQName(s.GetCommissionableInstanceName(), string(serviceType), kCommissionProtocol, kLocalDomain)
 
-	hostName := &core.FullQName{
-		Domain:   kLocalDomain,
-		Instance: s.GetCommissionableInstanceName(),
-	}
+	hostName, _ := core.ParseFullQName(kLocalDomain, s.GetCommissionableInstanceName())
 
 	if !allocator.AddResponder(responders.NewPtrResponder(serviceName, instanceName)).
 		SetReportAdditional(instanceName).
@@ -204,12 +185,8 @@ func (s *Advertiser) AdvertiseCommission(params CommissionAdvertisingParameters)
 
 	if params.GetVendorId() != nil {
 		name := fmt.Sprintf("_V%d", *params.GetVendorId())
-		vendorServiceName := &core.FullQName{
-			Instance:   name,
-			ServerType: kSubtypeServiceNamePart + serviceType,
-			Protocol:   kCommissionProtocol,
-			Domain:     kLocalDomain,
-		}
+
+		vendorServiceName, _ := core.ParseFullQName(name, kSubtypeServiceNamePart, string(serviceType), kCommissionProtocol, kLocalDomain)
 		if !allocator.AddResponder(responders.NewPtrResponder(vendorServiceName, instanceName)).
 			SetReportAdditional(instanceName).
 			SetReportInServiceListing(true).
@@ -220,12 +197,7 @@ func (s *Advertiser) AdvertiseCommission(params CommissionAdvertisingParameters)
 
 	if params.GetDeviceType() != nil {
 		name := fmt.Sprintf("_T%d", *params.GetDeviceType())
-		typeServiceName := &core.FullQName{
-			ServerType: kSubtypeServiceNamePart + serviceType,
-			Protocol:   kCommissionProtocol,
-			Domain:     kLocalDomain,
-			Instance:   name,
-		}
+		typeServiceName, _ := core.ParseFullQName(name, kSubtypeServiceNamePart, string(serviceType), kCommissionProtocol, kLocalDomain)
 		if !allocator.AddResponder(responders.NewPtrResponder(typeServiceName, instanceName)).
 			SetReportAdditional(instanceName).
 			SetReportInServiceListing(true).
@@ -244,17 +216,20 @@ func (s *Advertiser) AdvertiseCommission(params CommissionAdvertisingParameters)
 		return errors.New("failed to add TXT record mDNS responder")
 	}
 
-	err := s.AdvertiseRecords(kStarted)
+	err := s.advertiseRecords(kStarted)
 	if err != nil {
 		return err
 	}
-	log.Infof("mDNS service published: %s.%s", instanceName.ServerType, instanceName.Protocol)
+	log.Infof("mDNS service published: %s", instanceName.String())
 	return nil
 }
 
-func (s *Advertiser) OnMdnsPacketData(data *core.BytesRange, info *inet.IPPacketInfo) {
+func (s *Advertiser) OnMdnsPacketData(data *core.BytesRange, info *IPPacket.Info) {
 	s.mCurrentSource = info
-	errors.LogError(mdns.ParsePacket(data, s), "Discovery", "Failed to parse mDNS query")
+	if mdns.ParsePacket(data, s) {
+		log.Infof("failed to parse mDNS query")
+	}
+	s.mCurrentSource = nil
 }
 
 func (s *Advertiser) UpdateCommissionableInstanceName() {
@@ -274,8 +249,7 @@ func (s *Advertiser) FinalizeServiceUpdate() error {
 }
 
 func (s *Advertiser) OnHeader(header *core.ConstHeaderRef) {
-	//TODO implement me
-	panic("implement me")
+	s.mMessageId = header.GetMessageId()
 }
 
 func (s *Advertiser) OnQuery(queryData *mdns.QueryData) {
@@ -288,7 +262,7 @@ func (s *Advertiser) OnQuery(queryData *mdns.QueryData) {
 		"Failed to reply to query")
 }
 
-func (s *Advertiser) OnResource(t *QType.ResourceType, data *mdns.ResourceData) {
+func (s *Advertiser) OnResource(t ResourceType.T, data *mdns.ResourceData) {
 	//TODO implement me
 	panic("implement me")
 }
@@ -299,22 +273,20 @@ func (s *Advertiser) FindOperationalAllocator(qname core.QNamePart) *QueryRespon
 
 func (s *Advertiser) GetCommissioningTxtEntries(params CommissionAdvertisingParameters) *core.FullQName {
 
-	var txt = &core.FullQName{
-		Txt: make(map[string]string),
-	}
+	var txt = &core.FullQName{}
 
-	if params.GetProductId() != nil && params.GetVendorId() != nil {
-		txt.Txt["VP"] = fmt.Sprintf("%d+%d", *params.GetVendorId(), *params.GetProductId())
-	} else if params.GetVendorId() != nil {
-		txt.Txt["VP"] = fmt.Sprintf("%d", params.GetVendorId())
-	}
-
-	if params.GetDeviceType() != nil {
-		txt.Txt["DT"] = fmt.Sprintf("%d", *params.GetDeviceType())
-	}
-
-	if params.GetDeviceName() != "" {
-		txt.Txt["DN"] = fmt.Sprintf("%s", params.GetDeviceName())
-	}
+	//if params.GetProductId() != nil && params.GetVendorId() != nil {
+	//	txt.Txt["VP"] = fmt.Sprintf("%d+%d", *params.GetVendorId(), *params.GetProductId())
+	//} else if params.GetVendorId() != nil {
+	//	txt.Txt["VP"] = fmt.Sprintf("%d", params.GetVendorId())
+	//}
+	//
+	//if params.GetDeviceType() != nil {
+	//	txt.Txt["DT"] = fmt.Sprintf("%d", *params.GetDeviceType())
+	//}
+	//
+	//if params.GetDeviceName() != "" {
+	//	txt.Txt["DN"] = fmt.Sprintf("%s", params.GetDeviceName())
+	//}
 	return txt
 }

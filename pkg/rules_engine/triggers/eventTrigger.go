@@ -1,9 +1,9 @@
 package triggers
 
 import (
+	"encoding/json"
 	things "github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/bus/topic"
-	json "github.com/json-iterator/go"
 )
 
 type EventTriggerDescription struct {

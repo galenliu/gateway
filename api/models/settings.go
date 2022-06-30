@@ -5,7 +5,7 @@ import (
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
-	json "github.com/json-iterator/go"
+	"github.com/tidwall/gjson"
 )
 
 type AddonInfo struct {
@@ -46,8 +46,8 @@ func (s *Settings) GetTunnelInfo() string {
 		log.Info("Tunnel domain not set.")
 		return "Not Set."
 	}
-	name := json.Get([]byte(token), "name").ToString()
-	base := json.Get([]byte(token), "base").ToString()
+	name := gjson.GetBytes([]byte(token), "name").String()
+	base := gjson.GetBytes([]byte(token), "base").String()
 	log.Info("Tunnel domain found. Tunnel name is: &s and tunnel domain is: %s", name, base)
 	tunnelDomain := fmt.Sprintf("https://%s.%s", name, base)
 	return tunnelDomain

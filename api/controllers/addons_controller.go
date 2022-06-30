@@ -1,10 +1,11 @@
 package controllers
 
 import (
+	"encoding/json"
 	"github.com/galenliu/gateway/api/models"
 	"github.com/galenliu/gateway/pkg/log"
 	"github.com/gofiber/fiber/v2"
-	json "github.com/json-iterator/go"
+	"github.com/tidwall/gjson"
 	"net/http"
 )
 
@@ -56,7 +57,7 @@ func (addon *AddonController) handlerGetLicense(c *fiber.Ctx) error {
 // PUT /addons/:addonId
 func (addon *AddonController) handlerSetAddon(c *fiber.Ctx) error {
 	addonId := c.Params("addonId")
-	enabled := json.Get(c.Body(), "enabled").ToBool()
+	enabled := gjson.GetBytes(c.Body(), "enabled").Bool()
 	var err error
 	if enabled {
 		err = addon.manager.EnableAddon(addonId)
@@ -89,7 +90,7 @@ func (addon *AddonController) handlerGetAddonConfig(c *fiber.Ctx) error {
 func (addon *AddonController) handlerSetAddonConfig(c *fiber.Ctx) error {
 
 	var addonId = c.Params("addonId")
-	config := json.Get(c.Body(), "config").ToString()
+	config := gjson.GetBytes(c.Body(), "config").String()
 	if config == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "config empty")
 	}
@@ -119,9 +120,9 @@ func (addon *AddonController) handlerSetAddonConfig(c *fiber.Ctx) error {
 // Post /addons
 func (addon *AddonController) handlerInstallAddon(c *fiber.Ctx) error {
 
-	id := json.Get(c.Body(), "id").ToString()
-	url := json.Get(c.Body(), "url").ToString()
-	checksum := json.Get(c.Body(), "checksum").ToString()
+	id := gjson.GetBytes(c.Body(), "id").String()
+	url := gjson.GetBytes(c.Body(), "url").String()
+	checksum := gjson.GetBytes(c.Body(), "checksum").String()
 
 	if id == "" || url == "" || checksum == "" {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "Bad Request"})
@@ -140,8 +141,8 @@ func (addon *AddonController) handlerInstallAddon(c *fiber.Ctx) error {
 // Patch addons/:addonId
 func (addon *AddonController) handlerUpdateAddon(c *fiber.Ctx) error {
 	id := c.Params("addonId")
-	url := json.Get(c.Body(), "url").ToString()
-	checksum := json.Get(c.Body(), "checksum").ToString()
+	url := gjson.GetBytes(c.Body(), "url").String()
+	checksum := gjson.GetBytes(c.Body(), "checksum").String()
 	if id == "" || url == "" || checksum == "" {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "Bad Request"})
 	}

@@ -1,10 +1,10 @@
 package triggers
 
 import (
+	"encoding/json"
 	things "github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/rules_engine/state"
-	json "github.com/json-iterator/go"
 )
 
 const OpAND = "AND"

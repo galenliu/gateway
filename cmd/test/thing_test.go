@@ -14,10 +14,12 @@ func TestThingMarshal(t *testing.T) {
 		var thing things.Thing
 		err := json.Unmarshal([]byte(data), &thing)
 		if err != nil {
+			t.Log(err.Error())
 			return
 		}
 		marshal, err := json.Marshal(thing)
 		if err != nil {
+			t.Log(err.Error())
 			return
 		}
 		pjson := gjson.GetBytes(marshal, "@pretty")

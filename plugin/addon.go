@@ -3,8 +3,8 @@
 package plugin
 
 import (
+	"encoding/json"
 	"fmt"
-	json "github.com/json-iterator/go"
 	"path"
 )
 

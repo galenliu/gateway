@@ -12,22 +12,22 @@ type ResponderDelegate interface {
 }
 
 type responder struct {
-	mQType QType.QType
+	mQType QType.T
 	mQName *core.FullQName
 }
 
-func newResponder(qType QType.QType, mQname *core.FullQName) *responder {
+func newResponder(qType QType.T, mQname *core.FullQName) *responder {
 	return &responder{
 		mQType: qType,
 		mQName: mQname,
 	}
 }
 
-func (r responder) GetQClass() QClass.QClass {
+func (r responder) GetQClass() QClass.T {
 	return QClass.IN
 }
 
-func (r responder) GetQType() QType.QType {
+func (r responder) GetQType() QType.T {
 	return r.mQType
 }
 

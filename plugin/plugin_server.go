@@ -3,10 +3,10 @@ package plugin
 //	plugin api
 import (
 	"context"
+	"encoding/json"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/log"
 	"github.com/gofiber/websocket/v2"
-	json "github.com/json-iterator/go"
 	"sync"
 )
 

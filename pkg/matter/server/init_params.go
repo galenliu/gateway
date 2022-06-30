@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/galenliu/gateway/pkg/inet/Interface"
 	"github.com/galenliu/gateway/pkg/matter/access"
 	"github.com/galenliu/gateway/pkg/matter/config"
 	"github.com/galenliu/gateway/pkg/matter/lib"
@@ -10,7 +11,7 @@ import (
 type InitParams struct {
 	OperationalServicePort        int
 	UserDirectedCommissioningPort int
-	InterfaceId                   net.Interface
+	InterfaceId                   Interface.Id
 	AppDelegate                   any //unknown
 	PersistentStorageDelegate     lib.PersistentStorageDelegate
 	SessionResumptionStorage      any
@@ -35,7 +36,7 @@ func InitializeStaticResourcesBeforeServerInit() (initParams InitParams) {
 	for _, inter := range list {
 		adders, _ := inter.Addrs()
 		if len(adders) > 1 {
-			initParams.InterfaceId = inter
+			initParams.InterfaceId = Interface.Id{Interface: inter}
 		}
 	}
 	return

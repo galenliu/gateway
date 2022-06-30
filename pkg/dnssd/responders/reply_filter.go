@@ -7,5 +7,5 @@ import (
 )
 
 type ReplyFilter interface {
-	Accept(QType.QType, QClass.QClass, *core.FullQName) bool
+	Accept(QType.T, QClass.T, *core.FullQName) bool
 }

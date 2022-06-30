@@ -1,7 +1,7 @@
 package transport
 
 import (
-	"github.com/galenliu/gateway/pkg/matter/inet"
+	"github.com/galenliu/gateway/pkg/inet/udp_endpoint"
 	"net/netip"
 )
 
@@ -9,7 +9,7 @@ type UdpListenParameters struct {
 	mAddr            netip.Addr
 	mPort            int
 	mNativeParams    func()
-	mEndPointManager inet.EndpointManager
+	mEndPointManager udp_endpoint.UDPEndpoint
 }
 
 func (p *UdpListenParameters) SetListenPort(port int) {
@@ -23,6 +23,6 @@ func (p *UdpListenParameters) SetNativeParams(params func()) {
 type UdpTransport struct {
 }
 
-func NewUdpTransport(mgr inet.EndpointManager, params UdpListenParameters) (*UdpTransport, error) {
+func NewUdpTransport(mgr udp_endpoint.UDPEndpoint, params UdpListenParameters) (*UdpTransport, error) {
 	return nil, nil
 }

@@ -3,17 +3,17 @@ package server
 import (
 	"github.com/galenliu/gateway/pkg/dnssd"
 	"github.com/galenliu/gateway/pkg/errors"
+	"github.com/galenliu/gateway/pkg/inet/Interface"
+	"github.com/galenliu/gateway/pkg/inet/udp_endpoint"
 	"github.com/galenliu/gateway/pkg/matter/access"
 	"github.com/galenliu/gateway/pkg/matter/config"
 	"github.com/galenliu/gateway/pkg/matter/controller"
 	"github.com/galenliu/gateway/pkg/matter/credentials"
-	"github.com/galenliu/gateway/pkg/matter/inet"
 	"github.com/galenliu/gateway/pkg/matter/lib"
 	"github.com/galenliu/gateway/pkg/matter/messageing"
 	"github.com/galenliu/gateway/pkg/matter/server/internal"
 	"github.com/galenliu/gateway/pkg/matter/transport"
 	"log"
-	"net"
 	"sync"
 )
 
@@ -27,7 +27,7 @@ type Server struct {
 	mUnsecuredServicePort          int
 	mOperationalServicePort        int
 	mUserDirectedCommissioningPort int
-	mInterfaceId                   net.Interface
+	mInterfaceId                   Interface.Id
 	config                         Config
 	dnssdServer                    *DnssdServer
 	mFabrics                       *credentials.FabricTable
@@ -42,7 +42,7 @@ type Server struct {
 	mListener                      any
 }
 
-func NewCHIPServer() *Server {
+func defaultServer() *Server {
 	return &Server{}
 }
 
@@ -55,7 +55,7 @@ func (s *Server) Init(initParams InitParams) {
 	s.mSecuredServicePort = initParams.UserDirectedCommissioningPort
 	s.mInterfaceId = initParams.InterfaceId
 
-	s.dnssdServer = NewDnssdServer()
+	s.dnssdServer = defaultDnssd()
 	s.dnssdServer.SetFabricTable(s.mFabrics)
 
 	s.mCommissioningWindowManager = NewCommissioningWindowManager(s)
@@ -100,13 +100,13 @@ func (s *Server) Init(initParams InitParams) {
 	params := transport.UdpListenParameters{}
 	params.SetListenPort(s.mOperationalServicePort)
 	params.SetNativeParams(initParams.EndpointNativeParams)
-	s.mTransports, err = transport.NewUdpTransport(inet.UDPEndpointManager{}, params)
+	s.mTransports, err = transport.NewUdpTransport(udp_endpoint.UDPEndpoint{}, params)
 	errors.SuccessOrExit(err)
 
 	s.mListener, err = server.IntGroupDataProviderListener(s.mTransports)
 	errors.SuccessOrExit(err)
 
-	dnssd.ResolverInstance().Init(inet.UDPEndpointManager{})
+	dnssd.ResolverInstance().Init(udp_endpoint.UDPEndpoint{})
 
 	DnssdInstance().SetSecuredPort(s.mOperationalServicePort)
 	DnssdInstance().SetUnsecuredPort(s.mUserDirectedCommissioningPort)
@@ -137,7 +137,7 @@ var once sync.Once
 // GetInstance CHIP服务，单例模式，一个应用中只会存在一个实例
 func GetInstance() *Server {
 	once.Do(func() {
-		ins = NewCHIPServer()
+		ins = defaultServer()
 	})
 	return ins
 }

@@ -14,7 +14,7 @@ func IncorrectState(info string) error {
 	return fmt.Errorf("incorrect State: %s", info)
 }
 
-func NotImplement(info string) error {
+func NotImplement(info ...string) error {
 	return fmt.Errorf("not implement: %s", info)
 }
 

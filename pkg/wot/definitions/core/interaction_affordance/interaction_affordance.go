@@ -1,9 +1,9 @@
 package interaction_affordance
 
 import (
+	"encoding/json"
 	schema "github.com/galenliu/gateway/pkg/wot/definitions/data_schema"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
-	json "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
 )
 

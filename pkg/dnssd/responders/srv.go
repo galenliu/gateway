@@ -3,7 +3,7 @@ package responders
 import (
 	"github.com/galenliu/gateway/pkg/dnssd/core/QType"
 	"github.com/galenliu/gateway/pkg/dnssd/record"
-	"github.com/galenliu/gateway/pkg/matter/inet"
+	"github.com/galenliu/gateway/pkg/inet/IPPacket"
 )
 
 type SrvResponder struct {
@@ -18,12 +18,11 @@ func NewSrvResponder(resourceRecord *record.SrvResourceRecord) *SrvResponder {
 				mQType: QType.SRV,
 				mQName: resourceRecord.GetName(),
 			},
-			mTtl: kDefaultTtl,
 		},
 		mRecord: resourceRecord,
 	}
 }
 
-func (r *SrvResponder) AddAllResponses(source *inet.IPPacketInfo, delegate ResponderDelegate, configuration *ResponseConfiguration) {
+func (r *SrvResponder) AddAllResponses(source *IPPacket.Info, delegate ResponderDelegate, configuration *ResponseConfiguration) {
 
 }

@@ -1,10 +1,11 @@
 package triggers
 
 import (
+	"encoding/json"
 	"fmt"
 	things "github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/bus"
-	json "github.com/json-iterator/go"
+	"github.com/tidwall/gjson"
 )
 
 const TypeBooleanTrigger = "BooleanTrigger"
@@ -71,7 +72,7 @@ func FromDescription(a any, container things.Container) Entity {
 		fmt.Printf("Error marshalling err: %s", err.Error())
 		return nil
 	}
-	switch json.Get(data, "type").ToString() {
+	switch gjson.GetBytes(data, "type").String() {
 	case TypeBooleanTrigger:
 		var desc BooleanTriggerDescription
 		err := json.Unmarshal(data, &desc)

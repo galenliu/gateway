@@ -2,7 +2,7 @@ package actions
 
 import (
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
-	json "github.com/json-iterator/go"
+	"github.com/tidwall/gjson"
 )
 
 type ActionInput map[string]any
@@ -27,10 +27,10 @@ type Action struct {
 }
 
 func (a *Action) UnmarshalJSON(data []byte) error {
-	a.AtType = json.Get(data, "@type").ToString()
-	a.Type = json.Get(data, "type").ToString()
-	a.Title = json.Get(data, "title").ToString()
-	a.Description = json.Get(data, "description").ToString()
+	a.AtType = gjson.GetBytes(data, "@type").String()
+	a.Type = gjson.GetBytes(data, "type").String()
+	a.Title = gjson.GetBytes(data, "title").String()
+	a.Description = gjson.GetBytes(data, "description").String()
 	return nil
 }
 

@@ -8,8 +8,9 @@ import (
 	"github.com/galenliu/gateway/pkg/log"
 	wot "github.com/galenliu/gateway/pkg/wot/definitions/core"
 	controls "github.com/galenliu/gateway/pkg/wot/definitions/hypermedia_controls"
+	"github.com/tidwall/gjson"
 
-	json "github.com/json-iterator/go"
+	"encoding/json"
 
 	"time"
 )
@@ -65,16 +66,16 @@ func (t *Thing) UnmarshalJSON(data []byte) error {
 	t.Thing = &thing
 
 	var pin ThingPin
-	if p := json.Get(data, "pin"); p.LastError() == nil {
-		p.ToVal(&pin)
-		if &pin != nil {
+	if result := gjson.GetBytes(data, "pin"); result.Exists() {
+		err := json.Unmarshal(data[result.Index:result.Index+len(result.Raw)], &pin)
+		if err != nil {
 			t.Pin = &pin
 		}
 	}
-	t.CredentialsRequired = json.Get(data, "credentialsRequired").ToBool()
-	t.Connected = json.Get(data, "connected").ToBool()
-	t.GroupId = json.Get(data, "groupId").ToString()
-	t.SelectedCapability = json.Get(data, "selectedCapability").ToString()
+	t.CredentialsRequired = gjson.GetBytes(data, "credentialsRequired").Bool()
+	t.Connected = gjson.GetBytes(data, "connected").Bool()
+	t.GroupId = gjson.GetBytes(data, "groupId").String()
+	t.SelectedCapability = gjson.GetBytes(data, "selectedCapability").String()
 	if t.SelectedCapability == "" {
 		t.SelectedCapability = t.AtType[0]
 	}

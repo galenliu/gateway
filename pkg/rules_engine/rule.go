@@ -1,12 +1,12 @@
 package rules_engine
 
 import (
+	"encoding/json"
 	things "github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/bus/topic"
 	"github.com/galenliu/gateway/pkg/rules_engine/effects"
 	"github.com/galenliu/gateway/pkg/rules_engine/state"
 	"github.com/galenliu/gateway/pkg/rules_engine/triggers"
-	json "github.com/json-iterator/go"
 )
 
 type RuleDescription struct {
@@ -57,13 +57,13 @@ func (r Rule) MarshalJSON() ([]byte, error) {
 	desc := RuleDescription{
 		Enabled: r.enabled,
 		Id:      r.id,
-		Trigger: func() json.Any {
+		Trigger: func() any {
 			data, _ := json.Marshal(&r.trigger)
-			return json.Get(data)
+			return data
 		}(),
-		Effect: func() json.Any {
+		Effect: func() any {
 			data, _ := json.Marshal(&r.effect)
-			return json.Get(data)
+			return data
 		}(),
 		Name: r.name,
 	}
@@ -81,7 +81,7 @@ func (r *Rule) Start() {
 	if r.trigger == nil {
 		return
 	}
-	r.trigger.Subscribe(topic.StateChanged, r.onTriggerStateChanged)
+	_ = r.trigger.Subscribe(topic.StateChanged, r.onTriggerStateChanged)
 	r.trigger.Start()
 }
 

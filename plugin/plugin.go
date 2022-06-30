@@ -2,13 +2,14 @@ package plugin
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/fasthttp/websocket"
 	"github.com/galenliu/gateway/pkg/addon/actions"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
-	json "github.com/json-iterator/go"
+	"github.com/tidwall/gjson"
 	"os"
 	"os/exec"
 	"runtime"
@@ -227,7 +228,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 	}
 
 	//处理adapter消息，如果adapter未注册，则丢弃消息
-	adapterId := json.Get(data, "adapterId").ToString()
+	adapterId := gjson.GetBytes(data, "adapterId").String()
 	adapter := plugin.getAdapter(adapterId)
 	if adapter == nil {
 		log.Errorf("can not find adapter %s", adapterId)
@@ -313,7 +314,7 @@ func (plugin *Plugin) OnMsg(bt []byte) {
 	}
 
 	//处理device消息，如果device没有注册，则丢弃消息
-	deviceId := json.Get(data, "deviceId").ToString()
+	deviceId := gjson.GetBytes(data, "deviceId").String()
 	dev := plugin.manager.getDevice(deviceId)
 	if dev == nil {
 		log.Errorf("device:%s not found", deviceId)

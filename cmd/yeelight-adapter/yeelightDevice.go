@@ -2,11 +2,11 @@ package yeelight_adapter
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/galenliu/gateway/cmd/yeelight-adapter/lib"
 	"github.com/galenliu/gateway/pkg/addon/devices"
 	"github.com/galenliu/gateway/pkg/addon/properties"
-	json "github.com/json-iterator/go"
 	"github.com/xiam/to"
 	"log"
 	"strconv"

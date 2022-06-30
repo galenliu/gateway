@@ -1,11 +1,12 @@
 package mdns
 
-import "net"
+import (
+	"github.com/galenliu/gateway/pkg/inet/udp_endpoint"
+	"net/netip"
+)
 
 type EndpointInfo struct {
-	udp *UDPEndPoint
-}
-
-type UDPEndPoint interface {
-	Bind(listener net.TCPListener)
+	mInterfaceId Interface.Id
+	mAddress     netip.Addr
+	mListenUdp   *udp_endpoint.UDPEndpoint
 }

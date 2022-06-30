@@ -2,9 +2,9 @@ package db
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"github.com/galenliu/gateway/pkg/rules_engine"
-	json "github.com/json-iterator/go"
 	log "github.com/sirupsen/logrus"
 )
 

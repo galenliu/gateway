@@ -3,8 +3,8 @@ package util
 import (
 	"bytes"
 	"crypto/sha256"
+	"encoding/json"
 	"fmt"
-	json "github.com/json-iterator/go"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"io/ioutil"

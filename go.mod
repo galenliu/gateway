@@ -9,7 +9,6 @@ require (
 	github.com/gofiber/fiber/v2 v2.34.1
 	github.com/gofiber/websocket/v2 v2.0.14
 	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/json-iterator/go v1.1.12
 	github.com/kardianos/service v1.2.0
 	github.com/mattn/go-sqlite3 v1.14.12
 	github.com/melbahja/got v0.6.1
@@ -44,8 +43,6 @@ require (
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/miekg/dns v1.1.46 // indirect
 	github.com/mitchellh/mapstructure v1.4.2 // indirect
-	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
-	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect

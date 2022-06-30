@@ -2,15 +2,19 @@ package responders
 
 import (
 	"github.com/galenliu/gateway/pkg/dnssd/core"
+	"github.com/galenliu/gateway/pkg/dnssd/core/QClass"
+	"github.com/galenliu/gateway/pkg/dnssd/core/QType"
 	"github.com/galenliu/gateway/pkg/dnssd/record"
-	"github.com/galenliu/gateway/pkg/matter/inet"
+	"github.com/galenliu/gateway/pkg/inet/IPPacket"
 	"time"
 )
 
 type Responder interface {
 	ResetAdditionals()
-	AddAllResponses(*inet.IPPacketInfo, ResponderDelegate, *ResponseConfiguration)
+	AddAllResponses(*IPPacket.Info, ResponderDelegate, *ResponseConfiguration)
 	GetQName() *core.FullQName
+	GetQType() QType.T
+	GetQClass() QClass.T
 }
 
 type QueryResponderRecord struct {
@@ -28,6 +32,12 @@ type QueryResponderInfo struct {
 
 type QueryResponderSettings struct {
 	mInfo *QueryResponderInfo
+}
+
+type QueryResponderRecordFilter struct {
+	mIncludeAdditionalRepliesOnly bool
+	mReplyFilter                  ReplyFilter
+	mIncludeOnlyMulticastBefore   time.Time
 }
 
 func (s *QueryResponderSettings) SetReportAdditional(qName *core.FullQName) *QueryResponderSettings {
@@ -49,21 +59,31 @@ func (s *QueryResponderSettings) SetReportInServiceListing(reportService bool) *
 	return s
 }
 
-type QueryResponderRecordFilter struct {
-	mIncludeAdditionalRepliesOnly bool
-	mReplyFilter                  ReplyFilter
-	mIncludeOnlyMulticastBefore   time.Time
-}
-
-func (f *QueryResponderRecordFilter) SetReplyFilter(filter ReplyFilter) {
+func (f *QueryResponderRecordFilter) SetReplyFilter(filter ReplyFilter) *QueryResponderRecordFilter {
 	f.mReplyFilter = filter
+	return f
 }
 
 func (f *QueryResponderRecordFilter) SetIncludeOnlyMulticastBeforeMS(t time.Time) {
 	f.mIncludeOnlyMulticastBefore = t
 }
 
-func (f *QueryResponderRecordFilter) Accept(r *QueryResponderInfo) bool {
+func (f *QueryResponderRecordFilter) Accept(record *QueryResponderInfo) bool {
+	if record.Responder == nil {
+		return false
+	}
+	if f.mIncludeAdditionalRepliesOnly && !record.reportNowAsAdditional {
+		return false
+	}
+
+	if f.mIncludeOnlyMulticastBefore.Before(time.Now()) && record.LastMulticastTime.Before(f.mIncludeOnlyMulticastBefore) {
+		return false
+	}
+
+	if f.mReplyFilter != nil && !f.mReplyFilter.Accept(record.Responder.GetQType(), record.Responder.GetQClass(), record.Responder.GetQName()) {
+		return false
+	}
+
 	return true
 }
 
@@ -83,7 +103,7 @@ func (r *QueryResponderBase) ResetAdditionals() {
 	}
 }
 
-func (r *QueryResponderBase) AddAllResponses(source *inet.IPPacketInfo, delegate ResponderDelegate, configuration *ResponseConfiguration) {
+func (r *QueryResponderBase) AddAllResponses(source *IPPacket.Info, delegate ResponderDelegate, configuration *ResponseConfiguration) {
 	for _, m := range r.ResponderInfos {
 		if !m.reportService {
 			continue

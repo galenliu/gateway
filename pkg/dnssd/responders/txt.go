@@ -3,7 +3,6 @@ package responders
 import (
 	"github.com/galenliu/gateway/pkg/dnssd/core/QType"
 	"github.com/galenliu/gateway/pkg/dnssd/record"
-	"github.com/galenliu/gateway/pkg/matter/inet"
 )
 
 type TxtResponder struct {
@@ -24,6 +23,6 @@ func NewTxtResponder(resourceRecord *record.TxtResourceRecord) *TxtResponder {
 	}
 }
 
-func (r *TxtResponder) AddAllResponses(source *inet.IPPacketInfo, delegate ResponderDelegate, configuration *ResponseConfiguration) {
+func (r *TxtResponder) AddAllResponses(source *IPPacket.Info, delegate ResponderDelegate, configuration *ResponseConfiguration) {
 
 }

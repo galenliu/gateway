@@ -3,15 +3,21 @@ package server
 import (
 	"github.com/galenliu/gateway/pkg/dnssd"
 	"github.com/galenliu/gateway/pkg/errors"
+	"github.com/galenliu/gateway/pkg/inet"
+	"github.com/galenliu/gateway/pkg/inet/Interface"
+	"github.com/galenliu/gateway/pkg/inet/udp_endpoint"
 	"github.com/galenliu/gateway/pkg/matter/config"
-	"github.com/galenliu/gateway/pkg/matter/inet"
-	"github.com/galenliu/gateway/pkg/matter/inet/udp_endpoint"
 	"github.com/galenliu/gateway/pkg/matter/messageing"
 	"github.com/galenliu/gateway/pkg/matter/platform"
 	"github.com/galenliu/gateway/pkg/util"
-	"net"
 	"sync"
 )
+
+type ServiceAdvertiser interface {
+	Shutdown()
+	RemoveServices() error
+	AdvertiseCommission(dnssd.CommissionAdvertisingParameters) error
+}
 
 type Fabrics interface {
 	FabricCount() int
@@ -19,8 +25,9 @@ type Fabrics interface {
 
 type DnssdServer struct {
 	mSecuredPort               int
+	mdnsAdvertiser             ServiceAdvertiser
 	mUnsecuredPort             int
-	mInterfaceId               net.Interface
+	mInterfaceId               Interface.Id
 	mCommissioningModeProvider *CommissioningWindowManager
 	mFabrics                   Fabrics
 }
@@ -30,13 +37,15 @@ var onceDnssd sync.Once
 
 func DnssdInstance() *DnssdServer {
 	onceDnssd.Do(func() {
-		insDnssd = NewDnssdServer()
+		insDnssd = defaultDnssd()
 	})
 	return insDnssd
 }
 
-func NewDnssdServer() *DnssdServer {
-	return &DnssdServer{}
+func defaultDnssd() *DnssdServer {
+	i := &DnssdServer{}
+	i.mdnsAdvertiser = dnssd.GetAdvertiserInstance()
+	return i
 }
 
 func (d DnssdServer) Shutdown() {
@@ -63,7 +72,7 @@ func (d *DnssdServer) GetUnsecuredPort() int {
 	return d.mUnsecuredPort
 }
 
-func (d *DnssdServer) SetInterfaceId(inter net.Interface) {
+func (d *DnssdServer) SetInterfaceId(inter Interface.Id) {
 	d.mInterfaceId = inter
 }
 
@@ -78,10 +87,10 @@ func (d *DnssdServer) StartServer() error {
 func (d *DnssdServer) startServer(mode dnssd.CommissioningMode) error {
 
 	//使用UDPEndPointManager初始化一个Dnssd-Advertiser
-	err := dnssd.AdvertiserInstance().Init(udp_endpoint.UDPEndpoint{})
+	err := dnssd.GetAdvertiserInstance().Init(udp_endpoint.UDPEndpoint{})
 	errors.LogError(err, "Discover", "Failed initialize advertiser")
 
-	err = dnssd.AdvertiserInstance().RemoveServices()
+	err = dnssd.GetAdvertiserInstance().RemoveServices()
 	errors.LogError(err, "Discover", "Failed to remove advertised services")
 
 	err = d.AdvertiseOperational()
@@ -103,7 +112,7 @@ func (d *DnssdServer) startServer(mode dnssd.CommissioningMode) error {
 		errors.LogError(err, "Discover", "Failed to advertise commissioner")
 	}
 
-	err = dnssd.AdvertiserInstance().FinalizeServiceUpdate()
+	err = dnssd.GetAdvertiserInstance().FinalizeServiceUpdate()
 	errors.LogError(err, "Discover", "Failed to finalize service update")
 
 	return nil
@@ -195,8 +204,8 @@ func (d DnssdServer) Advertise(commissionAbleNode bool, mode dnssd.Commissioning
 		ins := platform.ConfigurationMgr().GetSecondaryPairingInstruction()
 		advertiseParameters.SetPairingInstruction(ins)
 	}
-	mdnsAdvertiser := dnssd.AdvertiserInstance()
-	return mdnsAdvertiser.AdvertiseCommission(advertiseParameters)
+
+	return d.mdnsAdvertiser.AdvertiseCommission(advertiseParameters)
 }
 
 func (d *DnssdServer) SetCommissioningModeProvider(manager *CommissioningWindowManager) {

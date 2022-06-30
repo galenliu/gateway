@@ -1,40 +1,43 @@
 package hypermedia_controls
 
-import json "github.com/json-iterator/go"
+import (
+	"encoding/json"
+	"github.com/tidwall/gjson"
+)
 
 func JSONGetString(data []byte, field string, defaultValue string) string {
-	if s := json.Get(data, field); s.ValueType() == json.StringValue {
-		return s.ToString()
+	if s := gjson.GetBytes(data, field); s.Type == gjson.String {
+		return s.String()
 	}
 	return defaultValue
 }
 
 func JSONGetBool(data []byte, field string, defaultValue bool) bool {
-	if b := json.Get(data, field); b.ValueType() == json.BoolValue {
-		return b.ToBool()
+	if b := gjson.GetBytes(data, field); b.Exists() {
+		return b.Bool()
 	}
 	return defaultValue
 }
 
 func JSONGetFloat64(data []byte, field string, defaultValue float64) float64 {
-	if f := json.Get(data, field); f.ValueType() == json.NumberValue {
-		return f.ToFloat64()
+	if f := gjson.GetBytes(data, field); f.Exists() {
+		return f.Float()
 	}
 	return defaultValue
 }
 
 func JSONGetUint64(data []byte, field string, def uint64) uint64 {
-	if f := json.Get(data, field); f.ValueType() == json.NumberValue {
-		return f.ToUint64()
+	if f := gjson.GetBytes(data, field); f.Exists() {
+		return f.Uint()
 	}
 	return def
 }
 
 func JSONGetMap(data []byte, field string) map[string]string {
 	var m map[string]string
-	if result := json.Get(data, field); result.LastError() == nil {
-		result.ToVal(&m)
-		if m != nil && len(m) > 0 {
+	if result := gjson.GetBytes(data, field); result.Exists() {
+		err := json.Unmarshal([]byte(result.Raw), &m)
+		if err == nil && m != nil && len(m) > 0 {
 			return m
 		}
 	}
@@ -42,8 +45,8 @@ func JSONGetMap(data []byte, field string) map[string]string {
 }
 
 func JSONGetInteger(data []byte, sep string) *Integer {
-	if v := json.Get(data, sep); v.LastError() == nil {
-		i := Integer(v.ToInt64())
+	if v := gjson.GetBytes(data, sep); v.Exists() {
+		i := Integer(v.Int())
 		return &i
 	}
 	return nil
@@ -51,12 +54,12 @@ func JSONGetInteger(data []byte, sep string) *Integer {
 
 func JSONGetArray(data []byte, field string) []string {
 	var arr []string
-	if result := json.Get(data, field); result.LastError() == nil {
-		result.ToVal(&arr)
-		if &arr != nil && len(arr) > 0 {
-			return arr
+	if result := gjson.GetBytes(data, field); result.Exists() {
+		list := result.Array()
+		for _, l := range list {
+			arr = append(arr, l.String())
 		}
-		return nil
+		return arr
 	}
 	return nil
 }

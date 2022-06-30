@@ -2,12 +2,12 @@ package proxy
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/fasthttp/websocket"
 	"github.com/galenliu/gateway/pkg/addon/manager"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
-	json "github.com/json-iterator/go"
 	"log"
 	"net/netip"
 	"time"
@@ -145,8 +145,8 @@ func (m *Manager) getDevice(deviceId string) DeviceProxy {
 
 func (m *Manager) OnMessage(data []byte) {
 
-	mt := json.Get(data, "messageType")
-	dataNode := json.Get(data, "data")
+	mt := gjson.GetBytes(data, "messageType")
+	dataNode := gjson.GetBytes(data, "data")
 	if mt.LastError() != nil || dataNode.LastError() != nil {
 		fmt.Printf("message unmarshal err: %s", data)
 		return
@@ -168,7 +168,7 @@ func (m *Manager) OnMessage(data []byte) {
 		return
 	}
 
-	adapterId := dataNode.Get("adapterId").ToString()
+	adapterId := dataNode.Get("adapterId").String()
 	adapter := m.getAdapter(adapterId)
 	if adapter == nil {
 		fmt.Printf("can not found adapter(%s) \t\n", adapterId)
@@ -224,7 +224,7 @@ func (m *Manager) OnMessage(data []byte) {
 		return
 	}
 
-	deviceId := dataNode.Get("deviceId").ToString()
+	deviceId := dataNode.Get("deviceId").String()
 	device := adapter.getDevice(deviceId)
 	if device == nil {
 		fmt.Printf("manager Onmessage: device %s not found \t\n", deviceId)

@@ -1,10 +1,11 @@
 package effects
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/rules_engine/state"
-	json "github.com/json-iterator/go"
+	"github.com/tidwall/gjson"
 )
 
 type Entity interface {
@@ -55,7 +56,7 @@ func FromDescription(a any, container container.Container) Entity {
 	if err != nil {
 		fmt.Printf("marshal error: %s\n", err.Error())
 	}
-	t := json.Get(data, "type").ToString()
+	t := gjson.GetBytes(data, "type").String()
 	switch t {
 	case TypeSetEffect:
 		var desc SetEffectDescription

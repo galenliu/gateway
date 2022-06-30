@@ -3,34 +3,13 @@ package udp_endpoint
 import (
 	"fmt"
 	"github.com/galenliu/gateway/pkg/errors"
-	"github.com/galenliu/gateway/pkg/matter/inet"
+	"github.com/galenliu/gateway/pkg/inet/IPPacket"
+	"github.com/galenliu/gateway/pkg/inet/Interface"
 	"github.com/galenliu/gateway/pkg/system"
-	"net"
 	"net/netip"
 )
 
 type State uint8
-
-type UDPEndpointImpl interface {
-	Close()
-	Bind(addr netip.Addr, port int, interfaceId inet.InterfaceId) error
-	Listen(funct OnMessageReceivedFunct, errorFunct OnReceiveErrorFunct, appState any) error
-	SendTo(addr netip.Addr, port int, handle *system.PacketBufferHandle, interfaceId inet.InterfaceId) error
-	SendMsg(pktInfo *inet.IPPacketInfo, msg *system.PacketBufferHandle) error
-	LeaveMulticastGroup(interfaceId inet.InterfaceId, addr netip.Addr) error
-}
-
-type OnMessageReceivedFunct = func(*system.PacketBufferHandle, *inet.IPPacketInfo)
-type OnReceiveErrorFunct = func(error, *inet.IPPacketInfo)
-
-type impl interface {
-	BindImpl(addr netip.Addr, port int, interfaceId inet.InterfaceId) error
-	SendMsgImpl(pktInfo *inet.IPPacketInfo, msg *system.PacketBufferHandle) error
-	IPv4JoinLeaveMulticastGroupImpl(aInterfaceId inet.InterfaceId, addr netip.Addr, b bool) error
-	IPv6JoinLeaveMulticastGroupImpl(aInterfaceId inet.InterfaceId, addr netip.Addr, b bool) error
-	ListenImpl() error
-	CloseImpl()
-}
 
 const (
 	kReady State = iota
@@ -39,8 +18,29 @@ const (
 	kClosed
 )
 
+type UDPEndpointImpl interface {
+	Close()
+	Bind(addr netip.Addr, port int, interfaceId Interface.Id) error
+	Listen(funct OnMessageReceivedFunct, errorFunct OnReceiveErrorFunct, appState any) error
+	SendTo(addr netip.Addr, port int, handle *system.PacketBufferHandle, interfaceId Interface.Id) error
+	SendMsg(pktInfo *IPPacket.Info, msg *system.PacketBufferHandle) error
+	LeaveMulticastGroup(interfaceId Interface.Id, addr netip.Addr) error
+}
+
+type OnMessageReceivedFunct = func(*system.PacketBufferHandle, *IPPacket.Info)
+type OnReceiveErrorFunct = func(error, *IPPacket.Info)
+
+type impl interface {
+	BindImpl(addr netip.Addr, port int, interfaceId Interface.Id) error
+	SendMsgImpl(pktInfo *IPPacket.Info, msg *system.PacketBufferHandle) error
+	IPv4JoinLeaveMulticastGroupImpl(aInterfaceId Interface.Id, addr netip.Addr, b bool) error
+	IPv6JoinLeaveMulticastGroupImpl(aInterfaceId Interface.Id, addr netip.Addr, b bool) error
+	ListenImpl() error
+	CloseImpl()
+}
+
 type UDPEndpoint struct {
-	mInterface net.Interface
+	mInterface Interface.Id
 	mAddr      netip.Addr
 	mPort      int
 	mState     State
@@ -57,7 +57,7 @@ func DefaultUDPEndpoint() *UDPEndpoint {
 	return up
 }
 
-func (e *UDPEndpoint) Bind(addr netip.Addr, port int, interfaceId inet.InterfaceId) error {
+func (e *UDPEndpoint) Bind(addr netip.Addr, port int, interfaceId Interface.Id) error {
 	if e.mState != kReady && e.mState != kBound {
 		return errors.IncorrectState("not ready or bound")
 	}
@@ -89,8 +89,8 @@ func (e *UDPEndpoint) Listen(funct OnMessageReceivedFunct, errorFunct OnReceiveE
 	return nil
 }
 
-func (e *UDPEndpoint) SendTo(addr netip.Addr, port int, msg *system.PacketBufferHandle, interfaceId inet.InterfaceId) error {
-	pktInfo := &inet.IPPacketInfo{
+func (e *UDPEndpoint) SendTo(addr netip.Addr, port int, msg *system.PacketBufferHandle, interfaceId Interface.Id) error {
+	pktInfo := &IPPacket.Info{
 		DestAddress: addr,
 		InterfaceId: interfaceId,
 		DestPort:    port,
@@ -98,24 +98,11 @@ func (e *UDPEndpoint) SendTo(addr netip.Addr, port int, msg *system.PacketBuffer
 	return e.SendMsg(pktInfo, msg)
 }
 
-func (e *UDPEndpoint) SendMsg(pktInfo *inet.IPPacketInfo, msg *system.PacketBufferHandle) error {
+func (e *UDPEndpoint) SendMsg(pktInfo *IPPacket.Info, msg *system.PacketBufferHandle) error {
 	return e.SendMsgImpl(pktInfo, msg)
 }
 
-func (e *UDPEndpoint) JoinMulticastGroup(interfaceId inet.InterfaceId, addr netip.Addr) error {
-	if !addr.IsMulticast() {
-		return fmt.Errorf("wrong address type")
-	}
-	if addr.Is4() {
-		return e.IPv4JoinLeaveMulticastGroupImpl(interfaceId, addr, true)
-	}
-	if addr.Is6() {
-		return e.IPv6JoinLeaveMulticastGroupImpl(interfaceId, addr, true)
-	}
-	return fmt.Errorf("wrong address type")
-}
-
-func (e *UDPEndpoint) LeaveMulticastGroup(interfaceId inet.InterfaceId, addr netip.Addr) error {
+func (e *UDPEndpoint) LeaveMulticastGroup(interfaceId Interface.Id, addr netip.Addr) error {
 	if !addr.IsMulticast() {
 		return fmt.Errorf("wrong address type")
 	}
@@ -134,4 +121,21 @@ func (e *UDPEndpoint) Close() {
 		e.CloseImpl()
 		e.mState = kClosed
 	}
+}
+
+func (e *UDPEndpoint) GetBoundInterface() Interface.Id {
+	return e.mInterface
+}
+
+func (e *UDPEndpoint) JoinMulticastGroup(interfaceId Interface.Id, addr netip.Addr) error {
+	if !addr.IsMulticast() {
+		return fmt.Errorf("wrong address type")
+	}
+	if addr.Is4() {
+		return e.IPv4JoinLeaveMulticastGroupImpl(interfaceId, addr, true)
+	}
+	if addr.Is6() {
+		return e.IPv6JoinLeaveMulticastGroupImpl(interfaceId, addr, true)
+	}
+	return fmt.Errorf("wrong address type")
 }

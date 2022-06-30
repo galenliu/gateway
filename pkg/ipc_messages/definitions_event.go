@@ -1,6 +1,6 @@
 package messages
 
-import json "github.com/json-iterator/go"
+import "encoding/json"
 
 type DeviceEvents map[string]Event
 

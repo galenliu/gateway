@@ -15,24 +15,23 @@ func (q QueryResponderAllocator) Clear() {
 	return
 }
 
-func (q *QueryResponderAllocator) AllocateHostQName(mac string, kLocalDomain string) *core.FullQName {
-	return &core.FullQName{
-		Mac:    mac,
-		Domain: kLocalDomain,
-	}
-}
-
-func (q *QueryResponderAllocator) AllocateQName(serviceType core.ServiceType, kCommissionProtocol core.Protocol, kLocalDomain string, instanceName ...string) *core.FullQName {
-	fName := &core.FullQName{
-		ServerType: serviceType,
-		Protocol:   kCommissionProtocol,
-		Domain:     kLocalDomain,
-	}
-	if instanceName != nil {
-		fName.Instance = instanceName[0]
-	}
-	return fName
-}
+//func (q *QueryResponderAllocator) AllocateHostQName(mac string, kLocalDomain string) *core.FullQName {
+//	return &core.FullQName{
+//		Domain: kLocalDomain,
+//	}
+//}
+//
+//func (q *QueryResponderAllocator) AllocateQName(serviceType core.ServiceType, kCommissionProtocol core.Protocol, kLocalDomain string, instanceName ...string) *core.FullQName {
+//	fName := &core.FullQName{
+//		ServerType: serviceType,
+//		Protocol:   kCommissionProtocol,
+//		Domain:     kLocalDomain,
+//	}
+//	if instanceName != nil {
+//		fName.Instance = instanceName[0]
+//	}
+//	return fName
+//}
 
 func (q *QueryResponderAllocator) GetQueryResponder() *responders.QueryResponderBase {
 	return q.mQueryResponder

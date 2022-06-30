@@ -4,7 +4,6 @@ import (
 	"github.com/galenliu/gateway/pkg/dnssd/core"
 	"github.com/galenliu/gateway/pkg/dnssd/core/QType"
 	"github.com/galenliu/gateway/pkg/dnssd/record"
-	"github.com/galenliu/gateway/pkg/matter/inet"
 )
 
 type PtrResponder struct {
@@ -25,7 +24,7 @@ func NewPtrResponder(qName *core.FullQName, target *core.FullQName) *PtrResponde
 	}
 }
 
-func (p *PtrResponder) AddAllResponses(info *inet.IPPacketInfo, delegate ResponderDelegate, configuration *ResponseConfiguration) {
+func (p *PtrResponder) AddAllResponses(info *IPPacket.Info, delegate ResponderDelegate, configuration *ResponseConfiguration) {
 	r := record.NewPtrResourceRecord(p.GetQName(), p.mTarget)
 	configuration.Adjust(r)
 	delegate.AddResponse(r)
