@@ -36,7 +36,6 @@ type Gateway struct {
 func NewGateway(ctx context.Context, config Config) (*Gateway, error) {
 
 	g := &Gateway{}
-
 	g.config = config
 	u := &messages.PluginRegisterResponseJsonDataUserProfile{
 		BaseDir:    g.config.BaseDir,

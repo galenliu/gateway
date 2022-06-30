@@ -3,7 +3,6 @@ module github.com/galenliu/gateway
 go 1.18
 
 require (
-	github.com/brutella/dnssd v1.2.2
 	github.com/brutella/hap v0.0.14
 	github.com/fasthttp/websocket v1.5.1-rc.4
 	github.com/gofiber/fiber/v2 v2.34.1
@@ -31,6 +30,7 @@ require (
 require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/brutella/dnssd v1.2.2 // indirect
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
