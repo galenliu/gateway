@@ -8,6 +8,7 @@ import (
 	"github.com/galenliu/gateway/pkg/addon/manager"
 	"github.com/galenliu/gateway/pkg/addon/properties"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
+	"github.com/tidwall/gjson"
 	"log"
 	"net/netip"
 	"time"
@@ -143,21 +144,23 @@ func (m *Manager) getDevice(deviceId string) DeviceProxy {
 	return nil
 }
 
-func (m *Manager) OnMessage(data []byte) {
+func (m *Manager) OnMessage(byt []byte) {
 
-	mt := gjson.GetBytes(data, "messageType")
-	dataNode := gjson.GetBytes(data, "data")
-	if mt.LastError() != nil || dataNode.LastError() != nil {
+	mt := gjson.GetBytes(byt, "messageType")
+	data := gjson.GetBytes(byt, "data")
+
+	if !mt.Exists() || !data.Exists() || mt.Type != gjson.Number {
 		fmt.Printf("message unmarshal err: %s", data)
 		return
 	}
-	messageType := messages.MessageType(mt.ToInt())
+
+	messageType := messages.MessageType(mt.Uint())
 	switch messageType {
 	case messages.MessageType_PluginUnloadRequest:
 		var msg messages.PluginUnloadRequestJsonData
-		dataNode.ToVal(&msg)
-		if dataNode.LastError() != nil {
-			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
+		err := json.Unmarshal(byt[data.Index:data.Index+len(data.Raw)], &msg)
+		if err != nil {
+			fmt.Printf("message unmarshal err:%s", err.Error())
 			return
 		}
 		m.send(messages.MessageType_PluginUnloadResponse, messages.PluginUnloadResponseJsonData{PluginId: msg.PluginId})
@@ -168,7 +171,7 @@ func (m *Manager) OnMessage(data []byte) {
 		return
 	}
 
-	adapterId := dataNode.Get("adapterId").String()
+	adapterId := data.Get("adapterId").String()
 	adapter := m.getAdapter(adapterId)
 	if adapter == nil {
 		fmt.Printf("can not found adapter(%s) \t\n", adapterId)
@@ -177,9 +180,9 @@ func (m *Manager) OnMessage(data []byte) {
 	switch messageType {
 	case messages.MessageType_AdapterStartPairingCommand:
 		var msg messages.AdapterStartPairingCommandJsonData
-		dataNode.ToVal(&msg)
-		if dataNode.LastError() != nil {
-			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
+		err := json.Unmarshal(byt[data.Index:data.Index+len(data.Raw)], &msg)
+		if err != nil {
+			fmt.Printf("message unmarshal err:%s", err.Error())
 			return
 		}
 		go adapter.StartPairing(time.After(time.Duration(msg.Timeout) * time.Millisecond))
@@ -187,9 +190,9 @@ func (m *Manager) OnMessage(data []byte) {
 
 	case messages.MessageType_AdapterCancelPairingCommand:
 		var msg messages.AdapterCancelPairingCommandJsonData
-		dataNode.ToVal(&msg)
-		if dataNode.LastError() != nil {
-			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
+		err := json.Unmarshal(byt[data.Index:data.Index+len(data.Raw)], &msg)
+		if err != nil {
+			fmt.Printf("message unmarshal err:%s", err.Error())
 			return
 		}
 		go adapter.CancelPairing()
@@ -197,9 +200,9 @@ func (m *Manager) OnMessage(data []byte) {
 
 	case messages.MessageType_AdapterUnloadRequest:
 		var msg messages.AdapterUnloadRequestJsonData
-		dataNode.ToVal(&msg)
-		if dataNode.LastError() != nil {
-			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
+		err := json.Unmarshal(byt[data.Index:data.Index+len(data.Raw)], &msg)
+		if err != nil {
+			fmt.Printf("message unmarshal err:%s", err.Error())
 			return
 		}
 		go adapter.unload()
@@ -215,16 +218,16 @@ func (m *Manager) OnMessage(data []byte) {
 
 	case messages.MessageType_DeviceSavedNotification:
 		var msg messages.DeviceSavedNotificationJsonData
-		dataNode.ToVal(&msg)
-		if dataNode.LastError() != nil {
-			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
+		err := json.Unmarshal(byt[data.Index:data.Index+len(data.Raw)], &msg)
+		if err != nil {
+			fmt.Printf("message unmarshal err:%s", err.Error())
 			return
 		}
 		go adapter.HandleDeviceSaved(msg)
 		return
 	}
 
-	deviceId := dataNode.Get("deviceId").String()
+	deviceId := data.Get("deviceId").String()
 	device := adapter.getDevice(deviceId)
 	if device == nil {
 		fmt.Printf("manager Onmessage: device %s not found \t\n", deviceId)
@@ -233,9 +236,9 @@ func (m *Manager) OnMessage(data []byte) {
 	switch messageType {
 	case messages.MessageType_AdapterCancelRemoveDeviceCommand:
 		var msg messages.AdapterCancelRemoveDeviceCommandJsonData
-		dataNode.ToVal(&msg)
-		if dataNode.LastError() != nil {
-			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
+		err := json.Unmarshal(byt[data.Index:data.Index+len(data.Raw)], &msg)
+		if err != nil {
+			fmt.Printf("message unmarshal err:%s", err.Error())
 			return
 		}
 		go adapter.CancelRemoveThing(msg.DeviceId)
@@ -243,9 +246,9 @@ func (m *Manager) OnMessage(data []byte) {
 
 	case messages.MessageType_AdapterRemoveDeviceRequest:
 		var msg messages.AdapterRemoveDeviceRequestJsonData
-		dataNode.ToVal(&msg)
-		if dataNode.LastError() != nil {
-			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
+		err := json.Unmarshal(byt[data.Index:data.Index+len(data.Raw)], &msg)
+		if err != nil {
+			fmt.Printf("message unmarshal err:%s", err.Error())
 			return
 		}
 		go func() {
@@ -256,9 +259,9 @@ func (m *Manager) OnMessage(data []byte) {
 
 	case messages.MessageType_DeviceSetPropertyCommand:
 		var msg messages.DeviceSetPropertyCommandJsonData
-		dataNode.ToVal(&msg)
-		if dataNode.LastError() != nil {
-			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
+		err := json.Unmarshal(byt[data.Index:data.Index+len(data.Raw)], &msg)
+		if err != nil {
+			fmt.Printf("message unmarshal err:%s", err.Error())
 			return
 		}
 		prop := device.GetProperty(msg.PropertyName)
@@ -362,9 +365,9 @@ func (m *Manager) OnMessage(data []byte) {
 
 	case messages.MessageType_DeviceSetPinRequest:
 		var msg messages.DeviceSetPinRequestJsonData
-		dataNode.ToVal(&msg)
-		if dataNode.LastError() != nil {
-			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
+		err := json.Unmarshal(byt[data.Index:data.Index+len(data.Raw)], &msg)
+		if err != nil {
+			fmt.Printf("message unmarshal err:%s", err.Error())
 			return
 		}
 		handleFunc := func() {
@@ -387,9 +390,9 @@ func (m *Manager) OnMessage(data []byte) {
 
 	case messages.MessageType_DeviceSetCredentialsRequest:
 		var msg messages.DeviceSetCredentialsRequestJsonData
-		dataNode.ToVal(&msg)
-		if dataNode.LastError() != nil {
-			fmt.Printf("message unmarshal err:%s", dataNode.LastError().Error())
+		err := json.Unmarshal(byt[data.Index:data.Index+len(data.Raw)], &msg)
+		if err != nil {
+			fmt.Printf("message unmarshal err:%s", err.Error())
 			return
 		}
 		handleFunc := func() {

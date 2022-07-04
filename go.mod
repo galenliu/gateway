@@ -5,12 +5,14 @@ go 1.18
 require (
 	github.com/brutella/hap v0.0.14
 	github.com/fasthttp/websocket v1.5.1-rc.4
+	github.com/goccy/go-json v0.9.8
 	github.com/gofiber/fiber/v2 v2.34.1
 	github.com/gofiber/websocket/v2 v2.0.14
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/kardianos/service v1.2.0
 	github.com/mattn/go-sqlite3 v1.14.12
 	github.com/melbahja/got v0.6.1
+	github.com/miekg/dns v1.1.46
 	github.com/oherych/yeelight v0.1.0
 	github.com/prometheus/client_golang v1.11.0
 	github.com/robfig/cron v1.2.0
@@ -41,7 +43,6 @@ require (
 	github.com/klauspost/compress v1.15.0 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
-	github.com/miekg/dns v1.1.46 // indirect
 	github.com/mitchellh/mapstructure v1.4.2 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect

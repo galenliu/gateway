@@ -1,6 +1,6 @@
 package messages
 
-type MessageType int32
+type MessageType uint64
 
 const (
 	MessageType_PluginRegisterRequest              MessageType = 0
