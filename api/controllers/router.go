@@ -1,13 +1,13 @@
 package controllers
 
 import (
+	"github.com/galenliu/gateway/addon"
 	"github.com/galenliu/gateway/api/middleware"
 	"github.com/galenliu/gateway/api/models"
 	things "github.com/galenliu/gateway/api/models/container"
 	"github.com/galenliu/gateway/pkg/constant"
 	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/rules_engine"
-	"github.com/galenliu/gateway/plugin"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -41,7 +41,7 @@ type Router struct {
 	logger    log.Logger
 }
 
-func NewRouter(addonUrls []string, manager *plugin.Manager, store Storage) *Router {
+func NewRouter(addonUrls []string, manager *addon.Manager, store Storage) *Router {
 
 	//router init
 	app := Router{}

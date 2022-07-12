@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	optionNameDataDir            = "data-dir"
+	optionNameDataDir            = "config"
 	optionNameMediaDir           = "media-dir"
 	optionNameLogDir             = "log-dir"
 	optionNameVerbosity          = "verbosity"
@@ -30,8 +30,6 @@ const (
 	optionNameHttpsPort          = "https-port"
 	optionNameAddonUrls          = "addon-urls"
 	optionLogRotateDays          = "log-rotate-days"
-	optionHomeKitPin             = "hk-pin"
-	optionHomeKitEnable          = "homekit-enable"
 	OptionVerbose                = "verbose"
 )
 
@@ -168,18 +166,13 @@ func (c *command) setAllFlags(cmd *cobra.Command) {
 	cmd.Flags().Bool(optionNameDBRemoveBeforeOpen, false, "remove db before open")
 	cmd.Flags().String(optionNameVerbosity, "trace", "log verbosity level 0=silent, 1=error, 2=warn, 3=info, 4=debug, 5=trace")
 	cmd.Flags().StringArray(optionNameAddonUrls, []string{"https://api.webthings.io:8443/addons"}, "addon urls")
-
 	cmd.Flags().Int(optionNameAPIPort, 9090, "HTTP API listen address")
 	cmd.Flags().Int(optionNameHttpPort, 9090, "http port")
 	cmd.Flags().Int(optionNameHttpsPort, 4443, "https port")
 	cmd.Flags().Bool(OptionVerbose, true, "logger OptionVerbose")
-
 	cmd.Flags().Int(optionNameIpcPort, 9500, "ipc port")
 	cmd.Flags().Int(optionNameRpcPort, 9600, "rpc port")
-
 	cmd.Flags().Int(optionLogRotateDays, 7, "log rotate days")
-	cmd.Flags().String(optionHomeKitPin, "12344321", "homekit pin")
-	cmd.Flags().Bool(optionHomeKitEnable, true, "homekit enable")
 }
 
 func newLogger(cmd *cobra.Command, verbosity string) (log.Logger, error) {

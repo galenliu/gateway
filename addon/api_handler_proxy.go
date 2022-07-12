@@ -1,4 +1,4 @@
-package plugin
+package addon
 
 type ApiHandler struct {
 	ID string

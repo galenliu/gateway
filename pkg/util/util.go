@@ -9,7 +9,6 @@ import (
 	"io"
 	"io/ioutil"
 	"math/rand"
-	"net"
 	"os"
 	"os/exec"
 	"runtime"
@@ -178,8 +177,8 @@ func ConditionFunc[T any](c bool, a, b func() T) T {
 	return b()
 }
 
-func GenerateMac() net.HardwareAddr {
-	var mac net.HardwareAddr
+func GenerateMac() string {
+	var mac string
 	buf := make([]byte, 6)
 	for i := 0; i < 10; i++ {
 		_, err := rand.Read(buf)
@@ -188,8 +187,7 @@ func GenerateMac() net.HardwareAddr {
 			break
 		}
 		buf[0] |= 2
-		s := fmt.Sprintf("%02x%02x%02x%02x%02x%02x", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5])
-		mac, _ = net.ParseMAC(strings.ToUpper(s))
+		mac = fmt.Sprintf("%02X%02X%02X%02X%02X%02X", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5])
 	}
 	return mac
 }

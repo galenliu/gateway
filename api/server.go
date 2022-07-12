@@ -2,9 +2,9 @@ package api
 
 import (
 	"context"
+	"github.com/galenliu/gateway/addon"
 	"github.com/galenliu/gateway/api/controllers"
 	"github.com/galenliu/gateway/pkg/log"
-	"github.com/galenliu/gateway/plugin"
 )
 
 type Config struct {
@@ -22,7 +22,7 @@ type WebServe struct {
 	options Config
 }
 
-func NewServe(ctx context.Context, config Config, addonManager *plugin.Manager, store controllers.Storage) *WebServe {
+func NewServe(ctx context.Context, config Config, addonManager *addon.Manager, store controllers.Storage) *WebServe {
 	sev := &WebServe{}
 	sev.options = config
 	sev.Router = controllers.NewRouter(config.AddonUrls, addonManager, store)

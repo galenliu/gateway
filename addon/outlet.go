@@ -1,4 +1,4 @@
-package plugin
+package addon
 
 type Outlet struct {
 	Id   string `json:"id"`

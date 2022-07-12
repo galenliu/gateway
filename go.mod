@@ -5,8 +5,7 @@ go 1.18
 require (
 	github.com/brutella/hap v0.0.14
 	github.com/fasthttp/websocket v1.5.1-rc.4
-	github.com/goccy/go-json v0.9.8
-	github.com/gofiber/fiber/v2 v2.34.1
+	github.com/gofiber/fiber/v2 v2.35.0
 	github.com/gofiber/websocket/v2 v2.0.14
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/kardianos/service v1.2.0
@@ -59,7 +58,7 @@ require (
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.37.0 // indirect
+	github.com/valyala/fasthttp v1.38.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect

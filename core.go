@@ -2,12 +2,12 @@ package gateway
 
 import (
 	"context"
+	"github.com/galenliu/gateway/addon"
 	"github.com/galenliu/gateway/api"
 	"github.com/galenliu/gateway/pkg/db"
 	messages "github.com/galenliu/gateway/pkg/ipc_messages"
 	"github.com/galenliu/gateway/pkg/log"
 	"github.com/galenliu/gateway/pkg/util"
-	"github.com/galenliu/gateway/plugin"
 	"path"
 	"time"
 )
@@ -22,29 +22,24 @@ type Config struct {
 	HttpAddr         string
 	HttpsAddr        string
 	LogRotateDays    int
-	HomeKitPin       string
-	HomeKitEnable    bool
 }
 
 type Gateway struct {
-	config       Config
-	addonManager *plugin.Manager
+	addonManager *addon.Manager
 	sever        *api.WebServe
 	logger       log.Logger
 }
 
 func NewGateway(ctx context.Context, config Config) (*Gateway, error) {
-
 	g := &Gateway{}
-	g.config = config
 	u := &messages.PluginRegisterResponseJsonDataUserProfile{
-		BaseDir:    g.config.BaseDir,
-		DataDir:    path.Join(g.config.BaseDir, "data"),
-		AddonsDir:  path.Join(g.config.BaseDir, "addons"),
-		ConfigDir:  path.Join(g.config.BaseDir, "config"),
-		MediaDir:   path.Join(g.config.BaseDir, "media"),
-		LogDir:     path.Join(g.config.BaseDir, "log"),
-		GatewayDir: g.config.BaseDir,
+		BaseDir:    config.BaseDir,
+		DataDir:    path.Join(config.BaseDir, "data"),
+		AddonsDir:  path.Join(config.BaseDir, "addons"),
+		ConfigDir:  path.Join(config.BaseDir, "config"),
+		MediaDir:   path.Join(config.BaseDir, "media"),
+		LogDir:     path.Join(config.BaseDir, "log"),
+		GatewayDir: config.BaseDir,
 	}
 	log.Infof("userprofile: %v ", util.JsonIndent(u))
 
@@ -63,7 +58,7 @@ func NewGateway(ctx context.Context, config Config) (*Gateway, error) {
 	log.Info("database init.")
 
 	//Addon manager init
-	g.addonManager = plugin.NewAddonsManager(ctx, plugin.Config{
+	g.addonManager = addon.NewAddonsManager(ctx, addon.Config{
 		UserProfile: u,
 		AddonsDir:   u.AddonsDir,
 		IPCPort:     config.IPCPort,
@@ -73,13 +68,13 @@ func NewGateway(ctx context.Context, config Config) (*Gateway, error) {
 
 	// Web service init
 	g.sever = api.NewServe(ctx, api.Config{
-		HttpAddr:    g.config.HttpAddr,
-		HttpsAddr:   g.config.HttpsAddr,
-		AddonUrls:   g.config.AddonUrls,
-		StaticDir:   path.Join(g.config.BaseDir, "static"),
-		TemplateDir: path.Join(g.config.BaseDir, "template"),
-		UploadDir:   path.Join(g.config.BaseDir, "upload"),
-		LogDir:      path.Join(g.config.BaseDir, "log"),
+		HttpAddr:    config.HttpAddr,
+		HttpsAddr:   config.HttpsAddr,
+		AddonUrls:   config.AddonUrls,
+		StaticDir:   path.Join(config.BaseDir, "static"),
+		TemplateDir: path.Join(config.BaseDir, "template"),
+		UploadDir:   path.Join(config.BaseDir, "upload"),
+		LogDir:      path.Join(config.BaseDir, "log"),
 	}, g.addonManager, storage)
 	return g, nil
 }

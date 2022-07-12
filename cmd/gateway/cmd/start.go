@@ -60,8 +60,6 @@ func (c *command) initStartCmd() (err error) {
 				HttpAddr:         ":" + strconv.Itoa(c.config.GetInt(optionNameHttpPort)),
 				HttpsAddr:        ":" + strconv.Itoa(c.config.GetInt(optionNameHttpsPort)),
 				LogRotateDays:    c.config.GetInt(optionLogRotateDays),
-				HomeKitPin:       c.config.GetString(optionHomeKitPin),
-				HomeKitEnable:    c.config.GetBool(optionHomeKitEnable),
 			})
 			if err != nil {
 				cancelFunc()

@@ -8,7 +8,7 @@ import (
 func (c *command) initConfiguratorOptionsCmd() (err error) {
 
 	cmd := &cobra.Command{
-		Use:   "print config",
+		Use:   "print-config",
 		Short: "Print default or provided configuration in yaml format",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
