@@ -5,7 +5,6 @@
 package log
 
 import (
-	m "github.com/galenliu/gateway/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 )
@@ -21,46 +20,46 @@ type metrics struct {
 	TraceCount prometheus.Counter
 }
 
-func newMetrics() metrics {
-	subsystem := "log"
-
-	return metrics{
-		ErrorCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "error_count",
-			Help:      "Number ERROR log messages.",
-		}),
-		WarnCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "warn_count",
-			Help:      "Number WARN log messages.",
-		}),
-		InfoCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "info_count",
-			Help:      "Number INFO log messages.",
-		}),
-		DebugCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "debug_count",
-			Help:      "Number DEBUG log messages.",
-		}),
-		TraceCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "trace_count",
-			Help:      "Number TRACE log messages.",
-		}),
-	}
-}
-
-func (l *logger) Metrics() []prometheus.Collector {
-	return m.PrometheusCollectorsFromFields(l.metrics)
-}
+//func newMetrics() metrics {
+//	subsystem := "log"
+//
+//	return metrics{
+//		ErrorCount: prometheus.NewCounter(prometheus.CounterOpts{
+//			Namespace: m.Namespace,
+//			Subsystem: subsystem,
+//			Name:      "error_count",
+//			Help:      "Number ERROR log messages.",
+//		}),
+//		WarnCount: prometheus.NewCounter(prometheus.CounterOpts{
+//			Namespace: m.Namespace,
+//			Subsystem: subsystem,
+//			Name:      "warn_count",
+//			Help:      "Number WARN log messages.",
+//		}),
+//		InfoCount: prometheus.NewCounter(prometheus.CounterOpts{
+//			Namespace: m.Namespace,
+//			Subsystem: subsystem,
+//			Name:      "info_count",
+//			Help:      "Number INFO log messages.",
+//		}),
+//		DebugCount: prometheus.NewCounter(prometheus.CounterOpts{
+//			Namespace: m.Namespace,
+//			Subsystem: subsystem,
+//			Name:      "debug_count",
+//			Help:      "Number DEBUG log messages.",
+//		}),
+//		TraceCount: prometheus.NewCounter(prometheus.CounterOpts{
+//			Namespace: m.Namespace,
+//			Subsystem: subsystem,
+//			Name:      "trace_count",
+//			Help:      "Number TRACE log messages.",
+//		}),
+//	}
+//}
+//
+//func (l *logger) Metrics() []prometheus.Collector {
+//	return m.PrometheusCollectorsFromFields(l.metrics)
+//}
 
 func (m metrics) Levels() []logrus.Level {
 	return []logrus.Level{

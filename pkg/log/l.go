@@ -53,11 +53,11 @@ func New(w io.Writer, level logrus.Level) Logger {
 	//l.Formatter = &logrus.JSONFormatter{}
 	l.SetOutput(ansicolor.NewAnsiColorWriter(w))
 	//l.SetReportCaller(true)
-	metrics := newMetrics()
-	l.AddHook(metrics)
+	//metrics := newMetrics()
+	//l.AddHook(metrics)
 	log = &logger{
-		Logger:  l,
-		metrics: metrics,
+		Logger: l,
+		//metrics: metrics,
 	}
 	return log
 }
