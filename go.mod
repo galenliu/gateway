@@ -3,7 +3,6 @@ module github.com/galenliu/gateway
 go 1.19
 
 require (
-	github.com/brutella/hap v0.0.14
 	github.com/fasthttp/websocket v1.5.1-rc.4
 	github.com/gofiber/fiber/v2 v2.35.0
 	github.com/gofiber/websocket/v2 v2.0.14
@@ -13,7 +12,6 @@ require (
 	github.com/melbahja/got v0.6.1
 	github.com/miekg/dns v1.1.46
 	github.com/oherych/yeelight v0.1.0
-	github.com/prometheus/client_golang v1.11.0
 	github.com/robfig/cron v1.2.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/shiena/ansicolor v0.0.0-20200904210342-c7312218db18
@@ -23,7 +21,6 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/tidwall/gjson v1.14.1
 	github.com/xiam/to v0.0.0-20200126224905-d60d31e03561
-	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
 	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )
